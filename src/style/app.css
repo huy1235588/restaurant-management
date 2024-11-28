@@ -1,0 +1,415 @@
+/*=========================================================
+Author       : LeThienHuy.
+==============================================================*/
+
+/*=============================================================
+    CSS INDEX
+  =============================
+    01.GENERAL STYLE
+    02.HEADER STYLE
+	03.MENU MAIN
+	04.SUBMENU
+	05.SUBMENU INSIDE
+	06.SIGN IN
+	07.MENU TRAY
+	08.BANNER
+	09.SECTION NEW GAME
+	10.SECTION TRENDING
+    11.SECTION BROWSE
+	13.FOOTER STYLE
+		
+*=============================================================*/
+/*===================================*
+    01.START GENERAL
+*===================================*/
+/* Color */
+:root {
+    --brown: #8d6e63;
+    --white-cream: #f5f5dc;
+    --white: #fff;
+    --gray: #e0e0e0;
+    --yellow: #020202;
+
+    /* --header-bg: #266A29; */
+    --body-bg: #d9d9d9;
+    --body-bg: #1b2838;
+    --header-bg: #393939;
+
+    /* Form */
+    --button-bg: #0074e4;
+    --button-bg-hover: #3b90e0;
+}
+
+.main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-left: 12rem;
+    transition: padding-left 0.3s ease-in-out;
+}
+
+aside.expanded ~ main {
+    padding-left: 1rem;
+}
+
+.main-title {
+    margin: 30px 0;
+}
+
+.section-title {
+    margin: 20px 0;
+}
+/*===================================*
+    01.START GENERAL
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    0.START FORM
+*===================================*/
+.form {
+    display: flex;
+    flex-direction: column;
+    margin: auto 0;
+    width: 100%;
+    height: 90%;
+    padding: 20px 48px;
+    background-color: var(--form-bg);
+}
+
+.form input {
+    width: 100%;
+    padding: 20px;
+    margin-bottom: 10px;
+    border: 1px solid #5f5f5f;
+    border-radius: 10px;
+    font-size: 16px;
+    background-color: transparent;
+    transition: all 0.4s;
+}
+
+.submit-form {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.submit-btn {
+    width: 100px;
+    height: 60px;
+    border-radius: 10px;
+    background-color: var(--button-bg);
+    color: #fff;
+    transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+    background-color: var(--button-bg-hover);
+}
+/*===================================*
+    05.END FORM
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    05.START TABLE STATUS
+*===================================*/
+.main-ts {
+    width: 100%;
+    margin: 0 3%;
+}
+
+.ts-section {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.ts-list {
+    /* border: 1px solid red; */
+    width: 30%;
+}
+
+.ts-list h2 {
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.ts-available-title {
+    background-color: rgb(25, 112, 13);
+}
+
+.ts-has-customer-title {
+    background-color: rgb(179, 14, 14);
+}
+
+.ts-reserved-title {
+    color: black;
+    background-color: rgb(251, 255, 35);
+}
+
+.ts-item {
+    padding: 10px;
+    margin-bottom: 30px;
+    background-color: #2c1177;
+
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.1s ease-in-out;
+    user-select: none;
+}
+
+.ts-item:hover {
+    background-color: #2c11777e;
+}
+/*===================================*
+    05.END TABLE STATUS
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    05.START ORDER DETAIL
+*===================================*/
+.main-order {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: normal;
+    width: 100%;
+    margin: 0 3%;
+    user-select: none;
+}
+
+.main-order .mf-section {
+    width: 52%;
+}
+
+.main-order .cart-section {
+    width: 45%;
+}
+/*===================================*
+    05.END ORDER DETAIL
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    05.START MENU FOOD
+*===================================*/
+.mf-section {
+    position: relative;
+    max-height: 100vh;
+}
+
+.mf-section .table-container {
+    max-height: 71%;
+    overflow: auto;
+    margin-top: 20px;
+}
+
+/* Search */
+.mf-form {
+    flex-direction: row;
+    width: auto;
+    height: auto;
+    padding: 0;
+}
+
+.mf-form .mf-input-form {
+    margin: 0 30px 0 0;
+    padding: 10px 20px;
+    font-size: 20px;
+}
+
+.mf-submit-btn {
+    width: 100px;
+    height: auto;
+}
+
+/* List Menu */
+.mf-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.mf-table th,
+.mf-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.mf-table td:last-child {
+    width: 100px;
+}
+
+.mf-table th {
+    background-color: #7c26cc;
+    color: white;
+    font-weight: bold;
+}
+
+.mf-table thead th {
+    position: sticky;
+    top: -1;
+    z-index: 1;
+    padding: 2px 8px;
+}
+
+.quantity-input {
+    width: 60px;
+    text-align: center;
+}
+
+.add-to-cart-btn {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 5px 7px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.add-to-cart-btn:hover {
+    background-color: #45a049;
+}
+/*===================================*
+    05.END MENU FOOD
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    05.START CART ORDER
+*===================================*/
+.cart-section {
+    position: relative;
+    max-height: 100vh;
+}
+
+.cart-section .table-container {
+    max-height: 57%;
+    overflow: auto;
+    margin-top: 20px;
+}
+
+.cart-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.cart-table th,
+.cart-table td {
+    border: 1px solid #ddd;
+    padding: 6px 8px;
+    text-align: left;
+}
+
+.cart-table td:last-child {
+    width: 80px;
+}
+
+.cart-table th {
+    background-color: #7c26cc;
+    color: white;
+    font-weight: bold;
+}
+
+.cart-table thead th {
+    position: sticky;
+    top: -1;
+    z-index: 1;
+    padding: 2px 8px;
+}
+
+.delete-card-btn {
+    background-color: #af4c4c;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.delete-card-btn:hover {
+    background-color: #a04545;
+}
+
+/* Total cart */
+.cart-total {
+    margin: 10px 0;
+    font-size: 25px;
+}
+
+.pay-bill-btn {
+    background-color: #4c6baf;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+/*===================================*
+    05.END CART ORDER
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/

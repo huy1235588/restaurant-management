@@ -3,10 +3,6 @@ import styles from "./page.module.css";
 import Link from "next/link";
 
 export default function Home() {
-    if (typeof window === 'undefined') {
-        console.log("Client");
-    }
-
     return (
         <div className={styles.page}>
             <main className={styles.main}>

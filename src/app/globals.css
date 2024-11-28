@@ -30,13 +30,55 @@ body {
     margin: 0;
 }
 
-a {
-    color: inherit;
-    text-decoration: none;
-}
-
 @media (prefers-color-scheme: dark) {
     html {
         color-scheme: dark;
     }
+}
+
+body .theme-toggle-button {
+    position: absolute;
+    top: 5%;
+    right: 1%;
+    min-width: 20px;
+    padding: 10px;
+}
+
+body .theme-toggle-button .MuiButton-icon {
+   margin: 0;
+}
+
+/* General */
+a,
+ul,
+li {
+    text-decoration: none;
+    list-style: none;
+    color: #fff;
+    padding: 0;
+    margin: 0;
+}
+
+button {
+    border: none;
+    margin: 0;
+    text-decoration: none;
+    background: none;
+    color: #fff;
+    cursor: pointer;
+}
+
+span {
+    width: auto;
+}
+
+.flex{
+    display: flex;
+}
+
+.toggle-aside{
+    position: absolute;
+    top: 4%;
+    left: 1%;
+    z-index: 11;
 }
