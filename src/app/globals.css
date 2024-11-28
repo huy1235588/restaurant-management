@@ -39,7 +39,7 @@ body {
 body .theme-toggle-button {
     position: absolute;
     top: 5%;
-    right: 1%;
+    right: 2%;
     min-width: 20px;
     padding: 10px;
 }

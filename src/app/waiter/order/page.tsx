@@ -1,24 +1,12 @@
 'use client'
 
-import ThemeToggleButton from "@/components/themeToggleButton";
+import CartTable from "@/components/order/cartTable";
+import MenuFoodTable from "@/components/order/menuFoodTable";
 import "@/style/app.css";
+import { Cart, CartOrder, MenuFood, OrderStatus } from "@/types/types";
+import stompClient from "@/utils/socket";
 import { useSearchParams } from 'next/navigation';
-import { useState } from "react";
-
-interface MenuFood {
-    id: string;
-    itemName: string;
-    category: string;
-    price: number;
-}
-
-interface Cart {
-    id: string;
-    itemName: string;
-    quantity: number;
-    price: number;
-    total: number;
-}
+import { useEffect, useMemo, useState } from "react";
 
 const menuFoodData: MenuFood[] = [
     {
@@ -85,15 +73,20 @@ const menuFoodData: MenuFood[] = [
 
 const Order = () => {
     const searchParams = useSearchParams();
-    const tableId = searchParams.get("tableId");
-    const billId = searchParams.get("billId");
+    const tableId = useMemo(() => searchParams.get("tableId"), [searchParams]);
+    const billId = useMemo(() => searchParams.get("billId"), [searchParams]);
+
+    const [isSending, setIsSending] = useState(false);
 
     // State quản lý số lượng cho từng mục
     const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
     const [cart, setCart] = useState<Cart[]>([]);
 
     // Tính tổng tiền của giỏ hàng
-    const totalAmount = cart.reduce((total, item) => total + item.total, 0);
+    const totalAmount = useMemo(
+        () => cart.reduce((total, item) => total + item.total, 0),
+        [cart]
+    );
 
     // Xử lý thay đổi số lượng
     const handleQuantityChange = (id: string, value: number) => {
@@ -110,27 +103,89 @@ const Order = () => {
         setCart((prevCart) => {
             const existingItemIndex = prevCart.findIndex((cartItem) => cartItem.id === item.id);
 
+            // Nếu sản phẩm đã tồn tại trong giỏ hàng, cập nhật số lượng và tổng giá trị
             if (existingItemIndex !== -1) {
-                // Nếu sản phẩm đã tồn tại trong giỏ hàng, cập nhật số lượng và tổng giá trị
-                const updatedCart = [...prevCart];
-                const existingItem = updatedCart[existingItemIndex];
-                updatedCart[existingItemIndex] = {
-                    ...existingItem,
-                    quantity: existingItem.quantity + quantity,
-                    total: (existingItem.quantity + quantity) * item.price,
-                };
-                return updatedCart;
-            } else {
-                // Nếu sản phẩm chưa tồn tại trong giỏ hàng, thêm sản phẩm mới
-                return [...prevCart, { ...item, quantity, total: item.price * quantity }];
+                return prevCart.map((cartItem) =>
+                    cartItem.id === item.id
+                        ? {
+                            ...cartItem,
+                            quantity: cartItem.quantity + quantity,
+                            total: (cartItem.quantity + quantity) * item.price,
+                        }
+                        : cartItem
+                );
             }
+
+            return [
+                ...prevCart,
+                { ...item, quantity, status: 'pending', total: item.price * quantity },
+            ];
         });
     };
-
 
     // Xử lý xóa vào giỏ hàng
     const handleRemoveFromCart = (id: string) => {
         setCart((prevCart) => prevCart.filter((item) => item.id !== id));
+    };
+
+    // WebSocket xử lý kết nối và nhận trạng thái từ bếp
+    useEffect(() => {
+        stompClient.onConnect = () => {
+            // Lắng nghe trạng thái từ bếp
+            stompClient.subscribe('/topic/waiter', (message) => {
+                const statusUpdate: OrderStatus = JSON.parse(message.body);
+                
+                // console.log(statusUpdate.status)
+
+                // Cập nhật trạng thái trong giỏ hàng
+                setCart((prevCart) =>
+                    prevCart.map((item) =>
+                        item.id === statusUpdate.itemId
+                            ? { ...item, status: statusUpdate.status } // Cập nhật trạng thái
+                            : item
+                    )
+                );
+            });
+        };
+
+        stompClient.activate();
+
+        return () => {
+            stompClient.deactivate();
+        };
+    }, []);
+
+    // Hàm gửi order đến bếp
+    const handleSendToKitchen = async () => {
+        // Kiểm tra cart có rỗng
+        if (cart.length === 0) {
+            alert("Your cart is empty!");
+            return;
+        }
+
+        setIsSending(true);
+        try {
+            // Simulate response (fake data as an example)
+            const data: CartOrder[] = cart.map((item) => ({
+                tableId: tableId,
+                itemId: item.id,
+                itemName: item.itemName,
+                quantity: item.quantity,
+                timeSubmitted: new Date(),
+            }));
+
+            // Gửi cho bếp
+            stompClient.publish({
+                destination: "/app/order",
+                body: JSON.stringify(data),
+            });
+
+            // alert("Order sent to kitchen!");
+        } catch (error) {
+            console.error("Failed to send to kitchen:", error);
+        } finally {
+            setIsSending(false);
+        }
     };
 
     return (
@@ -150,48 +205,12 @@ const Order = () => {
 
                 {/* List Food */}
                 <div className="table-container">
-                    <table className="mf-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Item Name</th>
-                                <th>Category</th>
-                                <th>Price</th>
-                                <th>Quantity</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {menuFoodData.map((item) => (
-                                <tr key={item.id}>
-                                    <td>{item.id}</td>
-                                    <td>{item.itemName}</td>
-                                    <td>{item.category}</td>
-                                    <td>{item.price.toFixed(2)}</td>
-                                    <td>
-                                        <input
-                                            type="number"
-                                            min="1"
-                                            value={quantities[item.id] || 1}
-                                            max={1000}
-                                            onChange={(e) =>
-                                                handleQuantityChange(item.id, parseInt(e.target.value, 10))
-                                            }
-                                            className="quantity-input"
-                                        />
-                                    </td>
-                                    <td>
-                                        <button
-                                            className="add-to-cart-btn"
-                                            onClick={() => handleAddToCart(item)}
-                                        >
-                                            Add to Cart
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    <MenuFoodTable
+                        menuFoodData={menuFoodData}
+                        onAddToCart={handleAddToCart}
+                        onQuantityChange={handleQuantityChange}
+                        quantities={quantities}
+                    />
                 </div>
             </section>
 
@@ -205,37 +224,10 @@ const Order = () => {
 
                 {/* Content */}
                 <div className="table-container">
-                    <table className="cart-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Item Name</th>
-                                <th>Price</th>
-                                <th>Quantity</th>
-                                <th>Total Price</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {cart.map((item, index) => (
-                                <tr key={index}>
-                                    <td>{item.id}</td>
-                                    <td>{item.itemName}</td>
-                                    <td>{item.price.toFixed(2)}</td>
-                                    <td>{item.quantity}</td>
-                                    <td>{item.total.toFixed(2)}</td>
-                                    <td>
-                                        <button
-                                            className="delete-card-btn"
-                                            onClick={() => handleRemoveFromCart(item.id)}
-                                        >
-                                            Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    <CartTable
+                        cartData={cart}
+                        handleRemoveFromCart={handleRemoveFromCart}
+                    />
                 </div>
 
                 {/* Summary */}
@@ -243,14 +235,20 @@ const Order = () => {
                     <p><strong>Total: ${totalAmount.toFixed(2)}</strong></p>
                 </div>
 
+                {/* Gửi yêu cầu đến bếp */}
+                <button
+                    className="send-to-kitchen-btn"
+                    onClick={handleSendToKitchen}
+                    disabled={isSending}
+                >
+                    {isSending ? 'Sending...' : 'Send to Kitchen'}
+                </button>
+
                 {/* Button Pay Bill */}
                 <button className="pay-bill-btn" onClick={() => alert('Bill paid')}>
                     Pay Bill
                 </button>
             </section>
-
-            {/* Toggle theme */}
-            <ThemeToggleButton />
         </main>
     );
 };

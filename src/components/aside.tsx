@@ -1,4 +1,5 @@
 import '@/style/aside.css';
+import Link from 'next/link';
 import { IconType } from 'react-icons';
 import { AiOutlineHome } from 'react-icons/ai';
 import { FaTable } from 'react-icons/fa';
@@ -41,7 +42,7 @@ const Aside: React.FC<AsideProps> = ({
                                     key={index}
                                     className="sidebar-item-has-menu"
                                 >
-                                    <a
+                                    <Link
                                         className="sidebar-item-link sidebar-link"
                                         href={item.href}
                                     >
@@ -51,7 +52,7 @@ const Aside: React.FC<AsideProps> = ({
                                         <span className="sidebar-item-text">
                                             {item.text}
                                         </span>
-                                    </a>
+                                    </Link>
                                 </li>
                             ))}
                         </ul>

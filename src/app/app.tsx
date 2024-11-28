@@ -1,6 +1,7 @@
 'use client'
 
 import Aside from "@/components/aside";
+import ThemeToggleButton from "@/components/themeToggleButton";
 import { useState } from "react";
 import { FiSidebar } from "react-icons/fi";
 
@@ -24,6 +25,9 @@ export default function AppLayout({
                 className={`aside-content ${isExpanded ? 'expanded' : 'collapsed'}`}
             />
             {children}
+
+            {/* Toggle theme */}
+            <ThemeToggleButton />
         </>
     );
 }
