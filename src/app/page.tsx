@@ -75,6 +75,8 @@ export default function Home() {
                     />
                     Examples
                 </a>
+                <p>Socket URL: {process.env.NEXT_PUBLIC_SOCKET_URL}</p>
+
                 <a
                     href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
                     target="_blank"

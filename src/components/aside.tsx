@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { IconType } from 'react-icons';
 import { AiOutlineHome } from 'react-icons/ai';
 import { FaTable } from 'react-icons/fa';
+import { FaKitchenSet } from 'react-icons/fa6';
 
 interface AsideProps {
     className?: string;
@@ -24,6 +25,11 @@ const sidebarList: Sidebar[] = [
         icon: FaTable,
         text: "Table",
         href: "/waiter/table",
+    },
+    {
+        icon: FaKitchenSet,
+        text: "Kitchen",
+        href: "/kitchen",
     },
 ];
 
