@@ -1,7 +1,7 @@
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 
-const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL;
+const socketUrl = `${process.env.NEXT_PUBLIC_SERVER_URL}/websocket`;
 
 if (!socketUrl) {
     throw new Error("NEXT_PUBLIC_SOCKET_URL is not defined.");

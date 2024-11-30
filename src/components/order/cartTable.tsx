@@ -16,14 +16,14 @@ const CartTable: React.FC<Props> = ({ cartData, handleRemoveFromCart }) => (
                 <th>Price</th>
                 <th>Quantity</th>
                 <th>Total Price</th>
-                <th>status</th>
+                <th>Status</th>
                 <th>Action</th>
             </tr>
         </thead>
         <tbody>
             {cartData.map((item, index) => (
                 <tr key={index}>
-                    <td>{item.id}</td>
+                    <td>{item.itemId}</td>
                     <td>{item.itemName}</td>
                     <td>{item.price.toFixed(2)}</td>
                     <td>{item.quantity}</td>
@@ -32,7 +32,7 @@ const CartTable: React.FC<Props> = ({ cartData, handleRemoveFromCart }) => (
                     <td>
                         <button
                             className="delete-card-btn"
-                            onClick={() => handleRemoveFromCart(item.id)}
+                            onClick={() => handleRemoveFromCart(item.itemId)}
                         >
                             Delete
                         </button>

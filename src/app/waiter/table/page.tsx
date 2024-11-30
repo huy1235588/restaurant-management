@@ -1,7 +1,9 @@
 'use client';
 
 import "@/style/app.css";
+import axios from "@/config/axios";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface TsItem {
     tableId: number;
@@ -10,38 +12,12 @@ interface TsItem {
     status: "available" | "reserved" | "hasCustomer"
 }
 
-const TsItemData: TsItem[] = [
-    {
-        tableId: 3,
-        billId: 1,
-        capacity: 4,
-        status: "available"
-    },
-    {
-        tableId: 4,
-        billId: 2,
-        capacity: 2,
-        status: "reserved"
-    },
-    {
-        tableId: 1,
-        billId: 2,
-        capacity: 2,
-        status: "reserved"
-    },
-    {
-        tableId: 5,
-        billId: 3,
-        capacity: 4,
-        status: "hasCustomer"
-    }
-];
-
 const TableStatus = () => {
+    const [tsItemData, setTsItemData] = useState<TsItem[]>([])
     const router = useRouter(); // Khởi tạo router
 
     //  Nhóm các bảng theo status
-    const groupedData = TsItemData.reduce((acc, item) => {
+    const groupedData = tsItemData.reduce((acc, item) => {
         acc[item.status].push(item);
         return acc;
     }, {
@@ -53,6 +29,21 @@ const TableStatus = () => {
     const handleItemClick = (tableId: number, billId: number) => {
         router.push(`/waiter/order?tableId=${tableId}&billId=${billId}`);
     }
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get<TsItem[]>('/api/tablestatus/all');
+                setTsItemData(response.data);
+
+                console.log(tsItemData)
+            } catch (error) {
+                console.error('Failed to fetch menu food data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     return (
         <main className="main main-ts">

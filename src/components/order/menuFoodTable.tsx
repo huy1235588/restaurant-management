@@ -22,8 +22,8 @@ const MenuFoodTable: React.FC<Props> = ({ menuFoodData, quantities, onQuantityCh
         </thead>
         <tbody>
             {menuFoodData.map((item) => (
-                <tr key={item.id}>
-                    <td>{item.id}</td>
+                <tr key={item.itemId}>
+                    <td>{item.itemId}</td>
                     <td>{item.itemName}</td>
                     <td>{item.category}</td>
                     <td>{item.price.toFixed(2)}</td>
@@ -31,9 +31,9 @@ const MenuFoodTable: React.FC<Props> = ({ menuFoodData, quantities, onQuantityCh
                         <input
                             type="number"
                             min="1"
-                            value={quantities[item.id] || 1}
+                            value={quantities[item.itemId] || 1}
                             max={1000}
-                            onChange={(e) => onQuantityChange(item.id, parseInt(e.target.value, 10))}
+                            onChange={(e) => onQuantityChange(item.itemId, parseInt(e.target.value, 10))}
                             className="quantity-input"
                         />
                     </td>

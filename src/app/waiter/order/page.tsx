@@ -5,76 +5,15 @@ import MenuFoodTable from "@/components/order/menuFoodTable";
 import "@/style/app.css";
 import { Cart, CartOrder, MenuFood, OrderStatus } from "@/types/types";
 import stompClient from "@/utils/socket";
+import axios from "@/config/axios";
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from "react";
-
-const menuFoodData: MenuFood[] = [
-    {
-        id: "c1",
-        itemName: "Pizza Margherita",
-        category: "Food",
-        price: 8.5,
-    },
-    {
-        id: "c2",
-        itemName: "Spaghetti Carbonara",
-        category: "Food",
-        price: 12.0,
-    },
-    {
-        id: "c3",
-        itemName: "Coca Cola",
-        category: "Drink",
-        price: 2.5,
-    },
-    {
-        id: "c4",
-        itemName: "Tiramisu",
-        category: "Dessert",
-        price: 6.0,
-    },
-    {
-        id: "c5",
-        itemName: "Tiramisu",
-        category: "Dessert",
-        price: 6.0,
-    },
-    {
-        id: "c6",
-        itemName: "Tiramisu",
-        category: "Dessert",
-        price: 6.0,
-    },
-    {
-        id: "c7",
-        itemName: "Tiramisu",
-        category: "Dessert",
-        price: 6.0,
-    },
-    {
-        id: "c8",
-        itemName: "Tiramisu",
-        category: "Dessert",
-        price: 6.0,
-    },
-    {
-        id: "c9",
-        itemName: "Tiramisu",
-        category: "Dessert",
-        price: 6.0,
-    },
-    {
-        id: "c10",
-        itemName: "Tiramisu",
-        category: "Dessert",
-        price: 6.0,
-    },
-];
 
 const Order = () => {
     const searchParams = useSearchParams();
     const tableId = useMemo(() => searchParams.get("tableId"), [searchParams]);
     const billId = useMemo(() => searchParams.get("billId"), [searchParams]);
+    const [menuFoodData, setMenuFoodData] = useState<MenuFood[]>([]);
 
     const [isSending, setIsSending] = useState(false);
 
@@ -98,15 +37,15 @@ const Order = () => {
 
     // Xử lý thêm vào giỏ hàng
     const handleAddToCart = (item: MenuFood) => {
-        const quantity = quantities[item.id] || 1; // Số lượng mặc định là 1 nếu chưa chọn số lượng
+        const quantity = quantities[item.itemId] || 1; // Số lượng mặc định là 1 nếu chưa chọn số lượng
 
         setCart((prevCart) => {
-            const existingItemIndex = prevCart.findIndex((cartItem) => cartItem.id === item.id);
+            const existingItemIndex = prevCart.findIndex((cartItem) => cartItem.itemId === item.itemId);
 
             // Nếu sản phẩm đã tồn tại trong giỏ hàng, cập nhật số lượng và tổng giá trị
             if (existingItemIndex !== -1) {
                 return prevCart.map((cartItem) =>
-                    cartItem.id === item.id
+                    cartItem.itemId === item.itemId
                         ? {
                             ...cartItem,
                             quantity: cartItem.quantity + quantity,
@@ -118,14 +57,14 @@ const Order = () => {
 
             return [
                 ...prevCart,
-                { ...item, quantity, status: 'pending', total: item.price * quantity },
+                { ...item, itemId: item.itemId, quantity, status: 'pending', total: item.price * quantity },
             ];
         });
     };
 
     // Xử lý xóa vào giỏ hàng
     const handleRemoveFromCart = (id: string) => {
-        setCart((prevCart) => prevCart.filter((item) => item.id !== id));
+        setCart((prevCart) => prevCart.filter((item) => item.itemId !== id));
     };
 
     // WebSocket xử lý kết nối và nhận trạng thái từ bếp
@@ -134,13 +73,13 @@ const Order = () => {
             // Lắng nghe trạng thái từ bếp
             stompClient.subscribe('/topic/waiter', (message) => {
                 const statusUpdate: OrderStatus = JSON.parse(message.body);
-                
-                // console.log(statusUpdate.status)
+
+                console.log(statusUpdate.status)
 
                 // Cập nhật trạng thái trong giỏ hàng
                 setCart((prevCart) =>
                     prevCart.map((item) =>
-                        item.id === statusUpdate.itemId
+                        item.itemId === statusUpdate.itemId
                             ? { ...item, status: statusUpdate.status } // Cập nhật trạng thái
                             : item
                     )
@@ -168,7 +107,7 @@ const Order = () => {
             // Simulate response (fake data as an example)
             const data: CartOrder[] = cart.map((item) => ({
                 tableId: tableId,
-                itemId: item.id,
+                itemId: item.itemId,
                 itemName: item.itemName,
                 quantity: item.quantity,
                 timeSubmitted: new Date(),
@@ -180,13 +119,58 @@ const Order = () => {
                 body: JSON.stringify(data),
             });
 
-            // alert("Order sent to kitchen!");
+            const addToCart = async () => {
+                const response = await axios.post('/api/cart', cart.map((item) => ({
+                    tableId: tableId,
+                    itemId: item.itemId,
+                    quantity: item.quantity,
+                    status: item.status,
+                })));
+
+                alert(response.data);
+            }
+
+            addToCart();
+
         } catch (error) {
             console.error("Failed to send to kitchen:", error);
         } finally {
             setIsSending(false);
         }
     };
+
+    useEffect(() => {
+        try {
+            const fetchData = async () => {
+                const response = await axios.get<Cart[]>(`/api/cart/${tableId}`);
+
+                const updatedCart = response.data.map((item) => ({
+                    ...item,
+                    total: item.quantity * item.price,  // Tính total cho từng item
+                }));
+
+                setCart(updatedCart);
+            };
+
+            fetchData();
+        } catch (error) {
+            console.error('Failed to fetch cart data:', error);
+        }
+    }, [tableId])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get<MenuFood[]>('/api/menufood/all');
+                setMenuFoodData(response.data);
+
+            } catch (error) {
+                console.error('Failed to fetch menu food data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     return (
         <main className='main main-order'>

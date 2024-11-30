@@ -1,16 +1,16 @@
 // Order
 export interface MenuFood {
-    id: string;
+    itemId: string;
     itemName: string;
     category: string;
     price: number;
 }
 
 export interface Cart {
-    id: string;
+    itemId: string;
     itemName: string;
-    quantity: number;
     price: number;
+    quantity: number;
     status: 'pending' | 'cooking' | 'completed' | 'error';
     total: number;
 }
