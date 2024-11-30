@@ -110,7 +110,7 @@ const Order = () => {
                 itemId: item.itemId,
                 itemName: item.itemName,
                 quantity: item.quantity,
-                timeSubmitted: new Date(),
+                orderAt: new Date(),
             }));
 
             // Gửi cho bếp

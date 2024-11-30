@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS Cart (
     itemId int(11) NOT NULL,
     quantity INT NOT NULL,
     status VARCHAR(20) NOT NULL,
-    orderTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    orderAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (tableId) REFERENCES TableStatus(tableId),
     FOREIGN KEY (itemId) REFERENCES MenuFood(itemId),
     PRIMARY KEY (tableId, itemId)

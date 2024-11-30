@@ -20,7 +20,7 @@ export interface CartOrder{
     itemId: string;
     itemName: string;
     quantity: number;
-    timeSubmitted: Date;
+    orderAt: Date;
 }
 
 export interface OrderStatus {

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import stompClient from "../../utils/socket";
 import { CartOrder } from "@/types/types";
+import axios from "@/config/axios";
 
 export default function Kitchen() {
     const [orders, setOrders] = useState<CartOrder[]>([]);
@@ -35,6 +36,15 @@ export default function Kitchen() {
                 }
             });
         }
+
+        const fetchData = async () => {
+            const response = await axios.get<CartOrder[]>("/api/cart/all");
+
+            setOrders(response.data);
+        }
+
+        fetchData();
+
     }, []);
 
     const updateStatus = (order: CartOrder) => {
@@ -66,7 +76,7 @@ export default function Kitchen() {
                         <th>Table ID</th>
                         <th>Item Name</th>
                         <th>Quantity</th>
-                        <th>Time Submitted</th>
+                        <th>Order At</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -77,10 +87,10 @@ export default function Kitchen() {
                             <td>{order.tableId}</td>
                             <td>{order.itemName}</td>
                             <td>{order.quantity}</td>
-                            <td>{order.timeSubmitted.toLocaleString()}</td>
+                            <td>{order.orderAt.toLocaleString()}</td>
                             <td>
                                 <button onClick={() => updateStatus(order)}>
-                                   Done
+                                    Done
                                 </button>
                                 <button onClick={() => updateStatusError(order)}>
                                     Error
