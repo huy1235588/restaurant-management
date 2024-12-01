@@ -11,7 +11,12 @@ import { useEffect, useMemo, useState } from "react";
 
 const Order = () => {
     const searchParams = useSearchParams();
-    const tableId = useMemo(() => searchParams.get("tableId"), [searchParams]);
+    // Chuyển thành số nguyên
+    const tableId = useMemo(() => {
+        const id = searchParams.get("tableId");
+        return id ? parseInt(id) : null;
+    }, [searchParams]);
+
     const billId = useMemo(() => searchParams.get("billId"), [searchParams]);
     const [menuFoodData, setMenuFoodData] = useState<MenuFood[]>([]);
 
@@ -92,8 +97,6 @@ const Order = () => {
 
                     return updatedCart;
                 });
-
-                console.log(cart)
             });
         };
 
@@ -129,6 +132,7 @@ const Order = () => {
                 body: JSON.stringify(data),
             });
 
+            // Thêm vào DB
             const response = await axios.post('/api/cart', cart.map((item) => ({
                 tableId: tableId,
                 itemId: item.itemId,

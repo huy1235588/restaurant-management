@@ -4,6 +4,8 @@ import "@/style/app.css";
 import axios from "@/config/axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import stompClient from "@/utils/socket";
+import { OrderStatus } from "@/types/types";
 
 interface TsItem {
     tableId: number;
@@ -13,7 +15,9 @@ interface TsItem {
 }
 
 const TableStatus = () => {
-    const [tsItemData, setTsItemData] = useState<TsItem[]>([])
+    const [tsItemData, setTsItemData] = useState<TsItem[]>([]);
+    const [highlightedTables, setHighlightedTables] = useState<number[]>([]);
+
     const router = useRouter(); // Khởi tạo router
 
     //  Nhóm các bảng theo status
@@ -45,6 +49,30 @@ const TableStatus = () => {
         fetchData();
     }, []);
 
+    // WebSocket xử lý kết nối và nhận trạng thái từ bếp
+    useEffect(() => {
+        stompClient.onConnect = () => {
+            // Lắng nghe trạng thái từ bếp
+            stompClient.subscribe('/topic/waiter', (message) => {
+                const statusUpdate: OrderStatus = JSON.parse(message.body);
+
+                // Highlight bảng được cập nhật
+                setHighlightedTables((prev) => {
+                    if (!prev.includes(statusUpdate.tableId)) {
+                        return [...prev, statusUpdate.tableId];
+                    }
+                    return prev;
+                });
+            });
+        };
+
+        stompClient.activate();
+
+        return () => {
+            stompClient.deactivate();
+        };
+    }, []);
+
     return (
         <main className="main main-ts">
             <h1 className="main-title">
@@ -57,7 +85,8 @@ const TableStatus = () => {
                     <h2 className="ts-available-title">Available</h2>
                     {groupedData.available.map((item) => (
                         <li key={item.tableId}
-                            className="ts-item"
+                            className={`ts-item ${highlightedTables.includes(item.tableId) ? "ts-notify" : ""
+                                }`}
                             onClick={() => handleItemClick(item.tableId, item.billId)}
                         >
                             <p id="tableId">
@@ -78,7 +107,8 @@ const TableStatus = () => {
                     <h2 className="ts-has-customer-title">Has customer</h2>
                     {groupedData.hasCustomer.map((item) => (
                         <li key={item.tableId}
-                            className="ts-item"
+                            className={`ts-item ${highlightedTables.includes(item.tableId) ? "ts-notify" : ""
+                                }`}
                             onClick={() => handleItemClick(item.tableId, item.billId)}
                         >
                             <p id="tableId">
@@ -99,7 +129,8 @@ const TableStatus = () => {
                     <h2 className="ts-reserved-title">Reserved</h2>
                     {groupedData.reserved.map((item) => (
                         <li key={item.tableId}
-                            className="ts-item"
+                            className={`ts-item ${highlightedTables.includes(item.tableId) ? "ts-notify" : ""
+                                }`}
                             onClick={() => handleItemClick(item.tableId, item.billId)}
                         >
                             <p id="tableId">

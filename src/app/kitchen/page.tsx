@@ -58,6 +58,7 @@ export default function Kitchen() {
 
     }, []);
 
+    // Gửi cho order thành công
     const updateStatus = (order: CartOrder) => {
         const status = { tableId: order.tableId, itemId: order.itemId, status: 'completed' };
 
@@ -65,8 +66,19 @@ export default function Kitchen() {
             destination: "/app/status",
             body: JSON.stringify(status),
         });
+
+        const updateStatus = async () => {
+             await axios.put(`/api/cart/status/${order.tableId}`, {
+                itemId: order.itemId,
+                status: "completed"
+             });
+        };
+
+        // Update DB
+        updateStatus();
     };
 
+    // Gửi cho order thất bại
     const updateStatusError = (order: CartOrder) => {
         const status = { tableId: order.tableId, itemId: order.itemId, status: 'error' };
 
@@ -74,6 +86,16 @@ export default function Kitchen() {
             destination: "/app/status",
             body: JSON.stringify(status),
         });
+
+        const updateStatus = async () => {
+            await axios.put(`/api/cart/status/${order.tableId}`, {
+                itemId: order.itemId,
+                status: "error"
+            });
+        };
+
+        // Update DB
+        updateStatus();
     };
 
     return (
@@ -83,7 +105,6 @@ export default function Kitchen() {
             <table>
                 <thead>
                     <tr>
-                        <th>Item ID</th>
                         <th>Table ID</th>
                         <th>Item Name</th>
                         <th>Quantity</th>
@@ -94,7 +115,6 @@ export default function Kitchen() {
                 <tbody>
                     {orders.map((order, idx) => (
                         <tr key={idx}>
-                            <td>{order.itemId}</td>
                             <td>{order.tableId}</td>
                             <td>{order.itemName}</td>
                             <td>{order.quantity}</td>

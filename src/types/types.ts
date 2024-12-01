@@ -16,7 +16,7 @@ export interface Cart {
 }
 
 export interface CartOrder{
-    tableId: string | null ;
+    tableId: number  | null ;
     itemId: string;
     itemName: string;
     quantity: number;
@@ -24,7 +24,7 @@ export interface CartOrder{
 }
 
 export interface OrderStatus {
-    tableId: string;
+    tableId: number;
     itemId: string;
     status: 'pending' | 'cooking' | 'completed' | 'error';
 }
