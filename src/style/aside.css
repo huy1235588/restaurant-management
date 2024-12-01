@@ -65,7 +65,7 @@ aside {
     left: 0;
     bottom: 0;
     display: block;
-    width: 8rem;
+    width: 12%;
     padding-top: 4%;
     background-color: var(--sidebar-bg);
     transition: width 0.3s ease-in-out;
@@ -386,9 +386,9 @@ body.navbar-vertical-aside-mini-mode .footer {
     }
 
     /* Main Content */
-    main.main {
+    /* main.main {
         padding-left: 0;
-    }
+    } */
 }
 /*===================================*
     09.END MOBILE HEADER ASIDE

@@ -74,16 +74,26 @@ const Order = () => {
             stompClient.subscribe('/topic/waiter', (message) => {
                 const statusUpdate: OrderStatus = JSON.parse(message.body);
 
-                console.log(statusUpdate.status)
-
                 // Cập nhật trạng thái trong giỏ hàng
-                setCart((prevCart) =>
-                    prevCart.map((item) =>
-                        item.itemId === statusUpdate.itemId
-                            ? { ...item, status: statusUpdate.status } // Cập nhật trạng thái
-                            : item
-                    )
-                );
+                setCart((prevCart) => {
+                    const updatedCart = [...prevCart];  // Sao chép mảng gốc để tránh mutation trực tiếp
+
+                    updatedCart.forEach(item => {
+                        if (item.itemId === "8") {
+                            console.log(item.itemId + " " + statusUpdate.itemId)
+                        }
+                    })
+
+                    const index = updatedCart.findIndex(item => item.itemId === statusUpdate.itemId); // Tìm index của item cần cập nhật
+
+                    if (index !== -1) {
+                        updatedCart[index] = { ...updatedCart[index], status: statusUpdate.status }; // Chỉ cập nhật trạng thái của item đó
+                    }
+
+                    return updatedCart;
+                });
+
+                console.log(cart)
             });
         };
 
@@ -106,11 +116,11 @@ const Order = () => {
         try {
             // Simulate response (fake data as an example)
             const data: CartOrder[] = cart.map((item) => ({
-                tableId: tableId,
                 itemId: item.itemId,
                 itemName: item.itemName,
                 quantity: item.quantity,
                 orderAt: new Date(),
+                tableId: tableId,
             }));
 
             // Gửi cho bếp
@@ -119,18 +129,14 @@ const Order = () => {
                 body: JSON.stringify(data),
             });
 
-            const addToCart = async () => {
-                const response = await axios.post('/api/cart', cart.map((item) => ({
-                    tableId: tableId,
-                    itemId: item.itemId,
-                    quantity: item.quantity,
-                    status: item.status,
-                })));
+            const response = await axios.post('/api/cart', cart.map((item) => ({
+                tableId: tableId,
+                itemId: item.itemId,
+                quantity: item.quantity,
+                status: item.status,
+            })));
 
-                alert(response.data);
-            }
-
-            addToCart();
+            alert(response.data);
 
         } catch (error) {
             console.error("Failed to send to kitchen:", error);
@@ -139,25 +145,26 @@ const Order = () => {
         }
     };
 
+    // Lấy cart từ database
     useEffect(() => {
-        try {
-            const fetchData = async () => {
+        if (!tableId) return;
+
+        const fetchCartData = async () => {
+            try {
                 const response = await axios.get<Cart[]>(`/api/cart/${tableId}`);
-
-                const updatedCart = response.data.map((item) => ({
+                setCart(response.data.map((item) => ({
                     ...item,
-                    total: item.quantity * item.price,  // Tính total cho từng item
-                }));
+                    total: item.quantity * item.price, // Tính total từng item
+                })));
+            } catch (error) {
+                console.error('Failed to fetch cart data:', error);
+            }
+        };
 
-                setCart(updatedCart);
-            };
-
-            fetchData();
-        } catch (error) {
-            console.error('Failed to fetch cart data:', error);
-        }
+        fetchCartData();
     }, [tableId])
 
+    // Lấy menu từ DB
     useEffect(() => {
         const fetchData = async () => {
             try {

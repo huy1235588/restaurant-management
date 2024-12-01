@@ -30,13 +30,13 @@ const TableStatus = () => {
         router.push(`/waiter/order?tableId=${tableId}&billId=${billId}`);
     }
 
+    // Lấy table từ DB
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await axios.get<TsItem[]>('/api/tablestatus/all');
                 setTsItemData(response.data);
 
-                console.log(tsItemData)
             } catch (error) {
                 console.error('Failed to fetch menu food data:', error);
             }

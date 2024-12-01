@@ -1,32 +1,42 @@
 'use client'
 
+import "@/style/app.css";
 import { useEffect, useState } from "react";
 import stompClient from "../../utils/socket";
 import { CartOrder } from "@/types/types";
 import axios from "@/config/axios";
 
+
 export default function Kitchen() {
     const [orders, setOrders] = useState<CartOrder[]>([]);
 
     useEffect(() => {
+        // Đảm bảo websocket được khởi tạo đúng cách
+        if (!stompClient) {
+            console.error('stompClient is not initialized');
+            return;
+        }
+
         stompClient.onConnect = () => {
             stompClient.subscribe("/topic/kitchen", (message) => {
                 try {
-                    const parsedData = JSON.parse(message.body);
+                    const parsedData: CartOrder = JSON.parse(message.body);
 
                     // Kiểm tra nếu `message.body` là mảng hoặc object
                     if (Array.isArray(parsedData)) {
                         // Chuyển đổi `timeSubmitted` sang `Date`
-                        const newOrders = parsedData.map((order) => ({
+                        const newOrders = parsedData.map((order: CartOrder) => ({
                             ...order,
-                            timeSubmitted: new Date(order.timeSubmitted),
+                            orderAt: new Date(order.orderAt),
                         }));
+
+                        console.log(newOrders)
 
                         setOrders((prev) => [...prev, ...newOrders]);
                     } else {
                         const order = {
                             ...parsedData,
-                            timeSubmitted: new Date(parsedData.timeSubmitted),
+                            orderAt: new Date(parsedData.orderAt),
                         };
                         setOrders((prev) => [...prev, order]);
                     }
@@ -37,6 +47,7 @@ export default function Kitchen() {
             });
         }
 
+        // Lấy dữ liệu cart từ DB
         const fetchData = async () => {
             const response = await axios.get<CartOrder[]>("/api/cart/all");
 
@@ -66,7 +77,7 @@ export default function Kitchen() {
     };
 
     return (
-        <div>
+        <main className="main">
             <h1>Bếp</h1>
             <h2>Đơn hàng:</h2>
             <table>
@@ -100,6 +111,6 @@ export default function Kitchen() {
                     ))}
                 </tbody>
             </table>
-        </div>
+        </main>
     );
 }
