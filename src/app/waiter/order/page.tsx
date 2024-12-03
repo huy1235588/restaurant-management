@@ -7,7 +7,7 @@ import { Cart, CartOrder, MenuFood, OrderStatus } from "@/types/types";
 import stompClient from "@/utils/socket";
 import axios from "@/config/axios";
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 
 const Order = () => {
     const searchParams = useSearchParams();
@@ -185,7 +185,6 @@ const Order = () => {
 
     return (
         <main className='main main-order'>
-
             {/* Menu Food */}
             <section className='section mf-section'>
                 <h2 className='section-title'>
@@ -248,4 +247,10 @@ const Order = () => {
     );
 };
 
-export default Order;
+export default function OrderPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <Order />
+        </Suspense>
+    );
+}
