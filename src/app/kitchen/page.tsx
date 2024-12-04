@@ -68,10 +68,10 @@ export default function Kitchen() {
         });
 
         const updateStatus = async () => {
-             await axios.put(`/api/cart/status/${order.tableId}`, {
+            await axios.put(`/api/cart/status/${order.tableId}`, {
                 itemId: order.itemId,
                 status: "completed"
-             });
+            });
         };
 
         // Update DB
@@ -80,7 +80,9 @@ export default function Kitchen() {
 
     // Gửi cho order thất bại
     const updateStatusError = (order: CartOrder) => {
-        const status = { tableId: order.tableId, itemId: order.itemId, status: 'error' };
+        const status = { itemId: order.itemId, status: 'error' };
+
+        console.log(status)
 
         stompClient.publish({
             destination: "/app/status",
@@ -106,6 +108,7 @@ export default function Kitchen() {
                 <thead>
                     <tr>
                         <th>Table ID</th>
+                        <th>Item ID</th>
                         <th>Item Name</th>
                         <th>Quantity</th>
                         <th>Order At</th>
@@ -113,22 +116,30 @@ export default function Kitchen() {
                     </tr>
                 </thead>
                 <tbody>
-                    {orders.map((order, idx) => (
-                        <tr key={idx}>
-                            <td>{order.tableId}</td>
-                            <td>{order.itemName}</td>
-                            <td>{order.quantity}</td>
-                            <td>{order.orderAt.toLocaleString()}</td>
-                            <td>
-                                <button onClick={() => updateStatus(order)}>
-                                    Done
-                                </button>
-                                <button onClick={() => updateStatusError(order)}>
-                                    Error
-                                </button>
+                    {orders && orders.length > 0 ? (
+                        orders.map((order, idx) => (
+                            <tr key={idx}>
+                                <td>{order.tableId}</td>
+                                <td>{order.itemId}</td>
+                                <td>{order.itemName}</td>
+                                <td>{order.quantity}</td>
+                                <td>{order.orderAt.toLocaleString()}</td>
+                                <td>
+                                    <button onClick={() => updateStatus(order)}>
+                                        Done
+                                    </button>
+                                    <button onClick={() => updateStatusError(order)}>
+                                        Error
+                                    </button>
+                                </td>
+                            </tr>
+                        ))) : (
+                        <tr>
+                            <td colSpan={5} style={{ textAlign: "center" }}>
+                                No orders found
                             </td>
                         </tr>
-                    ))}
+                    )}
                 </tbody>
             </table>
         </main>
