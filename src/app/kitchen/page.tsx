@@ -49,7 +49,7 @@ export default function Kitchen() {
 
         // Lấy dữ liệu cart từ DB
         const fetchData = async () => {
-            const response = await axios.get<CartOrder[]>("/api/cart/all");
+            const response = await axios.get<CartOrder[]>("/api/cart/pending");
 
             setOrders(response.data);
         }
@@ -72,6 +72,10 @@ export default function Kitchen() {
                 itemId: order.itemId,
                 status: "completed"
             });
+
+            const response = await axios.get<CartOrder[]>("/api/cart/pending");
+
+            setOrders(response.data);
         };
 
         // Update DB
@@ -94,6 +98,10 @@ export default function Kitchen() {
                 itemId: order.itemId,
                 status: "error"
             });
+
+            const response = await axios.get<CartOrder[]>("/api/cart/pending");
+
+            setOrders(response.data);
         };
 
         // Update DB
@@ -101,10 +109,10 @@ export default function Kitchen() {
     };
 
     return (
-        <main className="main">
+        <main className="main main-kitchen">
             <h1>Bếp</h1>
             <h2>Đơn hàng:</h2>
-            <table>
+            <table className="cart-table kitchen-table">
                 <thead>
                     <tr>
                         <th>Table ID</th>
@@ -112,7 +120,7 @@ export default function Kitchen() {
                         <th>Item Name</th>
                         <th>Quantity</th>
                         <th>Order At</th>
-                        <th>Action</th>
+                        <th colSpan={2}>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -125,10 +133,12 @@ export default function Kitchen() {
                                 <td>{order.quantity}</td>
                                 <td>{order.orderAt.toLocaleString()}</td>
                                 <td>
-                                    <button onClick={() => updateStatus(order)}>
+                                    <button className="add-to-cart-btn done-btn" onClick={() => updateStatus(order)}>
                                         Done
                                     </button>
-                                    <button onClick={() => updateStatusError(order)}>
+                                </td>
+                                <td>
+                                    <button className="delete-cart-btn error-btn" onClick={() => updateStatusError(order)}>
                                         Error
                                     </button>
                                 </td>

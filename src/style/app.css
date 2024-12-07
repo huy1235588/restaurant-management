@@ -192,7 +192,7 @@ aside.expanded ~ main {
     transition: background-color 0.5s ease-out;
 }
 
-.ts-item.ts-notify:hover{
+.ts-item.ts-notify:hover {
     background-color: #22acb6;
 }
 /*===================================*
@@ -382,7 +382,7 @@ aside.expanded ~ main {
     padding: 2px 8px;
 }
 
-.delete-card-btn {
+.delete-cart-btn {
     background-color: #af4c4c;
     color: white;
     border: none;
@@ -452,6 +452,39 @@ aside.expanded ~ main {
 }
 /*===================================*
     05.END CART ORDER
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    06.START KitCHEN
+*===================================*/
+.main-kitchen {
+    width: 80%;
+}
+
+.kitchen-table .done-btn {
+    padding: 10px 16px;
+}
+
+.kitchen-table .error-btn:hover {
+    background-color: #a04545;
+}
+
+.kitchen-table td:nth-last-child(2){
+    width: 80px;
+}
+/*===================================*
+    06.END KitCHEN
 *===================================*/
 /*
 
