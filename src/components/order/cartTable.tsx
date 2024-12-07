@@ -31,7 +31,7 @@ const CartTable: React.FC<Props> = ({ cartData, handleRemoveFromCart }) => (
                     <td className={`cart-status cart-status-${item.status}`}>{item.status}</td>
                     <td>
                         <button
-                            className="delete-card-btn"
+                            className="delete-cart-btn"
                             onClick={() => handleRemoveFromCart(item.itemId)}
                         >
                             Delete

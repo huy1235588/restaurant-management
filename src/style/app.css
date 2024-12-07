@@ -470,6 +470,7 @@ aside.expanded ~ main {
 *===================================*/
 .main-kitchen {
     width: 80%;
+    margin-left: 2%;
 }
 
 .kitchen-table .done-btn {
