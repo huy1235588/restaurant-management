@@ -145,7 +145,7 @@ export default function Kitchen() {
                             </tr>
                         ))) : (
                         <tr>
-                            <td colSpan={5} style={{ textAlign: "center" }}>
+                            <td colSpan={6} style={{ textAlign: "center" }}>
                                 No orders found
                             </td>
                         </tr>
