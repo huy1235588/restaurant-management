@@ -1,10 +1,10 @@
 USE restaurantManagement;
 
 CREATE TABLE IF NOT EXISTS MenuFood (
-    itemId VARCHAR(20) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    itemId VARCHAR(20) PRIMARY KEY NOT NULL,
     itemName VARCHAR(50) NOT NULL,
     category VARCHAR(100),
-    price DECIMAL(3, 2) CHECK(price >= 0.00)
+    price DECIMAL(7, 2) CHECK(price >= 0.00)
 );
 
 CREATE TABLE IF NOT EXISTS TableStatus (

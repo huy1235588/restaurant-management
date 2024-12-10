@@ -1,7 +1,7 @@
 USE restaurantManagement;
 
 INSERT INTO
-    tablestatus (capacity, status)
+    TableStatus (capacity, status)
 VALUES
     (100, 'available'),
     (200, 'reserved'),
@@ -54,7 +54,7 @@ VALUES
     (560, 'available');
 
 INSERT INTO
-    menufood (itemId, itemName, category, price)
+    MenuFood (itemId, itemName, category, price)
 VALUES
     (1, 'Pizza Margherita', 'Pizza', 9.99),
     (2, 'Spaghetti Carbonara', 'Pasta', 8.49),
