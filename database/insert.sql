@@ -17,55 +17,55 @@ VALUES
 INSERT INTO
     Tables (tableName, status, capacity)
 VALUES
-    ('T1', 'available', 4),
-    ('T2', 'available', 2),
-    ('T3', 'occupied', 6),
-    ('T4', 'reserved', 4),
-    ('T5', 'available', 8),
-    ('T6', 'occupied', 4),
+    ('T1', 'reserved', 4),
+    ('T2', 'occupied', 2),
+    ('T3', 'reserved', 6),
+    ('T4', 'occupied', 4),
+    ('T5', 'reserved', 8),
+    ('T6', 'reserved', 4),
     ('T7', 'reserved', 6),
-    ('T8', 'available', 2),
-    ('T9', 'available', 4),
-    ('T10', 'occupied', 10),
-    ('T11', 'reserved', 4),
+    ('T8', 'occupied', 2),
+    ('T9', 'occupied', 4),
+    ('T10', 'reserved', 10),
+    ('T11', 'available', 4),
     ('T12', 'available', 6),
     ('T13', 'available', 2),
-    ('T14', 'occupied', 4),
-    ('T15', 'reserved', 6),
+    ('T14', 'available', 4),
+    ('T15', 'available', 6),
     ('T16', 'available', 8),
     ('T17', 'available', 4),
-    ('T18', 'occupied', 4),
+    ('T18', 'available', 4),
     ('T19', 'available', 2),
-    ('T20', 'reserved', 4),
+    ('T20', 'available', 4),
     ('T21', 'available', 10),
-    ('T22', 'occupied', 6),
-    ('T23', 'reserved', 4),
+    ('T22', 'available', 6),
+    ('T23', 'available', 4),
     ('T24', 'available', 4),
     ('T25', 'available', 2),
-    ('T26', 'occupied', 8),
-    ('T27', 'reserved', 4),
+    ('T26', 'available', 8),
+    ('T27', 'available', 4),
     ('T28', 'available', 6),
     ('T29', 'available', 4),
-    ('T30', 'occupied', 2),
-    ('T31', 'reserved', 4),
+    ('T30', 'available', 2),
+    ('T31', 'available', 4),
     ('T32', 'available', 10),
-    ('T33', 'occupied', 8),
-    ('T34', 'reserved', 6),
+    ('T33', 'available', 8),
+    ('T34', 'available', 6),
     ('T35', 'available', 4),
-    ('T36', 'occupied', 2),
+    ('T36', 'available', 2),
     ('T37', 'available', 6),
-    ('T38', 'reserved', 4),
+    ('T38', 'available', 4),
     ('T39', 'available', 10),
-    ('T40', 'occupied', 4),
-    ('T41', 'reserved', 8),
+    ('T40', 'available', 4),
+    ('T41', 'available', 8),
     ('T42', 'available', 6),
     ('T43', 'available', 2),
-    ('T44', 'occupied', 4),
-    ('T45', 'reserved', 6),
+    ('T44', 'available', 4),
+    ('T45', 'available', 6),
     ('T46', 'available', 8),
-    ('T47', 'occupied', 4),
+    ('T47', 'available', 4),
     ('T48', 'available', 6),
-    ('T49', 'reserved', 2),
+    ('T49', 'available', 2),
     ('T50', 'available', 10);
 
 -- Insert sample data for MenuFood (50 entries)
@@ -122,3 +122,104 @@ VALUES
     ('F48', 'Margarita', 4, 5.99),
     ('F49', 'Chili Cheese Fries', 1, 6.99),
     ('F50', 'Beef Lasagna', 7, 14.49);
+
+-- TABLE BOOKING
+INSERT INTO
+    TableBooking (
+        tableId,
+        customerName,
+        phoneNumber,
+        reservedTime,
+        numberOfGuests
+    )
+VALUES
+    (
+        1,
+        'John Doe',
+        '0123456789',
+        '2024-12-23 12:00:00',
+        4
+    ),
+    (
+        2,
+        'Jane Smith',
+        '0987654321',
+        NULL,
+        2
+    ),
+    (
+        3,
+        'Emily Johnson',
+        '0912345678',
+        '2024-12-23 14:00:00',
+        3
+    ),
+    (
+        4,
+        'Michael Brown',
+        '0934123456',
+        NULL,
+        5
+    ),
+    (
+        5,
+        'Sarah Lee',
+        '0976123456',
+        '2024-12-23 16:00:00',
+        6
+    ),
+    (
+        6,
+        'David Wilson',
+        '0963456789',
+        '2024-12-23 17:00:00',
+        2
+    ),
+    (
+        7,
+        'Sophia Clark',
+        '0923456789',
+        '2024-12-23 18:00:00',
+        4
+    ),
+    (
+        8,
+        'James Miller',
+        '0907654321',
+        NULL,
+        3
+    ),
+    (
+        9,
+        'Olivia Harris',
+        '0912349876',
+        NULL,
+        2
+    ),
+    (
+        10,
+        'Liam Martinez',
+        '0943456789',
+        '2024-12-23 21:00:00',
+        5
+    );
+
+-- Bill
+INSERT INTO
+    Bills (
+        bookingId,
+        totalAmount,
+        paymentStatus,
+        paymentMethod
+    )
+VALUES
+    (1, 150.00, 'paid', 'cash'),
+    (2, 80.50, 'pending', 'card'),
+    (3, 120.00, 'failed', 'cash'),
+    (4, 200.00, 'paid', 'card'),
+    (5, 250.75, 'pending', 'cash'),
+    (6, 90.00, 'paid', 'card'),
+    (7, 160.30, 'failed', 'cash'),
+    (8, 180.00, 'paid', 'cash'),
+    (9, 140.00, 'pending', 'card'),
+    (10, 220.00, 'paid', 'card');
