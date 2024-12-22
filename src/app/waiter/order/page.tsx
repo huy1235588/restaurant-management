@@ -6,11 +6,13 @@ import "@/style/app.css";
 import { Cart, CartOrder, MenuFood, OrderStatus } from "@/types/types";
 import stompClient from "@/utils/socket";
 import axios from "@/config/axios";
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useState } from "react";
 
 const Order = () => {
     const searchParams = useSearchParams();
+    const router = useRouter();
+
     // Chuyển thành số nguyên
     const tableId = useMemo(() => {
         const id = searchParams.get("tableId");
@@ -183,6 +185,11 @@ const Order = () => {
         fetchData();
     }, []);
 
+    // Hàm in hóa đơn
+    const handleInvoice = () => {
+        router.push(`/payment/${billId}`);
+    }
+
     return (
         <main className='main main-order'>
             {/* Menu Food */}
@@ -239,7 +246,7 @@ const Order = () => {
                 </button>
 
                 {/* Button Pay Bill */}
-                <button className="pay-bill-btn" onClick={() => alert('Bill paid')}>
+                <button className="pay-bill-btn" onClick={handleInvoice}>
                     Pay Bill
                 </button>
             </section>

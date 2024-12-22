@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import stompClient from "@/utils/socket";
 import { OrderStatus } from "@/types/types";
+import TableModal from "@/components/tableModal";
 
 interface TsItem {
     tableId: number;
@@ -17,6 +18,8 @@ interface TsItem {
 const TableStatus = () => {
     const [tsItemData, setTsItemData] = useState<TsItem[]>([]);
     const [highlightedTables, setHighlightedTables] = useState<number[]>([]);
+
+    const [selectedTable, setSelectedTable] = useState<TsItem | undefined>(undefined);
 
     const router = useRouter(); // Khởi tạo router
 
@@ -73,6 +76,29 @@ const TableStatus = () => {
         };
     }, []);
 
+    const handleAvailableClick = async (tableId: number) => {
+        const table = tsItemData.find(item => item.tableId === tableId);
+
+        setSelectedTable(table);
+    };
+
+    const handleModalSubmit = (data: {
+        customerName: string;
+        phoneNumber: string;
+        status: "hasCustomer" | "reserved";
+        reservedTime?: string;
+        billId: number;
+    }) => {
+        setTsItemData(prev =>
+            prev.map(item =>
+                item.tableId === selectedTable?.tableId
+                    ? { ...item, status: data.status, billId: data.billId }
+                    : item
+            )
+        );
+        setSelectedTable(undefined);
+    };
+
     return (
         <main className="main main-ts">
             <h1 className="main-title">
@@ -87,7 +113,7 @@ const TableStatus = () => {
                         <li key={item.tableId}
                             className={`ts-item ${highlightedTables.includes(item.tableId) ? "ts-notify" : ""
                                 }`}
-                            onClick={() => handleItemClick(item.tableId, item.billId)}
+                            onClick={() => handleAvailableClick(item.tableId)}
                         >
                             <p id="tableId">
                                 Table {item.tableId}
@@ -146,6 +172,15 @@ const TableStatus = () => {
                     ))}
                 </ul>
             </section>
+            {/* Hiển thị Modal */}
+            {selectedTable && (
+                <TableModal
+                    tableId={selectedTable.tableId}
+                    initialBillId={selectedTable.billId || Date.now()}
+                    onSubmit={handleModalSubmit}
+                    onClose={() => setSelectedTable(undefined)}
+                />
+            )}
         </main>
     );
 }

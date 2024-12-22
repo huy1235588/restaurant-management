@@ -481,11 +481,33 @@ aside.expanded ~ main {
     background-color: #a04545;
 }
 
-.kitchen-table td:nth-last-child(2){
+.kitchen-table td:nth-last-child(2) {
     width: 80px;
 }
 /*===================================*
     06.END KitCHEN
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    06.START STATUS MODAL
+*===================================*/
+.MuiDialog-container.MuiDialog-scrollPaper.css-19do60a-MuiDialog-container > div{
+    padding: 5px 0 15px;
+}
+
+/*===================================*
+    07.END STATUS MODAL
 *===================================*/
 /*
 

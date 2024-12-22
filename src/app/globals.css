@@ -45,7 +45,7 @@ body .theme-toggle-button {
 }
 
 body .theme-toggle-button .MuiButton-icon {
-   margin: 0;
+    margin: 0;
 }
 
 /* General */
@@ -72,13 +72,18 @@ span {
     width: auto;
 }
 
-.flex{
+.flex {
     display: flex;
 }
 
-.toggle-aside{
-    position: absolute;
+.toggle-aside {
+    position: fixed;
     top: 4%;
-    left: 1%;
+    left: 2%;
     z-index: 11;
+    transition: left ease-in-out 0.3s;
+}
+
+.toggle-aside:has(~ aside.collapsed) {
+    left: 14%;
 }
