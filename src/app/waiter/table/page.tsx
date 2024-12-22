@@ -5,7 +5,7 @@ import axios from "@/config/axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import stompClient from "@/utils/socket";
-import { OrderStatus } from "@/types/types";
+import { OrderStatus, TableBooking } from "@/types/types";
 import TableModal from "@/components/tableModal";
 
 interface TsItem {
@@ -84,17 +84,22 @@ const TableStatus = () => {
     };
 
     // Xử lý submit điền thông tin bàn của khách hàng
-    const handleModalSubmit = (data: {
-        customerName: string;
-        phoneNumber: string;
-        status: "occupied" | "reserved";
-        reservedTime?: string;
-        billId: number;
-    }) => {
+    const handleModalSubmit = async (data: TableBooking) => {
+        const response = await axios.post<number>('/api/bookings', {
+            tableId: data.tableId,
+            customerName: data.customerName,
+            phoneNumber: data.phoneNumber,
+            reservedTime: data.reservedTime,
+            numberOfGuests: data.numberOfGuests,
+            tableStatus: data.tableStatus,
+        });
+
+        const billId = response.data;
+
         setTsItemData(prev =>
             prev.map(item =>
                 item.tableId === selectedTable?.tableId
-                    ? { ...item, status: data.status, billId: data.billId }
+                    ? { ...item, status: data.tableStatus, billId: billId }
                     : item
             )
         );

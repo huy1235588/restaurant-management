@@ -36,26 +36,26 @@ CREATE TABLE
     );
 
 CREATE TABLE
-    IF NOT EXISTS Bills (
-        billId INT AUTO_INCREMENT PRIMARY KEY,
-        bookingId INT NOT NULL,
-        totalAmount DECIMAL(10, 2) NOT NULL,
-        paymentStatus ENUM ('paid', 'pending', 'failed') NOT NULL,
-        paymentMethod ENUM ('cash', 'card') DEFAULT 'cash',
-        createAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    );
-
-CREATE TABLE
     IF NOT EXISTS TableBooking (
         bookingId INT AUTO_INCREMENT PRIMARY KEY,
         tableId INT NOT NULL,
-        billId INT NOT NULL,
         customerName VARCHAR(150) NOT NULL,
         phoneNumber VARCHAR(15),
         reservedTime DATETIME DEFAULT NULL,
+        numberOfGuests INT NOT NULL,
         createAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (tableId) REFERENCES Tables (tableId),
-        FOREIGN KEY (billId) REFERENCES Bills (billId)
+        FOREIGN KEY (tableId) REFERENCES Tables (tableId)
+    );
+
+CREATE TABLE
+    IF NOT EXISTS Bills (
+        billId INT AUTO_INCREMENT PRIMARY KEY,
+        bookingId INT NOT NULL,
+        totalAmount DECIMAL(10, 2) DEFAULT 0,
+        paymentStatus ENUM ('paid', 'pending', 'failed') NOT NULL,
+        paymentMethod ENUM ('cash', 'card') DEFAULT 'cash',
+        createAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (bookingId) REFERENCES TableBooking (bookingId)
     );

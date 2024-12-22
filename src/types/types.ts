@@ -15,6 +15,16 @@ export interface Cart {
     total: number;
 }
 
+export interface TableBooking {
+    tableId: number | null;
+    billId: number;
+    customerName: string;
+    phoneNumber: string;
+    reservedTime?: string;
+    numberOfGuests: number;
+    tableStatus: "occupied" | "reserved";
+}
+
 export interface CartOrder {
     tableId: number | null;
     itemId: string;
