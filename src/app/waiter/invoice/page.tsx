@@ -1,4 +1,6 @@
-import {  useState } from 'react';
+'use client';
+
+import { useEffect, useState } from 'react';
 
 type InvoiceData = {
     id: string;
@@ -9,6 +11,19 @@ type InvoiceData = {
 
 const InvoicePage = () => {
     const [invoice, setInvoice] = useState<InvoiceData | null>(null);
+
+    useEffect(() => {
+        // Simulate fetching invoice data after mounting
+        setInvoice({
+            id: '123',
+            customerName: 'Nguyễn Văn A',
+            items: [
+                { name: 'Món 1', quantity: 2, price: 50000 },
+                { name: 'Món 2', quantity: 1, price: 70000 }
+            ],
+            total: 170000
+        });
+    }, []);
 
     const handlePrint = () => {
         window.print(); // In hóa đơn

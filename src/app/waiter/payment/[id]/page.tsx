@@ -1,9 +1,10 @@
+'use client';
 
 const paymentPage = () => {
     return (
-        <div>
+        <main className='main main-payment'>
             Payment
-        </div>
+        </main>
     );
 };
 
