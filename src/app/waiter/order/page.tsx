@@ -129,13 +129,19 @@ const Order = () => {
         try {
             // Lấy danh sách item hiện có trong DB
             const responseCart = await axios.get<Cart[]>(`/api/cart/${tableId}`);
-            const existingCartItems = responseCart.data;
-
-            // Lọc các item chưa tồn tại trong DB
-            const newItems = cart.filter(
-                (cartItem) =>
-                    !existingCartItems.some((dbItem) => dbItem.itemId === cartItem.itemId)
+            const existingCartItems = new Map(
+                (responseCart.data || []).map((dbItem) => [dbItem.itemId, dbItem])
             );
+
+            // Lọc các item cần gửi
+            const newItems = cart.filter((cartItem) => {
+                const existingItem = existingCartItems.get(cartItem.itemId);
+
+                // Gửi nếu item không tồn tại hoặc có sự chênh lệch quantity
+                return (
+                    !existingItem || cartItem.itemQuantity > existingItem.itemQuantity
+                );
+            });
 
             // Nếu không có item nào được thêm 
             if (newItems.length === 0) {
@@ -182,7 +188,7 @@ const Order = () => {
         const fetchCartData = async () => {
             try {
                 const response = await axios.get<Cart[]>(`/api/cart/${tableId}`);
-                setCart(response.data.map((item) => ({
+                setCart((response.data || []).map((item) => ({
                     ...item,
                     total: item.itemQuantity * item.itemPrice, // Tính total từng item
                 })));

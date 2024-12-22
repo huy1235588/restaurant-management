@@ -42,7 +42,7 @@ const TableStatus = () => {
         const fetchData = async () => {
             try {
                 const response = await axios.get<TsItem[]>('/api/tablestatus/all');
-                setTsItemData(response.data);
+                setTsItemData(response.data || []);
 
             } catch (error) {
                 console.error('Failed to fetch menu food data:', error);

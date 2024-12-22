@@ -31,8 +31,6 @@ export default function Kitchen() {
                             orderAt: new Date(order.orderAt),
                         }));
 
-                        console.log(newOrders)
-
                         setOrders((prev) => [...prev, ...newOrders]);
                     } else {
                         const order = {
