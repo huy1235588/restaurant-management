@@ -13,7 +13,7 @@ import {
     FormControl,
     SelectChangeEvent, // Import kiểu SelectChangeEvent từ MUI
 } from "@mui/material";
-import { useTranslation } from 'react-i18next';
+import { useNotification } from "./notificationProvider";
 
 interface TableModalProps {
     tableId: number;
@@ -21,22 +21,24 @@ interface TableModalProps {
     onSubmit: (data: {
         customerName: string;
         phoneNumber: string;
-        status: "hasCustomer" | "reserved";
+        status: "occupied" | "reserved";
         reservedTime?: string;
+        numberOfGuests: number;
         billId: number;
     }) => void;
     onClose: () => void;
 }
 
 const TableModal: React.FC<TableModalProps> = ({ tableId, initialBillId, onSubmit, onClose }) => {
-    const { t } = useTranslation(); // Sử dụng useTrans để lấy các chuỗi từ tệp TypeScript
+    const { showNotification } = useNotification();
 
     // State để lưu dữ liệu của form
     const [formData, setFormData] = useState({
         customerName: "",
         phoneNumber: "",
-        status: "hasCustomer" as "hasCustomer" | "reserved", // Giá trị mặc định là "hasCustomer"
+        status: "occupied" as "occupied" | "reserved", // Giá trị mặc định là "hasCustomer"
         reservedTime: "",
+        numberOfGuests: 1,
         billId: initialBillId,
     });
 
@@ -47,7 +49,7 @@ const TableModal: React.FC<TableModalProps> = ({ tableId, initialBillId, onSubmi
     };
 
     // Hàm xử lý khi thay đổi dữ liệu trong Select
-    const handleSelectChange = (e: SelectChangeEvent<"hasCustomer" | "reserved">) => {
+    const handleSelectChange = (e: SelectChangeEvent<"occupied" | "reserved">) => {
         const { name, value } = e.target; // Lấy name và value từ sự kiện
         setFormData(prev => ({ ...prev, [name]: value })); // Cập nhật dữ liệu vào state
     };
@@ -56,14 +58,20 @@ const TableModal: React.FC<TableModalProps> = ({ tableId, initialBillId, onSubmi
     const handleFormSubmit = () => {
         // Kiểm tra nếu trạng thái là "reserved" mà không chọn thời gian thì hiển thị cảnh báo
         if (formData.status === "reserved" && !formData.reservedTime) {
-            alert("Please select a reserved time."); // Thông báo lỗi
+            showNotification("Please select a reserved time.", "warning"); // Thông báo lỗi
             return;
         }
         onSubmit(formData); // Gửi dữ liệu qua props onSubmit
     };
 
     return (
-        <Dialog open onClose={onClose} fullWidth maxWidth="sm"> {/* Hộp thoại (Dialog) của MUI */}
+        < Dialog
+            open
+            onClose={onClose}
+            fullWidth
+            maxWidth="sm"
+            disableScrollLock={true}
+        >
             <DialogTitle>Enter Customer Information</DialogTitle> {/* Tiêu đề hộp thoại */}
             <DialogContent>
                 <Box mb={2}>Table ID: {tableId}</Box> {/* Hiển thị mã bàn */}
@@ -72,7 +80,7 @@ const TableModal: React.FC<TableModalProps> = ({ tableId, initialBillId, onSubmi
                 <TextField
                     fullWidth
                     margin="normal"
-                    label={t('customerName')}
+                    label="Customer Name"
                     name="customerName"
                     value={formData.customerName}
                     onChange={handleInputChange}
@@ -82,10 +90,28 @@ const TableModal: React.FC<TableModalProps> = ({ tableId, initialBillId, onSubmi
                 <TextField
                     fullWidth
                     margin="normal"
-                    label={t('phoneNumber')}
+                    label="Phone Number"
                     name="phoneNumber"
                     value={formData.phoneNumber}
                     onChange={handleInputChange}
+                />
+
+                {/* Ô nhập lượng khách */}
+                <TextField
+                    fullWidth
+                    margin="normal"
+                    label="Number of Guests"
+                    name="numberOfGuests"
+                    type="number"
+                    value={formData.numberOfGuests}
+                    onChange={e => {
+                        const value = parseInt(e.target.value, 10);
+                        setFormData(prev => ({
+                            ...prev,
+                            numberOfGuests: isNaN(value) ? 1 : value,
+                        }));
+                    }}
+                    inputProps={{ min: 1 }}
                 />
 
                 {/* Dropdown chọn trạng thái */}
@@ -96,7 +122,7 @@ const TableModal: React.FC<TableModalProps> = ({ tableId, initialBillId, onSubmi
                         value={formData.status}
                         onChange={handleSelectChange} // Sử dụng handleSelectChange cho Select
                     >
-                        <MenuItem value="hasCustomer">Dine-In</MenuItem>
+                        <MenuItem value="occupied">Dine-In</MenuItem>
                         <MenuItem value="reserved">Reserved</MenuItem>
                     </Select>
                 </FormControl>
@@ -128,7 +154,7 @@ const TableModal: React.FC<TableModalProps> = ({ tableId, initialBillId, onSubmi
                     Cancel
                 </Button>
             </DialogActions>
-        </Dialog>
+        </Dialog >
     );
 };
 

@@ -17,6 +17,7 @@ export default function Kitchen() {
             return;
         }
 
+        // WebSocket xử lý kết nối và nhận order từ phục vụ
         stompClient.onConnect = () => {
             stompClient.subscribe("/topic/kitchen", (message) => {
                 try {
@@ -60,7 +61,11 @@ export default function Kitchen() {
 
     // Gửi cho order thành công
     const updateStatus = (order: CartOrder) => {
-        const status = { tableId: order.tableId, itemId: order.itemId, status: 'completed' };
+        const status = {
+            tableId: order.tableId,
+            itemId: order.itemId,
+            status: 'completed'
+        };
 
         stompClient.publish({
             destination: "/app/status",
@@ -84,9 +89,11 @@ export default function Kitchen() {
 
     // Gửi cho order thất bại
     const updateStatusError = (order: CartOrder) => {
-        const status = { itemId: order.itemId, status: 'error' };
-
-        console.log(status)
+        const status = {
+            tableId: order.tableId,
+            itemId: order.itemId,
+            status: 'error'
+        };
 
         stompClient.publish({
             destination: "/app/status",
@@ -130,7 +137,7 @@ export default function Kitchen() {
                                 <td>{order.tableId}</td>
                                 <td>{order.itemId}</td>
                                 <td>{order.itemName}</td>
-                                <td>{order.quantity}</td>
+                                <td>{order.itemQuantity}</td>
                                 <td>{order.orderAt.toLocaleString()}</td>
                                 <td>
                                     <button className="add-to-cart-btn done-btn" onClick={() => updateStatus(order)}>

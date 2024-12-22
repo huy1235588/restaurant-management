@@ -5,6 +5,7 @@ import { ThemeContextProvider } from "@/context/themeContext";
 import { CssBaseline } from "@mui/material";
 import AppLayout from "./app";
 import Head from "next/head";
+import { NotificationProvider } from "@/components/notificationProvider";
 
 const geistSans = localFont({
     src: "./fonts/GeistVF.woff",
@@ -36,7 +37,9 @@ export default function RootLayout({
                 <ThemeContextProvider>
                     <CssBaseline />
                     <AppLayout >
-                        {children}
+                        <NotificationProvider >
+                            {children}
+                        </NotificationProvider>
                     </AppLayout>
                 </ThemeContextProvider>
             </body>

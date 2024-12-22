@@ -8,10 +8,12 @@ import stompClient from "@/utils/socket";
 import axios from "@/config/axios";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useState } from "react";
+import { useNotification } from "@/components/notificationProvider";
 
 const Order = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
+    const { showNotification } = useNotification();
 
     // Chuyển thành số nguyên
     const tableId = useMemo(() => {
@@ -55,8 +57,8 @@ const Order = () => {
                     cartItem.itemId === item.itemId
                         ? {
                             ...cartItem,
-                            quantity: cartItem.quantity + quantity,
-                            total: (cartItem.quantity + quantity) * item.price,
+                            itemQuantity: cartItem.itemQuantity + quantity,
+                            total: (cartItem.itemQuantity + quantity) * item.price,
                         }
                         : cartItem
                 );
@@ -64,7 +66,13 @@ const Order = () => {
 
             return [
                 ...prevCart,
-                { ...item, itemId: item.itemId, quantity, status: 'pending', total: item.price * quantity },
+                {
+                    ...item,
+                    itemPrice: item.price,
+                    itemQuantity: quantity,
+                    status: 'pending',
+                    total: item.price * quantity
+                },
             ];
         });
     };
@@ -113,17 +121,33 @@ const Order = () => {
     const handleSendToKitchen = async () => {
         // Kiểm tra cart có rỗng
         if (cart.length === 0) {
-            alert("Your cart is empty!");
+            showNotification("Your cart is empty!", "warning");
             return;
         }
 
         setIsSending(true);
         try {
-            // Simulate response (fake data as an example)
-            const data: CartOrder[] = cart.map((item) => ({
+            // Lấy danh sách item hiện có trong DB
+            const responseCart = await axios.get<Cart[]>(`/api/cart/${tableId}`);
+            const existingCartItems = responseCart.data;
+
+            // Lọc các item chưa tồn tại trong DB
+            const newItems = cart.filter(
+                (cartItem) =>
+                    !existingCartItems.some((dbItem) => dbItem.itemId === cartItem.itemId)
+            );
+
+            // Nếu không có item nào được thêm 
+            if (newItems.length === 0) {
+                showNotification("All items are already in the kitchen's queue.", "info");
+                return;
+            }
+
+            // Chuyển đổi dữ liệu để gửi tới WebSocket và API
+            const data: CartOrder[] = newItems.map((item) => ({
                 itemId: item.itemId,
                 itemName: item.itemName,
-                quantity: item.quantity,
+                itemQuantity: item.itemQuantity,
                 orderAt: new Date(),
                 tableId: tableId,
             }));
@@ -135,14 +159,14 @@ const Order = () => {
             });
 
             // Thêm vào DB
-            const response = await axios.post('/api/cart', cart.map((item) => ({
+            const response = await axios.post('/api/cart', newItems.map((item) => ({
                 tableId: tableId,
                 itemId: item.itemId,
-                quantity: item.quantity,
+                quantity: item.itemQuantity,
                 status: item.status,
             })));
 
-            alert(response.data);
+            showNotification(response.data, "success");
 
         } catch (error) {
             console.error("Failed to send to kitchen:", error);
@@ -160,7 +184,7 @@ const Order = () => {
                 const response = await axios.get<Cart[]>(`/api/cart/${tableId}`);
                 setCart(response.data.map((item) => ({
                     ...item,
-                    total: item.quantity * item.price, // Tính total từng item
+                    total: item.itemQuantity * item.itemPrice, // Tính total từng item
                 })));
             } catch (error) {
                 console.error('Failed to fetch cart data:', error);

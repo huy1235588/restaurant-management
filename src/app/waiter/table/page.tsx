@@ -12,7 +12,7 @@ interface TsItem {
     tableId: number;
     billId: number;
     capacity: number;
-    status: "available" | "reserved" | "hasCustomer"
+    status: "available" | "reserved" | "occupied"
 }
 
 const TableStatus = () => {
@@ -30,7 +30,7 @@ const TableStatus = () => {
     }, {
         available: [] as TsItem[],
         reserved: [] as TsItem[],
-        hasCustomer: [] as TsItem[]
+        occupied: [] as TsItem[]
     });
 
     const handleItemClick = (tableId: number, billId: number) => {
@@ -76,16 +76,18 @@ const TableStatus = () => {
         };
     }, []);
 
+    // Xử lý click vào bàn còn trống
     const handleAvailableClick = async (tableId: number) => {
         const table = tsItemData.find(item => item.tableId === tableId);
 
         setSelectedTable(table);
     };
 
+    // Xử lý submit điền thông tin bàn của khách hàng
     const handleModalSubmit = (data: {
         customerName: string;
         phoneNumber: string;
-        status: "hasCustomer" | "reserved";
+        status: "occupied" | "reserved";
         reservedTime?: string;
         billId: number;
     }) => {
@@ -131,7 +133,7 @@ const TableStatus = () => {
                 {/* Has Customer tables */}
                 <ul className="ts-list">
                     <h2 className="ts-has-customer-title">Has customer</h2>
-                    {groupedData.hasCustomer.map((item) => (
+                    {groupedData.occupied.map((item) => (
                         <li key={item.tableId}
                             className={`ts-item ${highlightedTables.includes(item.tableId) ? "ts-notify" : ""
                                 }`}

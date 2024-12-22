@@ -9,22 +9,22 @@ export interface MenuFood {
 export interface Cart {
     itemId: string;
     itemName: string;
-    price: number;
-    quantity: number;
-    status: 'pending' | 'cooking' | 'completed' | 'error';
+    itemPrice: number;
+    itemQuantity: number;
+    status: 'pending' | 'completed' | 'error';
     total: number;
 }
 
-export interface CartOrder{
-    tableId: number  | null ;
+export interface CartOrder {
+    tableId: number | null;
     itemId: string;
     itemName: string;
-    quantity: number;
+    itemQuantity: number;
     orderAt: Date;
 }
 
 export interface OrderStatus {
     tableId: number;
     itemId: string;
-    status: 'pending' | 'cooking' | 'completed' | 'error';
+    status: 'pending' | 'completed' | 'error';
 }
