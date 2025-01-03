@@ -1,0 +1,328 @@
+/*=========================================================
+Author       : LeThienHuy.
+==============================================================*/
+
+/*=============================================================
+    CSS INDEX
+  =============================
+    01.GENERAL STYLE
+
+
+*=============================================================*/
+/*===================================*
+    01.GENERAL STYLE
+*===================================*/
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+:root {
+    --brown: #8d6e63;
+    --white-cream: #f5f5dc;
+    --white: #fff;
+    --gray: #e0e0e0;
+    --yellow: #020202;
+
+    /* Header */
+    --header-bg: #0e6de2;
+
+    /* Section overview */
+    --overview-title: #05405a;
+    --overview-description: #29323c;
+
+    /* Footer */
+    --footer-bg: linear-gradient(60deg, #29323c 0%, #485563 100%);
+}
+/*===================================*
+    01.END GENERAL STYLE
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    02.START HEADER
+*===================================*/
+/* Header */
+.header-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 2rem;
+    background-color: var(--header-bg);
+    z-index: 1000;
+}
+
+/* Logo */
+.logo-container {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--white);
+    text-transform: uppercase;
+}
+
+.logo-link {
+    display: flex;
+    align-items: center;
+    color: var(--white);
+}
+
+.logo-link h1 {
+    font-size: 1.5rem;
+    margin-left: 0.5rem;
+}
+
+/* Nav */
+.nav-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.nav-item {
+    display: inline-block;
+}
+
+.nav-item a {
+    display: inline-block;
+    font-size: 1rem;
+    color: var(--white);
+    text-transform: uppercase;
+    margin: 0 0.25rem;
+    padding: 1.25rem 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: all 0.3s;
+}
+
+.nav-item a:hover {
+    color: var(--white-cream);
+    background-color: #105ab4ad;
+}
+
+/*===================================*
+    02.END HEADER
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    02.START MAIN
+*===================================*/
+/* Main */
+.main-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+}
+
+/* Video banner */
+.video-banner {
+    width: 100%;
+    height: 100vh;
+    object-fit: cover;
+    object-position: center;
+}
+/*===================================*
+    02.END MAIN
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    03.START OVERVIEW SECTION
+*===================================*/
+/* OVERVIEW SECTION */
+.section-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    padding: 3.125rem 2rem;
+}
+
+.home-overview-section {
+    align-items: stretch;
+    flex-direction: row;
+}
+
+/* Info */
+.overview-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 40%;
+    padding: 1rem;
+}
+
+.overview-title {
+    font-size: 2rem;
+    line-height: 2rem;
+    font-family: "Libre Baskerville", sans-serif;
+    color: var(--overview-title);
+    margin-bottom: 0.125rem;
+}
+
+/* Description */
+.overview-description {
+    font-size: 1rem;
+    padding: 1.5rem 0;
+    color: var(--overview-description);
+}
+
+.overview-text {
+    font-size: 1rem;
+    padding: 1.5rem 0;
+    color: var(--overview-description);
+}
+
+.overview-text strong {
+    margin-right: 0.25rem;
+}
+
+/* List */
+.overview-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    padding-left: 1rem;
+    list-style: disc;
+}
+
+.overview-item {
+    font-size: 1rem;
+    color: var(--overview-description);
+    padding: 0.5rem 0;
+    text-align: left;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    list-style: disc;
+}
+
+/* Image */
+.overview-image {
+    width: 60%;
+}
+
+.overview-image img {
+    width: 100%;
+    height: auto;
+}
+/*===================================*
+    03.END OVERVIEW SECTION
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    10.START FOOTER
+*===================================*/
+/* Footer */
+footer {
+    background-image: var(--footer-bg);
+}
+
+.footer-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    padding: 3.125rem 2rem 0.75rem;
+    z-index: 1000;
+}
+
+.brand-name {
+    font-size: 1.875rem;
+    text-transform: uppercase;
+    color: var(--white);
+}
+
+footer h2 {
+    font-size: 1.25rem;
+    color: var(--white);
+    margin: 1rem 0;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+}
+
+/* Social media */
+.social-media-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.social-media-container a {
+    margin: 0 0.5rem;
+    font-size: 1.25rem;
+}
+
+.social-media-container a img {
+    filter: grayscale(1);
+    transition: all 0.3s;
+}
+
+.social-media-container a:hover img {
+    filter: grayscale(0);
+}
+
+.copy-right {
+    font-size: 1rem;
+    color: var(--white);
+    margin: 0 0.5rem;
+    font-weight: 400;
+}
+
+/*===================================*
+    10.END FOOTER
+*===================================*/

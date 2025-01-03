@@ -33,7 +33,7 @@ export default function RootLayout({
             <Head>
                 <link rel="icon" href="public/favicon.ico" />
             </Head>
-            <body className={`${geistSans.variable} ${geistMono.variable} flex`}>
+            <body className={`${geistSans.variable} ${geistMono.variable}`}>
                 <ThemeContextProvider>
                     <CssBaseline />
                     <AppLayout >

@@ -370,7 +370,7 @@ aside.expanded ~ main {
 }
 
 .cart-table th {
-    background-color: #98F8FF;
+    background-color: #0866ff;
     color: white;
     font-weight: bold;
 }
@@ -502,7 +502,8 @@ aside.expanded ~ main {
 /*===================================*
     06.START STATUS MODAL
 *===================================*/
-.MuiDialog-container.MuiDialog-scrollPaper.css-19do60a-MuiDialog-container > div{
+.MuiDialog-container.MuiDialog-scrollPaper.css-19do60a-MuiDialog-container
+    > div {
     padding: 5px 0 15px;
 }
 
@@ -521,3 +522,24 @@ aside.expanded ~ main {
 
 
 */
+/*===================================*
+    08.START PAYMENT
+*===================================*/
+.main-payment {
+    width: 100%;
+    margin: 0 2%;
+}
+
+.payment-section {
+    width: 100%;
+    margin: 0 2%;
+}
+
+.payment-section .main-title {
+    width: 100%;
+    text-align: center;
+    margin: 30px 0;
+}
+/*===================================*
+    08.END PAYMENT
+*===================================*/

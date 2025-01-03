@@ -25,12 +25,12 @@ const sidebarList: Sidebar[] = [
     {
         icon: FaTable,
         text: "Table",
-        href: "/waiter/table",
+        href: "/admin/table",
     },
     {
         icon: FaKitchenSet,
         text: "Kitchen",
-        href: "/kitchen",
+        href: "/admin/kitchen",
     },
 ];
 

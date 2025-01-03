@@ -34,7 +34,7 @@ const TableStatus = () => {
     });
 
     const handleItemClick = (tableId: number, billId: number) => {
-        router.push(`/waiter/order?tableId=${tableId}&billId=${billId}`);
+        router.push(`/admin/order?tableId=${tableId}&billId=${billId}`);
     }
 
     // Lấy table từ DB

@@ -58,6 +58,7 @@ const Order = () => {
                         ? {
                             ...cartItem,
                             itemQuantity: cartItem.itemQuantity + quantity,
+                            status: 'pending',
                             total: (cartItem.itemQuantity + quantity) * item.price,
                         }
                         : cartItem
@@ -133,15 +134,25 @@ const Order = () => {
                 (responseCart.data || []).map((dbItem) => [dbItem.itemId, dbItem])
             );
 
-            // Lọc các item cần gửi
-            const newItems = cart.filter((cartItem) => {
+            // Lọc các item cần gửi với phần chênh lệch số lượng
+            const newItems = cart.map((cartItem) => {
                 const existingItem = existingCartItems.get(cartItem.itemId);
 
-                // Gửi nếu item không tồn tại hoặc có sự chênh lệch quantity
-                return (
-                    !existingItem || cartItem.itemQuantity > existingItem.itemQuantity
-                );
-            });
+                // Tính số lượng thêm
+                const extraQuantity =
+                    cartItem.itemQuantity - (existingItem?.itemQuantity || 0);
+
+                // Nếu có số lượng thêm, tạo dữ liệu mới
+                if (extraQuantity > 0) {
+                    return {
+                        ...cartItem,
+                        itemQuantity: extraQuantity, // Chỉ gửi số lượng thêm
+                    };
+                }
+
+                return null;
+                
+            }).filter((item) => item !== null) as Cart[];
 
             // Nếu không có item nào được thêm 
             if (newItems.length === 0) {
@@ -168,7 +179,7 @@ const Order = () => {
             const response = await axios.post('/api/cart', newItems.map((item) => ({
                 tableId: tableId,
                 itemId: item.itemId,
-                quantity: item.itemQuantity,
+                itemQuantity: item.itemQuantity,
                 status: item.status,
             })));
 
@@ -217,7 +228,7 @@ const Order = () => {
 
     // Hàm in hóa đơn
     const handleInvoice = () => {
-        router.push(`/waiter/payment/${billId}`);
+        router.push(`/admin/payment/${billId}`);
     }
 
     return (

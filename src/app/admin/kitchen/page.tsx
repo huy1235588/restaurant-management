@@ -2,7 +2,7 @@
 
 import "@/style/app.css";
 import { useEffect, useState } from "react";
-import stompClient from "../../utils/socket";
+import stompClient from "@/utils/socket";
 import { CartOrder } from "@/types/types";
 import axios from "@/config/axios";
 
