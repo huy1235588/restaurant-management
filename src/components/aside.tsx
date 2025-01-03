@@ -1,4 +1,5 @@
 import '@/style/aside.css';
+import { useTheme } from '@mui/material';
 import Link from 'next/link';
 import { IconType } from 'react-icons';
 import { AiOutlineHome } from 'react-icons/ai';
@@ -36,8 +37,10 @@ const sidebarList: Sidebar[] = [
 const Aside: React.FC<AsideProps> = ({
     className
 }) => {
+    const theme = useTheme();
+
     return (
-        <aside className={`navbar-vertical-aside ${className}`}>
+        <aside className={`navbar-vertical-aside ${className} ${theme}`}>
             <div className="sidebar-container">
                 <div className="sidebar-offset">
                     {/*  START CONTENT  */}

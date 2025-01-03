@@ -35,6 +35,9 @@ Author       : LeThienHuy.
     /* SIDEBAR */
     --sidebar-bg: #1b2838;
     --sidebar-text: #96a2c1;
+    --sidebar-bg-dark: #96a2c1;
+    --sidebar-text-dark: #1b2838;
+
     --sidebar-icon: #96a2c1;
     --sidebar-subitem-active: #377dff;
 
@@ -392,4 +395,31 @@ body.navbar-vertical-aside-mini-mode .footer {
 }
 /*===================================*
     09.END MOBILE HEADER ASIDE
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    09.START THEME
+*===================================*/
+.navbar-vertical-aside.light {
+    background-color: var(--sidebar-bg);
+    color: var(--sidebar-text);
+}
+
+.navbar-vertical-aside.dark {
+    background-color: var(--sidebar-bg-dark);
+    color: var(--sidebar-bg-dark);
+}
+/*===================================*
+    09.END THEME
 *===================================*/
