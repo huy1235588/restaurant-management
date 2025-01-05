@@ -11,6 +11,7 @@ import {
     Select,
     InputLabel,
     FormControl,
+    useTheme,
     SelectChangeEvent, // Import kiểu SelectChangeEvent từ MUI
 } from "@mui/material";
 import { useNotification } from "./notificationProvider";
@@ -24,6 +25,7 @@ interface TableModalProps {
 }
 
 const TableModal: React.FC<TableModalProps> = ({ tableId, initialBillId, onSubmit, onClose }) => {
+    const theme = useTheme(); // Sử dụng hook useTheme để lấy theme hiện tại
     const { showNotification } = useNotification();
 
     // State để lưu dữ liệu của form
@@ -31,10 +33,10 @@ const TableModal: React.FC<TableModalProps> = ({ tableId, initialBillId, onSubmi
         tableId: tableId,
         billId: initialBillId,
         customerName: "",
-        phoneNumber: "",
         reservedTime: "",
         numberOfGuests: 1,
         tableStatus: "occupied" as "occupied" | "reserved", // Giá trị mặc định là "occupied"
+
     });
 
     // Hàm xử lý khi thay đổi dữ liệu trong TextField
@@ -44,9 +46,11 @@ const TableModal: React.FC<TableModalProps> = ({ tableId, initialBillId, onSubmi
     };
 
     // Hàm xử lý khi thay đổi dữ liệu trong Select
-    const handleSelectChange = (e: SelectChangeEvent<"occupied" | "reserved">) => {
-        const { name, value } = e.target; // Lấy name và value từ sự kiện
-        setFormData(prev => ({ ...prev, [name]: value })); // Cập nhật dữ liệu vào state
+    const handleStatusChange = (event: SelectChangeEvent<"occupied" | "reserved">) => {
+        setFormData(prev => ({
+            ...prev,
+            tableStatus: event.target.value as "occupied" | "reserved"
+        }));
     };
 
     // Hàm xử lý khi bấm nút Submit
@@ -60,7 +64,8 @@ const TableModal: React.FC<TableModalProps> = ({ tableId, initialBillId, onSubmi
     };
 
     return (
-        < Dialog
+        <Dialog
+            className="table-modal" // Thêm class "table-modal" để tùy chỉnh CSS
             open
             onClose={onClose}
             fullWidth
@@ -81,16 +86,6 @@ const TableModal: React.FC<TableModalProps> = ({ tableId, initialBillId, onSubmi
                     onChange={handleInputChange}
                 />
 
-                {/* Ô nhập số điện thoại */}
-                <TextField
-                    fullWidth
-                    margin="normal"
-                    label="Phone Number"
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={handleInputChange}
-                />
-
                 {/* Ô nhập lượng khách */}
                 <TextField
                     fullWidth
@@ -106,19 +101,36 @@ const TableModal: React.FC<TableModalProps> = ({ tableId, initialBillId, onSubmi
                             numberOfGuests: isNaN(value) ? 1 : value,
                         }));
                     }}
-                    inputProps={{ min: 1 }}
+                    slotProps={{
+                        htmlInput: {
+                            min: 1,
+                        }
+                    }}
                 />
 
                 {/* Dropdown chọn trạng thái */}
                 <FormControl fullWidth margin="normal">
-                    <InputLabel>Status</InputLabel>
+                    <InputLabel
+                        className={`status-label ${theme.palette.mode === "dark" ? "dark" : ""} `}
+                    >
+                        Status
+                    </InputLabel>
                     <Select
+                        className="status-select"
                         name="status"
                         value={formData.tableStatus}
-                        onChange={handleSelectChange} // Sử dụng handleSelectChange cho Select
+                        onChange={handleStatusChange}
                     >
-                        <MenuItem value="occupied">Dine-In</MenuItem>
-                        <MenuItem value="reserved">Reserved</MenuItem>
+                        <MenuItem className={`status-item ${theme.palette.mode === "dark" ? "dark" : ""}`}
+                            value="occupied"
+                        >
+                            Dine-In
+                        </MenuItem>
+                        <MenuItem className={`status-item ${theme.palette.mode === "dark" ? "dark" : ""}`}
+                            value="reserved"
+                        >
+                            Reserved
+                        </MenuItem>
                     </Select>
                 </FormControl>
 
@@ -130,7 +142,6 @@ const TableModal: React.FC<TableModalProps> = ({ tableId, initialBillId, onSubmi
                         label="Reserved Time"
                         name="reservedTime"
                         type="datetime-local"
-                        InputLabelProps={{ shrink: true }}
                         value={formData.reservedTime}
                         onChange={handleInputChange}
                         slotProps={{
@@ -138,6 +149,17 @@ const TableModal: React.FC<TableModalProps> = ({ tableId, initialBillId, onSubmi
                         }}
                     />
                 )}
+
+                <TextField
+                    fullWidth
+                    multiline
+                    margin="normal"
+                    label="Note"
+                    name="specialRequest"
+                    value={formData.specialRequest}
+                    onChange={handleInputChange}
+                    placeholder="E.g., Near window, Birthday setup, etc."
+                />
             </DialogContent>
 
             {/* Các nút hành động */}

@@ -70,7 +70,7 @@ function Header() {
                         </Link>
                     </li>
                     <li className='nav-item'>
-                        <Link href='/admin/staff'>
+                        <Link href='/admin/table'>
                             Staff
                         </Link>
                     </li>

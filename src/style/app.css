@@ -16,7 +16,7 @@ Author       : LeThienHuy.
 	09.SECTION NEW GAME
 	10.SECTION TRENDING
     11.SECTION BROWSE
-	13.FOOTER STYLE
+	20.FOOTER STYLE
 		
 *=============================================================*/
 /*===================================*
@@ -27,6 +27,7 @@ Author       : LeThienHuy.
     --brown: #8d6e63;
     --white-cream: #f5f5dc;
     --white: #fff;
+    --black: #000;
     --gray: #e0e0e0;
     --yellow: #020202;
 
@@ -38,6 +39,14 @@ Author       : LeThienHuy.
     /* Form */
     --button-bg: #0074e4;
     --button-bg-hover: #3b90e0;
+
+    /* Tables */
+    --available-bg: #009966;
+    --has-customer-bg: #cc0033;
+    --reserved-bg: #660066;
+    --available-bg-hover: #40846a;
+    --has-customer-bg-hover: #b24d5c;
+    --reserved-bg-hover: #7a4c74;
 }
 
 .main {
@@ -50,7 +59,7 @@ Author       : LeThienHuy.
 }
 
 aside.expanded ~ main {
-    padding-left: 2rem;
+    padding-left: 0;
 }
 
 .main-title {
@@ -137,13 +146,13 @@ aside.expanded ~ main {
 *===================================*/
 .main-ts {
     width: 100%;
-    margin: 0 3%;
 }
 
 .ts-section {
     display: flex;
     justify-content: space-between;
     width: 100%;
+    padding: 0 2%;
 }
 
 .ts-list {
@@ -153,28 +162,26 @@ aside.expanded ~ main {
 
 .ts-list h2 {
     padding: 10px;
-    border-radius: 10px;
+    border-radius: 5px;
     margin-bottom: 30px;
 }
 
 .ts-available-title {
-    background-color: rgb(25, 112, 13);
+    background-color: var(--available-bg);
 }
 
 .ts-has-customer-title {
-    background-color: rgb(179, 14, 14);
+    background-color: var(--has-customer-bg);
 }
 
 .ts-reserved-title {
-    color: black;
-    background-color: rgb(251, 255, 35);
+    background-color: var(--reserved-bg);
 }
 
 .ts-item {
     padding: 10px;
     margin-bottom: 30px;
     border-radius: 10px;
-    background-color: #2c1177;
 
     font-size: 20px;
     cursor: pointer;
@@ -182,8 +189,28 @@ aside.expanded ~ main {
     user-select: none;
 }
 
-.ts-item:hover {
-    background-color: #2c1177b7;
+.ts-item.available {
+    background-color: var(--available-bg);
+}
+
+.ts-item.has-customer {
+    background-color: var(--has-customer-bg);
+}
+
+.ts-item.reserved {
+    background-color: var(--reserved-bg);
+}
+
+.ts-item.available:hover {
+    background-color: var(--available-bg-hover);
+}
+
+.ts-item.has-customer:hover {
+    background-color: var(--has-customer-bg-hover);
+}
+
+.ts-item.reserved:hover {
+    background-color: var(--reserved-bg-hover);
 }
 
 .ts-item.ts-notify {
@@ -502,11 +529,25 @@ aside.expanded ~ main {
 /*===================================*
     06.START STATUS MODAL
 *===================================*/
-.MuiDialog-container.MuiDialog-scrollPaper.css-19do60a-MuiDialog-container
-    > div {
+.table-modal .MuiDialog-container .MuiDialog-paper {
     padding: 5px 0 15px;
 }
 
+.status-item.MuiMenuItem-root.dark {
+    color: var(--white);
+}
+
+.status-item.MuiMenuItem-root {
+    color: var(--black);
+}
+
+.status-label {
+    background-color: var(--white);
+}
+
+.status-label.dark {
+    background-color: #393939;
+}
 /*===================================*
     07.END STATUS MODAL
 *===================================*/
@@ -543,3 +584,15 @@ aside.expanded ~ main {
 /*===================================*
     08.END PAYMENT
 *===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/

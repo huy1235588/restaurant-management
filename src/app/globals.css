@@ -87,5 +87,5 @@ span {
 }
 
 .toggle-aside:has(~ aside.collapsed) {
-    left: 9%;
+    left: 14%;
 }

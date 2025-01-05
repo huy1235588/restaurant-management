@@ -10,6 +10,7 @@ import TableModal from "@/components/tableModal";
 
 interface TsItem {
     tableId: number;
+    tableName: string;
     billId: number;
     capacity: number;
     status: "available" | "reserved" | "occupied"
@@ -33,6 +34,7 @@ const TableStatus = () => {
         occupied: [] as TsItem[]
     });
 
+    // Xử lý click vào bàn đã có khách
     const handleItemClick = (tableId: number, billId: number) => {
         router.push(`/admin/order?tableId=${tableId}&billId=${billId}`);
     }
@@ -41,7 +43,7 @@ const TableStatus = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get<TsItem[]>('/api/tablestatus/all');
+                const response = await axios.get<TsItem[]>('/api/tables/all');
                 setTsItemData(response.data || []);
 
             } catch (error) {
@@ -88,7 +90,7 @@ const TableStatus = () => {
         const response = await axios.post<number>('/api/bookings', {
             tableId: data.tableId,
             customerName: data.customerName,
-            phoneNumber: data.phoneNumber,
+            specialRequest: data.specialRequest,
             reservedTime: data.reservedTime,
             numberOfGuests: data.numberOfGuests,
             tableStatus: data.tableStatus,
@@ -109,7 +111,7 @@ const TableStatus = () => {
     return (
         <main className="main main-ts">
             <h1 className="main-title">
-                TABLE STATUS
+                TABLE
             </h1>
 
             <section className="ts-section">
@@ -118,7 +120,7 @@ const TableStatus = () => {
                     <h2 className="ts-available-title">Available</h2>
                     {groupedData.available.map((item) => (
                         <li key={item.tableId}
-                            className={`ts-item ${highlightedTables.includes(item.tableId) ? "ts-notify" : ""
+                            className={`ts-item available ${highlightedTables.includes(item.tableId) ? "ts-notify" : ""
                                 }`}
                             onClick={() => handleAvailableClick(item.tableId)}
                         >
@@ -140,7 +142,7 @@ const TableStatus = () => {
                     <h2 className="ts-has-customer-title">Has customer</h2>
                     {groupedData.occupied.map((item) => (
                         <li key={item.tableId}
-                            className={`ts-item ${highlightedTables.includes(item.tableId) ? "ts-notify" : ""
+                            className={`ts-item has-customer ${highlightedTables.includes(item.tableId) ? "ts-notify" : ""
                                 }`}
                             onClick={() => handleItemClick(item.tableId, item.billId)}
                         >
@@ -162,7 +164,7 @@ const TableStatus = () => {
                     <h2 className="ts-reserved-title">Reserved</h2>
                     {groupedData.reserved.map((item) => (
                         <li key={item.tableId}
-                            className={`ts-item ${highlightedTables.includes(item.tableId) ? "ts-notify" : ""
+                            className={`ts-item reserved ${highlightedTables.includes(item.tableId) ? "ts-notify" : ""
                                 }`}
                             onClick={() => handleItemClick(item.tableId, item.billId)}
                         >

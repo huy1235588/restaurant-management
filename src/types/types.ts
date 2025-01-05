@@ -13,6 +13,14 @@ export interface Category {
     categoryName: string;
 }
 
+// Restaurant Tables
+export interface RestaurantTables {
+    tableId: number;
+    tableName: string;
+    capacity: number;
+    status: 'occupied' | 'reserved' | 'available';
+}
+
 export interface Cart {
     itemId: string;
     itemName: string;
@@ -26,7 +34,17 @@ export interface TableBooking {
     tableId: number | null;
     billId: number;
     customerName: string;
-    phoneNumber: string;
+    specialRequest?: "",
+    reservedTime?: string;
+    numberOfGuests: number;
+    tableStatus: "occupied" | "reserved";
+}
+
+export interface Reservation {
+    reservationId: number | null;
+    tableId: number;
+    customerName: string;
+    specialRequest?: "",
     reservedTime?: string;
     numberOfGuests: number;
     tableStatus: "occupied" | "reserved";
