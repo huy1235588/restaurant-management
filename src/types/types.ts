@@ -9,7 +9,7 @@ export interface MenuFood {
 
 // Category
 export interface Category {
-    categoryId: number;
+    id: number;
     categoryName: string;
 }
 

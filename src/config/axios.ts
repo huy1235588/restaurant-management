@@ -6,8 +6,6 @@ const instance = axios.create({
     withCredentials: true      // Để gửi kèm cookie trong yêu cầu
 });
 
-console.log(process.env.NEXT_PUBLIC_SERVER_URL)
-
 // Thay đổi cấu hình mặc định sau khi đã tạo instance
 // instance.defaults.headers.common['Authorization'] = AUTH_TOKEN;
 
