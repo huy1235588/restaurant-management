@@ -1,6 +1,7 @@
 'use client'
 
 import Aside from '@/components/aside';
+import ThemeToggleButton from '@/components/themeToggleButton';
 import { ReactNode, useState } from 'react';
 import { FiSidebar } from 'react-icons/fi';
 
@@ -31,6 +32,9 @@ const Layout = ({ children }: LayoutProps) => {
             <footer>
                 <p>© 2023 Restaurant Management</p>
             </footer>
+
+            {/* Toggle theme */}
+            <ThemeToggleButton />
         </div>
     );
 };

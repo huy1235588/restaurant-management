@@ -1,9 +1,16 @@
-// Order
+// Menu
 export interface MenuFood {
-    itemId: string;
+    itemId: number;
     itemName: string;
-    category: string;
-    price: number;
+    categoryId: number;
+    price: string;
+    description: string;
+}
+
+// Category
+export interface Category {
+    categoryId: number;
+    categoryName: string;
 }
 
 export interface Cart {

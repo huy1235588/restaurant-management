@@ -1,0 +1,265 @@
+{
+	"approved" : true,
+	"contentrating" : "Everyone",
+	"description" : "[img]https://i.imgur.com/BktfQLs.png[/img]\r\nThis table of elements is multi language and you can also change the background color! (controls are as seen on the screenshot)\r\nSelect atomic information such as ELECTRONEGATIVITY, IONIZATION ENERGY, DISCOVERY YEAR and many more atomic properties ... [b]Click any element's name and the Wiki page for that element pops up.[/b]\r\nThis is the periodic table of elements for chemistry lovers. It has bright neon colors that clearly divides different category of elements. It also has CGI affects that shows atomic weights, number of electrons per orbits, etc. Enjoy!\r\nFor more information watch this short YouTube clip https://youtu.be/fg6Yg63oCfM\r\n                                                           [img]https://i.imgur.com/3u98LK6.gif[/img]\r\n                                               Tabla Periódica de los Elementos\r\n                                               Tableau Périodique des Éléments\r\n                                               Периодическая таблица элементов\r\n                                               Das Periodensystem der Elemente\r\n                                                                 元素周期表\r\n\r\n                                                         [img]https://i.imgur.com/aaFNJIj.gif[/img]\r\n[h1]If you enjoy my content and choose to support me, Thank You![/h1]\r\n                                         [url=https://ko-fi.com/agwallpapers][img]https://i.imgur.com/xB2P70h.png[/img][/url]\r\n[img]https://i.imgur.com/BktfQLs.png[/img]",
+	"file" : "index.html",
+	"general" : 
+	{
+		"properties" : 
+		{
+			"atomic_info" : 
+			{
+				"options" : 
+				[
+					{
+						"label" : "Atomic mass",
+						"value" : "atomic_mass"
+					},
+					{
+						"label" : "Discovery Year",
+						"value" : "discovery_year"
+					},
+					{
+						"label" : "Earth Crust (%)",
+						"value" : "earth_crust"
+					},
+					{
+						"label" : "Electronegativity (Pauling scale)",
+						"value" : "electronegativity_Pauling_scale"
+					},
+					{
+						"label" : "Electron configuration",
+						"value" : "electron_configuration"
+					},
+					{
+						"label" : "Ionization Energy (eV)",
+						"value" : "ionization_energy"
+					}
+				],
+				"order" : 90,
+				"text" : "Atomic Info",
+				"type" : "combo",
+				"value" : "atomic_mass"
+			},
+			"background_color" : 
+			{
+				"order" : 100,
+				"text" : "Background Color",
+				"type" : "color",
+				"value" : "0.06 0.07 0.09"
+			},
+			"language" : 
+			{
+				"options" : 
+				[
+					{
+						"label" : "English",
+						"value" : "english"
+					},
+					{
+						"label" : "Español",
+						"value" : "spanish"
+					},
+					{
+						"label" : "Français",
+						"value" : "french"
+					},
+					{
+						"label" : "Dansk",
+						"value" : "danish"
+					},
+					{
+						"label" : "Deutsch",
+						"value" : "german"
+					},
+					{
+						"label" : "Dutch",
+						"value" : "dutch"
+					},
+					{
+						"label" : "Italiano",
+						"value" : "italian"
+					},
+					{
+						"label" : "Kurdî",
+						"value" : "kurdish"
+					},
+					{
+						"label" : "Latviešu",
+						"value" : "latvian"
+					},
+					{
+						"label" : "Lietuviškai",
+						"value" : "lithuanian"
+					},
+					{
+						"label" : "Македонски",
+						"value" : "macedonian"
+					},
+					{
+						"label" : "Magyar",
+						"value" : "hungarian"
+					},
+					{
+						"label" : "Norsk",
+						"value" : "norwegian"
+					},
+					{
+						"label" : "O'zbekcha",
+						"value" : "uzbek"
+					},
+					{
+						"label" : "Polska",
+						"value" : "polish"
+					},
+					{
+						"label" : "Português",
+						"value" : "portuguese"
+					},
+					{
+						"label" : "Suomi",
+						"value" : "finnish"
+					},
+					{
+						"label" : "Svensk",
+						"value" : "swidish"
+					},
+					{
+						"label" : "Română",
+						"value" : "romanian"
+					},
+					{
+						"label" : "فارسی",
+						"value" : "farsi"
+					},
+					{
+						"label" : "Ελληνικα",
+						"value" : "greek"
+					},
+					{
+						"label" : "Bahasa Melayu",
+						"value" : "malay"
+					},
+					{
+						"label" : "Türkçe",
+						"value" : "turkish"
+					},
+					{
+						"label" : "한국어",
+						"value" : "korean"
+					},
+					{
+						"label" : "हिन्दी",
+						"value" : "hindi"
+					},
+					{
+						"label" : "русский",
+						"value" : "russian"
+					},
+					{
+						"label" : "Slovenčina",
+						"value" : "slovak"
+					},
+					{
+						"label" : "中文",
+						"value" : "chinese"
+					},
+					{
+						"label" : "日本語",
+						"value" : "japanese"
+					},
+					{
+						"label" : "العربية",
+						"value" : "arabic"
+					},
+					{
+						"label" : "Česky",
+						"value" : "czech"
+					},
+					{
+						"label" : "Íslenska",
+						"value" : "icelandic"
+					},
+					{
+						"label" : "বাংলা",
+						"value" : "bengali"
+					},
+					{
+						"label" : "Tiếng Việt",
+						"value" : "vietnamese"
+					},
+					{
+						"label" : "ไทย",
+						"value" : "thai"
+					},
+					{
+						"label" : "Српски",
+						"value" : "serbian"
+					},
+					{
+						"label" : "Български",
+						"value" : "bulgarian"
+					},
+					{
+						"label" : "Українска",
+						"value" : "ukrainian"
+					},
+					{
+						"label" : "eesti keel",
+						"value" : "estonian"
+					},
+					{
+						"label" : "Hrvatska",
+						"value" : "croatian"
+					}
+				],
+				"order" : 110,
+				"text" : "Language",
+				"type" : "combo",
+				"value" : "english"
+			},
+			"music" : 
+			{
+				"order" : 45,
+				"text" : "Play Music Intro",
+				"type" : "bool",
+				"value" : false
+			},
+			"music_volume" : 
+			{
+				"condition" : "music.value",
+				"max" : 100,
+				"min" : 0,
+				"order" : 75,
+				"step" : 1,
+				"text" : "Music Volume",
+				"type" : "slider",
+				"value" : 25
+			},
+			"schemecolor" : 
+			{
+				"order" : 0,
+				"text" : "ui_browse_properties_scheme_color",
+				"type" : "color",
+				"value" : "0 0 0"
+			},
+			"ultrawide_monitor" : 
+			{
+				"order" : 200,
+				"text" : "Ultrawide Monitor",
+				"type" : "bool",
+				"value" : false
+			}
+		}
+	},
+	"preview" : "preview.gif",
+	"ratingsex" : "none",
+	"ratingviolence" : "none",
+	"tags" : [ "Technology" ],
+	"title" : "Periodic Table of Elements *** 40 LANGUAGES ***",
+	"type" : "web",
+	"version" : 33,
+	"visibility" : "public",
+	"workshopid" : "1828698678",
+	"workshopurl" : "steam://url/CommunityFilePage/1828698678"
+}

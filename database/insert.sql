@@ -1,225 +1,462 @@
--- Insert sample data for Category
+-- Categories
 INSERT INTO
     Category (categoryName)
 VALUES
     ('Appetizers'),
-    ('Main Course'),
+    ('Main Courses'),
     ('Desserts'),
-    ('Beverages'),
-    ('Salads'),
-    ('Soups'),
-    ('Pasta'),
-    ('Grill'),
-    ('Pizza'),
-    ('Seafood');
+    ('Beverages');
 
--- Insert sample data for Tables (50 entries)
+-- Menu Items
 INSERT INTO
-    Tables (tableName, status, capacity)
+    Menu (itemId, itemName, categoryId, price, description)
 VALUES
-    ('T1', 'reserved', 4),
-    ('T2', 'occupied', 2),
-    ('T3', 'reserved', 6),
-    ('T4', 'occupied', 4),
-    ('T5', 'reserved', 8),
-    ('T6', 'reserved', 4),
-    ('T7', 'reserved', 6),
-    ('T8', 'occupied', 2),
-    ('T9', 'occupied', 4),
-    ('T10', 'reserved', 10),
-    ('T11', 'available', 4),
-    ('T12', 'available', 6),
-    ('T13', 'available', 2),
-    ('T14', 'available', 4),
-    ('T15', 'available', 6),
-    ('T16', 'available', 8),
-    ('T17', 'available', 4),
-    ('T18', 'available', 4),
-    ('T19', 'available', 2),
-    ('T20', 'available', 4),
-    ('T21', 'available', 10),
-    ('T22', 'available', 6),
-    ('T23', 'available', 4),
-    ('T24', 'available', 4),
-    ('T25', 'available', 2),
-    ('T26', 'available', 8),
-    ('T27', 'available', 4),
-    ('T28', 'available', 6),
-    ('T29', 'available', 4),
-    ('T30', 'available', 2),
-    ('T31', 'available', 4),
-    ('T32', 'available', 10),
-    ('T33', 'available', 8),
-    ('T34', 'available', 6),
-    ('T35', 'available', 4),
-    ('T36', 'available', 2),
-    ('T37', 'available', 6),
-    ('T38', 'available', 4),
-    ('T39', 'available', 10),
-    ('T40', 'available', 4),
-    ('T41', 'available', 8),
-    ('T42', 'available', 6),
-    ('T43', 'available', 2),
-    ('T44', 'available', 4),
-    ('T45', 'available', 6),
-    ('T46', 'available', 8),
-    ('T47', 'available', 4),
-    ('T48', 'available', 6),
-    ('T49', 'available', 2),
-    ('T50', 'available', 10);
+    (
+        'M001',
+        'Veggie Spring Rolls',
+        1,
+        4.99,
+        'Crispy rolls stuffed with fresh vegetables'
+    ),
+    (
+        'M002',
+        'Teriyaki Chicken',
+        2,
+        13.50,
+        'Grilled chicken glazed with teriyaki sauce'
+    ),
+    (
+        'M003',
+        'Red Velvet Cake',
+        3,
+        7.50,
+        'Rich red velvet cake with cream cheese frosting'
+    ),
+    (
+        'M004',
+        'Pepsi',
+        4,
+        2.00,
+        'Chilled Pepsi beverage'
+    ),
+    (
+        'M005',
+        'Greek Salad',
+        1,
+        6.99,
+        'Fresh salad with feta cheese and olives'
+    ),
+    (
+        'M006',
+        'Ribeye Steak',
+        2,
+        18.99,
+        'Juicy ribeye steak grilled to perfection'
+    ),
+    (
+        'M007',
+        'Lemon Tart',
+        3,
+        5.99,
+        'Tangy lemon tart with a buttery crust'
+    ),
+    (
+        'M008',
+        'Sparkling Water',
+        4,
+        2.50,
+        'Refreshing sparkling water'
+    ),
+    (
+        'M009',
+        'Cheesy Garlic Bread',
+        1,
+        4.99,
+        'Toasted garlic bread with melted cheese'
+    ),
+    (
+        'M010',
+        'Fettuccine Alfredo',
+        2,
+        12.50,
+        'Pasta with creamy Alfredo sauce'
+    ),
+    (
+        'M011',
+        'Mango Cheesecake',
+        3,
+        6.99,
+        'Cheesecake topped with fresh mango puree'
+    ),
+    (
+        'M012',
+        'Iced Mocha',
+        4,
+        3.50,
+        'Cold coffee with chocolate and cream'
+    ),
+    (
+        'M013',
+        'Caprese Salad',
+        1,
+        5.99,
+        'Tomato and mozzarella salad with basil'
+    ),
+    (
+        'M014',
+        'Grilled Pork Chops',
+        2,
+        16.50,
+        'Pork chops grilled with BBQ sauce'
+    ),
+    (
+        'M015',
+        'Strawberry Shortcake',
+        3,
+        7.00,
+        'Shortcake with strawberries and whipped cream'
+    ),
+    (
+        'M016',
+        'Mint Lemonade',
+        4,
+        3.00,
+        'Lemonade infused with fresh mint'
+    ),
+    (
+        'M017',
+        'Shrimp Cocktail',
+        1,
+        8.99,
+        'Chilled shrimp with cocktail sauce'
+    ),
+    (
+        'M018',
+        'Baked Salmon',
+        2,
+        15.50,
+        'Salmon baked with herbs and lemon'
+    ),
+    (
+        'M019',
+        'Coconut Panna Cotta',
+        3,
+        6.50,
+        'Creamy panna cotta with coconut flavor'
+    ),
+    (
+        'M020',
+        'Herbal Tea',
+        4,
+        2.50,
+        'Aromatic herbal tea'
+    ),
+    (
+        'M021',
+        'Stuffed Zucchini',
+        1,
+        6.99,
+        'Zucchini stuffed with cheese and vegetables'
+    ),
+    (
+        'M022',
+        'BBQ Beef Ribs',
+        2,
+        17.99,
+        'Slow-cooked beef ribs with BBQ sauce'
+    ),
+    (
+        'M023',
+        'Banana Split',
+        3,
+        6.00,
+        'Banana with ice cream, chocolate, and nuts'
+    ),
+    (
+        'M024',
+        'Espresso Macchiato',
+        4,
+        2.50,
+        'Espresso with a dash of foamed milk'
+    ),
+    (
+        'M025',
+        'Fried Calamari',
+        1,
+        7.99,
+        'Crispy fried squid rings with dipping sauce'
+    ),
+    (
+        'M026',
+        'Chicken Parmesan',
+        2,
+        14.99,
+        'Breaded chicken with marinara and cheese'
+    ),
+    (
+        'M027',
+        'Blueberry Muffin',
+        3,
+        3.99,
+        'Soft muffin with fresh blueberries'
+    ),
+    (
+        'M028',
+        'Vanilla Milkshake',
+        4,
+        3.99,
+        'Creamy milkshake with vanilla flavor'
+    ),
+    (
+        'M029',
+        'Chili Nachos',
+        1,
+        7.50,
+        'Nachos topped with chili, cheese, and sour cream'
+    ),
+    (
+        'M030',
+        'Seafood Paella',
+        2,
+        16.99,
+        'Traditional Spanish rice dish with seafood'
+    ),
+    (
+        'M031',
+        'Black Forest Cake',
+        3,
+        7.50,
+        'Chocolate cake layered with cherries and cream'
+    ),
+    (
+        'M032',
+        'Berry Smoothie',
+        4,
+        4.50,
+        'Smoothie made with mixed berries'
+    ),
+    (
+        'M033',
+        'Chicken Wings',
+        1,
+        8.50,
+        'Spicy and crispy chicken wings'
+    ),
+    (
+        'M034',
+        'Vegetable Lasagna',
+        2,
+        13.00,
+        'Lasagna layered with vegetables and cheese'
+    ),
+    (
+        'M035',
+        'Pumpkin Pie',
+        3,
+        5.99,
+        'Seasonal pumpkin pie with whipped cream'
+    ),
+    (
+        'M036',
+        'Hot Cappuccino',
+        4,
+        3.00,
+        'Hot coffee with steamed milk foam'
+    ),
+    (
+        'M037',
+        'Spinach Artichoke Dip',
+        1,
+        6.50,
+        'Warm dip served with tortilla chips'
+    ),
+    (
+        'M038',
+        'Roasted Duck',
+        2,
+        18.50,
+        'Roasted duck served with orange glaze'
+    ),
+    (
+        'M039',
+        'Vanilla Pudding',
+        3,
+        4.99,
+        'Creamy vanilla pudding with caramel topping'
+    ),
+    (
+        'M040',
+        'Chai Latte',
+        4,
+        3.50,
+        'Hot spiced tea with milk'
+    ),
+    (
+        'M041',
+        'Eggplant Parmesan',
+        1,
+        9.50,
+        'Breaded eggplant with marinara and cheese'
+    ),
+    (
+        'M042',
+        'Lobster Tail',
+        2,
+        22.99,
+        'Grilled lobster tail with butter sauce'
+    ),
+    (
+        'M043',
+        'Chocolate Truffle',
+        3,
+        6.50,
+        'Rich chocolate truffle with ganache'
+    ),
+    (
+        'M044',
+        'Cold Brew Coffee',
+        4,
+        3.99,
+        'Iced coffee steeped for a smooth flavor'
+    ),
+    (
+        'M045',
+        'Deviled Eggs',
+        1,
+        5.50,
+        'Classic deviled eggs with paprika'
+    ),
+    (
+        'M046',
+        'Turkey Roast',
+        2,
+        19.99,
+        'Oven-roasted turkey with cranberry sauce'
+    ),
+    (
+        'M047',
+        'Peach Cobbler',
+        3,
+        6.00,
+        'Warm peach cobbler with vanilla ice cream'
+    ),
+    (
+        'M048',
+        'Energy Drink',
+        4,
+        2.99,
+        'Refreshing energy drink'
+    ),
+    (
+        'M049',
+        'Falafel Platter',
+        1,
+        7.99,
+        'Crispy falafels with hummus and pita bread'
+    ),
+    (
+        'M050',
+        'Shrimp Scampi',
+        2,
+        15.99,
+        'Shrimp in garlic butter sauce with pasta'
+    );
 
--- Insert sample data for MenuFood (50 entries)
+-- Accounts
 INSERT INTO
-    MenuFood (itemId, itemName, categoryId, price)
+    Account (username, email, phoneNumber, password)
 VALUES
-    ('F1', 'Spring Rolls', 1, 5.99),
-    ('F2', 'Garlic Bread', 1, 3.99),
-    ('F3', 'Caesar Salad', 5, 7.99),
-    ('F4', 'Tomato Soup', 6, 4.99),
-    ('F5', 'Grilled Chicken', 8, 12.99),
-    ('F6', 'Spaghetti Carbonara', 7, 10.99),
-    ('F7', 'Margherita Pizza', 9, 9.99),
-    ('F8', 'Tiramisu', 3, 6.99),
-    ('F9', 'Iced Tea', 4, 2.99),
-    ('F10', 'Grilled Salmon', 10, 15.99),
-    ('F11', 'Cheesecake', 3, 6.49),
-    ('F12', 'Chicken Soup', 6, 5.49),
-    ('F13', 'Pasta Alfredo', 7, 11.99),
-    ('F14', 'Veggie Pizza', 9, 8.99),
-    ('F15', 'Grilled Steak', 8, 18.99),
-    ('F16', 'Fruit Salad', 5, 6.49),
-    ('F17', 'Hot Chocolate', 4, 3.49),
-    ('F18', 'Seafood Pasta', 10, 14.99),
-    ('F19', 'Garlic Shrimp', 1, 9.99),
-    ('F20', 'BBQ Ribs', 8, 19.99),
-    ('F21', 'Caprese Salad', 5, 8.49),
-    ('F22', 'French Fries', 1, 3.49),
-    ('F23', 'Pepperoni Pizza', 9, 10.99),
-    ('F24', 'Vanilla Ice Cream', 3, 4.99),
-    ('F25', 'Espresso', 4, 2.49),
-    ('F26', 'Clam Chowder', 6, 6.99),
-    ('F27', 'Lobster Tail', 10, 25.99),
-    ('F28', 'Chicken Alfredo', 7, 13.99),
-    ('F29', 'Greek Salad', 5, 7.49),
-    ('F30', 'Veggie Soup', 6, 5.99),
-    ('F31', 'Filet Mignon', 8, 29.99),
-    ('F32', 'BBQ Chicken Pizza', 9, 12.99),
-    ('F33', 'Mocha', 4, 3.99),
-    ('F34', 'Ice Lemon Tea', 4, 3.29),
-    ('F35', 'Prawn Tempura', 1, 10.49),
-    ('F36', 'Chocolate Cake', 3, 7.49),
-    ('F37', 'Cappuccino', 4, 3.49),
-    ('F38', 'Grilled Veggies', 8, 7.99),
-    ('F39', 'Fish and Chips', 10, 13.49),
-    ('F40', 'Pesto Pasta', 7, 12.49),
-    ('F41', 'Brownie', 3, 5.49),
-    ('F42', 'Chicken Caesar Wrap', 5, 9.49),
-    ('F43', 'Minestrone Soup', 6, 6.49),
-    ('F44', 'BBQ Pork Ribs', 8, 21.99),
-    ('F45', 'Seafood Pizza', 9, 15.99),
-    ('F46', 'Fruit Punch', 4, 4.49),
-    ('F47', 'Sushi Platter', 10, 24.99),
-    ('F48', 'Margarita', 4, 5.99),
-    ('F49', 'Chili Cheese Fries', 1, 6.99),
-    ('F50', 'Beef Lasagna', 7, 14.49);
+    ('ha', 'ha@example.com', '1234567890', 'ha'),
+    ('he', 'he@example.com', '0987654321', 'he'),
+    ('hi', 'hi@example.com', '0983444321', 'hi');
 
--- TABLE BOOKING
+-- Staffs
 INSERT INTO
-    TableBooking (
-        tableId,
+    Staffs (accountId, fullName, address, role)
+VALUES
+    (1, 'haha', '123 Main Street', 'chef'),
+    (2, 'hehe', '456 Elm Street', 'waiter'),
+    (3, 'hihi', '789 Oak Street', 'manager');
+
+-- Restaurant Tables
+INSERT INTO
+    RestaurantTables (tableName, capacity, status)
+VALUES
+    ('T1', 4, 'occupied'),
+    ('T2', 6, 'reserved'),
+    ('T3', 2, 'available'),
+    ('T4', 4, 'available'),
+    ('T5', 6, 'available'),
+    ('T6', 2, 'available'),
+    ('T7', 4, 'available'),
+    ('T8', 6, 'available'),
+    ('T9', 2, 'available'),
+    ('T10', 4, 'available'),
+    ('T11', 6, 'available'),
+    ('T12', 2, 'available'),
+    ('T13', 4, 'available'),
+    ('T14', 6, 'available'),
+    ('T15', 2, 'available'),
+    ('T16', 4, 'available'),
+    ('T17', 6, 'available'),
+    ('T18', 2, 'available'),
+    ('T19', 4, 'available'),
+    ('T20', 6, 'available');
+
+-- Reservations
+INSERT INTO
+    Reservations (
         customerName,
-        phoneNumber,
-        reservedTime,
-        numberOfGuests
+        tableId,
+        reservationDate,
+        reservationTime,
+        headCount,
+        specialRequest
     )
 VALUES
     (
+        'Alice Johnson',
         1,
-        'John Doe',
-        '0123456789',
-        '2024-12-23 12:00:00',
-        4
-    ),
-    (
-        2,
-        'Jane Smith',
-        '0987654321',
-        NULL,
-        2
-    ),
-    (
-        3,
-        'Emily Johnson',
-        '0912345678',
-        '2024-12-23 14:00:00',
-        3
-    ),
-    (
+        '2025-01-05',
+        '18:30:00',
         4,
-        'Michael Brown',
-        '0934123456',
-        NULL,
-        5
-    ),
-    (
-        5,
-        'Sarah Lee',
-        '0976123456',
-        '2024-12-23 16:00:00',
-        6
-    ),
-    (
-        6,
-        'David Wilson',
-        '0963456789',
-        '2024-12-23 17:00:00',
-        2
-    ),
-    (
-        7,
-        'Sophia Clark',
-        '0923456789',
-        '2024-12-23 18:00:00',
-        4
-    ),
-    (
-        8,
-        'James Miller',
-        '0907654321',
-        NULL,
-        3
-    ),
-    (
-        9,
-        'Olivia Harris',
-        '0912349876',
-        NULL,
-        2
-    ),
-    (
-        10,
-        'Liam Martinez',
-        '0943456789',
-        '2024-12-23 21:00:00',
-        5
+        'Window seat'
     );
 
--- Bill
+-- Card Payments
+INSERT INTO
+    CardPayments (cardNumber, cardHolderName, expiryDate, cvv)
+VALUES
+    (
+        '1234567812345678',
+        'Alice Johnson',
+        '2026-12-01',
+        123
+    );
+
+-- Bills
 INSERT INTO
     Bills (
-        bookingId,
+        staffId,
+        reservationId,
+        tableId,
+        cardId,
         totalAmount,
-        paymentStatus,
         paymentMethod
     )
 VALUES
-    (1, 150.00, 'paid', 'cash'),
-    (2, 80.50, 'pending', 'card'),
-    (3, 120.00, 'failed', 'cash'),
-    (4, 200.00, 'paid', 'card'),
-    (5, 250.75, 'pending', 'cash'),
-    (6, 90.00, 'paid', 'card'),
-    (7, 160.30, 'failed', 'cash'),
-    (8, 180.00, 'paid', 'cash'),
-    (9, 140.00, 'pending', 'card'),
-    (10, 220.00, 'paid', 'card');
+    (1, 1, 1, 1, 25.99, 'card');
+
+-- Bill Items
+INSERT INTO
+    BillItems (billId, itemId, quantity)
+VALUES
+    (1, 'M001', 2),
+    (1, 'M004', 3);
+
+-- Kitchen Orders
+INSERT INTO
+    KitchenOrders (staffId, itemId, quantity, status)
+VALUES
+    (2, 'M001', 2, 'completed'),
+    (2, 'M003', 1, 'pending');

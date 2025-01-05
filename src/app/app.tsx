@@ -1,7 +1,5 @@
 'use client'
 
-import ThemeToggleButton from "@/components/themeToggleButton";
-
 export default function AppLayout({
     children,
 }: Readonly<{
@@ -11,10 +9,7 @@ export default function AppLayout({
 
     return (
         <>           
-            {children}
-
-            {/* Toggle theme */}
-            <ThemeToggleButton />
+            {children}            
         </>
     );
 }
