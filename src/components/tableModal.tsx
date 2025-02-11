@@ -15,12 +15,12 @@ import {
     SelectChangeEvent, // Import kiểu SelectChangeEvent từ MUI
 } from "@mui/material";
 import { useNotification } from "./notificationProvider";
-import { TableBooking } from "@/types/types";
+import { Reservation } from "@/types/types";
 
 interface TableModalProps {
     tableId: number;
     initialBillId: number;
-    onSubmit: (data: TableBooking) => void;
+    onSubmit: (data: Reservation) => void;
     onClose: () => void;
 }
 
@@ -29,12 +29,12 @@ const TableModal: React.FC<TableModalProps> = ({ tableId, initialBillId, onSubmi
     const { showNotification } = useNotification();
 
     // State để lưu dữ liệu của form
-    const [formData, setFormData] = useState<TableBooking>({
+    const [formData, setFormData] = useState<Reservation>({
         tableId: tableId,
         billId: initialBillId,
         customerName: "",
         reservedTime: "",
-        numberOfGuests: 1,
+        headCount: 1,
         tableStatus: "occupied" as "occupied" | "reserved", // Giá trị mặc định là "occupied"
 
     });
@@ -93,7 +93,7 @@ const TableModal: React.FC<TableModalProps> = ({ tableId, initialBillId, onSubmi
                     label="Number of Guests"
                     name="numberOfGuests"
                     type="number"
-                    value={formData.numberOfGuests}
+                    value={formData.headCount}
                     onChange={e => {
                         const value = parseInt(e.target.value, 10);
                         setFormData(prev => ({

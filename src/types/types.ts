@@ -35,18 +35,20 @@ export interface TableBooking {
     billId: number;
     customerName: string;
     specialRequest?: "",
+    reservedDate?: string;
     reservedTime?: string;
     numberOfGuests: number;
     tableStatus: "occupied" | "reserved";
 }
 
 export interface Reservation {
-    reservationId: number | null;
-    tableId: number;
+    tableId: RestaurantTables['tableId'];
+    billId: number;
     customerName: string;
-    specialRequest?: "",
+    reservedDate?: string;
     reservedTime?: string;
-    numberOfGuests: number;
+    headCount: number;
+    specialRequest?: "",
     tableStatus: "occupied" | "reserved";
 }
 
