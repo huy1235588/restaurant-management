@@ -12,7 +12,6 @@ const MenuFoodTable: React.FC<Props> = ({ menuFoodData, quantities, onQuantityCh
     <table className="mf-table">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Item Name</th>
                 <th>Category</th>
                 <th>Price</th>
@@ -23,9 +22,8 @@ const MenuFoodTable: React.FC<Props> = ({ menuFoodData, quantities, onQuantityCh
         <tbody>
             {menuFoodData.map((item) => (
                 <tr key={item.itemId}>
-                    <td>{item.itemId}</td>
                     <td>{item.itemName}</td>
-                    <td>{item.category}</td>
+                    <td>{item.categoryId}</td>
                     <td>{item.price.toFixed(2)}</td>
                     <td>
                         <input
@@ -33,7 +31,7 @@ const MenuFoodTable: React.FC<Props> = ({ menuFoodData, quantities, onQuantityCh
                             min="1"
                             value={quantities[item.itemId] || 1}
                             max={1000}
-                            onChange={(e) => onQuantityChange(item.itemId, parseInt(e.target.value, 10))}
+                            onChange={(e) => onQuantityChange(String(item.itemId), parseInt(e.target.value, 10))}
                             className="quantity-input"
                         />
                     </td>

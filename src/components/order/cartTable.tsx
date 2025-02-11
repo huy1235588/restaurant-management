@@ -11,7 +11,6 @@ const CartTable: React.FC<Props> = ({ cartData, handleRemoveFromCart }) => (
     <table className="cart-table">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Item Name</th>
                 <th>Price</th>
                 <th>Quantity</th>
@@ -23,7 +22,6 @@ const CartTable: React.FC<Props> = ({ cartData, handleRemoveFromCart }) => (
         <tbody>
             {cartData.map((item, index) => (
                 <tr key={index}>
-                    <td>{item.itemId}</td>
                     <td>{item.itemName}</td>
                     <td>{item.itemPrice.toFixed(2)}</td>
                     <td>{item.itemQuantity}</td>

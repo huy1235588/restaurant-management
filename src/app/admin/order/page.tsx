@@ -49,12 +49,12 @@ const Order = () => {
         const quantity = quantities[item.itemId] || 1; // Số lượng mặc định là 1 nếu chưa chọn số lượng
 
         setCart((prevCart) => {
-            const existingItemIndex = prevCart.findIndex((cartItem) => cartItem.itemId === item.itemId);
+            const existingItemIndex = prevCart.findIndex((cartItem) => cartItem.itemId === item.itemId.toString());
 
             // Nếu sản phẩm đã tồn tại trong giỏ hàng, cập nhật số lượng và tổng giá trị
             if (existingItemIndex !== -1) {
                 return prevCart.map((cartItem) =>
-                    cartItem.itemId === item.itemId
+                    cartItem.itemId === item.itemId.toString()
                         ? {
                             ...cartItem,
                             itemQuantity: cartItem.itemQuantity + quantity,
@@ -69,6 +69,7 @@ const Order = () => {
                 ...prevCart,
                 {
                     ...item,
+                    itemId: item.itemId.toString(),
                     itemPrice: item.price,
                     itemQuantity: quantity,
                     status: 'pending',

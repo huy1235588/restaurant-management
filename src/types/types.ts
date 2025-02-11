@@ -3,7 +3,7 @@ export interface MenuFood {
     itemId: number;
     itemName: string;
     categoryId: number;
-    price: string;
+    price: number;
     description: string;
 }
 

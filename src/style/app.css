@@ -59,7 +59,7 @@ Author       : LeThienHuy.
 }
 
 aside.expanded ~ main {
-    padding-left: 0;
+    padding-left: 40px;
 }
 
 .main-title {
@@ -144,84 +144,73 @@ aside.expanded ~ main {
 /*===================================*
     05.START TABLE STATUS
 *===================================*/
-.main-ts {
-    width: 100%;
+/* Container holding the entire floor plan */
+.ts-floor-plan {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 20px 50px;
+    margin: 0.5rem auto;
+    max-width: 800px;
 }
 
-.ts-section {
+/* Each table box */
+.ts-table {
     display: flex;
-    justify-content: space-between;
-    width: 100%;
-    padding: 0 2%;
-}
-
-.ts-list {
-    /* border: 1px solid red; */
-    width: 30%;
-}
-
-.ts-list h2 {
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 30px;
-}
-
-.ts-available-title {
-    background-color: var(--available-bg);
-}
-
-.ts-has-customer-title {
-    background-color: var(--has-customer-bg);
-}
-
-.ts-reserved-title {
-    background-color: var(--reserved-bg);
-}
-
-.ts-item {
-    padding: 10px;
-    margin-bottom: 30px;
-    border-radius: 10px;
-
-    font-size: 20px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
     cursor: pointer;
-    transition: background-color 0.1s ease-in-out;
-    user-select: none;
+    background-color: #f7f7f7;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.ts-item.available {
-    background-color: var(--available-bg);
+/* Hover effect for the table box */
+.ts-table:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
 }
 
-.ts-item.has-customer {
-    background-color: var(--has-customer-bg);
+/* Table label style */
+.table-label {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
 }
 
-.ts-item.reserved {
-    background-color: var(--reserved-bg);
+/* Status color coding */
+.ts-table.available {
+    border-color: green;
+    background-color: #e6ffe6; /* light green */
 }
 
-.ts-item.available:hover {
-    background-color: var(--available-bg-hover);
+.ts-table.occupied {
+    border-color: red;
+    background-color: #ffe6e6; /* light red */
 }
 
-.ts-item.has-customer:hover {
-    background-color: var(--has-customer-bg-hover);
+.ts-table.reserved {
+    border-color: orange;
+    background-color: #fff7e6; /* light orange */
 }
 
-.ts-item.reserved:hover {
-    background-color: var(--reserved-bg-hover);
+/* Highlight animation when there's an update */
+.ts-notify {
+    animation: notifyBlink 1s infinite alternate;
 }
 
-.ts-item.ts-notify {
-    background-color: #00eeff;
-    color: #020202;
-    transition: background-color 0.5s ease-out;
+@keyframes notifyBlink {
+    0% {
+        box-shadow: 0 0 10px #1abc9c;
+    }
+    100% {
+        box-shadow: 0 0 10px #f1c40f;
+    }
 }
 
-.ts-item.ts-notify:hover {
-    background-color: #22acb6;
-}
 /*===================================*
     05.END TABLE STATUS
 *===================================*/
@@ -244,7 +233,7 @@ aside.expanded ~ main {
     flex-direction: row;
     justify-content: space-between;
     align-items: normal;
-    width: 100%;
+    /* width: 100%; */
     margin: 0 2%;
     user-select: none;
 }
