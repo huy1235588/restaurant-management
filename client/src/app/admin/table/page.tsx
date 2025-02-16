@@ -107,27 +107,45 @@ const TableStatus = () => {
         <main className="main main-ts">
             <h1 className="main-title">TABLE</h1>
 
-            {/* Floor-plan style container */}
-            <section className="ts-floor-plan">
-                {tsItemData.map((item) => (
-                    <div
-                        key={item.tableId}
-                        className={`ts-table ${item.status} ${highlightedTables.includes(item.tableId) ? "ts-notify" : ""
-                            }`}
-                        onClick={() => {
-                            if (item.status === "available") {
-                                handleAvailableClick(item.tableId);
-                            } else {
-                                handleItemClick(item.tableId, item.billId);
-                            }
-                        }}
-                    >
-                        <p className="table-label">Table {item.tableId}</p>
-                        <p>Capacity: {item.capacity}</p>
-                        <p>Bill ID: {item.billId}</p>
+            <div className="ts-container">
+                {/* Floor-plan style container */}
+                <section className="ts-floor-plan">
+                    {tsItemData.map((item) => (
+                        <div
+                            key={item.tableId}
+                            className={`ts-table ${item.status} ${highlightedTables.includes(item.tableId) ? "ts-notify" : ""
+                                }`}
+                            onClick={() => {
+                                if (item.status === "available") {
+                                    handleAvailableClick(item.tableId);
+                                } else {
+                                    handleItemClick(item.tableId, item.billId);
+                                }
+                            }}
+                        >
+                            <p className="table-label">Table {item.tableId}</p>
+                            <p>Capacity: {item.capacity}</p>
+                            <p>Bill ID: {item.billId}</p>
+                        </div>
+                    ))}
+                </section>
+
+                {/* Legend */}
+                <section className="ts-legend">
+                    <div className="ts-legend-item">
+                        <div className="ts-legend-color" style={{ backgroundColor: 'green' }}></div>
+                        <span>Available</span>
                     </div>
-                ))}
-            </section>
+                    <div className="ts-legend-item">
+                        <div className="ts-legend-color" style={{ backgroundColor: 'yellow' }}></div>
+                        <span>Reserved</span>
+                    </div>
+                    <div className="ts-legend-item">
+                        <div className="ts-legend-color" style={{ backgroundColor: 'red' }}></div>
+                        <span>Occupied</span>
+                    </div>
+                </section>
+            </div>
 
             {/* Table Modal */}
             {selectedTable && (

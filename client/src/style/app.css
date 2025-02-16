@@ -211,6 +211,51 @@ aside.expanded ~ main {
     }
 }
 
+.ts-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    max-width: 800px;
+}
+
+/* Legend */
+/* .ts-table.available {
+    background-color: green;
+    color: white;
+}
+
+.ts-table.reserved {
+    background-color: yellow;
+    color: black;
+}
+
+.ts-table.occupied {
+    background-color: red;
+    color: white;
+} */
+/* 
+.ts-notify {
+    border: 2px solid blue;
+} */
+
+.ts-legend {
+    display: flex;
+    flex-direction: column;
+    margin-left: 50px;
+}
+
+.ts-legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.ts-legend-color {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
 /*===================================*
     05.END TABLE STATUS
 *===================================*/
