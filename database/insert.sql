@@ -456,7 +456,7 @@ VALUES
 
 -- Kitchen Orders
 INSERT INTO
-    KitchenOrders (staffId, itemId, quantity, status)
+    KitchenOrders (billId, staffId, itemId, quantity, status)
 VALUES
-    (2, 'M001', 2, 'completed'),
-    (2, 'M003', 1, 'pending');
+    (1, 2, 'M001', 2, 'completed'),
+    (1, 2, 'M003', 1, 'pending');

@@ -1,6 +1,6 @@
 // Menu
 export interface MenuFood {
-    itemId: number;
+    itemId: string;
     itemName: string;
     categoryId: number;
     price: number;
@@ -19,15 +19,6 @@ export interface RestaurantTables {
     tableName: string;
     capacity: number;
     status: 'occupied' | 'reserved' | 'available';
-}
-
-export interface Cart {
-    itemId: string;
-    itemName: string;
-    itemPrice: number;
-    itemQuantity: number;
-    status: 'pending' | 'completed' | 'error';
-    total: number;
 }
 
 export interface TableBooking {
@@ -69,10 +60,29 @@ export interface OrderStatus {
 export interface Bills {
     id: number;
     staffId: number;
-    reservation: Reservation;
-    table: RestaurantTables;
+    reservationId: number;
+    tableId: number;
     cardId: number;
     totalAmount: number;
     billTime: Date;
     paymentMethod: 'cash' | 'card';
+}
+
+export interface BillItem {
+    id?: number;
+    billID: number;
+    itemId: string;
+    itemName: string;
+    itemPrice: number;
+    quantity: number;
+}
+
+export interface KitchenOrder {
+    id?: number;
+    billID: number;
+    itemId: string;
+    itemName: string;
+    itemPrice: number;
+    quantity: number;
+    status: 'pending' | 'completed' | 'error';
 }

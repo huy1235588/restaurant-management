@@ -3,7 +3,7 @@
 import CartTable from "@/components/order/cartTable";
 import MenuFoodTable from "@/components/order/menuFoodTable";
 import "@/style/app.css";
-import { Cart, CartOrder, MenuFood, OrderStatus } from "@/types/types";
+import { BillItem, Bills, CartOrder, KitchenOrder, MenuFood, OrderStatus } from "@/types/types";
 import stompClient from "@/utils/socket";
 import axios from "@/config/axios";
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -21,20 +21,33 @@ const Order = () => {
         return id ? parseInt(id) : null;
     }, [searchParams]);
 
+    // Lấy bill từ database
     const billId = useMemo(() => searchParams.get("billId"), [searchParams]);
+    const [bill, setBill] = useState<Bills | null>(null);
+    useEffect(() => {
+        if (!billId) return;
+
+        const fetchBillData = async () => {
+            try {
+                const response = await axios.get<Bills>(`/api/bill/${billId}`);
+                setBill(response.data);
+            } catch (error) {
+                console.error('Failed to fetch bill data:', error);
+            }
+        };
+
+        fetchBillData();
+    }, []);
+
+    // State quản lý giỏ hàng
     const [menuFoodData, setMenuFoodData] = useState<MenuFood[]>([]);
 
+    // State quản lý giỏ hàng
     const [isSending, setIsSending] = useState(false);
 
     // State quản lý số lượng cho từng mục
     const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
-    const [cart, setCart] = useState<Cart[]>([]);
-
-    // Tính tổng tiền của giỏ hàng
-    const totalAmount = useMemo(
-        () => cart.reduce((total, item) => total + item.total, 0),
-        [cart]
-    );
+    const [kitchenOrders, setKitchenOrders] = useState<KitchenOrder[]>([]);
 
     // Xử lý thay đổi số lượng
     const handleQuantityChange = (id: string, value: number) => {
@@ -48,32 +61,32 @@ const Order = () => {
     const handleAddToCart = (item: MenuFood) => {
         const quantity = quantities[item.itemId] || 1; // Số lượng mặc định là 1 nếu chưa chọn số lượng
 
-        setCart((prevCart) => {
-            const existingItemIndex = prevCart.findIndex((cartItem) => cartItem.itemId === item.itemId.toString());
+        setKitchenOrders((prevKitchenOrders) => {
+            const existingItemIndex = prevKitchenOrders.findIndex((billItem) => billItem.itemId === item.itemId);
 
             // Nếu sản phẩm đã tồn tại trong giỏ hàng, cập nhật số lượng và tổng giá trị
-            if (existingItemIndex !== -1) {
-                return prevCart.map((cartItem) =>
-                    cartItem.itemId === item.itemId.toString()
-                        ? {
-                            ...cartItem,
-                            itemQuantity: cartItem.itemQuantity + quantity,
-                            status: 'pending',
-                            total: (cartItem.itemQuantity + quantity) * item.price,
-                        }
-                        : cartItem
-                );
-            }
+            // if (existingItemIndex !== -1) {
+            //     return prevBillItems.map((billItem) =>
+            //         billItem.itemId === item.itemId
+            //             ? {
+            //                 ...billItem,
+            //                 bill: bill,
+            //                 menu: item,
+            //                 quantity: billItem.quantity + quantity,
+            //             }
+            //             : billItem
+            //     );
+            // }
 
             return [
-                ...prevCart,
+                ...prevKitchenOrders,
                 {
-                    ...item,
-                    itemId: item.itemId.toString(),
+                    billID: bill?.id,
+                    itemId: item.itemId,
+                    itemName: item.itemName,
                     itemPrice: item.price,
-                    itemQuantity: quantity,
+                    quantity: quantity,
                     status: 'pending',
-                    total: item.price * quantity
                 },
             ];
         });
@@ -81,7 +94,7 @@ const Order = () => {
 
     // Xử lý xóa vào giỏ hàng
     const handleRemoveFromCart = (id: string) => {
-        setCart((prevCart) => prevCart.filter((item) => item.itemId !== id));
+        setKitchenOrders((prevKitchenOrders) => prevKitchenOrders.filter((kitchenOrder) => kitchenOrder.itemId!== id));
     };
 
     // WebSocket xử lý kết nối và nhận trạng thái từ bếp
@@ -122,7 +135,7 @@ const Order = () => {
     // Hàm gửi order đến bếp
     const handleSendToKitchen = async () => {
         // Kiểm tra cart có rỗng
-        if (cart.length === 0) {
+        if (kitchenOrders.length === 0) {
             showNotification("Your cart is empty!", "warning");
             return;
         }
@@ -130,30 +143,30 @@ const Order = () => {
         setIsSending(true);
         try {
             // Lấy danh sách item hiện có trong DB
-            const responseCart = await axios.get<Cart[]>(`/api/cart/${tableId}`);
+            const responseCart = await axios.get<BillItem[]>(`/api/cart/${tableId}`);
             const existingCartItems = new Map(
-                (responseCart.data || []).map((dbItem) => [dbItem.itemId, dbItem])
+                (responseCart.data || []).map((dbItem) => [dbItem.id, dbItem])
             );
 
             // Lọc các item cần gửi với phần chênh lệch số lượng
-            const newItems = cart.map((cartItem) => {
-                const existingItem = existingCartItems.get(cartItem.itemId);
+            const newItems = kitchenOrders.map((kitchenOrder) => {
+                const existingItem = existingCartItems.get(kitchenOrder.id);
 
                 // Tính số lượng thêm
                 const extraQuantity =
-                    cartItem.itemQuantity - (existingItem?.itemQuantity || 0);
+                kitchenOrder.quantity - (existingItem?.quantity || 0);
 
                 // Nếu có số lượng thêm, tạo dữ liệu mới
                 if (extraQuantity > 0) {
                     return {
-                        ...cartItem,
+                        ...kitchenOrder,
                         itemQuantity: extraQuantity, // Chỉ gửi số lượng thêm
                     };
                 }
 
                 return null;
-                
-            }).filter((item) => item !== null) as Cart[];
+
+            }).filter((item) => item !== null) as BillItem[];
 
             // Nếu không có item nào được thêm 
             if (newItems.length === 0) {
@@ -163,9 +176,9 @@ const Order = () => {
 
             // Chuyển đổi dữ liệu để gửi tới WebSocket và API
             const data: CartOrder[] = newItems.map((item) => ({
-                itemId: item.itemId,
-                itemName: item.itemName,
-                itemQuantity: item.itemQuantity,
+                itemId: item.menu.itemId,
+                itemName: item.menu.itemName,
+                itemQuantity: item.quantity,
                 orderAt: new Date(),
                 tableId: tableId,
             }));
@@ -179,9 +192,9 @@ const Order = () => {
             // Thêm vào DB
             const response = await axios.post('/api/cart', newItems.map((item) => ({
                 tableId: tableId,
-                itemId: item.itemId,
-                itemQuantity: item.itemQuantity,
-                status: item.status,
+                itemId: item.menu.itemId,
+                itemQuantity: item.quantity,
+                // status: item.,
             })));
 
             showNotification(response.data, "success");
@@ -199,10 +212,10 @@ const Order = () => {
 
         const fetchCartData = async () => {
             try {
-                const response = await axios.get<Cart[]>(`/api/cart/${tableId}`);
-                setCart((response.data || []).map((item) => ({
+                const response = await axios.get<KitchenOrder[]>(`/api/kitchenOrder/all/${tableId}`);
+                setKitchenOrders((response.data || []).map((item) => ({
                     ...item,
-                    total: item.itemQuantity * item.itemPrice, // Tính total từng item
+                    total: item.quantity * item.itemPrice, // Tính total từng item
                 })));
             } catch (error) {
                 console.error('Failed to fetch cart data:', error);
@@ -210,13 +223,13 @@ const Order = () => {
         };
 
         fetchCartData();
-    }, [tableId])
+    }, [])
 
     // Lấy menu từ DB
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get<MenuFood[]>('/api/menufood/all');
+                const response = await axios.get<MenuFood[]>('/api/menu/all');
                 setMenuFoodData(response.data);
 
             } catch (error) {
@@ -263,19 +276,19 @@ const Order = () => {
                     Cart
                 </h2>
                 <p>Table ID: {tableId}</p>
-                <p>Bill ID: {billId}</p>
+                <p>Bill ID: {bill?.id}</p>
 
                 {/* Content */}
                 <div className="table-container">
                     <CartTable
-                        cartData={cart}
+                        KitchenOrders={kitchenOrders}
                         handleRemoveFromCart={handleRemoveFromCart}
                     />
                 </div>
 
                 {/* Summary */}
                 <div className="cart-total">
-                    <p><strong>Total: ${totalAmount.toFixed(2)}</strong></p>
+                    <p><strong>Total: ${bill?.totalAmount}</strong></p>
                 </div>
 
                 {/* Gửi yêu cầu đến bếp */}

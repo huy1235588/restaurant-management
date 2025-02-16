@@ -105,12 +105,14 @@ CREATE TABLE
 CREATE TABLE
     IF NOT EXISTS KitchenOrders (
         orderId INT PRIMARY KEY AUTO_INCREMENT,
+        billId INT,
         staffId INT,
         itemId VARCHAR(10),
         quantity INT NOT NULL,
         orderTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         status ENUM ('pending', 'cancelled', 'completed') DEFAULT 'pending',
         cancelReason VARCHAR(255) DEFAULT NULL,
+        FOREIGN KEY (billId) REFERENCES Bills (billId),
         FOREIGN KEY (staffId) REFERENCES Staffs (staffId),
         FOREIGN KEY (itemId) REFERENCES Menu (itemId)
     );
