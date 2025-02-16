@@ -331,6 +331,7 @@ aside.expanded ~ main {
     margin: 0 30px 0 0;
     padding: 10px 20px;
     font-size: 20px;
+    color: #000;
 }
 
 .mf-submit-btn {
@@ -346,9 +347,14 @@ aside.expanded ~ main {
 
 .mf-table th,
 .mf-table td {
+    height: 65px;
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
+}
+
+.mf-table-row.hidden {
+    display: none;
 }
 
 .mf-table td:last-child {
@@ -377,7 +383,7 @@ aside.expanded ~ main {
     background-color: #4caf50;
     color: white;
     border: none;
-    padding: 5px 7px;
+    padding: 10px 7px;
     cursor: pointer;
     border-radius: 4px;
 }
@@ -421,6 +427,7 @@ aside.expanded ~ main {
 
 .cart-table th,
 .cart-table td {
+    height: 65px;
     border: 1px solid #ddd;
     padding: 6px 8px;
     text-align: left;

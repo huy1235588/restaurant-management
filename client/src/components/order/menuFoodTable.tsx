@@ -21,7 +21,7 @@ const MenuFoodTable: React.FC<Props> = ({ menuFoodData, quantities, onQuantityCh
         </thead>
         <tbody>
             {menuFoodData.map((item) => (
-                <tr key={item.itemId}>
+                <tr key={item.itemId} data-item-id={item.itemId} data-item-name={item.itemName} className='mf-table-row'>
                     <td>{item.itemName}</td>
                     <td>{item.categoryId}</td>
                     <td>{item.price.toFixed(2)}</td>

@@ -49,6 +49,24 @@ const Order = () => {
     const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
     const [kitchenOrders, setKitchenOrders] = useState<KitchenOrder[]>([]);
 
+    // Hàm tìm kiếm món ăn
+    const handleSearchFood = (e: React.ChangeEvent<HTMLInputElement>) => {
+        // Chuyển giá trị search về chữ thường
+        const searchValue = e.target.value.toLowerCase();
+        const mfTableRows = document.querySelectorAll('.mf-table-row');
+
+        // Lặp qua từng hàng trong bảng
+        mfTableRows.forEach((row) => {
+            const itemName = row.getAttribute('data-item-name')?.toLowerCase() || '';
+            const isMatch = itemName.includes(searchValue);
+
+            // Nếu tên món ăn chứa giá trị search, hiển thị hàng đó
+            row.classList.toggle('hidden', !isMatch);
+        });
+
+        
+    }
+
     // Xử lý thay đổi số lượng
     const handleQuantityChange = (id: string, value: number) => {
         setQuantities((prev) => ({
@@ -94,7 +112,7 @@ const Order = () => {
 
     // Xử lý xóa vào giỏ hàng
     const handleRemoveFromCart = (id: string) => {
-        setKitchenOrders((prevKitchenOrders) => prevKitchenOrders.filter((kitchenOrder) => kitchenOrder.itemId!== id));
+        setKitchenOrders((prevKitchenOrders) => prevKitchenOrders.filter((kitchenOrder) => kitchenOrder.itemId !== id));
     };
 
     // WebSocket xử lý kết nối và nhận trạng thái từ bếp
@@ -154,7 +172,7 @@ const Order = () => {
 
                 // Tính số lượng thêm
                 const extraQuantity =
-                kitchenOrder.quantity - (existingItem?.quantity || 0);
+                    kitchenOrder.quantity - (existingItem?.quantity || 0);
 
                 // Nếu có số lượng thêm, tạo dữ liệu mới
                 if (extraQuantity > 0) {
@@ -255,7 +273,12 @@ const Order = () => {
 
                 {/* Search food */}
                 <form className="form mf-form" action="">
-                    <input className="mf-input-form" type="text" placeholder="Search Food & Drinks" />
+                    <input
+                        className="mf-input-form"
+                        type="text"
+                        placeholder="Search Food & Drinks"
+                        onChange={handleSearchFood}
+                    />
                     <button className="submit-btn mf-submit-btn" type="button" >Search</button>
                 </form>
 
