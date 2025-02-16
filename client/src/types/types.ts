@@ -45,8 +45,8 @@ export interface Reservation {
     tableId: RestaurantTables['tableId'];
     billId: number;
     customerName: string;
-    reservedDate?: string;
-    reservedTime?: string;
+    reservationDate?: string;
+    reservationTime?: string;
     headCount: number;
     specialRequest?: "",
     tableStatus: "occupied" | "reserved";
@@ -64,4 +64,15 @@ export interface OrderStatus {
     tableId: number;
     itemId: string;
     status: 'pending' | 'completed' | 'error';
+}
+
+export interface Bills {
+    id: number;
+    staffId: number;
+    reservation: Reservation;
+    table: RestaurantTables;
+    cardId: number;
+    totalAmount: number;
+    billTime: Date;
+    paymentMethod: 'cash' | 'card';
 }

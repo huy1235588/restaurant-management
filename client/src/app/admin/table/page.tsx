@@ -5,7 +5,7 @@ import axios from "@/config/axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import stompClient from "@/utils/socket";
-import { OrderStatus, Reservation, RestaurantTables } from "@/types/types";
+import { Bills, OrderStatus, Reservation, RestaurantTables } from "@/types/types";
 import TableModal from "@/components/tableModal";
 
 interface TsItem {
@@ -23,7 +23,7 @@ const TableStatus = () => {
 
     const router = useRouter();
 
-    // Fetch tables from DB
+    // Lấy dữ liệu bàn từ server
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -36,13 +36,13 @@ const TableStatus = () => {
         fetchData();
     }, []);
 
-    // WebSocket for receiving status updates
+    // WebSocket để nhận thông báo từ server
     useEffect(() => {
         stompClient.onConnect = () => {
             stompClient.subscribe("/topic/waiter", (message) => {
                 const statusUpdate: OrderStatus = JSON.parse(message.body);
 
-                // Highlight the table that received an update
+                // Highlight cho bàn có thay đổi trạng thái
                 setHighlightedTables((prev) => {
                     if (!prev.includes(statusUpdate.tableId)) {
                         return [...prev, statusUpdate.tableId];
@@ -59,31 +59,35 @@ const TableStatus = () => {
         };
     }, []);
 
-    // Handle clicking on a table that is already occupied or reserved
+    // Hàm xử lý khi click vào một bàn
     const handleItemClick = (tableId: number, billId: number) => {
         router.push(`/admin/order?tableId=${tableId}&billId=${billId}`);
     };
 
-    // Handle clicking on an available table
+    // Hàm xử lý khi click vào bàn trống
     const handleAvailableClick = (tableId: number) => {
         const table = tsItemData.find((item) => item.tableId === tableId);
         setSelectedTable(table);
     };
 
-    // Handle submitting the booking from the modal
+    // Hàm xử lý khi submit form modal
     const handleModalSubmit = async (data: Reservation) => {
         try {
-            const response = await axios.post<Reservation>(`/api/reservation?status=${data.tableStatus}`, {
+            const response = await axios.post<Bills>(`/api/reservation?status=${data.tableStatus}`, {
                 table: {
                     id: data.tableId,
                 },
                 customerName: data.customerName,
                 specialRequest: data.specialRequest,
-                reservedTime: data.reservedTime,
+                reservationDate: data.reservationDate,
+                reservationTime: data.reservationTime,
                 headCount: data.headCount,
             });
 
-            const billId = response.data.tableId;
+            // Cập nhật bill ID cho bàn
+            const billId = response.data.id;
+
+            // Cập nhật trạng thái bàn
             setTsItemData((prev) =>
                 prev.map((item) =>
                     item.tableId === selectedTable?.tableId
@@ -91,6 +95,8 @@ const TableStatus = () => {
                         : item
                 )
             );
+
+            // Đóng modal
             setSelectedTable(undefined);
         } catch (error) {
             console.error("Failed to book table:", error);

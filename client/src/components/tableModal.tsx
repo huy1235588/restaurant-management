@@ -33,7 +33,8 @@ const TableModal: React.FC<TableModalProps> = ({ tableId, initialBillId, onSubmi
         tableId: tableId,
         billId: initialBillId,
         customerName: "",
-        reservedTime: "",
+        reservationDate: "",
+        reservationTime: "",
         headCount: 1,
         tableStatus: "occupied" as "occupied" | "reserved", // Giá trị mặc định là "occupied"
 
@@ -56,10 +57,13 @@ const TableModal: React.FC<TableModalProps> = ({ tableId, initialBillId, onSubmi
     // Hàm xử lý khi bấm nút Submit
     const handleFormSubmit = () => {
         // Kiểm tra nếu trạng thái là "reserved" mà không chọn thời gian thì hiển thị cảnh báo
-        if (formData.tableStatus === "reserved" && !formData.reservedTime) {
+        if (formData.tableStatus === "reserved" && !formData.reservationDate) {
             showNotification("Please select a reserved time.", "warning"); // Thông báo lỗi
             return;
         }
+
+        formData.reservationTime = formData.reservationDate; // Gán giá trị của reservationDate vào reservationTime
+
         onSubmit(formData); // Gửi dữ liệu qua props onSubmit
     };
 
@@ -140,12 +144,15 @@ const TableModal: React.FC<TableModalProps> = ({ tableId, initialBillId, onSubmi
                         fullWidth
                         margin="normal"
                         label="Reserved Time"
-                        name="reservedTime"
+                        name="reservationDate"
                         type="datetime-local"
-                        value={formData.reservedTime}
+                        value={formData.reservationDate}
                         onChange={handleInputChange}
                         slotProps={{
                             inputLabel: { shrink: true }
+                        }}
+                        sx={{
+                            colorScheme: "light"
                         }}
                     />
                 )}
