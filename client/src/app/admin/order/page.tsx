@@ -64,7 +64,7 @@ const Order = () => {
             row.classList.toggle('hidden', !isMatch);
         });
 
-        
+
     }
 
     // Xử lý thay đổi số lượng
@@ -80,26 +80,28 @@ const Order = () => {
         const quantity = quantities[item.itemId] || 1; // Số lượng mặc định là 1 nếu chưa chọn số lượng
 
         setKitchenOrders((prevKitchenOrders) => {
-            const existingItemIndex = prevKitchenOrders.findIndex((billItem) => billItem.itemId === item.itemId);
+            const existingItemIndex = prevKitchenOrders.findIndex((kitchenOrder) =>
+                kitchenOrder.itemId === item.itemId
+            );
 
             // Nếu sản phẩm đã tồn tại trong giỏ hàng, cập nhật số lượng và tổng giá trị
-            // if (existingItemIndex !== -1) {
-            //     return prevBillItems.map((billItem) =>
-            //         billItem.itemId === item.itemId
-            //             ? {
-            //                 ...billItem,
-            //                 bill: bill,
-            //                 menu: item,
-            //                 quantity: billItem.quantity + quantity,
-            //             }
-            //             : billItem
-            //     );
-            // }
+            if (existingItemIndex !== -1) {
+                return prevKitchenOrders.map((kitchenOrder) =>
+                    kitchenOrder.itemId === item.itemId
+                        ? {
+                            ...kitchenOrder,
+                            bill: bill,
+                            menu: item,
+                            quantity: kitchenOrder.quantity + quantity,
+                        }
+                        : kitchenOrder
+                );
+            }
 
             return [
                 ...prevKitchenOrders,
                 {
-                    billID: bill?.id,
+                    billID: bill ? bill.id : 0,
                     itemId: item.itemId,
                     itemName: item.itemName,
                     itemPrice: item.price,
