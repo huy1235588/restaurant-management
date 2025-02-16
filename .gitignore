@@ -40,3 +40,5 @@ yarn-error.log*
 next-env.d.ts
 
 public/videos/*
+
+server/node_modules
