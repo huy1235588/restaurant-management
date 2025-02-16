@@ -80,9 +80,14 @@ export interface BillItem {
 export interface KitchenOrder {
     id?: number;
     billID: number;
+    staffId: number;
     itemId: string;
     itemName: string;
     itemPrice: number;
     quantity: number;
+    orderTime: Date;
     status: 'pending' | 'completed' | 'error';
+    cancelReason?: string;
+    totalPrice?: number;
+    tableId?: number;
 }

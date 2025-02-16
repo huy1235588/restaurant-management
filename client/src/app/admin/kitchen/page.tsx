@@ -3,12 +3,12 @@
 import "@/style/app.css";
 import { useEffect, useState } from "react";
 import stompClient from "@/utils/socket";
-import { CartOrder } from "@/types/types";
+import { KitchenOrder } from "@/types/types";
 import axios from "@/config/axios";
 
 
 export default function Kitchen() {
-    const [orders, setOrders] = useState<CartOrder[]>([]);
+    const [orders, setOrders] = useState<KitchenOrder[]>([]);
 
     useEffect(() => {
         // Đảm bảo websocket được khởi tạo đúng cách
@@ -21,21 +21,21 @@ export default function Kitchen() {
         stompClient.onConnect = () => {
             stompClient.subscribe("/topic/kitchen", (message) => {
                 try {
-                    const parsedData: CartOrder = JSON.parse(message.body);
+                    const parsedData: KitchenOrder = JSON.parse(message.body);
 
                     // Kiểm tra nếu `message.body` là mảng hoặc object
                     if (Array.isArray(parsedData)) {
                         // Chuyển đổi `timeSubmitted` sang `Date`
-                        const newOrders = parsedData.map((order: CartOrder) => ({
+                        const newOrders = parsedData.map((order: KitchenOrder) => ({
                             ...order,
-                            orderAt: new Date(order.orderAt),
+                            orderAt: new Date(order.orderTime),
                         }));
 
                         setOrders((prev) => [...prev, ...newOrders]);
                     } else {
                         const order = {
                             ...parsedData,
-                            orderAt: new Date(parsedData.orderAt),
+                            orderAt: new Date(parsedData.orderTime),
                         };
                         setOrders((prev) => [...prev, order]);
                     }
@@ -48,7 +48,7 @@ export default function Kitchen() {
 
         // Lấy dữ liệu cart từ DB
         const fetchData = async () => {
-            const response = await axios.get<CartOrder[]>("/api/cart/pending");
+            const response = await axios.get<KitchenOrder[]>("/api/kitchenOrder/all?status=pending");
 
             setOrders(response.data);
         }
@@ -58,7 +58,7 @@ export default function Kitchen() {
     }, []);
 
     // Gửi cho order thành công
-    const updateStatus = (order: CartOrder) => {
+    const updateStatus = (order: KitchenOrder) => {
         const status = {
             tableId: order.tableId,
             itemId: order.itemId,
@@ -76,7 +76,7 @@ export default function Kitchen() {
                 status: "completed"
             });
 
-            const response = await axios.get<CartOrder[]>("/api/cart/pending");
+            const response = await axios.get<KitchenOrder[]>("/api/cart/pending");
 
             setOrders(response.data);
         };
@@ -86,7 +86,7 @@ export default function Kitchen() {
     };
 
     // Gửi cho order thất bại
-    const updateStatusError = (order: CartOrder) => {
+    const updateStatusError = (order: KitchenOrder) => {
         const status = {
             tableId: order.tableId,
             itemId: order.itemId,
@@ -104,7 +104,7 @@ export default function Kitchen() {
                 status: "error"
             });
 
-            const response = await axios.get<CartOrder[]>("/api/cart/pending");
+            const response = await axios.get<KitchenOrder[]>("/api/cart/pending");
 
             setOrders(response.data);
         };
@@ -135,8 +135,8 @@ export default function Kitchen() {
                                 <td>{order.tableId}</td>
                                 <td>{order.itemId}</td>
                                 <td>{order.itemName}</td>
-                                <td>{order.itemQuantity}</td>
-                                <td>{order.orderAt.toLocaleString()}</td>
+                                <td>{order.quantity}</td>
+                                <td>{order.orderTime.toLocaleString()}</td>
                                 <td>
                                     <button className="add-to-cart-btn done-btn" onClick={() => updateStatus(order)}>
                                         Done

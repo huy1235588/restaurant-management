@@ -125,22 +125,22 @@ const Order = () => {
                 const statusUpdate: OrderStatus = JSON.parse(message.body);
 
                 // Cập nhật trạng thái trong giỏ hàng
-                setCart((prevCart) => {
-                    const updatedCart = [...prevCart];  // Sao chép mảng gốc để tránh mutation trực tiếp
+                setKitchenOrders((prevKitchenOrder) => {
+                    const updatedKitchenOrder = [...prevKitchenOrder];  // Sao chép mảng gốc để tránh mutation trực tiếp
 
-                    updatedCart.forEach(item => {
+                    updatedKitchenOrder.forEach(item => {
                         if (item.itemId === "8") {
                             console.log(item.itemId + " " + statusUpdate.itemId)
                         }
                     })
 
-                    const index = updatedCart.findIndex(item => item.itemId === statusUpdate.itemId); // Tìm index của item cần cập nhật
+                    const index = updatedKitchenOrder.findIndex(item => item.itemId === statusUpdate.itemId); // Tìm index của item cần cập nhật
 
                     if (index !== -1) {
-                        updatedCart[index] = { ...updatedCart[index], status: statusUpdate.status }; // Chỉ cập nhật trạng thái của item đó
+                        updatedKitchenOrder[index] = { ...updatedKitchenOrder[index], status: statusUpdate.status }; // Chỉ cập nhật trạng thái của item đó
                     }
 
-                    return updatedCart;
+                    return updatedKitchenOrder;
                 });
             });
         };
