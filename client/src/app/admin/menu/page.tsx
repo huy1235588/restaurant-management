@@ -176,8 +176,6 @@ const FoodManagementPage = () => {
 
     // Xử lý xóa item
     const handleDelete = (itemId: string) => {
-        setFoodItems(foodItems.filter(item => item.itemId !== itemId));
-
         // API call
         axios.delete(`/api/menu/delete/${itemId}`)
             .then(() => {
@@ -193,6 +191,9 @@ const FoodManagementPage = () => {
                     'error'
                 );
             });
+
+        // Update state
+        setFoodItems(foodItems.filter(item => item.itemId !== itemId));
     };
 
     // Lọc items theo search term
@@ -248,7 +249,7 @@ const FoodManagementPage = () => {
                                     fullWidth
                                     required
                                     slotProps={{
-                                        htmlInput:{
+                                        htmlInput: {
                                             maxLength: 10,
                                             readOnly: true
                                         }

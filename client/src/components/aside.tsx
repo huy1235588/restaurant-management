@@ -1,18 +1,18 @@
 import '@/style/aside.css';
+import { SvgIconComponent } from '@mui/icons-material';
+import PointOfSaleOutlined from '@mui/icons-material/PointOfSaleOutlined';
 import { useTheme } from '@mui/material';
 import Link from 'next/link';
 import { IconType } from 'react-icons';
 import { AiOutlineHome } from 'react-icons/ai';
 import { BiSolidFoodMenu } from 'react-icons/bi';
-import { FaTable } from 'react-icons/fa';
-import { FaKitchenSet } from 'react-icons/fa6';
+import { FaKitchenSet, FaTableCells } from 'react-icons/fa6';
 
 interface AsideProps {
     className?: string;
 }
-
 interface Sidebar {
-    icon: IconType;
+    icon: IconType | SvgIconComponent;
     text: string;
     href: string;
 }
@@ -24,8 +24,8 @@ const sidebarList: Sidebar[] = [
         href: "/",
     },
     {
-        icon: FaTable,
-        text: "Table",
+        icon: PointOfSaleOutlined,
+        text: "Point of Sale",
         href: "/admin/table",
     },
     {
@@ -37,6 +37,11 @@ const sidebarList: Sidebar[] = [
         icon: BiSolidFoodMenu,
         text: "Menu",
         href: "/admin/menu",
+    },
+    {
+        icon: FaTableCells,
+        text: "Table",
+        href: "/admin/table-panel",
     }
 ];
 
