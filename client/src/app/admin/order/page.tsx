@@ -79,6 +79,11 @@ const Order = () => {
     const handleAddToCart = (item: MenuFood) => {
         const quantity = quantities[item.itemId] || 1; // Số lượng mặc định là 1 nếu chưa chọn số lượng
 
+        if (!tableId) {
+            showNotification("Table ID is required!", "warning");
+            return;
+        }
+
         setKitchenOrders((prevKitchenOrders) => {
             const existingItemIndex = prevKitchenOrders.findIndex((kitchenOrder) =>
                 kitchenOrder.itemId === item.itemId
@@ -107,6 +112,8 @@ const Order = () => {
                     itemPrice: item.price,
                     quantity: quantity,
                     status: 'pending',
+                    staffId: 0, 
+                    orderTime: new Date(),
                 },
             ];
         });
@@ -196,8 +203,8 @@ const Order = () => {
 
             // Chuyển đổi dữ liệu để gửi tới WebSocket và API
             const data: CartOrder[] = newItems.map((item) => ({
-                itemId: item.menu.itemId,
-                itemName: item.menu.itemName,
+                itemId: item.itemId,
+                itemName: item.itemName,
                 itemQuantity: item.quantity,
                 orderAt: new Date(),
                 tableId: tableId,
@@ -212,7 +219,7 @@ const Order = () => {
             // Thêm vào DB
             const response = await axios.post('/api/cart', newItems.map((item) => ({
                 tableId: tableId,
-                itemId: item.menu.itemId,
+                itemId: item.itemId,
                 itemQuantity: item.quantity,
                 // status: item.,
             })));

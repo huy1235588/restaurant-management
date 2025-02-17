@@ -23,8 +23,9 @@ function Header() {
     }, []);
 
     // Tính toán tỷ lệ cuộn (chỉ bắt đầu tính từ 30% chiều cao của viewport)
-    const scrollThreshold = window.innerHeight * 0.3; // Ngưỡng 30% chiều cao viewport
-    const scrollPercentage = Math.min((scrollPosition - scrollThreshold) / (window.innerHeight * 0.7), 1);
+    const innerHeight = typeof window !== 'undefined' ? window.innerHeight : 0;
+    const scrollThreshold = innerHeight * 0.3; // Ngưỡng 30% chiều cao viewport
+    const scrollPercentage = innerHeight ? Math.min((scrollPosition - scrollThreshold) / (innerHeight * 0.7), 1) : 0;
 
     // Chuyển đổi tỷ lệ cuộn thành màu nền
     const backgroundColor = `rgba(14, 109, 226, ${scrollPercentage})`;
