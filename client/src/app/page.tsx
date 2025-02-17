@@ -18,11 +18,11 @@ export type Source = {
 };
 
 const sourceOptions: Array<Source> = [
-    { type: 'video', label: 'Sleepy fish', src: '/videos/boucle-1_V2.mp4' },
-    { type: 'video', label: 'Furina', src: '/videos/Furina-FHD.mp4' },
-    { type: 'video', label: 'felly', src: '/videos/CR226.mp4' },
-    { type: 'iframe', label: 'Just mazes', src: '/iframe/maze/index.html' },
-    { type: 'iframe', label: 'Periodic Table', src: '/iframe/periodic-table/index.html' },
+    { type: 'video', label: 'Sleepy fish', src: 'https://res.cloudinary.com/doogrw74d/video/upload/v1739793516/ff7d44yyhwesgsywa42q.mp4' },
+    { type: 'video', label: 'Furina', src: 'https://res.cloudinary.com/doogrw74d/video/upload/v1739793496/gxypwwzb880vykowq3ya.mp4' },
+    { type: 'video', label: 'felly', src: 'https://res.cloudinary.com/doogrw74d/video/upload/v1739793511/rmvis7fg7pirinzy1rbl.mp4' },
+    { type: 'iframe', label: 'Just mazes', src: 'https://res.cloudinary.com/doogrw74d/raw/upload/v1739793685/index_xgodz8.html' },
+    { type: 'iframe', label: 'Periodic Table', src: 'https://res.cloudinary.com/doogrw74d/raw/upload/v1739793687/index_tv2fkr.html' },
 ];
 
 // Address list
