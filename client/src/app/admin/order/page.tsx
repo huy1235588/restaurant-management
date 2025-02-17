@@ -244,7 +244,7 @@ const Order = () => {
 
         const fetchCartData = async () => {
             try {
-                const response = await axios.get<KitchenOrder[]>(`/api/kitchenOrder/all/${tableId}`);
+                const response = await axios.get<KitchenOrder[]>(`/api/kitchenOrder/all/${billId}`);
                 setKitchenOrders((response.data || []).map((item) => ({
                     ...item,
                     total: item.quantity * item.itemPrice, // Tính total từng item

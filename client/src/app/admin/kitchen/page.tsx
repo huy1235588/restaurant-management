@@ -65,18 +65,22 @@ export default function Kitchen() {
             status: 'completed'
         };
 
+        // Gửi thông báo cho phục vụ
         stompClient.publish({
             destination: "/app/status",
             body: JSON.stringify(status),
         });
 
+        // Cập nhật trạng thái order
         const updateStatus = async () => {
-            await axios.put(`/api/cart/status/${order.tableId}`, {
+            await axios.put(`/api/kitchenOrder/updateStatus?orderId=${order.id}&status=completed`, {
+                billID: order.billID,
                 itemId: order.itemId,
-                status: "completed"
+                quantity: order.quantity,
             });
 
-            const response = await axios.get<KitchenOrder[]>("/api/cart/pending");
+            // Lấy dữ liệu 
+            const response = await axios.get<KitchenOrder[]>("/api/kitchenOrder/all?status=pending");
 
             setOrders(response.data);
         };
@@ -93,19 +97,22 @@ export default function Kitchen() {
             status: 'error'
         };
 
+        // Gửi thông báo cho phục vụ
         stompClient.publish({
             destination: "/app/status",
             body: JSON.stringify(status),
         });
 
+        // Cập nhật trạng thái order
         const updateStatus = async () => {
-            await axios.put(`/api/cart/status/${order.tableId}`, {
+            await axios.put(`/api/kitchenOrder/updateStatus?orderId=${order.id}&status=error`, {
+                billID: order.billID,
                 itemId: order.itemId,
-                status: "error"
+                quantity: order.quantity,              
             });
 
-            const response = await axios.get<KitchenOrder[]>("/api/cart/pending");
-
+            // Lấy dữ liệu 
+            const response = await axios.get<KitchenOrder[]>("/api/kitchenOrder/all?status=pending");
             setOrders(response.data);
         };
 
