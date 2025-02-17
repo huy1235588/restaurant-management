@@ -3,6 +3,7 @@ import { useTheme } from '@mui/material';
 import Link from 'next/link';
 import { IconType } from 'react-icons';
 import { AiOutlineHome } from 'react-icons/ai';
+import { BiSolidFoodMenu } from 'react-icons/bi';
 import { FaTable } from 'react-icons/fa';
 import { FaKitchenSet } from 'react-icons/fa6';
 
@@ -32,6 +33,11 @@ const sidebarList: Sidebar[] = [
         text: "Kitchen",
         href: "/admin/kitchen",
     },
+    {
+        icon: BiSolidFoodMenu,
+        text: "Menu",
+        href: "/admin/menu",
+    }
 ];
 
 const Aside: React.FC<AsideProps> = ({
