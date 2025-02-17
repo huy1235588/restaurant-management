@@ -3,7 +3,7 @@
 import CartTable from "@/components/order/cartTable";
 import MenuFoodTable from "@/components/order/menuFoodTable";
 import "@/style/app.css";
-import { BillItem, Bills, CartOrder, KitchenOrder, MenuFood, OrderStatus } from "@/types/types";
+import { Bills, KitchenOrder, MenuFood, OrderStatus } from "@/types/types";
 import stompClient from "@/utils/socket";
 import axios from "@/config/axios";
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -112,7 +112,7 @@ const Order = () => {
                     itemPrice: item.price,
                     quantity: quantity,
                     status: 'pending',
-                    staffId: 0, 
+                    staffId: 0,
                     orderTime: new Date(),
                 },
             ];
@@ -170,14 +170,14 @@ const Order = () => {
         setIsSending(true);
         try {
             // Lấy danh sách item hiện có trong DB
-            const responseCart = await axios.get<BillItem[]>(`/api/cart/${tableId}`);
-            const existingCartItems = new Map(
-                (responseCart.data || []).map((dbItem) => [dbItem.id, dbItem])
+            const responseKitchenOrder = await axios.get<KitchenOrder[]>(`/api/kitchenOrder/all/${tableId}`);
+            const existingCKitchenOrders = new Map(
+                (responseKitchenOrder.data || []).map((dbItem) => [dbItem.id, dbItem])
             );
 
             // Lọc các item cần gửi với phần chênh lệch số lượng
             const newItems = kitchenOrders.map((kitchenOrder) => {
-                const existingItem = existingCartItems.get(kitchenOrder.id);
+                const existingItem = existingCKitchenOrders.get(kitchenOrder.id);
 
                 // Tính số lượng thêm
                 const extraQuantity =
@@ -193,7 +193,7 @@ const Order = () => {
 
                 return null;
 
-            }).filter((item) => item !== null) as BillItem[];
+            }).filter((item) => item !== null) as KitchenOrder[];
 
             // Nếu không có item nào được thêm 
             if (newItems.length === 0) {
@@ -202,12 +202,16 @@ const Order = () => {
             }
 
             // Chuyển đổi dữ liệu để gửi tới WebSocket và API
-            const data: CartOrder[] = newItems.map((item) => ({
+            const data: KitchenOrder[] = newItems.map((item) => ({
+                billID: bill ? bill.id : 0,
                 itemId: item.itemId,
                 itemName: item.itemName,
-                itemQuantity: item.quantity,
-                orderAt: new Date(),
-                tableId: tableId,
+                itemPrice: item.itemPrice,
+                quantity: item.quantity,
+                orderTime: new Date(),
+                status: item.status,
+                tableId: tableId ?? undefined,
+                staffId: 0,
             }));
 
             // Gửi cho bếp
@@ -217,14 +221,15 @@ const Order = () => {
             });
 
             // Thêm vào DB
-            const response = await axios.post('/api/cart', newItems.map((item) => ({
-                tableId: tableId,
+            await axios.post<KitchenOrder[]>('/api/kitchenOrder/add', newItems.map((item) => ({
+                billId: bill ? bill.id : 0,
                 itemId: item.itemId,
-                itemQuantity: item.quantity,
-                // status: item.,
+                quantity: item.quantity,
+                orderTime: item.orderTime,
+                status: 'pending',
             })));
 
-            showNotification(response.data, "success");
+            showNotification("Order sent to kitchen!", "success");
 
         } catch (error) {
             console.error("Failed to send to kitchen:", error);
