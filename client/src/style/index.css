@@ -550,8 +550,8 @@ footer h2 {
 /* Source selector */
 .source-selector {
     position: absolute;
-    bottom: 30;
-    right: 30;
+    bottom: 30px;
+    right: 30px;
     display: flex;
     justify-content: center;
     align-items: center;
