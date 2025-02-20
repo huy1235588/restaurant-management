@@ -26,32 +26,60 @@ const sourceOptions: Array<Source> = [
 ];
 
 // Address list
-const addresses = [
+// const addresses = [
+//     {
+//         name: '6F, 東京都渋谷区宇田川町 31-1 HURIC & new shibuya, Tokyo 150-0042, Nhật Bản',
+//         location: "!1m18!1m12!1m3!1d25933.017781037543!2d139.66160991083981!3d35.661554999999986!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188da99d636e93%3A0x152defa6742dcef!2zQ0hVUlJBU0NPIEdBTkcg5riL6LC35pys5bqX44CQ44K344Ol44Op44K544Kz44Ku44Oj44Oz44Kw44CR!5e0!3m2!1svi!2s!4v1736068678682!5m2!1svi!2s",
+//     },
+//     {
+//         name: '56-13 KR 서울특별시 용산구 3F, 56-13 Itaewon-dong 3층',
+//         location: '!1m18!1m12!1m3!1d25308.94609480401!2d126.9626165178456!3d37.540495003191374!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x357ca37ae1df2b6b%3A0x727c210f4e0f0a2c!2sHojiBobo%20Restaurant%20%7C%20Itaewon%20Seoul!5e0!3m2!1svi!2s!4v1736071391858!5m2!1svi!2s',
+//     },
+//     {
+//         name: 'Via Corcianese, 260, 06132 Perugia PG, Italy',
+//         location: '!1m18!1m12!1m3!1d372913.3570019396!2d11.7402255734375!3d43.09641070000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x132ea710a73c1e03%3A0x5eece0bd07102084!2sIl%20Vizio!5e0!3m2!1svi!2s!4v1736071960147!5m2!1svi!2s',
+//     },
+//     {
+//         name: "2 Rue d'Argentine, 21210 Saulieu, Pháp",
+//         location: '!1m18!1m12!1m3!1d1399437.6758564524!2d1.464302986474972!3d46.75944194692608!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47f205f1a6f2244b%3A0x4adb3bdea3828439!2sLe%20Relais%20Bernard%20Loiseau!5e0!3m2!1svi!2s!4v1736072008850!5m2!1svi!2s',
+//     },
+//     {
+//         name: 'Berlepsch 1, 37218 Witzenhausen, Đức',
+//         location: '!1m18!1m12!1m3!1d320050.4239279785!2d9.573421441732377!3d51.19339247697995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47bb33203eb8c279%3A0x4eede2153cb368ff!2sSchloss%20Berlepsch!5e0!3m2!1svi!2s!4v1736072062995!5m2!1svi!2s',
+//     },
+//     {
+//         name: '176 N Canon Dr, Beverly Hills, CA 90210, Hoa Kỳ',
+//         location: '!1m18!1m12!1m3!1d423049.324435104!2d-118.97435402656248!3d34.067646800000006!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c2bbfed96ef75b%3A0x6595937c3757fbed!2sSpago!5e0!3m2!1svi!2s!4v1736072124587!5m2!1svi!2s',
+//     },
+// ];
+
+// Address vietnam
+const addressesVietnam = [
     {
-        name: '6F, 東京都渋谷区宇田川町 31-1 HURIC & new shibuya, Tokyo 150-0042, Nhật Bản',
-        location: "!1m18!1m12!1m3!1d25933.017781037543!2d139.66160991083981!3d35.661554999999986!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188da99d636e93%3A0x152defa6742dcef!2zQ0hVUlJBU0NPIEdBTkcg5riL6LC35pys5bqX44CQ44K344Ol44Op44K544Kz44Ku44Oj44Oz44Kw44CR!5e0!3m2!1svi!2s!4v1736068678682!5m2!1svi!2s",
+        name: '11 Nguyễn Văn Trỗi, Phường 11, Phú Nhuận, Hồ Chí Minh, Việt Nam',
+        location: "!1m18!1m12!1m3!1d244.9532308310318!2d106.68103731807564!3d10.792024877865309!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317528d45492df45%3A0xeca067d83dd82d48!2zTmjDoCBIw6BuZyBOUyBC4bq_biBUaHV54buBbg!5e0!3m2!1svi!2s!4v1740004723992!5m2!1svi!2s",
     },
     {
-        name: '56-13 KR 서울특별시 용산구 3F, 56-13 Itaewon-dong 3층',
-        location: '!1m18!1m12!1m3!1d25308.94609480401!2d126.9626165178456!3d37.540495003191374!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x357ca37ae1df2b6b%3A0x727c210f4e0f0a2c!2sHojiBobo%20Restaurant%20%7C%20Itaewon%20Seoul!5e0!3m2!1svi!2s!4v1736071391858!5m2!1svi!2s',
+        name: '28A Trần Cao Vân, Phường 12, Phú Nhuận, Hồ Chí Minh, Việt Nam',
+        location: '!1m18!1m12!1m3!1d244.95247045175518!2d106.67655946805343!3d10.79295790000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317528d571227b47%3A0x619bff606e50e153!2zTmjDoCBow6BuZyBQZXJnb2xh!5e0!3m2!1svi!2s!4v1740004792474!5m2!1svi!2s'
     },
     {
-        name: 'Via Corcianese, 260, 06132 Perugia PG, Italy',
-        location: '!1m18!1m12!1m3!1d372913.3570019396!2d11.7402255734375!3d43.09641070000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x132ea710a73c1e03%3A0x5eece0bd07102084!2sIl%20Vizio!5e0!3m2!1svi!2s!4v1736071960147!5m2!1svi!2s',
+        name: '176/9 Lê Văn Sỹ, Phường 10, Phú Nhuận, Hồ Chí Minh 700000, Việt Nam',
+        location: '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d244.95247656424274!2d106.67144379999999!3d10.792950399999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752fb348054ebb%3A0x8a2ef8b6e3ede66f!2s'
     },
     {
-        name: "2 Rue d'Argentine, 21210 Saulieu, Pháp",
-        location: '!1m18!1m12!1m3!1d1399437.6758564524!2d1.464302986474972!3d46.75944194692608!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47f205f1a6f2244b%3A0x4adb3bdea3828439!2sLe%20Relais%20Bernard%20Loiseau!5e0!3m2!1svi!2s!4v1736072008850!5m2!1svi!2s',
+        name: '140/13 Trần Huy Liệu, Phường 15, Phú Nhuận, Hồ Chí Minh, Việt Nam',
+        location: '!1m18!1m',
     },
     {
-        name: 'Berlepsch 1, 37218 Witzenhausen, Đức',
-        location: '!1m18!1m12!1m3!1d320050.4239279785!2d9.573421441732377!3d51.19339247697995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47bb33203eb8c279%3A0x4eede2153cb368ff!2sSchloss%20Berlepsch!5e0!3m2!1svi!2s!4v1736072062995!5m2!1svi!2s',
+        name: '1 Nguyễn Văn Trỗi, Phường 12, Phú Nhuận, Hồ Chí Minh, Việt Nam',
+        location: '!1m18!1m12!1m3!1d244.9532308310318!2d'
     },
     {
-        name: '176 N Canon Dr, Beverly Hills, CA 90210, Hoa Kỳ',
-        location: '!1m18!1m12!1m3!1d423049.324435104!2d-118.97435402656248!3d34.067646800000006!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c2bbfed96ef75b%3A0x6595937c3757fbed!2sSpago!5e0!3m2!1svi!2s!4v1736072124587!5m2!1svi!2s',
-    },
-];
+        name: '3a Đ. Hồ Biểu Chánh, Phường 12, Phú Nhuận, Hồ Chí Minh, Việt Nam',
+        location: '!1m18!1m12!1m3!1d244.9532308310318!2d106.68103731807564!3d10.792024877865309!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317528d45492df45%3A0xeca067d83dd82d48!2zTmjDoCBIw6BuZyBOUyBC4bq_biBUaHV54buBbg!5e0!3m2!1svi!2s!4v1740004723992!5m2!1svi!2s',
+    }
+]
 
 export default function Home() {
     const [selectedSource, setSelectedSource] = useState<Source>(sourceOptions[0]);
@@ -63,7 +91,7 @@ export default function Home() {
     const [error, setError] = useState<string | null>(null);
 
     // Map
-    const [selectedLocation, setSelectedLocation] = useState(addresses[0].location);
+    const [selectedLocation, setSelectedLocation] = useState(addressesVietnam[0].location);
 
     // Lấy ra các category từ menuItems
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -172,7 +200,7 @@ export default function Home() {
                         <span>
                             SAIGON
                         </span>
-                        <br/>
+                        <br />
                         <span>
                             RESTAURANT
                         </span>
@@ -325,7 +353,7 @@ export default function Home() {
                     <div className='address-container'>
                         <div className='address-info'>
                             <AddressList
-                                addresses={addresses}
+                                addresses={addressesVietnam}
                                 onSelect={(location) => setSelectedLocation(location)}
                             />
                         </div>
