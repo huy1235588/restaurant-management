@@ -274,7 +274,7 @@ const Order = () => {
 
     // Hàm in hóa đơn
     const handleInvoice = () => {
-        router.push(`/admin/payment/${billId}`);
+        router.push(`/admin/bill?id=${billId}`);
     }
 
     return (
