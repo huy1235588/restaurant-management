@@ -20,7 +20,7 @@ interface Config {
     jwtRefreshExpiresIn: string;
 
     // CORS
-    corsOrigin: string;
+    corsOrigin: string[];
 
     // Rate Limiting
     rateLimitWindowMs: number;
@@ -42,11 +42,11 @@ const config: Config = {
 
     // JWT
     jwtSecret: process.env['JWT_SECRET'] || 'your-secret-key',
-    jwtExpiresIn: process.env['JWT_EXPIRES_IN'] || '7d',
-    jwtRefreshExpiresIn: process.env['JWT_REFRESH_EXPIRES_IN'] || '30d',
+    jwtExpiresIn: process.env['JWT_EXPIRES_IN'] || '15m',
+    jwtRefreshExpiresIn: process.env['JWT_REFRESH_EXPIRES_IN'] || '7d',
 
     // CORS
-    corsOrigin: process.env['CORS_ORIGIN'] || 'http://localhost:3000',
+    corsOrigin: process.env['CLIENT_URL'] ? process.env['CLIENT_URL'].split(',').map(url => url.trim()) : ['http://localhost:3000'],
 
     // Rate Limiting
     rateLimitWindowMs: parseInt(process.env['RATE_LIMIT_WINDOW_MS'] || '900000', 10),

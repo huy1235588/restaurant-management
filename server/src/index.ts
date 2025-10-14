@@ -4,6 +4,7 @@ import config from './config';
 import DatabaseClient from './config/database';
 import socketService from './utils/socket';
 import logger from './config/logger';
+import { scheduleTokenCleanup } from './jobs/cleanupTokens';
 
 async function startServer() {
     try {
@@ -19,6 +20,10 @@ async function startServer() {
         // Initialize Socket.IO
         socketService.initialize(httpServer);
         logger.info('✅ Socket.IO initialized');
+
+        // Schedule token cleanup job
+        scheduleTokenCleanup();
+        logger.info('✅ Token cleanup job scheduled');
 
         // Start server
         httpServer.listen(config.port, () => {

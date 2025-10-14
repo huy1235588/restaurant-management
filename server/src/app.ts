@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import compression from 'compression';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import config from './config';
@@ -69,6 +70,9 @@ export function createApp(): Application {
     // Body parser
     app.use(express.json({ limit: '10mb' }));
     app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+    // Cookie parser
+    app.use(cookieParser());
 
     // Logging
     if (config.nodeEnv === 'development') {

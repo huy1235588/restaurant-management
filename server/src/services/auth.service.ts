@@ -1,15 +1,17 @@
 import accountRepository from '@/repositories/account.repository';
 import staffRepository from '@/repositories/staff.repository';
+import refreshTokenRepository from '@/repositories/refreshToken.repository';
 import { UnauthorizedError, ConflictError, NotFoundError } from '@/utils/errors';
-import AuthUtils from '@/utils/auth';
+import AuthUtils, { TokenPayload } from '@/utils/auth';
 import { LoginDTO, RegisterDTO, CreateStaffDTO } from '@/validators';
 import { Prisma } from '@prisma/client';
+import config from '@/config';
 
 export class AuthService {
     /**
      * User login
      */
-    async login(data: LoginDTO) {
+    async login(data: LoginDTO, deviceInfo?: string, ipAddress?: string) {
         const { username, password } = data;
 
         // Find account
@@ -38,7 +40,7 @@ export class AuthService {
         await accountRepository.updateLastLogin(account.accountId);
 
         // Generate tokens
-        const tokenPayload = {
+        const tokenPayload: TokenPayload = {
             accountId: account.accountId,
             staffId: staff.staffId,
             username: account.username,
@@ -46,6 +48,17 @@ export class AuthService {
         };
 
         const { accessToken, refreshToken } = AuthUtils.generateAuthTokens(tokenPayload);
+
+        // Store refresh token in database
+        await refreshTokenRepository.create({
+            account: {
+                connect: { accountId: account.accountId },
+            },
+            token: refreshToken,
+            expiresAt: AuthUtils.getTokenExpirationDate(config.jwtRefreshExpiresIn),
+            deviceInfo,
+            ipAddress,
+        });
 
         return {
             user: {
@@ -58,6 +71,33 @@ export class AuthService {
             },
             accessToken,
             refreshToken,
+        };
+    }
+
+    /**
+     * Get user info by account ID
+     */
+    async getUserInfo(accountId: number) {
+        const account = await accountRepository.findById(accountId);
+        if (!account) {
+            throw new NotFoundError('Account not found');
+        }
+
+        const staff = await staffRepository.findByAccountId(accountId);
+        if (!staff) {
+            throw new NotFoundError('Staff profile not found');
+        }
+
+        return {
+            accountId: account.accountId,
+            staffId: staff.staffId,
+            username: account.username,
+            email: account.email,
+            phoneNumber: account.phoneNumber,
+            fullName: staff.fullName,
+            role: staff.role,
+            isActive: account.isActive,
+            lastLogin: account.lastLogin,
         };
     }
 
@@ -159,28 +199,66 @@ export class AuthService {
      */
     async refreshToken(refreshToken: string) {
         try {
+            // Verify token format
             const decoded = AuthUtils.verifyToken(refreshToken);
 
-            // Verify account still exists and is active
-            const account = await accountRepository.findById(decoded.accountId);
-            if (!account || !account.isActive) {
+            // Check if refresh token exists and is valid in database
+            const storedToken = await refreshTokenRepository.findByToken(refreshToken);
+            if (!storedToken) {
                 throw new UnauthorizedError('Invalid refresh token');
             }
 
+            // Verify account still exists and is active
+            const account = storedToken.account;
+            if (!account || !account.isActive) {
+                throw new UnauthorizedError('Account is inactive or not found');
+            }
+
             // Generate new access token
-            const tokenPayload = {
+            const tokenPayload: TokenPayload = {
                 accountId: decoded.accountId,
                 staffId: decoded.staffId,
                 username: decoded.username,
                 role: decoded.role,
             };
 
-            const accessToken = AuthUtils.generateToken(tokenPayload);
+            const accessToken = AuthUtils.generateToken(tokenPayload, config.jwtExpiresIn);
 
             return { accessToken };
         } catch (error) {
+            if (error instanceof UnauthorizedError) {
+                throw error;
+            }
             throw new UnauthorizedError('Invalid or expired refresh token');
         }
+    }
+
+    /**
+     * Logout user
+     */
+    async logout(refreshToken?: string) {
+        if (refreshToken) {
+            try {
+                // Revoke refresh token from database
+                await refreshTokenRepository.deleteByToken(refreshToken);
+            } catch (error) {
+                // Ignore errors during logout
+            }
+        }
+    }
+
+    /**
+     * Logout from all devices
+     */
+    async logoutAll(accountId: number) {
+        await refreshTokenRepository.revokeAllByAccountId(accountId);
+    }
+
+    /**
+     * Clean up expired tokens (should be run periodically)
+     */
+    async cleanupExpiredTokens() {
+        return refreshTokenRepository.deleteExpired();
     }
 }
 

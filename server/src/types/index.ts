@@ -27,6 +27,23 @@ export interface PaginatedResponse<T> {
 }
 
 // ============================================
+// Authentication Types
+// ============================================
+
+export interface AuthResponse {
+    user: {
+        accountId: number;
+        staffId: number;
+        username: string;
+        email: string;
+        fullName: string;
+        role: Role;
+    };
+    accessToken: string;
+    refreshToken: string;
+}
+
+// ============================================
 // Re-export Prisma Enum Types
 // ============================================
 

@@ -95,6 +95,66 @@ router.post('/login', validate(LoginSchema), authController.login.bind(authContr
 
 /**
  * @swagger
+ * /auth/me:
+ *   get:
+ *     summary: Get current user info
+ *     description: Get information about the currently authenticated user
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User info retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: User info retrieved successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     accountId:
+ *                       type: integer
+ *                       example: 1
+ *                     staffId:
+ *                       type: integer
+ *                       example: 1
+ *                     username:
+ *                       type: string
+ *                       example: admin
+ *                     email:
+ *                       type: string
+ *                       example: admin@example.com
+ *                     phoneNumber:
+ *                       type: string
+ *                       example: "0123456789"
+ *                     fullName:
+ *                       type: string
+ *                       example: Admin User
+ *                     role:
+ *                       type: string
+ *                       enum: [admin, manager, waiter, chef, bartender, cashier]
+ *                       example: admin
+ *                     isActive:
+ *                       type: boolean
+ *                       example: true
+ *                     lastLogin:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2025-10-14T10:30:00.000Z"
+ *       401:
+ *         description: Unauthorized - Invalid or missing token
+ */
+router.get('/me', authenticate, authController.getMe.bind(authController));
+
+/**
+ * @swagger
  * /auth/refresh:
  *   post:
  *     summary: Refresh access token
@@ -380,6 +440,34 @@ router.post(
  *       401:
  *         description: Unauthorized - Invalid or missing token
  */
-router.post('/logout', authenticate, authController.logout.bind(authController));
+router.post('/logout', authController.logout.bind(authController));
+
+/**
+ * @swagger
+ * /auth/logout-all:
+ *   post:
+ *     summary: Logout from all devices
+ *     description: Revoke all refresh tokens for the current user across all devices
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully logged out from all devices
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Logged out from all devices
+ *       401:
+ *         description: Unauthorized - Invalid or missing token
+ */
+router.post('/logout-all', authenticate, authController.logoutAll.bind(authController));
 
 export default router;
