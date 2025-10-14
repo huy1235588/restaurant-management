@@ -2,12 +2,16 @@ import { prisma } from '@/config/database';
 import { Prisma, RestaurantTable } from '@prisma/client';
 import { TableStatus } from '@/types';
 
+export type TableWithOrders = Prisma.RestaurantTableGetPayload<{
+    include: { orders: true; reservations: true }
+}>;
+
 export class RestaurantTableRepository {
     async create(data: Prisma.RestaurantTableCreateInput): Promise<RestaurantTable> {
         return prisma.restaurantTable.create({ data });
     }
 
-    async findById(tableId: number): Promise<RestaurantTable | null> {
+    async findById(tableId: number): Promise<TableWithOrders | null> {
         return prisma.restaurantTable.findUnique({
             where: { tableId },
             include: {
@@ -18,6 +22,13 @@ export class RestaurantTableRepository {
                     where: { status: { notIn: ['served', 'cancelled'] } },
                 },
             },
+        });
+    }
+
+    async findByIdWithDetails(tableId: number, includeOptions?: any) {
+        return prisma.restaurantTable.findUnique({
+            where: { tableId },
+            ...includeOptions,
         });
     }
 
@@ -82,7 +93,7 @@ export class RestaurantTableRepository {
         return prisma.restaurantTable.delete({ where: { tableId } });
     }
 
-    async getAvailableTables(params?: { capacity?: number; floor?: number }): Promise<RestaurantTable[]> {
+    async findAvailable(params?: { capacity?: number; floor?: number }): Promise<RestaurantTable[]> {
         const { capacity, floor } = params || {};
         return prisma.restaurantTable.findMany({
             where: {
@@ -93,6 +104,10 @@ export class RestaurantTableRepository {
             },
             orderBy: { capacity: 'asc' },
         });
+    }
+
+    async getAvailableTables(params?: { capacity?: number; floor?: number }): Promise<RestaurantTable[]> {
+        return this.findAvailable(params);
     }
 }
 

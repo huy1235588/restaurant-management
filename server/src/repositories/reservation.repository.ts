@@ -61,6 +61,16 @@ export class ReservationRepository {
         });
     }
 
+    async findByPhone(phoneNumber: string): Promise<Reservation[]> {
+        return prisma.reservation.findMany({
+            where: { phoneNumber },
+            include: {
+                table: true,
+            },
+            orderBy: [{ reservationDate: 'desc' }, { reservationTime: 'desc' }],
+        });
+    }
+
     async findUpcoming(limit?: number): Promise<Reservation[]> {
         const now = new Date();
         return prisma.reservation.findMany({
