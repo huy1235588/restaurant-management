@@ -1,0 +1,191 @@
+{
+  "common": {
+    "appName": "Restaurant Management",
+    "welcome": "Welcome",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "search": "Search",
+    "filter": "Filter",
+    "actions": "Actions",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "logout": "Logout",
+    "login": "Login"
+  },
+  "auth": {
+    "login": "Login",
+    "loginSubtitle": "Login to continue",
+    "loggingIn": "Logging in...",
+    "logout": "Logout",
+    "username": "Username",
+    "usernamePlaceholder": "Enter your username",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "email": "Email",
+    "fullName": "Full Name",
+    "phoneNumber": "Phone Number",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "loginSuccess": "Login successful",
+    "loginFailed": "Login failed",
+    "logoutSuccess": "Logout successful",
+    "invalidCredentials": "Invalid credentials"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "todayRevenue": "Today's Revenue",
+    "todayOrders": "Today's Orders",
+    "activeOrders": "Active Orders",
+    "availableTables": "Available Tables",
+    "pendingReservations": "Pending Reservations",
+    "revenueChart": "Revenue Chart",
+    "categorySales": "Sales by Category",
+    "recentOrders": "Recent Orders"
+  },
+  "orders": {
+    "title": "Orders",
+    "createOrder": "Create Order",
+    "editOrder": "Edit Order",
+    "orderDetails": "Order Details",
+    "orderNumber": "Order Number",
+    "orderType": "Order Type",
+    "orderStatus": "Order Status",
+    "orderTime": "Order Time",
+    "table": "Table",
+    "customer": "Customer",
+    "staff": "Staff",
+    "items": "Items",
+    "specialRequests": "Special Requests",
+    "subtotal": "Subtotal",
+    "tax": "Tax",
+    "discount": "Discount",
+    "total": "Total",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "preparing": "Preparing",
+      "ready": "Ready",
+      "served": "Served",
+      "cancelled": "Cancelled"
+    },
+    "type": {
+      "dine-in": "Dine In",
+      "takeaway": "Takeaway",
+      "delivery": "Delivery"
+    }
+  },
+  "menu": {
+    "title": "Menu",
+    "categories": "Categories",
+    "items": "Items",
+    "addItem": "Add Item",
+    "editItem": "Edit Item",
+    "itemName": "Item Name",
+    "itemCode": "Item Code",
+    "category": "Category",
+    "price": "Price",
+    "cost": "Cost",
+    "description": "Description",
+    "image": "Image",
+    "available": "Available",
+    "preparationTime": "Preparation Time",
+    "spicyLevel": "Spicy Level",
+    "vegetarian": "Vegetarian",
+    "calories": "Calories"
+  },
+  "tables": {
+    "title": "Tables",
+    "tableNumber": "Table Number",
+    "tableName": "Table Name",
+    "capacity": "Capacity",
+    "floor": "Floor",
+    "section": "Section",
+    "status": "Status",
+    "currentOrder": "Current Order",
+    "status": {
+      "available": "Available",
+      "occupied": "Occupied",
+      "reserved": "Reserved",
+      "maintenance": "Maintenance"
+    }
+  },
+  "kitchen": {
+    "title": "Kitchen Display",
+    "orderQueue": "Order Queue",
+    "preparingOrders": "Preparing Orders",
+    "completedOrders": "Completed Orders",
+    "priority": {
+      "low": "Low",
+      "normal": "Normal",
+      "high": "High"
+    }
+  },
+  "bills": {
+    "title": "Bills",
+    "billNumber": "Bill Number",
+    "billDate": "Bill Date",
+    "order": "Order",
+    "subtotal": "Subtotal",
+    "tax": "Tax",
+    "discount": "Discount",
+    "serviceCharge": "Service Charge",
+    "total": "Total",
+    "paymentStatus": "Payment Status",
+    "paymentMethod": "Payment Method",
+    "processPayment": "Process Payment",
+    "paymentMethods": {
+      "cash": "Cash",
+      "card": "Card",
+      "banking": "Bank Transfer",
+      "momo": "MoMo",
+      "other": "Other"
+    }
+  },
+  "reservations": {
+    "title": "Reservations",
+    "createReservation": "Create Reservation",
+    "customerName": "Customer Name",
+    "customerPhone": "Customer Phone",
+    "customerEmail": "Customer Email",
+    "partySize": "Party Size",
+    "reservationDate": "Reservation Date",
+    "reservationTime": "Reservation Time",
+    "duration": "Duration",
+    "status": "Status",
+    "specialRequests": "Special Requests",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled",
+      "completed": "Completed",
+      "no-show": "No Show"
+    }
+  },
+  "roles": {
+    "admin": "Admin",
+    "manager": "Manager",
+    "waiter": "Waiter",
+    "chef": "Chef",
+    "bartender": "Bartender",
+    "cashier": "Cashier"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "minLength": "Minimum length is {{min}} characters",
+    "maxLength": "Maximum length is {{max}} characters",
+    "minValue": "Minimum value is {{min}}",
+    "maxValue": "Maximum value is {{max}}",
+    "invalidFormat": "Invalid format"
+  }
+}

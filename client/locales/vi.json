@@ -1,0 +1,191 @@
+{
+  "common": {
+    "appName": "Quản Lý Nhà Hàng",
+    "welcome": "Chào mừng",
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "success": "Thành công",
+    "confirm": "Xác nhận",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "create": "Tạo mới",
+    "update": "Cập nhật",
+    "search": "Tìm kiếm",
+    "filter": "Lọc",
+    "actions": "Thao tác",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "previous": "Trước",
+    "close": "Đóng",
+    "logout": "Đăng xuất",
+    "login": "Đăng nhập"
+  },
+  "auth": {
+    "login": "Đăng nhập",
+    "loginSubtitle": "Đăng nhập để tiếp tục",
+    "loggingIn": "Đang đăng nhập...",
+    "logout": "Đăng xuất",
+    "username": "Tên đăng nhập",
+    "usernamePlaceholder": "Nhập tên đăng nhập",
+    "password": "Mật khẩu",
+    "passwordPlaceholder": "Nhập mật khẩu",
+    "email": "Email",
+    "fullName": "Họ và tên",
+    "phoneNumber": "Số điện thoại",
+    "rememberMe": "Ghi nhớ đăng nhập",
+    "forgotPassword": "Quên mật khẩu?",
+    "loginSuccess": "Đăng nhập thành công",
+    "loginFailed": "Đăng nhập thất bại",
+    "logoutSuccess": "Đăng xuất thành công",
+    "invalidCredentials": "Thông tin đăng nhập không hợp lệ"
+  },
+  "dashboard": {
+    "title": "Bảng điều khiển",
+    "todayRevenue": "Doanh thu hôm nay",
+    "todayOrders": "Đơn hàng hôm nay",
+    "activeOrders": "Đơn hàng đang xử lý",
+    "availableTables": "Bàn trống",
+    "pendingReservations": "Đặt bàn chờ xác nhận",
+    "revenueChart": "Biểu đồ doanh thu",
+    "categorySales": "Doanh số theo danh mục",
+    "recentOrders": "Đơn hàng gần đây"
+  },
+  "orders": {
+    "title": "Đơn hàng",
+    "createOrder": "Tạo đơn hàng",
+    "editOrder": "Sửa đơn hàng",
+    "orderDetails": "Chi tiết đơn hàng",
+    "orderNumber": "Số đơn hàng",
+    "orderType": "Loại đơn hàng",
+    "orderStatus": "Trạng thái",
+    "orderTime": "Thời gian đặt",
+    "table": "Bàn",
+    "customer": "Khách hàng",
+    "staff": "Nhân viên",
+    "items": "Món ăn",
+    "specialRequests": "Yêu cầu đặc biệt",
+    "subtotal": "Tạm tính",
+    "tax": "Thuế",
+    "discount": "Giảm giá",
+    "total": "Tổng cộng",
+    "status": {
+      "pending": "Chờ xử lý",
+      "confirmed": "Đã xác nhận",
+      "preparing": "Đang chuẩn bị",
+      "ready": "Sẵn sàng",
+      "served": "Đã phục vụ",
+      "cancelled": "Đã hủy"
+    },
+    "type": {
+      "dine-in": "Tại chỗ",
+      "takeaway": "Mang đi",
+      "delivery": "Giao hàng"
+    }
+  },
+  "menu": {
+    "title": "Thực đơn",
+    "categories": "Danh mục",
+    "items": "Món ăn",
+    "addItem": "Thêm món",
+    "editItem": "Sửa món",
+    "itemName": "Tên món",
+    "itemCode": "Mã món",
+    "category": "Danh mục",
+    "price": "Giá bán",
+    "cost": "Giá vốn",
+    "description": "Mô tả",
+    "image": "Hình ảnh",
+    "available": "Còn hàng",
+    "preparationTime": "Thời gian chuẩn bị",
+    "spicyLevel": "Độ cay",
+    "vegetarian": "Món chay",
+    "calories": "Calories"
+  },
+  "tables": {
+    "title": "Bàn",
+    "tableNumber": "Số bàn",
+    "tableName": "Tên bàn",
+    "capacity": "Sức chứa",
+    "floor": "Tầng",
+    "section": "Khu vực",
+    "status": "Trạng thái",
+    "currentOrder": "Đơn hàng hiện tại",
+    "status": {
+      "available": "Trống",
+      "occupied": "Đang sử dụng",
+      "reserved": "Đã đặt",
+      "maintenance": "Bảo trì"
+    }
+  },
+  "kitchen": {
+    "title": "Màn hình bếp",
+    "orderQueue": "Hàng đợi",
+    "preparingOrders": "Đang chuẩn bị",
+    "completedOrders": "Đã hoàn thành",
+    "priority": {
+      "low": "Thấp",
+      "normal": "Bình thường",
+      "high": "Cao"
+    }
+  },
+  "bills": {
+    "title": "Hóa đơn",
+    "billNumber": "Số hóa đơn",
+    "billDate": "Ngày hóa đơn",
+    "order": "Đơn hàng",
+    "subtotal": "Tạm tính",
+    "tax": "Thuế",
+    "discount": "Giảm giá",
+    "serviceCharge": "Phí dịch vụ",
+    "total": "Tổng cộng",
+    "paymentStatus": "Trạng thái thanh toán",
+    "paymentMethod": "Phương thức thanh toán",
+    "processPayment": "Xử lý thanh toán",
+    "paymentMethods": {
+      "cash": "Tiền mặt",
+      "card": "Thẻ",
+      "banking": "Chuyển khoản",
+      "momo": "MoMo",
+      "other": "Khác"
+    }
+  },
+  "reservations": {
+    "title": "Đặt bàn",
+    "createReservation": "Tạo đặt bàn",
+    "customerName": "Tên khách hàng",
+    "customerPhone": "Số điện thoại",
+    "customerEmail": "Email",
+    "partySize": "Số người",
+    "reservationDate": "Ngày đặt",
+    "reservationTime": "Giờ đặt",
+    "duration": "Thời gian",
+    "status": "Trạng thái",
+    "specialRequests": "Yêu cầu đặc biệt",
+    "status": {
+      "pending": "Chờ xác nhận",
+      "confirmed": "Đã xác nhận",
+      "cancelled": "Đã hủy",
+      "completed": "Hoàn thành",
+      "no-show": "Không đến"
+    }
+  },
+  "roles": {
+    "admin": "Quản trị viên",
+    "manager": "Quản lý",
+    "waiter": "Phục vụ",
+    "chef": "Đầu bếp",
+    "bartender": "Pha chế",
+    "cashier": "Thu ngân"
+  },
+  "validation": {
+    "required": "Trường này là bắt buộc",
+    "invalidEmail": "Email không hợp lệ",
+    "minLength": "Độ dài tối thiểu là {{min}} ký tự",
+    "maxLength": "Độ dài tối đa là {{max}} ký tự",
+    "minValue": "Giá trị tối thiểu là {{min}}",
+    "maxValue": "Giá trị tối đa là {{max}}",
+    "invalidFormat": "Định dạng không hợp lệ"
+  }
+}
