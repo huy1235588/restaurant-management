@@ -100,8 +100,11 @@ make prod
 
 | Document | Description |
 |----------|-------------|
-| [**DOCKER.md**](./DOCKER.md) | Complete Docker deployment guide |
-| [**DOCKER_OPTIMIZATION.md**](./DOCKER_OPTIMIZATION.md) | Docker optimization details |
+| [**docs/DATABASE.md**](./docs/DATABASE.md) | Complete database documentation with ERD, table details, and queries |
+| [**docs/DATABASE_ERD.mmd**](./docs/DATABASE_ERD.mmd) | Mermaid ERD diagram (renders on GitHub) |
+| [**docs/DATABASE_QUERIES.sql**](./docs/DATABASE_QUERIES.sql) | 50+ common SQL query examples |
+| [**docs/DOCKER.md**](./docs/DOCKER.md) | Complete Docker deployment guide |
+| [**docs/README.md**](./docs/README.md) | Documentation index and guide |
 
 ## 🛠️ Tech Stack
 
