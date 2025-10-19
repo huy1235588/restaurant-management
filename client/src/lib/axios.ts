@@ -1,11 +1,11 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '@/stores/authStore';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 
 // Create axios instance
 export const axiosInstance = axios.create({
-    baseURL: API_URL + '/api/v1',
+    baseURL: API_URL,
     timeout: 30000,
     headers: {
         'Content-Type': 'application/json',
