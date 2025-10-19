@@ -1,0 +1,256 @@
+%% Restaurant Management System - Entity Relationship Diagram
+%% This is a Mermaid ERD diagram that can be rendered on GitHub or using Mermaid tools
+
+erDiagram
+    %% ====================================
+    %% Authentication & User Management
+    %% ====================================
+    
+    ACCOUNTS ||--o| STAFF : "has"
+    ACCOUNTS ||--o{ REFRESH_TOKENS : "has"
+    
+    %% ====================================
+    %% Menu Management
+    %% ====================================
+    
+    CATEGORIES ||--o{ MENU_ITEMS : "contains"
+    
+    %% ====================================
+    %% Table & Reservation
+    %% ====================================
+    
+    RESTAURANT_TABLES ||--o{ RESERVATIONS : "books"
+    RESTAURANT_TABLES ||--o{ ORDERS : "serves"
+    RESTAURANT_TABLES ||--o{ BILLS : "generates"
+    
+    %% ====================================
+    %% Reservation & Orders
+    %% ====================================
+    
+    RESERVATIONS ||--o{ ORDERS : "creates"
+    
+    %% ====================================
+    %% Orders
+    %% ====================================
+    
+    ORDERS ||--o{ ORDER_ITEMS : "contains"
+    ORDERS ||--o{ KITCHEN_ORDERS : "sends_to"
+    ORDERS ||--o| BILLS : "generates"
+    STAFF ||--o{ ORDERS : "takes"
+    MENU_ITEMS ||--o{ ORDER_ITEMS : "ordered_in"
+    
+    %% ====================================
+    %% Kitchen
+    %% ====================================
+    
+    STAFF ||--o{ KITCHEN_ORDERS : "assigned_to"
+    
+    %% ====================================
+    %% Billing & Payment
+    %% ====================================
+    
+    BILLS ||--o{ BILL_ITEMS : "contains"
+    BILLS ||--o{ PAYMENTS : "receives"
+    STAFF ||--o{ BILLS : "processes"
+    MENU_ITEMS ||--o{ BILL_ITEMS : "billed_in"
+    
+    %% ====================================
+    %% Entity Definitions
+    %% ====================================
+    
+    ACCOUNTS {
+        int accountId PK "Primary Key, Auto Increment"
+        string username UK "Unique, Tên đăng nhập"
+        string email UK "Unique, Email"
+        string phoneNumber UK "Unique, Số điện thoại"
+        string password "Mật khẩu đã mã hóa"
+        boolean isActive "Trạng thái kích hoạt"
+        datetime lastLogin "Lần đăng nhập cuối"
+        datetime createdAt "Thời gian tạo"
+        datetime updatedAt "Thời gian cập nhật"
+    }
+    
+    REFRESH_TOKENS {
+        int tokenId PK "Primary Key"
+        int accountId FK "Foreign Key -> accounts"
+        string token UK "Unique, JWT refresh token"
+        datetime expiresAt "Thời gian hết hạn"
+        string deviceInfo "Thông tin thiết bị"
+        string ipAddress "Địa chỉ IP"
+        boolean isRevoked "Token đã thu hồi"
+        datetime createdAt "Thời gian tạo"
+        datetime revokedAt "Thời gian thu hồi"
+    }
+    
+    STAFF {
+        int staffId PK "Primary Key"
+        int accountId FK_UK "Foreign Key -> accounts, Unique"
+        string fullName "Họ tên đầy đủ"
+        string address "Địa chỉ"
+        date dateOfBirth "Ngày sinh"
+        date hireDate "Ngày tuyển dụng"
+        decimal salary "Lương"
+        enum role "Vai trò: admin/manager/waiter/chef/bartender/cashier"
+        boolean isActive "Đang làm việc"
+        datetime createdAt "Thời gian tạo"
+        datetime updatedAt "Thời gian cập nhật"
+    }
+    
+    CATEGORIES {
+        int categoryId PK "Primary Key"
+        string categoryName UK "Unique, Tên danh mục"
+        string description "Mô tả"
+        int displayOrder "Thứ tự hiển thị"
+        boolean isActive "Đang hoạt động"
+        string imageUrl "URL hình ảnh"
+        datetime createdAt "Thời gian tạo"
+        datetime updatedAt "Thời gian cập nhật"
+    }
+    
+    MENU_ITEMS {
+        int itemId PK "Primary Key"
+        string itemCode UK "Unique, Mã món ăn"
+        string itemName "Tên món ăn"
+        int categoryId FK "Foreign Key -> categories"
+        decimal price "Giá bán"
+        decimal cost "Giá vốn"
+        string description "Mô tả món ăn"
+        string imageUrl "URL hình ảnh"
+        boolean isAvailable "Còn hàng"
+        boolean isActive "Đang kinh doanh"
+        int preparationTime "Thời gian chế biến (phút)"
+        int spicyLevel "Độ cay (0-5)"
+        boolean isVegetarian "Món chay"
+        int calories "Lượng calo"
+        int displayOrder "Thứ tự hiển thị"
+        datetime createdAt "Thời gian tạo"
+        datetime updatedAt "Thời gian cập nhật"
+    }
+    
+    RESTAURANT_TABLES {
+        int tableId PK "Primary Key"
+        string tableNumber UK "Unique, Số bàn"
+        string tableName "Tên bàn"
+        int capacity "Sức chứa tối đa"
+        int minCapacity "Sức chứa tối thiểu"
+        int floor "Tầng"
+        string section "Khu vực: VIP/Garden/Indoor/Outdoor"
+        enum status "Trạng thái: available/occupied/reserved/maintenance"
+        string qrCode UK "Unique, Mã QR code"
+        boolean isActive "Đang hoạt động"
+        datetime createdAt "Thời gian tạo"
+        datetime updatedAt "Thời gian cập nhật"
+    }
+    
+    RESERVATIONS {
+        int reservationId PK "Primary Key"
+        string reservationCode UK "Unique, Mã đặt bàn (UUID)"
+        string customerName "Tên khách hàng"
+        string phoneNumber "Số điện thoại"
+        string email "Email"
+        int tableId FK "Foreign Key -> restaurant_tables"
+        date reservationDate "Ngày đặt"
+        time reservationTime "Giờ đặt"
+        int duration "Thời gian (phút), default 120"
+        int headCount "Số người"
+        text specialRequest "Yêu cầu đặc biệt"
+        decimal depositAmount "Tiền đặt cọc"
+        enum status "pending/confirmed/seated/completed/cancelled/no_show"
+        text notes "Ghi chú"
+        datetime createdAt "Thời gian tạo"
+        datetime updatedAt "Thời gian cập nhật"
+    }
+    
+    ORDERS {
+        int orderId PK "Primary Key"
+        string orderNumber UK "Unique, Số đơn hàng (UUID)"
+        int tableId FK "Foreign Key -> restaurant_tables"
+        int staffId FK "Foreign Key -> staff (waiter)"
+        int reservationId FK "Foreign Key -> reservations"
+        string customerName "Tên khách hàng"
+        string customerPhone "SĐT khách hàng"
+        int headCount "Số người"
+        enum status "pending/confirmed/preparing/ready/served/cancelled"
+        text notes "Ghi chú"
+        datetime orderTime "Thời gian đặt"
+        datetime confirmedAt "Thời gian xác nhận"
+        datetime completedAt "Thời gian hoàn thành"
+        datetime createdAt "Thời gian tạo"
+        datetime updatedAt "Thời gian cập nhật"
+    }
+    
+    ORDER_ITEMS {
+        int orderItemId PK "Primary Key"
+        int orderId FK "Foreign Key -> orders"
+        int itemId FK "Foreign Key -> menu_items"
+        int quantity "Số lượng"
+        decimal unitPrice "Đơn giá"
+        decimal subtotal "Thành tiền"
+        string specialRequest "Yêu cầu đặc biệt"
+        enum status "pending/confirmed/preparing/ready/served/cancelled"
+        datetime createdAt "Thời gian tạo"
+        datetime updatedAt "Thời gian cập nhật"
+    }
+    
+    KITCHEN_ORDERS {
+        int kitchenOrderId PK "Primary Key"
+        int orderId FK "Foreign Key -> orders"
+        int staffId FK "Foreign Key -> staff (chef)"
+        int priority "Độ ưu tiên"
+        enum status "pending/confirmed/preparing/ready/served/cancelled"
+        datetime startedAt "Thời gian bắt đầu"
+        datetime completedAt "Thời gian hoàn thành"
+        int estimatedTime "Thời gian ước tính (phút)"
+        text notes "Ghi chú"
+        datetime createdAt "Thời gian tạo"
+        datetime updatedAt "Thời gian cập nhật"
+    }
+    
+    BILLS {
+        int billId PK "Primary Key"
+        string billNumber UK "Unique, Số hóa đơn (UUID)"
+        int orderId FK_UK "Foreign Key -> orders, Unique"
+        int tableId FK "Foreign Key -> restaurant_tables"
+        int staffId FK "Foreign Key -> staff (cashier)"
+        decimal subtotal "Tổng tiền hàng"
+        decimal taxAmount "Tiền thuế"
+        decimal taxRate "Tỷ lệ thuế (%)"
+        decimal discountAmount "Tiền giảm giá"
+        decimal serviceCharge "Phí dịch vụ"
+        decimal totalAmount "Tổng cộng"
+        decimal paidAmount "Tiền đã trả"
+        decimal changeAmount "Tiền thối lại"
+        enum paymentStatus "pending/paid/refunded/cancelled"
+        enum paymentMethod "cash/card/momo/bank_transfer"
+        text notes "Ghi chú"
+        datetime createdAt "Thời gian tạo"
+        datetime paidAt "Thời gian thanh toán"
+        datetime updatedAt "Thời gian cập nhật"
+    }
+    
+    BILL_ITEMS {
+        int billItemId PK "Primary Key"
+        int billId FK "Foreign Key -> bills"
+        int itemId FK "Foreign Key -> menu_items"
+        string itemName "Tên món (snapshot)"
+        int quantity "Số lượng"
+        decimal unitPrice "Đơn giá"
+        decimal subtotal "Tạm tính"
+        decimal discount "Giảm giá"
+        decimal total "Thành tiền"
+        datetime createdAt "Thời gian tạo"
+    }
+    
+    PAYMENTS {
+        int paymentId PK "Primary Key"
+        int billId FK "Foreign Key -> bills"
+        enum paymentMethod "cash/card/momo/bank_transfer"
+        decimal amount "Số tiền"
+        string transactionId "Mã giao dịch"
+        string cardNumber "Số thẻ (4 số cuối)"
+        string cardHolderName "Tên chủ thẻ"
+        enum status "pending/paid/refunded/cancelled"
+        text notes "Ghi chú"
+        datetime paymentDate "Ngày thanh toán"
+        datetime createdAt "Thời gian tạo"
+    }
