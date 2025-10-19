@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { tableController } from '@/controllers/table.controller';
 import { authenticate } from '@/middlewares/auth';
 
-const router = Router();
+const router: Router = Router();
 
 // Apply authentication middleware to all routes
 router.use(authenticate);
