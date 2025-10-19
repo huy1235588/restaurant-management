@@ -1,10 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/authStore';
 import { useTableStore } from '@/stores/tableStore';
 import { hasPermission } from '@/types';

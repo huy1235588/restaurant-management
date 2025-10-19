@@ -5,17 +5,17 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { authApi } from '@/services/auth.service';
 import { UserRole, LoginCredentials } from '@/types';
+import { AxiosError } from 'axios';
 
 export function useAuth(requiredRole?: UserRole | UserRole[]) {
     const router = useRouter();
-    const { 
-        user, 
-        isAuthenticated, 
+    const {
+        user,
+        isAuthenticated,
         isLoading,
-        accessToken,
         setAuth,
         setUser,
-        clearAuth, 
+        clearAuth,
         logout: logoutStore,
         setLoading,
     } = useAuthStore();
@@ -48,20 +48,28 @@ export function useAuth(requiredRole?: UserRole | UserRole[]) {
         try {
             setLoading(true);
             const response = await authApi.login(credentials);
-            
+
             if (response.user && response.accessToken) {
                 // Save user and access token to memory
                 // Refresh token is in HttpOnly cookie
                 setAuth(response.user, response.accessToken);
                 return { success: true, user: response.user };
             }
-            
+
             throw new Error('Invalid response from server');
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Login error:', error);
-            return { 
-                success: false, 
-                error: error.response?.data?.message || error.message || 'Login failed' 
+            let errorMessage = 'Login failed';
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            }
+            if (error && typeof error === 'object' && 'response' in error) {
+                const axiosError = error as AxiosError<{ message?: string }>;
+                errorMessage = axiosError.response?.data?.message || errorMessage;
+            }
+            return {
+                success: false,
+                error: errorMessage
             };
         } finally {
             setLoading(false);
@@ -126,9 +134,9 @@ export function useAuth(requiredRole?: UserRole | UserRole[]) {
         };
 
         const allowedRoutes = roleRoutes[user.role] || [];
-        
+
         if (allowedRoutes.includes('*')) return true;
-        
+
         return allowedRoutes.some(allowedRoute => route.startsWith(allowedRoute));
     };
 

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslation } from 'react-i18next';
 import {
     LayoutDashboard,
     ShoppingCart,
@@ -91,7 +90,6 @@ export default function DashboardLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const { t } = useTranslation();
     const router = useRouter();
     const { user, isAuthenticated, isLoading, logout } = useAuthStore();
     const [sidebarOpen, setSidebarOpen] = useState(false);

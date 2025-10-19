@@ -5,14 +5,14 @@ import type { NextRequest } from 'next/server';
 const publicRoutes = ['/login', '/register', '/'];
 
 // Define role-based route access
-const roleRoutes: Record<string, string[]> = {
-    admin: ['*'], // Admin has access to all routes
-    manager: ['/dashboard', '/orders', '/menu', '/tables', '/reservations', '/bills', '/staff', '/reports', '/kitchen'],
-    waiter: ['/dashboard', '/orders', '/menu', '/tables', '/reservations'],
-    chef: ['/kitchen', '/orders', '/menu'],
-    bartender: ['/kitchen', '/orders', '/menu'],
-    cashier: ['/dashboard', '/orders', '/bills', '/payments'],
-};
+// const roleRoutes: Record<string, string[]> = {
+//     admin: ['*'], // Admin has access to all routes
+//     manager: ['/dashboard', '/orders', '/menu', '/tables', '/reservations', '/bills', '/staff', '/reports', '/kitchen'],
+//     waiter: ['/dashboard', '/orders', '/menu', '/tables', '/reservations'],
+//     chef: ['/kitchen', '/orders', '/menu'],
+//     bartender: ['/kitchen', '/orders', '/menu'],
+//     cashier: ['/dashboard', '/orders', '/bills', '/payments'],
+// };
 
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
@@ -25,7 +25,7 @@ export function middleware(request: NextRequest) {
     // Check if user is authenticated via cookie
     const accessToken = request.cookies.get('accessToken');
     const refreshToken = request.cookies.get('refreshToken');
-    
+
     // Allow if either access token or refresh token exists
     if (!accessToken && !refreshToken) {
         // Not authenticated, redirect to login

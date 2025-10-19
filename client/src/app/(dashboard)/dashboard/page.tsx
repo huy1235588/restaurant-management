@@ -7,6 +7,7 @@ import {
     ShoppingCart,
     Users,
     CheckCircle,
+    LucideIcon,
 } from 'lucide-react';
 
 import { useAuthStore } from '@/stores/authStore';
@@ -19,7 +20,7 @@ interface StatCard {
     title: string;
     value: string;
     description: string;
-    icon: any;
+    icon: LucideIcon;
     trend?: string;
     permission?: string;
 }

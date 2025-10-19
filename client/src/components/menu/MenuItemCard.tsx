@@ -2,6 +2,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Clock } from 'lucide-react';
+import { useState } from 'react';
+import Image from 'next/image';
 
 interface MenuItem {
     itemId: number;
@@ -23,17 +25,19 @@ interface MenuItemCardProps {
 }
 
 export function MenuItemCard({ item, onEdit, onToggleAvailability, canManage }: MenuItemCardProps) {
+    const [imageError, setImageError] = useState(false);
+
     return (
         <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
             <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 relative">
-                {item.imageUrl ? (
-                    <img
+                {item.imageUrl && !imageError ? (
+                    <Image
                         src={item.imageUrl}
                         alt={item.itemName}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                        }}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        onError={() => setImageError(true)}
                     />
                 ) : (
                     <div className="flex items-center justify-center h-full">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChefHat, CheckCircle2 } from 'lucide-react';
 
@@ -8,8 +8,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useOrderStore } from '@/stores/orderStore';
-import { OrderStatus } from '@/types';
-import { PageHeader } from '@/components/shared/PageHeader';
 import { KitchenOrderCard } from '@/components/kitchen/KitchenOrderCard';
 
 export default function KitchenPage() {

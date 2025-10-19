@@ -15,7 +15,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 export default function SettingsPage() {
     const { t, i18n } = useTranslation();
     const { user } = useAuthStore();
-    const { theme, language, setLanguage } = useSettingsStore();
+    const { setLanguage } = useSettingsStore();
 
     const [fullName, setFullName] = useState(user?.fullName || '');
     const [email, setEmail] = useState(user?.email || '');

@@ -2,7 +2,7 @@ import { Clock } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Order, OrderStatus } from '@/types';
+import { Order } from '@/types';
 
 interface KitchenOrderCardProps {
     order: Order;
@@ -10,18 +10,17 @@ interface KitchenOrderCardProps {
     onMarkReady?: (orderId: number) => void;
 }
 
-export function KitchenOrderCard({ 
-    order, 
-    onStartPreparing, 
-    onMarkReady 
+export function KitchenOrderCard({
+    order,
+    onStartPreparing,
+    onMarkReady
 }: KitchenOrderCardProps) {
     return (
         <Card
-            className={`${
-                order.status === 'confirmed'
+            className={`${order.status === 'confirmed'
                     ? 'border-orange-500 border-2'
                     : 'border-blue-500 border-2'
-            }`}
+                }`}
         >
             <CardHeader>
                 <div className="flex items-center justify-between">

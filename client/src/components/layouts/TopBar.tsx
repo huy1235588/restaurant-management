@@ -19,7 +19,7 @@ interface TopBarProps {
 }
 
 export function TopBar({ user, onMenuClick, onLogout }: TopBarProps) {
-    const { t, i18n } = useTranslation();
+    const { i18n } = useTranslation();
 
     const changeLanguage = (lng: string) => {
         i18n.changeLanguage(lng);

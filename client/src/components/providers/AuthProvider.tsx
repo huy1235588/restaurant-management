@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { authApi } from '@/services/auth.service';
@@ -14,45 +14,47 @@ const publicPaths = ['/login', '/register', '/'];
 export function AuthProvider({ children }: AuthProviderProps) {
     const pathname = usePathname();
     const router = useRouter();
-    const { isAuthenticated, isLoading, setAuth, clearAuth, setLoading } = useAuthStore();
+    const { isLoading, setAuth, clearAuth, setLoading } = useAuthStore();
+
+    const checkAuth = useCallback(async () => {
+        const isPublicPath = publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'));
+
+        try {
+            setLoading(true);
+
+            // Always verify session with server (using HttpOnly cookie)
+            const user = await authApi.me();
+
+            // User has valid session, update store
+            setAuth(user, ''); // Access token is in cookie
+            setLoading(false);
+        } catch {
+            // Session invalid or no session
+            clearAuth();
+            setLoading(false);
+
+            // Redirect to login if not on public path
+            if (!isPublicPath) {
+                router.push('/login');
+            }
+        }
+    }, [pathname, router, setAuth, clearAuth, setLoading]);
 
     useEffect(() => {
         let mounted = true;
 
-        const checkAuth = async () => {
-            const isPublicPath = publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'));
-
-            try {
-                setLoading(true);
-                
-                // Always verify session with server (using HttpOnly cookie)
-                const user = await authApi.me();
-                
-                if (mounted) {
-                    // User has valid session, update store
-                    setAuth(user, ''); // Access token is in cookie
-                    setLoading(false);
-                }
-            } catch (error) {
-                // Session invalid or no session
-                if (mounted) {
-                    clearAuth();
-                    setLoading(false);
-                    
-                    // Redirect to login if not on public path
-                    if (!isPublicPath) {
-                        router.push('/login');
-                    }
-                }
-            }
+        const performAuthCheck = async () => {
+            await checkAuth();
         };
 
-        checkAuth();
+        if (mounted) {
+            performAuthCheck();
+        }
 
         return () => {
             mounted = false;
         };
-    }, []); // Run once on mount
+    }, [checkAuth]);
 
     // Show loading state
     if (isLoading && !publicPaths.some(path => pathname === path)) {

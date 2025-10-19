@@ -5,7 +5,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1
 
 // Create axios instance
 export const axiosInstance = axios.create({
-    baseURL: API_URL,
+    baseURL: API_URL + '/api/v1',
     timeout: 30000,
     headers: {
         'Content-Type': 'application/json',
@@ -36,11 +36,11 @@ axiosInstance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         // Get access token from Zustand store (memory only)
         const accessToken = useAuthStore.getState().accessToken;
-        
+
         if (accessToken && config.headers) {
             config.headers.Authorization = `Bearer ${accessToken}`;
         }
-        
+
         // Cookies are sent automatically via withCredentials: true
         return config;
     },
@@ -87,10 +87,10 @@ axiosInstance.interceptors.response.use(
 
                 if (response.data.data?.accessToken) {
                     const newAccessToken = response.data.data.accessToken;
-                    
+
                     // Save new access token to Zustand store (memory only)
                     useAuthStore.getState().setAccessToken(newAccessToken);
-                    
+
                     // Update the failed request with new token
                     if (originalRequest.headers) {
                         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;

@@ -1,11 +1,12 @@
 import { io, Socket } from 'socket.io-client';
-import { SocketOrder, SocketTable } from '@/types';
+import { SocketOrder, SocketTable, KitchenOrder } from '@/types';
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001';
 
 class SocketService {
     private socket: Socket | null = null;
-    private listeners: Map<string, Set<Function>> = new Map();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private listeners: Map<string, Set<(...args: any[]) => void>> = new Map();
 
     connect(token?: string) {
         if (this.socket?.connected) {
@@ -77,16 +78,17 @@ class SocketService {
     }
 
     // Kitchen events
-    onKitchenOrderReceived(callback: (order: any) => void) {
+    onKitchenOrderReceived(callback: (order: KitchenOrder) => void) {
         this.addEventListener('kitchen:order-received', callback);
     }
 
-    onKitchenOrderUpdated(callback: (order: any) => void) {
+    onKitchenOrderUpdated(callback: (order: KitchenOrder) => void) {
         this.addEventListener('kitchen:order-updated', callback);
     }
 
     // Generic event listener
-    private addEventListener(event: string, callback: Function) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private addEventListener(event: string, callback: (...args: any[]) => void) {
         if (!this.socket) {
             console.warn('Socket not connected');
             return;
@@ -96,7 +98,7 @@ class SocketService {
             this.listeners.set(event, new Set());
 
             // Set up socket listener
-            this.socket.on(event, (...args: any[]) => {
+            this.socket.on(event, (...args: unknown[]) => {
                 const callbacks = this.listeners.get(event);
                 if (callbacks) {
                     callbacks.forEach(cb => cb(...args));
@@ -108,7 +110,8 @@ class SocketService {
     }
 
     // Remove event listener
-    removeEventListener(event: string, callback: Function) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    removeEventListener(event: string, callback: (...args: any[]) => void) {
         const callbacks = this.listeners.get(event);
         if (callbacks) {
             callbacks.delete(callback);
@@ -121,7 +124,7 @@ class SocketService {
     }
 
     // Emit events
-    emit(event: string, data?: any) {
+    emit(event: string, data?: unknown) {
         if (!this.socket?.connected) {
             console.warn('Socket not connected');
             return;

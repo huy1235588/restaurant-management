@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { AxiosError } from 'axios';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,7 +27,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export default function LoginPage() {
     const { t } = useTranslation();
     const router = useRouter();
-    const { setUser, setTokens } = useAuthStore();
+    const { setUser } = useAuthStore();
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -65,9 +66,16 @@ export default function LoginPage() {
             const redirectPath = roleRedirects[response.user.role] || '/dashboard';
             router.push(redirectPath);
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Login error:', error);
-            const errorMessage = error.response?.data?.message || error.message || 'Login failed';
+            let errorMessage = 'Login failed';
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            }
+            if (error && typeof error === 'object' && 'response' in error) {
+                const axiosError = error as AxiosError<{ message?: string }>;
+                errorMessage = axiosError.response?.data?.message || errorMessage;
+            }
             toast.error(errorMessage);
         } finally {
             setIsLoading(false);
