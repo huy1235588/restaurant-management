@@ -1,0 +1,438 @@
+erDiagram
+    %% ============================================
+    %% Restaurant Management System - ERD Diagram
+    %% ============================================
+    %% This diagram shows the complete database structure
+    %% including inventory management system
+    %% ============================================
+
+    %% ============================================
+    %% AUTHENTICATION & USER MANAGEMENT
+    %% ============================================
+    
+    Account ||--o| Staff : "has"
+    Account ||--o{ RefreshToken : "has many"
+    
+    Account {
+        int accountId PK
+        string username UK
+        string email UK
+        string phoneNumber UK
+        string password
+        boolean isActive
+        timestamp lastLogin
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    RefreshToken {
+        int tokenId PK
+        int accountId FK
+        string token UK
+        timestamp expiresAt
+        string deviceInfo
+        string ipAddress
+        boolean isRevoked
+        timestamp createdAt
+        timestamp revokedAt
+    }
+    
+    Staff {
+        int staffId PK
+        int accountId FK "UK"
+        string fullName
+        string address
+        date dateOfBirth
+        date hireDate
+        decimal salary
+        enum role
+        boolean isActive
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    %% ============================================
+    %% STAFF RELATIONSHIPS
+    %% ============================================
+    
+    Staff ||--o{ Order : "creates"
+    Staff ||--o{ Bill : "processes"
+    Staff ||--o{ KitchenOrder : "assigned to"
+    Staff ||--o{ PurchaseOrder : "creates"
+    Staff ||--o{ StockTransaction : "performs"
+    
+    %% ============================================
+    %% MENU MANAGEMENT
+    %% ============================================
+    
+    Category ||--o{ MenuItem : "contains"
+    
+    Category {
+        int categoryId PK
+        string categoryName UK
+        string description
+        int displayOrder
+        boolean isActive
+        string imageUrl
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    MenuItem {
+        int itemId PK
+        string itemCode UK
+        string itemName
+        int categoryId FK
+        decimal price
+        decimal cost
+        string description
+        string imageUrl
+        boolean isAvailable
+        boolean isActive
+        int preparationTime
+        int spicyLevel
+        boolean isVegetarian
+        int calories
+        int displayOrder
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    MenuItem ||--o{ OrderItem : "ordered in"
+    MenuItem ||--o{ BillItem : "billed in"
+    MenuItem ||--o{ RecipeItem : "has recipe"
+    
+    %% ============================================
+    %% TABLE MANAGEMENT
+    %% ============================================
+    
+    RestaurantTable {
+        int tableId PK
+        string tableNumber UK
+        string tableName
+        int capacity
+        int minCapacity
+        int floor
+        string section
+        enum status
+        string qrCode UK
+        boolean isActive
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    RestaurantTable ||--o{ Reservation : "reserved for"
+    RestaurantTable ||--o{ Order : "placed at"
+    RestaurantTable ||--o{ Bill : "billed to"
+    
+    %% ============================================
+    %% RESERVATION MANAGEMENT
+    %% ============================================
+    
+    Reservation {
+        int reservationId PK
+        string reservationCode UK
+        string customerName
+        string phoneNumber
+        string email
+        int tableId FK
+        date reservationDate
+        time reservationTime
+        int duration
+        int headCount
+        text specialRequest
+        decimal depositAmount
+        enum status
+        text notes
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    Reservation ||--o{ Order : "leads to"
+    
+    %% ============================================
+    %% ORDER MANAGEMENT
+    %% ============================================
+    
+    Order {
+        int orderId PK
+        string orderNumber UK
+        int tableId FK
+        int staffId FK
+        int reservationId FK
+        string customerName
+        string customerPhone
+        int headCount
+        enum status
+        text notes
+        timestamp orderTime
+        timestamp confirmedAt
+        timestamp completedAt
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    Order ||--|{ OrderItem : "contains"
+    Order ||--o{ KitchenOrder : "sent to kitchen"
+    Order ||--o| Bill : "generates"
+    
+    OrderItem {
+        int orderItemId PK
+        int orderId FK
+        int itemId FK
+        int quantity
+        decimal unitPrice
+        decimal subtotal
+        string specialRequest
+        enum status
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    %% ============================================
+    %% KITCHEN MANAGEMENT
+    %% ============================================
+    
+    KitchenOrder {
+        int kitchenOrderId PK
+        int orderId FK
+        int staffId FK
+        int priority
+        enum status
+        timestamp startedAt
+        timestamp completedAt
+        int estimatedTime
+        text notes
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    %% ============================================
+    %% BILLING & PAYMENT
+    %% ============================================
+    
+    Bill {
+        int billId PK
+        string billNumber UK
+        int orderId FK "UK"
+        int tableId FK
+        int staffId FK
+        decimal subtotal
+        decimal taxAmount
+        decimal taxRate
+        decimal discountAmount
+        decimal serviceCharge
+        decimal totalAmount
+        decimal paidAmount
+        decimal changeAmount
+        enum paymentStatus
+        enum paymentMethod
+        text notes
+        timestamp createdAt
+        timestamp paidAt
+        timestamp updatedAt
+    }
+    
+    Bill ||--|{ BillItem : "contains"
+    Bill ||--o{ Payment : "paid by"
+    
+    BillItem {
+        int billItemId PK
+        int billId FK
+        int itemId FK
+        string itemName
+        int quantity
+        decimal unitPrice
+        decimal subtotal
+        decimal discount
+        decimal total
+        timestamp createdAt
+    }
+    
+    Payment {
+        int paymentId PK
+        int billId FK
+        enum paymentMethod
+        decimal amount
+        string transactionId
+        string cardNumber
+        string cardHolderName
+        enum status
+        text notes
+        timestamp paymentDate
+        timestamp createdAt
+    }
+    
+    %% ============================================
+    %% INVENTORY - SUPPLIERS
+    %% ============================================
+    
+    Supplier {
+        int supplierId PK
+        string supplierCode UK
+        string supplierName
+        string contactPerson
+        string phoneNumber
+        string email
+        text address
+        string taxId
+        string paymentTerms
+        text notes
+        boolean isActive
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    Supplier ||--o{ PurchaseOrder : "supplies to"
+    Supplier ||--o{ Ingredient : "supplies"
+    Supplier ||--o{ IngredientBatch : "supplies"
+    
+    %% ============================================
+    %% INVENTORY - INGREDIENTS
+    %% ============================================
+    
+    Ingredient {
+        int ingredientId PK
+        string ingredientCode UK
+        string ingredientName
+        string categoryName
+        string unit
+        decimal currentStock
+        decimal minimumStock
+        decimal maximumStock
+        decimal reorderPoint
+        decimal unitCost
+        int supplierId FK
+        string storageLocation
+        boolean requiresBatchTracking
+        boolean isActive
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    Ingredient ||--o{ RecipeItem : "used in"
+    Ingredient ||--o{ IngredientBatch : "has batches"
+    Ingredient ||--o{ StockTransaction : "tracked in"
+    Ingredient ||--o{ StockAlert : "monitored by"
+    Ingredient ||--o{ PurchaseOrderItem : "ordered in"
+    
+    %% ============================================
+    %% INVENTORY - RECIPES
+    %% ============================================
+    
+    RecipeItem {
+        int recipeItemId PK
+        int itemId FK
+        int ingredientId FK
+        decimal quantity
+        string unit
+        text notes
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    %% ============================================
+    %% INVENTORY - PURCHASE ORDERS
+    %% ============================================
+    
+    PurchaseOrder {
+        int purchaseOrderId PK
+        string poNumber UK
+        int supplierId FK
+        int staffId FK
+        date orderDate
+        date expectedDate
+        date receivedDate
+        string status
+        decimal subtotal
+        decimal taxAmount
+        decimal totalAmount
+        text notes
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    PurchaseOrder ||--|{ PurchaseOrderItem : "contains"
+    PurchaseOrder ||--o{ IngredientBatch : "creates batches"
+    
+    PurchaseOrderItem {
+        int poItemId PK
+        int purchaseOrderId FK
+        int ingredientId FK
+        decimal quantity
+        decimal receivedQuantity
+        decimal unitPrice
+        decimal subtotal
+        text notes
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    %% ============================================
+    %% INVENTORY - BATCHES
+    %% ============================================
+    
+    IngredientBatch {
+        int batchId PK
+        int ingredientId FK
+        string batchNumber
+        decimal quantity
+        decimal remainingQuantity
+        decimal unitCost
+        int supplierId FK
+        int purchaseOrderId FK
+        date receivedDate
+        date manufactureDate
+        date expiryDate
+        string storageLocation
+        string status
+        text notes
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    IngredientBatch ||--o{ StockTransaction : "tracked in"
+    
+    %% ============================================
+    %% INVENTORY - TRANSACTIONS
+    %% ============================================
+    
+    StockTransaction {
+        int transactionId PK
+        int ingredientId FK
+        int batchId FK
+        string transactionType
+        decimal quantity
+        string unit
+        decimal unitCost
+        decimal totalCost
+        string referenceType
+        int referenceId
+        decimal balanceBefore
+        decimal balanceAfter
+        text notes
+        int staffId FK
+        timestamp transactionDate
+        timestamp createdAt
+    }
+    
+    %% ============================================
+    %% INVENTORY - ALERTS
+    %% ============================================
+    
+    StockAlert {
+        int alertId PK
+        int ingredientId FK
+        string alertType
+        decimal currentStock
+        decimal thresholdValue
+        string severity
+        string status
+        int acknowledgedBy FK
+        timestamp acknowledgedAt
+        text notes
+        timestamp createdAt
+        timestamp resolvedAt
+    }
+    
+    Staff ||--o{ StockAlert : "acknowledges"

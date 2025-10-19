@@ -100,8 +100,8 @@ make prod
 
 | Document | Description |
 |----------|-------------|
-| [**DOCKER.md**](./DOCKER.md) | Complete Docker deployment guide |
-| [**DOCKER_OPTIMIZATION.md**](./DOCKER_OPTIMIZATION.md) | Docker optimization details |
+| [**DATABASE.md**](./docs/DATABASE.md) | Complete database documentation and schema |
+| [**DOCKER.md**](./docs/DOCKER.md) | Complete Docker deployment guide |
 
 ## 🛠️ Tech Stack
 
