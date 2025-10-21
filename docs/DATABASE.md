@@ -111,7 +111,7 @@ erDiagram
     
     Staff {
         int staffId PK
-        int accountId FK UK
+        int accountId FK
         string fullName
         string address
         date dateOfBirth
@@ -236,7 +236,7 @@ erDiagram
     Bill {
         int billId PK
         string billNumber UK
-        int orderId FK UK
+        int orderId FK
         int tableId FK
         int staffId FK
         decimal subtotal
@@ -2146,34 +2146,6 @@ CREATE INDEX idx_purchase_orders_status ON purchase_orders(status);
 CREATE INDEX idx_purchase_orders_orderDate ON purchase_orders(orderDate);
 ```
 
-### 8.7. Lộ trình triển khai
-
-#### Phase 1: Basic Inventory (2-3 tuần)
-- [ ] Tạo bảng ingredients, ingredient_categories
-- [ ] Tạo bảng suppliers
-- [ ] Tạo bảng stock_transactions
-- [ ] API CRUD cơ bản
-- [ ] UI quản lý nguyên liệu
-
-#### Phase 2: Recipes & Auto Deduction (2 tuần)
-- [ ] Tạo bảng recipes
-- [ ] Liên kết món ăn với nguyên liệu
-- [ ] Trigger tự động trừ kho
-- [ ] UI quản lý công thức
-
-#### Phase 3: Purchase Orders (2 tuần)
-- [ ] Tạo bảng purchase_orders, purchase_order_items
-- [ ] Quy trình đặt hàng
-- [ ] Quy trình nhập kho
-- [ ] UI đặt hàng và nhập kho
-
-#### Phase 4: Advanced Features (2-3 tuần)
-- [ ] Bảng ingredient_batches (FIFO)
-- [ ] Bảng stock_alerts
-- [ ] Cảnh báo hạn sử dụng
-- [ ] Dashboard và báo cáo
-- [ ] Tối ưu hóa queries
-
 ---
 
 ## 9. Kết luận
@@ -2223,7 +2195,7 @@ Tài liệu này cung cấp cái nhìn toàn diện về cơ sở dữ liệu h�
 #### Regular Tasks
 - 📅 **Daily**: Backup database
 - 📅 **Weekly**: Analyze slow queries
-- �� **Monthly**: Review and optimize indexes
+- 📅 **Monthly**: Review and optimize indexes
 - 📅 **Quarterly**: Archive old data
 
 #### Monitoring
@@ -2275,12 +2247,8 @@ docker exec postgres pg_dump -U postgres restaurant_db > backup.sql
 docker exec -i postgres psql -U postgres restaurant_db < backup.sql
 ```
 
-### 10.4. Liên hệ
-Nếu có thắc mắc hoặc cần hỗ trợ về database, vui lòng tạo issue trên GitHub hoặc liên hệ team phát triển.
-
 ---
 
 **Ngày cập nhật**: 2025-10-19  
 **Phiên bản**: 1.0  
-**Tác giả**: Restaurant Management Team
-
+**Tác giả**: Le Huy
