@@ -5,50 +5,15 @@ import compression from 'compression';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
-import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import config from './config';
+import { swaggerSpec } from './config/swagger';
 import routes from './routes';
-import { errorHandler, notFoundHandler } from './middlewares/errorHandler';
+import { errorHandler, notFoundHandler } from './shared/middlewares';
 import logger from './config/logger';
 
 export function createApp(): Application {
     const app = express();
-
-    // Swagger configuration
-    const swaggerOptions = {
-        definition: {
-            openapi: '3.0.0',
-            info: {
-                title: 'Restaurant Management System API',
-                version: '1.0.0',
-                description: 'API documentation for Restaurant Management System',
-            },
-            servers: [
-                {
-                    url: `${config.apiBaseUrl}/api/${config.apiVersion}`,
-                    description: 'Development server',
-                },
-            ],
-            components: {
-                securitySchemes: {
-                    bearerAuth: {
-                        type: 'http',
-                        scheme: 'bearer',
-                        bearerFormat: 'JWT',
-                    },
-                },
-            },
-            security: [
-                {
-                    bearerAuth: [],
-                },
-            ],
-        },
-        apis: ['./src/routes/*.ts'], // Path to the API routes
-    };
-
-    const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
     // Swagger UI
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));

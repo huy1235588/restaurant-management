@@ -1,9 +1,9 @@
 import http from 'http';
 import { createApp } from './app';
-import config from './config';
-import DatabaseClient from './config/database';
-import socketService from './utils/socket';
-import logger from './config/logger';
+import config from '@/config/index';
+import DatabaseClient from '@/config/database';
+import socketService from '@/shared/utils/socket';
+import logger from '@/config/logger';
 import { scheduleTokenCleanup } from './jobs/cleanupTokens';
 
 async function startServer() {

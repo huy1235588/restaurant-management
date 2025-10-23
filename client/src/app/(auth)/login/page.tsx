@@ -17,11 +17,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useAuthStore } from '@/stores/authStore';
 import { authApi } from '@/services/auth.service';
 
-const loginSchema = z.object({
-    username: z.string().min(3, 'Username must be at least 3 characters'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-});
-
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {

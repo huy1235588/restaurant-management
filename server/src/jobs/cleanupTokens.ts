@@ -1,4 +1,4 @@
-import authService from '@/services/auth.service';
+import authService from '@/features/auth/auth.service';
 import logger from '@/config/logger';
 
 /**

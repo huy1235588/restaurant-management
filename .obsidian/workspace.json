@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "docs/DATABASE.md",
+                "file": "docs/use_case/MENU_MANAGEMENT_DIAGRAMS.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "DATABASE"
+              "title": "MENU_MANAGEMENT_DIAGRAMS"
             }
           }
         ]
@@ -142,13 +142,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "docs/DATABASE.md",
+                "file": "docs/use_case/MENU_MANAGEMENT_DIAGRAMS.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of DATABASE"
+              "title": "Outline of MENU_MANAGEMENT_DIAGRAMS"
             }
           }
         ],
@@ -156,7 +156,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 283.5
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -171,6 +171,28 @@
   },
   "active": "48a45e0a49bdddd9",
   "lastOpenFiles": [
+    "server/dist/features/bill/validators/index.js.map",
+    "server/dist/features/bill/validators/index.js",
+    "server/dist/features/bill/validators/index.d.ts.map",
+    "server/dist/features/bill/validators/bill.schema.js.map",
+    "server/dist/features/bill/validators/index.d.ts",
+    "server/dist/features/bill/validators/bill.schema.js",
+    "server/dist/features/bill/validators/bill.schema.d.ts.map",
+    "server/dist/features/bill/validators/bill.schema.d.ts",
+    "server/dist/features/bill/validators",
+    "server/dist/features/bill/dtos/index.js.map",
+    "server/dist/features/bill/dtos/index.js",
+    "server/REFACTORING_SUMMARY.md",
+    "server/IMPORT_UPDATE_GUIDE.md",
+    "server/STRUCTURE_REFACTORING.md",
+    "docs/BUSINESS_USE_CASES.md",
+    "docs/use_case/MENU_MANAGEMENT_DIAGRAMS.md",
+    "docs/use_case/MENU_MANAGEMENT.md",
+    "docs/MENU_MANAGEMENT.md",
+    "docs/use_case/USECASE_MENU_DANHMUC.md",
+    "docs/USE_CASES/UC-002_MENU_MANAGEMENT.md",
+    "docs/MARKDOWN_DOCUMENTATION_GUIDE.md",
+    "docs/DATABASE.md",
     "docs/DATABASE_SUMMARY.md",
     "docs/business-flows/order-processing.md",
     "docs/templates/BUSINESS_PROCESS_SPECIFICATION_TEMPLATE.md"

@@ -1,14 +1,14 @@
 import { Router } from 'express';
-import authRoutes from './auth.routes';
-import orderRoutes from './order.routes';
-import billRoutes from './bill.routes';
-import categoryRoutes from './category.routes';
-import menuRoutes from './menu.routes';
-import tableRoutes from './table.routes';
-import reservationRoutes from './reservation.routes';
-import kitchenRoutes from './kitchen.routes';
-import staffRoutes from './staff.routes';
-import paymentRoutes from './payment.routes';
+import authRoutes from '../features/auth/auth.routes';
+import orderRoutes from '../features/order/order.routes';
+import billRoutes from '../features/bill/bill.routes';
+import categoryRoutes from '../features/category/category.routes';
+import menuRoutes from '../features/menu/menu.routes';
+import tableRoutes from '../features/table/table.routes';
+import reservationRoutes from '../features/reservation/reservation.routes';
+import kitchenRoutes from '../features/kitchen/kitchen.routes';
+import staffRoutes from '../features/staff/staff.routes';
+import paymentRoutes from '../features/payment/payment.routes';
 
 const router: Router = Router();
 
