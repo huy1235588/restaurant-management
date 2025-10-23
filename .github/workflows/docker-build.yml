@@ -77,7 +77,7 @@ jobs:
 
     - name: Run tests
       run: |
-        docker-compose -f docker-compose.yml up -d postgres redis
+        docker compose -f docker-compose.yml up -d postgres redis
         sleep 10
         # Add your test commands here
         # docker-compose exec -T server pnpm test
