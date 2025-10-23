@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { paymentController } from '@/features/payment/payment.controller';
 import { authenticate } from '@/shared/middlewares/auth';
+import { validate } from '@/shared/middlewares/validation';
+import {
+    createPaymentSchema,
+    updatePaymentStatusSchema,
+} from '@/features/payment/validators';
 
 const router: Router = Router();
 
@@ -350,7 +355,7 @@ router.get('/:id', paymentController.getById.bind(paymentController));
  *         description: Internal server error
  */
 // POST /api/payments - Create new payment
-router.post('/', paymentController.create.bind(paymentController));
+router.post('/', validate(createPaymentSchema), paymentController.create.bind(paymentController));
 
 /**
  * @swagger
@@ -421,7 +426,7 @@ router.post('/', paymentController.create.bind(paymentController));
  *         description: Internal server error
  */
 // POST /api/payments/process - Process payment
-router.post('/process', paymentController.process.bind(paymentController));
+router.post('/process', validate(createPaymentSchema), paymentController.process.bind(paymentController));
 
 /**
  * @swagger
@@ -499,7 +504,7 @@ router.post('/process', paymentController.process.bind(paymentController));
  *         description: Internal server error
  */
 // PATCH /api/payments/:id/refund - Refund payment
-router.patch('/:id/refund', paymentController.refund.bind(paymentController));
+router.patch('/:id/refund', validate(updatePaymentStatusSchema), paymentController.refund.bind(paymentController));
 
 /**
  * @swagger
@@ -565,6 +570,6 @@ router.patch('/:id/refund', paymentController.refund.bind(paymentController));
  *         description: Internal server error
  */
 // PATCH /api/payments/:id/cancel - Cancel payment
-router.patch('/:id/cancel', paymentController.cancel.bind(paymentController));
+router.patch('/:id/cancel', validate(updatePaymentStatusSchema), paymentController.cancel.bind(paymentController));
 
 export default router;

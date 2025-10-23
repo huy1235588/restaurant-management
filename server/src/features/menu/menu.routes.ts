@@ -1,6 +1,12 @@
 import { Router } from 'express';
 import { menuController } from '@/features/menu/menu.controller';
 import { authenticate } from '@/shared/middlewares/auth';
+import { validate } from '@/shared/middlewares/validation';
+import {
+    createMenuItemSchema,
+    updateMenuItemSchema,
+    updateMenuItemAvailabilitySchema,
+} from '@/features/menu/validators';
 
 const router: Router = Router();
 
@@ -365,7 +371,7 @@ router.get('/:id', menuController.getById.bind(menuController));
  *         description: Internal server error
  */
 // POST /api/menu - Create new menu item
-router.post('/', menuController.create.bind(menuController));
+router.post('/', validate(createMenuItemSchema), menuController.create.bind(menuController));
 
 /**
  * @swagger
@@ -468,7 +474,7 @@ router.post('/', menuController.create.bind(menuController));
  *         description: Internal server error
  */
 // PUT /api/menu/:id - Update menu item
-router.put('/:id', menuController.update.bind(menuController));
+router.put('/:id', validate(updateMenuItemSchema), menuController.update.bind(menuController));
 
 /**
  * @swagger
@@ -534,7 +540,7 @@ router.put('/:id', menuController.update.bind(menuController));
  *         description: Internal server error
  */
 // PATCH /api/menu/:id/availability - Update menu item availability
-router.patch('/:id/availability', menuController.updateAvailability.bind(menuController));
+router.patch('/:id/availability', validate(updateMenuItemAvailabilitySchema), menuController.updateAvailability.bind(menuController));
 
 /**
  * @swagger

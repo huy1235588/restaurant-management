@@ -205,9 +205,9 @@ pnpm install
 
 ```bash
 # In server directory
-pnpm prisma:generate
-pnpm prisma:migrate
-pnpm prisma:seed
+pnpm run prisma:generate
+pnpm run prisma:migrate
+pnpm run prisma:seed
 ```
 
 #### 3. Start Development Servers
@@ -215,11 +215,11 @@ pnpm prisma:seed
 ```bash
 # Terminal 1 - Server
 cd server
-pnpm dev
+pnpm run dev
 
 # Terminal 2 - Client
 cd client
-pnpm dev
+pnpm run dev
 ```
 
 ### Docker Development
@@ -282,13 +282,13 @@ make <command>
 ```bash
 # Server tests
 cd server
-pnpm test
-pnpm test:watch
-pnpm test:coverage
+pnpm run test
+pnpm run test:watch
+pnpm run test:coverage
 
 # Client tests (if configured)
 cd client
-pnpm test
+pnpm run test
 ```
 
 ## 🚀 Deployment
@@ -317,18 +317,18 @@ See [DOCKER.md](./DOCKER.md) for complete deployment guide.
 
 ```bash
 cd client
-pnpm build
-pnpm start  # or deploy to Vercel/Netlify
+pnpm run build
+pnpm run start  # or deploy to Vercel/Netlify
 ```
 
 #### Build Server
 
 ```bash
 cd server
-pnpm build
-pnpm prisma:generate
-pnpm prisma:migrate:deploy
-pnpm start
+pnpm run build
+pnpm run prisma:generate
+pnpm run prisma:migrate:deploy
+pnpm run start
 ```
 
 ## 🔒 Security

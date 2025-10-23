@@ -1,6 +1,12 @@
 import { Router } from 'express';
 import { tableController } from '@/features/table/table.controller';
 import { authenticate } from '@/shared/middlewares/auth';
+import { validate } from '@/shared/middlewares/validation';
+import {
+    createTableSchema,
+    updateTableSchema,
+    updateTableStatusSchema,
+} from '@/features/table/validators';
 
 const router: Router = Router();
 
@@ -376,7 +382,7 @@ router.get('/:id/current-order', tableController.getWithCurrentOrder.bind(tableC
  *         description: Internal server error
  */
 // POST /api/tables - Create new table
-router.post('/', tableController.create.bind(tableController));
+router.post('/', validate(createTableSchema), tableController.create.bind(tableController));
 
 /**
  * @swagger
@@ -458,7 +464,7 @@ router.post('/', tableController.create.bind(tableController));
  *         description: Internal server error
  */
 // PUT /api/tables/:id - Update table
-router.put('/:id', tableController.update.bind(tableController));
+router.put('/:id', validate(updateTableSchema), tableController.update.bind(tableController));
 
 /**
  * @swagger
@@ -526,7 +532,7 @@ router.put('/:id', tableController.update.bind(tableController));
  *         description: Internal server error
  */
 // PATCH /api/tables/:id/status - Update table status
-router.patch('/:id/status', tableController.updateStatus.bind(tableController));
+router.patch('/:id/status', validate(updateTableStatusSchema), tableController.updateStatus.bind(tableController));
 
 /**
  * @swagger

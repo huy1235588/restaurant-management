@@ -16,6 +16,8 @@ RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
 
 # Stage 2: Builder
 FROM node:20-alpine AS builder
+RUN apk add --no-cache libc6-compat && \
+    npm install -g pnpm
 WORKDIR /app
 
 # Copy dependencies
@@ -24,7 +26,7 @@ COPY --from=deps /app/package.json ./package.json
 
 # Copy source and build
 COPY . .
-RUN pnpm build
+RUN pnpm run build
 
 # Stage 3: Runner
 FROM node:20-alpine AS runner

@@ -1,6 +1,12 @@
 import { Router } from 'express';
 import { reservationController } from '@/features/reservation/reservation.controller';
 import { authenticate } from '@/shared/middlewares/auth';
+import { validate } from '@/shared/middlewares/validation';
+import {
+    createReservationSchema,
+    updateReservationSchema,
+    updateReservationStatusSchema,
+} from '@/features/reservation/validators';
 
 const router: Router = Router();
 
@@ -437,7 +443,7 @@ router.get('/:id', reservationController.getById.bind(reservationController));
  *         description: Internal server error
  */
 // POST /api/reservations - Create new reservation
-router.post('/', reservationController.create.bind(reservationController));
+router.post('/', validate(createReservationSchema), reservationController.create.bind(reservationController));
 
 /**
  * @swagger
@@ -543,7 +549,7 @@ router.post('/', reservationController.create.bind(reservationController));
  *         description: Internal server error
  */
 // PUT /api/reservations/:id - Update reservation
-router.put('/:id', reservationController.update.bind(reservationController));
+router.put('/:id', validate(updateReservationSchema), reservationController.update.bind(reservationController));
 
 /**
  * @swagger
@@ -594,7 +600,7 @@ router.put('/:id', reservationController.update.bind(reservationController));
  *         description: Internal server error
  */
 // PATCH /api/reservations/:id/cancel - Cancel reservation
-router.patch('/:id/cancel', reservationController.cancel.bind(reservationController));
+router.patch('/:id/cancel', validate(updateReservationStatusSchema), reservationController.cancel.bind(reservationController));
 
 /**
  * @swagger
@@ -647,7 +653,7 @@ router.patch('/:id/cancel', reservationController.cancel.bind(reservationControl
  *         description: Internal server error
  */
 // PATCH /api/reservations/:id/confirm - Confirm reservation
-router.patch('/:id/confirm', reservationController.confirm.bind(reservationController));
+router.patch('/:id/confirm', validate(updateReservationStatusSchema), reservationController.confirm.bind(reservationController));
 
 /**
  * @swagger
@@ -700,6 +706,6 @@ router.patch('/:id/confirm', reservationController.confirm.bind(reservationContr
  *         description: Internal server error
  */
 // PATCH /api/reservations/:id/seated - Mark reservation as seated
-router.patch('/:id/seated', reservationController.markSeated.bind(reservationController));
+router.patch('/:id/seated', validate(updateReservationStatusSchema), reservationController.markSeated.bind(reservationController));
 
 export default router;

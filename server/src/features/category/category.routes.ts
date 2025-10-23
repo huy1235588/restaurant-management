@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { categoryController } from '@/features/category/category.controller';
 import { authenticate } from '@/shared/middlewares/auth';
+import { validate } from '@/shared/middlewares/validation';
+import { createCategorySchema, updateCategorySchema } from '@/features/category/validators';
 
 const router: Router = Router();
 
@@ -252,7 +254,7 @@ router.get('/:id/items', categoryController.getWithItems.bind(categoryController
  *         description: Internal server error
  */
 // POST /api/categories - Create new category
-router.post('/', categoryController.create.bind(categoryController));
+router.post('/', validate(createCategorySchema), categoryController.create.bind(categoryController));
 
 /**
  * @swagger
@@ -331,7 +333,7 @@ router.post('/', categoryController.create.bind(categoryController));
  *         description: Internal server error
  */
 // PUT /api/categories/:id - Update category
-router.put('/:id', categoryController.update.bind(categoryController));
+router.put('/:id', validate(updateCategorySchema), categoryController.update.bind(categoryController));
 
 /**
  * @swagger

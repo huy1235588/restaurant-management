@@ -1,6 +1,13 @@
 import { Router } from 'express';
 import { kitchenController } from '@/features/kitchen/kitchen.controller';
 import { authenticate } from '@/shared/middlewares/auth';
+import { validate } from '@/shared/middlewares/validation';
+import {
+    createKitchenOrderSchema,
+    updateKitchenOrderSchema,
+    updateKitchenOrderStatusSchema,
+    assignChefSchema,
+} from '@/features/kitchen/validators';
 
 const router: Router = Router();
 
@@ -363,7 +370,7 @@ router.get('/:id', kitchenController.getById.bind(kitchenController));
  *         description: Internal server error
  */
 // POST /api/kitchen - Create new kitchen order
-router.post('/', kitchenController.create.bind(kitchenController));
+router.post('/', validate(createKitchenOrderSchema), kitchenController.create.bind(kitchenController));
 
 /**
  * @swagger
@@ -451,7 +458,7 @@ router.post('/', kitchenController.create.bind(kitchenController));
  *         description: Internal server error
  */
 // PUT /api/kitchen/:id - Update kitchen order
-router.put('/:id', kitchenController.update.bind(kitchenController));
+router.put('/:id', validate(updateKitchenOrderSchema), kitchenController.update.bind(kitchenController));
 
 /**
  * @swagger
@@ -507,7 +514,7 @@ router.put('/:id', kitchenController.update.bind(kitchenController));
  *         description: Internal server error
  */
 // PATCH /api/kitchen/:id/start - Start preparing kitchen order
-router.patch('/:id/start', kitchenController.startPreparing.bind(kitchenController));
+router.patch('/:id/start', validate(updateKitchenOrderStatusSchema), kitchenController.startPreparing.bind(kitchenController));
 
 /**
  * @swagger
@@ -563,7 +570,7 @@ router.patch('/:id/start', kitchenController.startPreparing.bind(kitchenControll
  *         description: Internal server error
  */
 // PATCH /api/kitchen/:id/complete - Complete kitchen order
-router.patch('/:id/complete', kitchenController.complete.bind(kitchenController));
+router.patch('/:id/complete', validate(updateKitchenOrderStatusSchema), kitchenController.complete.bind(kitchenController));
 
 /**
  * @swagger
@@ -699,6 +706,6 @@ router.patch('/:id/priority', kitchenController.updatePriority.bind(kitchenContr
  *         description: Internal server error
  */
 // PATCH /api/kitchen/:id/assign - Assign chef to kitchen order
-router.patch('/:id/assign', kitchenController.assignChef.bind(kitchenController));
+router.patch('/:id/assign', validate(assignChefSchema), kitchenController.assignChef.bind(kitchenController));
 
 export default router;

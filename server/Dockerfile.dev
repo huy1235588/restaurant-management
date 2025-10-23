@@ -17,7 +17,7 @@ COPY entrypoint.sh ./entrypoint.sh
 RUN pnpm install
 
 # Generate Prisma Client
-RUN pnpm prisma:generate
+RUN pnpm run prisma:generate
 
 # Make entrypoint executable
 RUN chmod +x entrypoint.sh

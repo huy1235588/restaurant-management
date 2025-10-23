@@ -14,6 +14,8 @@ RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
 
 # Stage 2: Builder
 FROM node:20-alpine AS builder
+RUN apk add --no-cache libc6-compat && \
+    npm install -g pnpm
 WORKDIR /app
 
 # Copy dependencies from deps stage
@@ -25,7 +27,7 @@ COPY . .
 
 # Build with telemetry disabled
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN pnpm build
+RUN pnpm run build
 
 # Stage 3: Runner
 FROM node:20-alpine AS runner

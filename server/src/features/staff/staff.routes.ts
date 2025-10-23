@@ -1,6 +1,12 @@
 import { Router } from 'express';
 import { staffController } from '@/features/staff/staff.controller';
 import { authenticate } from '@/shared/middlewares/auth';
+import { validate } from '@/shared/middlewares/validation';
+import {
+    createStaffSchema,
+    updateStaffSchema,
+    updateStaffStatusSchema,
+} from '@/features/staff/validators';
 
 const router: Router = Router();
 
@@ -365,7 +371,7 @@ router.get('/:id/performance', staffController.getPerformance.bind(staffControll
  *         description: Internal server error
  */
 // POST /api/staff - Create new staff
-router.post('/', staffController.create.bind(staffController));
+router.post('/', validate(createStaffSchema), staffController.create.bind(staffController));
 
 /**
  * @swagger
@@ -460,7 +466,7 @@ router.post('/', staffController.create.bind(staffController));
  *         description: Internal server error
  */
 // PUT /api/staff/:id - Update staff
-router.put('/:id', staffController.update.bind(staffController));
+router.put('/:id', validate(updateStaffSchema), staffController.update.bind(staffController));
 
 /**
  * @swagger
@@ -513,7 +519,7 @@ router.put('/:id', staffController.update.bind(staffController));
  *         description: Internal server error
  */
 // PATCH /api/staff/:id/deactivate - Deactivate staff
-router.patch('/:id/deactivate', staffController.deactivate.bind(staffController));
+router.patch('/:id/deactivate', validate(updateStaffStatusSchema), staffController.deactivate.bind(staffController));
 
 /**
  * @swagger
@@ -564,7 +570,7 @@ router.patch('/:id/deactivate', staffController.deactivate.bind(staffController)
  *         description: Internal server error
  */
 // PATCH /api/staff/:id/activate - Activate staff
-router.patch('/:id/activate', staffController.activate.bind(staffController));
+router.patch('/:id/activate', validate(updateStaffStatusSchema), staffController.activate.bind(staffController));
 
 /**
  * @swagger
