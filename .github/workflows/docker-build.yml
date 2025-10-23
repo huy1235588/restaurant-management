@@ -81,7 +81,7 @@ jobs:
         sleep 10
         # Add your test commands here
         # docker-compose exec -T server pnpm test
-        docker-compose down
+        docker compose down
 
   security-scan:
     runs-on: ubuntu-latest
