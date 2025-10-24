@@ -77,11 +77,11 @@ jobs:
 
     - name: Run tests
       run: |
-        docker-compose -f docker-compose.yml up -d postgres redis
+        docker compose -f docker-compose.yml up -d postgres redis
         sleep 10
         # Add your test commands here
         # docker-compose exec -T server pnpm test
-        docker-compose down
+        docker compose down
 
   security-scan:
     runs-on: ubuntu-latest
@@ -90,6 +90,14 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build images locally for scanning
+      run: |
+        docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-server:${{ github.sha }} ./server
+        docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-client:${{ github.sha }} ./client
 
     - name: Run Trivy vulnerability scanner - Server
       uses: aquasecurity/trivy-action@master
