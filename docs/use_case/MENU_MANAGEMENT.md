@@ -238,18 +238,18 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 
 **Thông tin cần nhập**:
 
-| Trường | Loại | Bắt buộc | Mô tả |
-|--------|------|----------|-------|
-| Tên sản phẩm | Text | ✓ | Tên món ăn (ví dụ: "Phở Bò") |
-| Mô tả ngắn | Text | ✓ | Mô tả 1-2 dòng cho menu |
-| Mô tả chi tiết | Rich Text | ✗ | Công thức, nguyên liệu, cách nấu |
-| Giá tiền | Number | ✓ | Giá bán (VND) |
-| Danh mục | Dropdown | ✓ | Chọn danh mục |
-| Ảnh sản phẩm | File | ✗ | Ảnh (JPG, PNG, max 5MB) |
-| Thành phần chính | Multi-select | ✗ | Allergens (Tôm, Cua, Cá, v.v.) |
-| Thời gian chuẩn bị | Number | ✗ | Phút (ví dụ: 20 phút) |
-| Trạng thái | Select | ✓ | Có sẵn / Hết hàng |
-| Ghi chú | Text | ✗ | Hướng dẫn đặc biệt cho bếp |
+| Trường             | Loại         | Bắt buộc | Mô tả                            |
+| ------------------ | ------------ | -------- | -------------------------------- |
+| Tên sản phẩm       | Text         | ✓        | Tên món ăn (ví dụ: "Phở Bò")     |
+| Mô tả ngắn         | Text         | ✓        | Mô tả 1-2 dòng cho menu          |
+| Mô tả chi tiết     | Rich Text    | ✗        | Công thức, nguyên liệu, cách nấu |
+| Giá tiền           | Number       | ✓        | Giá bán (VND)                    |
+| Danh mục           | Dropdown     | ✓        | Chọn danh mục                    |
+| Ảnh sản phẩm       | File         | ✗        | Ảnh (JPG, PNG, max 5MB)          |
+| Thành phần chính   | Multi-select | ✗        | Allergens (Tôm, Cua, Cá, v.v.)   |
+| Thời gian chuẩn bị | Number       | ✗        | Phút (ví dụ: 20 phút)            |
+| Trạng thái         | Select       | ✓        | Có sẵn / Hết hàng                |
+| Ghi chú            | Text         | ✗        | Hướng dẫn đặc biệt cho bếp       |
 
 3. **Bước 3**: Điền thông tin sản phẩm
 4. **Bước 4**: Tải lên ảnh (nếu có)
@@ -753,13 +753,13 @@ Phở Bò | Chính | 50000 | Phở bò truyền thống | 15 | Tôm,Cua
 
 ## 5. Các Tác Nhân (Actors) và Quyền Hạn
 
-| Tác Nhân | Tạo | Xem | Sửa | Xóa | Ẩn | Cập Nhật Trạng Thái |
-|----------|-----|-----|-----|-----|----|--------------------|
-| Khách hàng | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ |
-| Nhân viên phục vụ | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ |
-| Đầu bếp | ✗ | ✓ | ✗ | ✗ | ✗ | ✓ |
-| Quản lý | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Admin/Quản trị viên | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Tác Nhân            | Tạo | Xem | Sửa | Xóa | Ẩn  | Cập Nhật Trạng Thái |
+| ------------------- | --- | --- | --- | --- | --- | ------------------- |
+| Khách hàng          | ✗   | ✓   | ✗   | ✗   | ✗   | ✗                   |
+| Nhân viên phục vụ   | ✗   | ✓   | ✗   | ✗   | ✗   | ✗                   |
+| Đầu bếp             | ✗   | ✓   | ✗   | ✗   | ✗   | ✓                   |
+| Quản lý             | ✓   | ✓   | ✓   | ✓   | ✓   | ✓                   |
+| Admin/Quản trị viên | ✓   | ✓   | ✓   | ✓   | ✓   | ✓                   |
 
 ---
 
@@ -785,15 +785,15 @@ Phở Bò | Chính | 50000 | Phở bò truyền thống | 15 | Tôm,Cua
 
 ## 7. Bảng Tóm Tắt Lỗi và Xử Lý
 
-| Lỗi | Nguyên Nhân | Cách Xử Lý |
-|-----|-----------|-----------|
-| Tên danh mục/sản phẩm trùng | Dữ liệu đã tồn tại | Thay đổi tên hoặc lựa chọn danh mục khác |
-| Ảnh quá lớn | Kích thước file > 5MB | Nén ảnh hoặc chọn ảnh nhỏ hơn |
-| Ảnh không hợp lệ | Định dạng không được phép | Dùng JPG, PNG, hoặc WebP |
-| Không thể xóa danh mục | Danh mục còn sản phẩm | Xóa/chuyển hết sản phẩm trước |
-| Không thể xóa sản phẩm | Sản phẩm còn trong đơn | Chờ đơn thanh toán hoặc hủy đơn |
-| Giá không hợp lệ | Giá ≤ 0 | Nhập giá > 0 |
-| Hệ thống không cập nhật | Lỗi kết nối | Refresh trang hoặc thử lại |
+| Lỗi                         | Nguyên Nhân               | Cách Xử Lý                               |
+| --------------------------- | ------------------------- | ---------------------------------------- |
+| Tên danh mục/sản phẩm trùng | Dữ liệu đã tồn tại        | Thay đổi tên hoặc lựa chọn danh mục khác |
+| Ảnh quá lớn                 | Kích thước file > 5MB     | Nén ảnh hoặc chọn ảnh nhỏ hơn            |
+| Ảnh không hợp lệ            | Định dạng không được phép | Dùng JPG, PNG, hoặc WebP                 |
+| Không thể xóa danh mục      | Danh mục còn sản phẩm     | Xóa/chuyển hết sản phẩm trước            |
+| Không thể xóa sản phẩm      | Sản phẩm còn trong đơn    | Chờ đơn thanh toán hoặc hủy đơn          |
+| Giá không hợp lệ            | Giá ≤ 0                   | Nhập giá > 0                             |
+| Hệ thống không cập nhật     | Lỗi kết nối               | Refresh trang hoặc thử lại               |
 
 ---
 

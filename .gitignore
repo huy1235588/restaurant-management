@@ -42,3 +42,4 @@ next-env.d.ts
 public/videos/*
 
 server/node_modules
+.obsidian/workspace.json

@@ -608,33 +608,33 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
 
 ## 3. Tóm Tắt Các Tác Nhân (Actors)
 
-| Tác Nhân | Mô Tả | Quyền Hạn Chính |
-|----------|-------|-----------------|
-| **Khách Hàng** | Người sử dụng dịch vụ của nhà hàng | Xem menu, đặt bàn, gọi nhân viên, thanh toán |
-| **Nhân Viên Phục Vụ** | Phục vụ khách, tạo đơn hàng | Tạo/sửa đơn, xem trạng thái, thanh toán |
-| **Đầu Bếp** | Chuẩn bị thức ăn | Xem đơn hàng, cập nhật trạng thái, quản lý nguyên liệu |
-| **Nhân Viên Tiếp Nhận** | Tiếp nhận khách, quản lý bàn | Quản lý đặt bàn, gán bàn, xem sơ đồ |
-| **Quản Lý** | Quản lý toàn bộ hệ thống | Tất cả quyền hạn trừ quản trị hệ thống |
-| **Quản Lý Kho** | Quản lý nguyên liệu, kho | Cập nhật kho, ghi nhận hàng về |
-| **Kế Toán** | Quản lý tài chính | Xem báo cáo, quản lý hóa đơn, thanh toán |
-| **Quản Trị Viên** | Quản lý hệ thống | Tất cả quyền hạn, cấu hình hệ thống |
+| Tác Nhân                | Mô Tả                              | Quyền Hạn Chính                                        |
+| ----------------------- | ---------------------------------- | ------------------------------------------------------ |
+| **Khách Hàng**          | Người sử dụng dịch vụ của nhà hàng | Xem menu, đặt bàn, gọi nhân viên, thanh toán           |
+| **Nhân Viên Phục Vụ**   | Phục vụ khách, tạo đơn hàng        | Tạo/sửa đơn, xem trạng thái, thanh toán                |
+| **Đầu Bếp**             | Chuẩn bị thức ăn                   | Xem đơn hàng, cập nhật trạng thái, quản lý nguyên liệu |
+| **Nhân Viên Tiếp Nhận** | Tiếp nhận khách, quản lý bàn       | Quản lý đặt bàn, gán bàn, xem sơ đồ                    |
+| **Quản Lý**             | Quản lý toàn bộ hệ thống           | Tất cả quyền hạn trừ quản trị hệ thống                 |
+| **Quản Lý Kho**         | Quản lý nguyên liệu, kho           | Cập nhật kho, ghi nhận hàng về                         |
+| **Kế Toán**             | Quản lý tài chính                  | Xem báo cáo, quản lý hóa đơn, thanh toán               |
+| **Quản Trị Viên**       | Quản lý hệ thống                   | Tất cả quyền hạn, cấu hình hệ thống                    |
 
 ---
 
 ## 4. Tóm Tắt Các Chức Năng Chính
 
-| Chức Năng | Mô Tả |
-|-----------|-------|
-| **Quản Lý Tài Khoản** | Đăng ký, đăng nhập, reset mật khẩu, quản lý phiên làm việc |
-| **Quản Lý Menu** | Tạo/sửa/xóa danh mục, sản phẩm, cập nhật giá |
-| **Quản Lý Bàn** | Tạo/cấu hình bàn, cập nhật trạng thái, ghép/tách bàn |
-| **Quản Lý Đơn Hàng** | Tạo/sửa/hủy đơn, theo dõi trạng thái, ghi chú đặc biệt |
-| **Quản Lý Thanh Toán** | Tạo hóa đơn, áp dụng giảm giá, thanh toán, hoàn tiền |
-| **Quản Lý Bếp** | Xem danh sách đơn, cập nhật trạng thái, quản lý nguyên liệu |
-| **Quản Lý Nhân Sự** | Tạo tài khoản, phân công, theo dõi hiệu suất, quản lý quyền |
-| **Quản Lý Đặt Bàn** | Tạo/xác nhận/hủy đặt bàn, nhắc lịch, xử lý no-show |
-| **Báo Cáo** | Báo cáo doanh thu, sản phẩm, nhân viên, phân tích xu hướng |
-| **Hệ Thống** | Sao lưu, phục hồi, ghi log, cập nhật phiên bản, cấu hình |
+| Chức Năng              | Mô Tả                                                       |
+| ---------------------- | ----------------------------------------------------------- |
+| **Quản Lý Tài Khoản**  | Đăng ký, đăng nhập, reset mật khẩu, quản lý phiên làm việc  |
+| **Quản Lý Menu**       | Tạo/sửa/xóa danh mục, sản phẩm, cập nhật giá                |
+| **Quản Lý Bàn**        | Tạo/cấu hình bàn, cập nhật trạng thái, ghép/tách bàn        |
+| **Quản Lý Đơn Hàng**   | Tạo/sửa/hủy đơn, theo dõi trạng thái, ghi chú đặc biệt      |
+| **Quản Lý Thanh Toán** | Tạo hóa đơn, áp dụng giảm giá, thanh toán, hoàn tiền        |
+| **Quản Lý Bếp**        | Xem danh sách đơn, cập nhật trạng thái, quản lý nguyên liệu |
+| **Quản Lý Nhân Sự**    | Tạo tài khoản, phân công, theo dõi hiệu suất, quản lý quyền |
+| **Quản Lý Đặt Bàn**    | Tạo/xác nhận/hủy đặt bàn, nhắc lịch, xử lý no-show          |
+| **Báo Cáo**            | Báo cáo doanh thu, sản phẩm, nhân viên, phân tích xu hướng  |
+| **Hệ Thống**           | Sao lưu, phục hồi, ghi log, cập nhật phiên bản, cấu hình    |
 
 ---
 

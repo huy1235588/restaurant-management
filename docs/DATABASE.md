@@ -31,16 +31,16 @@ Cơ sở dữ liệu hệ thống quản lý nhà hàng được thiết kế đ
 ### 1.3. Cấu trúc tổng thể
 Cơ sở dữ liệu được chia thành các module chính:
 
-| Module | Bảng chính | Mô tả |
-|--------|-----------|-------|
-| **Authentication** | accounts, refresh_tokens | Xác thực và bảo mật |
-| **Staff Management** | staff | Quản lý nhân viên |
-| **Menu Management** | categories, menu_items | Quản lý thực đơn |
-| **Table Management** | restaurant_tables | Quản lý bàn ăn |
-| **Reservation** | reservations | Đặt bàn trực tuyến |
-| **Order Management** | orders, order_items | Quản lý đơn hàng |
-| **Kitchen** | kitchen_orders | Quản lý bếp |
-| **Billing** | bills, bill_items, payments | Thanh toán |
+| Module               | Bảng chính                  | Mô tả               |
+| -------------------- | --------------------------- | ------------------- |
+| **Authentication**   | accounts, refresh_tokens    | Xác thực và bảo mật |
+| **Staff Management** | staff                       | Quản lý nhân viên   |
+| **Menu Management**  | categories, menu_items      | Quản lý thực đơn    |
+| **Table Management** | restaurant_tables           | Quản lý bàn ăn      |
+| **Reservation**      | reservations                | Đặt bàn trực tuyến  |
+| **Order Management** | orders, order_items         | Quản lý đơn hàng    |
+| **Kitchen**          | kitchen_orders              | Quản lý bếp         |
+| **Billing**          | bills, bill_items, payments | Thanh toán          |
 
 
 ---
@@ -361,17 +361,17 @@ enum ReservationStatus {
 #### 3.1.1. accounts (Tài khoản)
 Lưu trữ thông tin đăng nhập của nhân viên.
 
-| Trường | Kiểu | Ràng buộc | Mô tả |
-|--------|------|-----------|-------|
-| accountId | INTEGER | PK, Auto | ID tài khoản |
-| username | VARCHAR(50) | UNIQUE, NOT NULL | Tên đăng nhập |
-| email | VARCHAR(255) | UNIQUE, NOT NULL | Email |
-| phoneNumber | VARCHAR(20) | UNIQUE, NOT NULL | Số điện thoại |
-| password | VARCHAR(255) | NOT NULL | Mật khẩu (hashed) |
-| isActive | BOOLEAN | DEFAULT true | Trạng thái hoạt động |
-| lastLogin | TIMESTAMP | NULL | Lần đăng nhập cuối |
-| createdAt | TIMESTAMP | DEFAULT now() | Ngày tạo |
-| updatedAt | TIMESTAMP | AUTO UPDATE | Ngày cập nhật |
+| Trường      | Kiểu         | Ràng buộc        | Mô tả                |
+| ----------- | ------------ | ---------------- | -------------------- |
+| accountId   | INTEGER      | PK, Auto         | ID tài khoản         |
+| username    | VARCHAR(50)  | UNIQUE, NOT NULL | Tên đăng nhập        |
+| email       | VARCHAR(255) | UNIQUE, NOT NULL | Email                |
+| phoneNumber | VARCHAR(20)  | UNIQUE, NOT NULL | Số điện thoại        |
+| password    | VARCHAR(255) | NOT NULL         | Mật khẩu (hashed)    |
+| isActive    | BOOLEAN      | DEFAULT true     | Trạng thái hoạt động |
+| lastLogin   | TIMESTAMP    | NULL             | Lần đăng nhập cuối   |
+| createdAt   | TIMESTAMP    | DEFAULT now()    | Ngày tạo             |
+| updatedAt   | TIMESTAMP    | AUTO UPDATE      | Ngày cập nhật        |
 
 **Indexes:**
 - `idx_accounts_email` trên `email`
@@ -386,17 +386,17 @@ Lưu trữ thông tin đăng nhập của nhân viên.
 #### 3.1.2. refresh_tokens (Token làm mới)
 Quản lý refresh tokens cho JWT authentication.
 
-| Trường | Kiểu | Ràng buộc | Mô tả |
-|--------|------|-----------|-------|
-| tokenId | INTEGER | PK, Auto | ID token |
-| accountId | INTEGER | FK, NOT NULL | ID tài khoản |
-| token | TEXT | UNIQUE, NOT NULL | Token string |
-| expiresAt | TIMESTAMP | NOT NULL | Thời gian hết hạn |
-| deviceInfo | VARCHAR(500) | NULL | Thông tin thiết bị |
-| ipAddress | VARCHAR(45) | NULL | Địa chỉ IP |
-| isRevoked | BOOLEAN | DEFAULT false | Đã thu hồi |
-| createdAt | TIMESTAMP | DEFAULT now() | Ngày tạo |
-| revokedAt | TIMESTAMP | NULL | Ngày thu hồi |
+| Trường     | Kiểu         | Ràng buộc        | Mô tả              |
+| ---------- | ------------ | ---------------- | ------------------ |
+| tokenId    | INTEGER      | PK, Auto         | ID token           |
+| accountId  | INTEGER      | FK, NOT NULL     | ID tài khoản       |
+| token      | TEXT         | UNIQUE, NOT NULL | Token string       |
+| expiresAt  | TIMESTAMP    | NOT NULL         | Thời gian hết hạn  |
+| deviceInfo | VARCHAR(500) | NULL             | Thông tin thiết bị |
+| ipAddress  | VARCHAR(45)  | NULL             | Địa chỉ IP         |
+| isRevoked  | BOOLEAN      | DEFAULT false    | Đã thu hồi         |
+| createdAt  | TIMESTAMP    | DEFAULT now()    | Ngày tạo           |
+| revokedAt  | TIMESTAMP    | NULL             | Ngày thu hồi       |
 
 **Indexes:**
 - `idx_refresh_tokens_accountId` trên `accountId`
@@ -411,19 +411,19 @@ Quản lý refresh tokens cho JWT authentication.
 #### 3.1.3. staff (Nhân viên)
 Thông tin chi tiết về nhân viên.
 
-| Trường | Kiểu | Ràng buộc | Mô tả |
-|--------|------|-----------|-------|
-| staffId | INTEGER | PK, Auto | ID nhân viên |
-| accountId | INTEGER | FK, UNIQUE, NOT NULL | ID tài khoản |
-| fullName | VARCHAR(255) | NOT NULL | Họ và tên |
-| address | VARCHAR(500) | NULL | Địa chỉ |
-| dateOfBirth | DATE | NULL | Ngày sinh |
-| hireDate | DATE | DEFAULT now() | Ngày vào làm |
-| salary | DECIMAL(12,2) | NULL | Lương |
-| role | ENUM(Role) | NOT NULL | Vai trò |
-| isActive | BOOLEAN | DEFAULT true | Đang làm việc |
-| createdAt | TIMESTAMP | DEFAULT now() | Ngày tạo |
-| updatedAt | TIMESTAMP | AUTO UPDATE | Ngày cập nhật |
+| Trường      | Kiểu          | Ràng buộc            | Mô tả         |
+| ----------- | ------------- | -------------------- | ------------- |
+| staffId     | INTEGER       | PK, Auto             | ID nhân viên  |
+| accountId   | INTEGER       | FK, UNIQUE, NOT NULL | ID tài khoản  |
+| fullName    | VARCHAR(255)  | NOT NULL             | Họ và tên     |
+| address     | VARCHAR(500)  | NULL                 | Địa chỉ       |
+| dateOfBirth | DATE          | NULL                 | Ngày sinh     |
+| hireDate    | DATE          | DEFAULT now()        | Ngày vào làm  |
+| salary      | DECIMAL(12,2) | NULL                 | Lương         |
+| role        | ENUM(Role)    | NOT NULL             | Vai trò       |
+| isActive    | BOOLEAN       | DEFAULT true         | Đang làm việc |
+| createdAt   | TIMESTAMP     | DEFAULT now()        | Ngày tạo      |
+| updatedAt   | TIMESTAMP     | AUTO UPDATE          | Ngày cập nhật |
 
 **Indexes:**
 - `idx_staff_role` trên `role`
@@ -442,16 +442,16 @@ Thông tin chi tiết về nhân viên.
 #### 3.2.1. categories (Danh mục)
 Danh mục món ăn (Appetizer, Main Course, Dessert, Beverage, v.v.)
 
-| Trường | Kiểu | Ràng buộc | Mô tả |
-|--------|------|-----------|-------|
-| categoryId | INTEGER | PK, Auto | ID danh mục |
-| categoryName | VARCHAR(100) | UNIQUE, NOT NULL | Tên danh mục |
-| description | VARCHAR(500) | NULL | Mô tả |
-| displayOrder | INTEGER | DEFAULT 0 | Thứ tự hiển thị |
-| isActive | BOOLEAN | DEFAULT true | Đang hoạt động |
-| imageUrl | VARCHAR(500) | NULL | URL hình ảnh |
-| createdAt | TIMESTAMP | DEFAULT now() | Ngày tạo |
-| updatedAt | TIMESTAMP | AUTO UPDATE | Ngày cập nhật |
+| Trường       | Kiểu         | Ràng buộc        | Mô tả           |
+| ------------ | ------------ | ---------------- | --------------- |
+| categoryId   | INTEGER      | PK, Auto         | ID danh mục     |
+| categoryName | VARCHAR(100) | UNIQUE, NOT NULL | Tên danh mục    |
+| description  | VARCHAR(500) | NULL             | Mô tả           |
+| displayOrder | INTEGER      | DEFAULT 0        | Thứ tự hiển thị |
+| isActive     | BOOLEAN      | DEFAULT true     | Đang hoạt động  |
+| imageUrl     | VARCHAR(500) | NULL             | URL hình ảnh    |
+| createdAt    | TIMESTAMP    | DEFAULT now()    | Ngày tạo        |
+| updatedAt    | TIMESTAMP    | AUTO UPDATE      | Ngày cập nhật   |
 
 **Indexes:**
 - `idx_categories_isActive` trên `isActive`
@@ -464,25 +464,25 @@ Danh mục món ăn (Appetizer, Main Course, Dessert, Beverage, v.v.)
 #### 3.2.2. menu_items (Món ăn)
 Thông tin chi tiết về các món ăn trong thực đơn.
 
-| Trường | Kiểu | Ràng buộc | Mô tả |
-|--------|------|-----------|-------|
-| itemId | INTEGER | PK, Auto | ID món ăn |
-| itemCode | VARCHAR(20) | UNIQUE, NOT NULL | Mã món |
-| itemName | VARCHAR(100) | NOT NULL | Tên món |
-| categoryId | INTEGER | FK, NOT NULL | ID danh mục |
-| price | DECIMAL(10,2) | NOT NULL | Giá bán |
-| cost | DECIMAL(10,2) | NULL | Giá vốn |
-| description | VARCHAR(1000) | NULL | Mô tả |
-| imageUrl | VARCHAR(500) | NULL | URL hình ảnh |
-| isAvailable | BOOLEAN | DEFAULT true | Còn hàng |
-| isActive | BOOLEAN | DEFAULT true | Đang bán |
-| preparationTime | INTEGER | NULL | Thời gian chế biến (phút) |
-| spicyLevel | INTEGER | DEFAULT 0 | Độ cay (0-5) |
-| isVegetarian | BOOLEAN | DEFAULT false | Món chay |
-| calories | INTEGER | NULL | Calo |
-| displayOrder | INTEGER | DEFAULT 0 | Thứ tự hiển thị |
-| createdAt | TIMESTAMP | DEFAULT now() | Ngày tạo |
-| updatedAt | TIMESTAMP | AUTO UPDATE | Ngày cập nhật |
+| Trường          | Kiểu          | Ràng buộc        | Mô tả                     |
+| --------------- | ------------- | ---------------- | ------------------------- |
+| itemId          | INTEGER       | PK, Auto         | ID món ăn                 |
+| itemCode        | VARCHAR(20)   | UNIQUE, NOT NULL | Mã món                    |
+| itemName        | VARCHAR(100)  | NOT NULL         | Tên món                   |
+| categoryId      | INTEGER       | FK, NOT NULL     | ID danh mục               |
+| price           | DECIMAL(10,2) | NOT NULL         | Giá bán                   |
+| cost            | DECIMAL(10,2) | NULL             | Giá vốn                   |
+| description     | VARCHAR(1000) | NULL             | Mô tả                     |
+| imageUrl        | VARCHAR(500)  | NULL             | URL hình ảnh              |
+| isAvailable     | BOOLEAN       | DEFAULT true     | Còn hàng                  |
+| isActive        | BOOLEAN       | DEFAULT true     | Đang bán                  |
+| preparationTime | INTEGER       | NULL             | Thời gian chế biến (phút) |
+| spicyLevel      | INTEGER       | DEFAULT 0        | Độ cay (0-5)              |
+| isVegetarian    | BOOLEAN       | DEFAULT false    | Món chay                  |
+| calories        | INTEGER       | NULL             | Calo                      |
+| displayOrder    | INTEGER       | DEFAULT 0        | Thứ tự hiển thị           |
+| createdAt       | TIMESTAMP     | DEFAULT now()    | Ngày tạo                  |
+| updatedAt       | TIMESTAMP     | AUTO UPDATE      | Ngày cập nhật             |
 
 **Indexes:**
 - `idx_menu_items_categoryId` trên `categoryId`
@@ -501,20 +501,20 @@ Thông tin chi tiết về các món ăn trong thực đơn.
 #### 3.3.1. restaurant_tables (Bàn ăn)
 Quản lý bàn ăn trong nhà hàng.
 
-| Trường | Kiểu | Ràng buộc | Mô tả |
-|--------|------|-----------|-------|
-| tableId | INTEGER | PK, Auto | ID bàn |
-| tableNumber | VARCHAR(20) | UNIQUE, NOT NULL | Số bàn |
-| tableName | VARCHAR(50) | NULL | Tên bàn |
-| capacity | INTEGER | NOT NULL | Sức chứa |
-| minCapacity | INTEGER | DEFAULT 1 | Sức chứa tối thiểu |
-| floor | INTEGER | DEFAULT 1 | Tầng |
-| section | VARCHAR(50) | NULL | Khu vực (VIP, Garden, v.v.) |
-| status | ENUM(TableStatus) | DEFAULT available | Trạng thái |
-| qrCode | VARCHAR(255) | UNIQUE, NULL | Mã QR |
-| isActive | BOOLEAN | DEFAULT true | Đang sử dụng |
-| createdAt | TIMESTAMP | DEFAULT now() | Ngày tạo |
-| updatedAt | TIMESTAMP | AUTO UPDATE | Ngày cập nhật |
+| Trường      | Kiểu              | Ràng buộc         | Mô tả                       |
+| ----------- | ----------------- | ----------------- | --------------------------- |
+| tableId     | INTEGER           | PK, Auto          | ID bàn                      |
+| tableNumber | VARCHAR(20)       | UNIQUE, NOT NULL  | Số bàn                      |
+| tableName   | VARCHAR(50)       | NULL              | Tên bàn                     |
+| capacity    | INTEGER           | NOT NULL          | Sức chứa                    |
+| minCapacity | INTEGER           | DEFAULT 1         | Sức chứa tối thiểu          |
+| floor       | INTEGER           | DEFAULT 1         | Tầng                        |
+| section     | VARCHAR(50)       | NULL              | Khu vực (VIP, Garden, v.v.) |
+| status      | ENUM(TableStatus) | DEFAULT available | Trạng thái                  |
+| qrCode      | VARCHAR(255)      | UNIQUE, NULL      | Mã QR                       |
+| isActive    | BOOLEAN           | DEFAULT true      | Đang sử dụng                |
+| createdAt   | TIMESTAMP         | DEFAULT now()     | Ngày tạo                    |
+| updatedAt   | TIMESTAMP         | AUTO UPDATE       | Ngày cập nhật               |
 
 **Indexes:**
 - `idx_restaurant_tables_status` trên `status`
@@ -533,24 +533,24 @@ Quản lý bàn ăn trong nhà hàng.
 #### 3.4.1. reservations (Đặt bàn)
 Quản lý đặt bàn trực tuyến.
 
-| Trường | Kiểu | Ràng buộc | Mô tả |
-|--------|------|-----------|-------|
-| reservationId | INTEGER | PK, Auto | ID đặt bàn |
-| reservationCode | VARCHAR(50) | UNIQUE, UUID | Mã đặt bàn |
-| customerName | VARCHAR(255) | NOT NULL | Tên khách |
-| phoneNumber | VARCHAR(20) | NOT NULL | SĐT khách |
-| email | VARCHAR(255) | NULL | Email khách |
-| tableId | INTEGER | FK, NOT NULL | ID bàn |
-| reservationDate | DATE | NOT NULL | Ngày đặt |
-| reservationTime | TIME | NOT NULL | Giờ đặt |
-| duration | INTEGER | DEFAULT 120 | Thời lượng (phút) |
-| headCount | INTEGER | NOT NULL | Số người |
-| specialRequest | TEXT | NULL | Yêu cầu đặc biệt |
-| depositAmount | DECIMAL(10,2) | NULL | Tiền cọc |
-| status | ENUM(ReservationStatus) | DEFAULT pending | Trạng thái |
-| notes | TEXT | NULL | Ghi chú |
-| createdAt | TIMESTAMP | DEFAULT now() | Ngày tạo |
-| updatedAt | TIMESTAMP | AUTO UPDATE | Ngày cập nhật |
+| Trường          | Kiểu                    | Ràng buộc       | Mô tả             |
+| --------------- | ----------------------- | --------------- | ----------------- |
+| reservationId   | INTEGER                 | PK, Auto        | ID đặt bàn        |
+| reservationCode | VARCHAR(50)             | UNIQUE, UUID    | Mã đặt bàn        |
+| customerName    | VARCHAR(255)            | NOT NULL        | Tên khách         |
+| phoneNumber     | VARCHAR(20)             | NOT NULL        | SĐT khách         |
+| email           | VARCHAR(255)            | NULL            | Email khách       |
+| tableId         | INTEGER                 | FK, NOT NULL    | ID bàn            |
+| reservationDate | DATE                    | NOT NULL        | Ngày đặt          |
+| reservationTime | TIME                    | NOT NULL        | Giờ đặt           |
+| duration        | INTEGER                 | DEFAULT 120     | Thời lượng (phút) |
+| headCount       | INTEGER                 | NOT NULL        | Số người          |
+| specialRequest  | TEXT                    | NULL            | Yêu cầu đặc biệt  |
+| depositAmount   | DECIMAL(10,2)           | NULL            | Tiền cọc          |
+| status          | ENUM(ReservationStatus) | DEFAULT pending | Trạng thái        |
+| notes           | TEXT                    | NULL            | Ghi chú           |
+| createdAt       | TIMESTAMP               | DEFAULT now()   | Ngày tạo          |
+| updatedAt       | TIMESTAMP               | AUTO UPDATE     | Ngày cập nhật     |
 
 **Indexes:**
 - `idx_reservations_reservationDate` trên `reservationDate`
@@ -569,23 +569,23 @@ Quản lý đặt bàn trực tuyến.
 #### 3.5.1. orders (Đơn hàng)
 Đơn hàng của khách tại bàn.
 
-| Trường | Kiểu | Ràng buộc | Mô tả |
-|--------|------|-----------|-------|
-| orderId | INTEGER | PK, Auto | ID đơn hàng |
-| orderNumber | VARCHAR(50) | UNIQUE, UUID | Mã đơn hàng |
-| tableId | INTEGER | FK, NOT NULL | ID bàn |
-| staffId | INTEGER | FK, NULL | ID nhân viên phục vụ |
-| reservationId | INTEGER | FK, NULL | ID đặt bàn |
-| customerName | VARCHAR(255) | NULL | Tên khách |
-| customerPhone | VARCHAR(20) | NULL | SĐT khách |
-| headCount | INTEGER | DEFAULT 1 | Số người |
-| status | ENUM(OrderStatus) | DEFAULT pending | Trạng thái |
-| notes | TEXT | NULL | Ghi chú |
-| orderTime | TIMESTAMP | DEFAULT now() | Giờ đặt |
-| confirmedAt | TIMESTAMP | NULL | Giờ xác nhận |
-| completedAt | TIMESTAMP | NULL | Giờ hoàn thành |
-| createdAt | TIMESTAMP | DEFAULT now() | Ngày tạo |
-| updatedAt | TIMESTAMP | AUTO UPDATE | Ngày cập nhật |
+| Trường        | Kiểu              | Ràng buộc       | Mô tả                |
+| ------------- | ----------------- | --------------- | -------------------- |
+| orderId       | INTEGER           | PK, Auto        | ID đơn hàng          |
+| orderNumber   | VARCHAR(50)       | UNIQUE, UUID    | Mã đơn hàng          |
+| tableId       | INTEGER           | FK, NOT NULL    | ID bàn               |
+| staffId       | INTEGER           | FK, NULL        | ID nhân viên phục vụ |
+| reservationId | INTEGER           | FK, NULL        | ID đặt bàn           |
+| customerName  | VARCHAR(255)      | NULL            | Tên khách            |
+| customerPhone | VARCHAR(20)       | NULL            | SĐT khách            |
+| headCount     | INTEGER           | DEFAULT 1       | Số người             |
+| status        | ENUM(OrderStatus) | DEFAULT pending | Trạng thái           |
+| notes         | TEXT              | NULL            | Ghi chú              |
+| orderTime     | TIMESTAMP         | DEFAULT now()   | Giờ đặt              |
+| confirmedAt   | TIMESTAMP         | NULL            | Giờ xác nhận         |
+| completedAt   | TIMESTAMP         | NULL            | Giờ hoàn thành       |
+| createdAt     | TIMESTAMP         | DEFAULT now()   | Ngày tạo             |
+| updatedAt     | TIMESTAMP         | AUTO UPDATE     | Ngày cập nhật        |
 
 **Indexes:**
 - `idx_orders_orderNumber` trên `orderNumber`
@@ -606,18 +606,18 @@ Quản lý đặt bàn trực tuyến.
 #### 3.5.2. order_items (Chi tiết đơn hàng)
 Chi tiết các món trong đơn hàng.
 
-| Trường | Kiểu | Ràng buộc | Mô tả |
-|--------|------|-----------|-------|
-| orderItemId | INTEGER | PK, Auto | ID chi tiết |
-| orderId | INTEGER | FK, NOT NULL | ID đơn hàng |
-| itemId | INTEGER | FK, NOT NULL | ID món ăn |
-| quantity | INTEGER | NOT NULL | Số lượng |
-| unitPrice | DECIMAL(10,2) | NOT NULL | Đơn giá |
-| subtotal | DECIMAL(10,2) | NOT NULL | Thành tiền |
-| specialRequest | VARCHAR(500) | NULL | Yêu cầu đặc biệt |
-| status | ENUM(OrderStatus) | DEFAULT pending | Trạng thái |
-| createdAt | TIMESTAMP | DEFAULT now() | Ngày tạo |
-| updatedAt | TIMESTAMP | AUTO UPDATE | Ngày cập nhật |
+| Trường         | Kiểu              | Ràng buộc       | Mô tả            |
+| -------------- | ----------------- | --------------- | ---------------- |
+| orderItemId    | INTEGER           | PK, Auto        | ID chi tiết      |
+| orderId        | INTEGER           | FK, NOT NULL    | ID đơn hàng      |
+| itemId         | INTEGER           | FK, NOT NULL    | ID món ăn        |
+| quantity       | INTEGER           | NOT NULL        | Số lượng         |
+| unitPrice      | DECIMAL(10,2)     | NOT NULL        | Đơn giá          |
+| subtotal       | DECIMAL(10,2)     | NOT NULL        | Thành tiền       |
+| specialRequest | VARCHAR(500)      | NULL            | Yêu cầu đặc biệt |
+| status         | ENUM(OrderStatus) | DEFAULT pending | Trạng thái       |
+| createdAt      | TIMESTAMP         | DEFAULT now()   | Ngày tạo         |
+| updatedAt      | TIMESTAMP         | AUTO UPDATE     | Ngày cập nhật    |
 
 **Indexes:**
 - `idx_order_items_orderId` trên `orderId`
@@ -635,19 +635,19 @@ Chi tiết các món trong đơn hàng.
 #### 3.6.1. kitchen_orders (Đơn bếp)
 Quản lý đơn hàng trong bếp.
 
-| Trường | Kiểu | Ràng buộc | Mô tả |
-|--------|------|-----------|-------|
-| kitchenOrderId | INTEGER | PK, Auto | ID đơn bếp |
-| orderId | INTEGER | FK, NOT NULL | ID đơn hàng |
-| staffId | INTEGER | FK, NULL | ID đầu bếp |
-| priority | INTEGER | DEFAULT 0 | Độ ưu tiên |
-| status | ENUM(OrderStatus) | DEFAULT pending | Trạng thái |
-| startedAt | TIMESTAMP | NULL | Giờ bắt đầu |
-| completedAt | TIMESTAMP | NULL | Giờ hoàn thành |
-| estimatedTime | INTEGER | NULL | Thời gian ước tính (phút) |
-| notes | TEXT | NULL | Ghi chú |
-| createdAt | TIMESTAMP | DEFAULT now() | Ngày tạo |
-| updatedAt | TIMESTAMP | AUTO UPDATE | Ngày cập nhật |
+| Trường         | Kiểu              | Ràng buộc       | Mô tả                     |
+| -------------- | ----------------- | --------------- | ------------------------- |
+| kitchenOrderId | INTEGER           | PK, Auto        | ID đơn bếp                |
+| orderId        | INTEGER           | FK, NOT NULL    | ID đơn hàng               |
+| staffId        | INTEGER           | FK, NULL        | ID đầu bếp                |
+| priority       | INTEGER           | DEFAULT 0       | Độ ưu tiên                |
+| status         | ENUM(OrderStatus) | DEFAULT pending | Trạng thái                |
+| startedAt      | TIMESTAMP         | NULL            | Giờ bắt đầu               |
+| completedAt    | TIMESTAMP         | NULL            | Giờ hoàn thành            |
+| estimatedTime  | INTEGER           | NULL            | Thời gian ước tính (phút) |
+| notes          | TEXT              | NULL            | Ghi chú                   |
+| createdAt      | TIMESTAMP         | DEFAULT now()   | Ngày tạo                  |
+| updatedAt      | TIMESTAMP         | AUTO UPDATE     | Ngày cập nhật             |
 
 **Indexes:**
 - `idx_kitchen_orders_orderId` trên `orderId`
@@ -665,27 +665,27 @@ Quản lý đơn hàng trong bếp.
 #### 3.7.1. bills (Hóa đơn)
 Hóa đơn thanh toán.
 
-| Trường | Kiểu | Ràng buộc | Mô tả |
-|--------|------|-----------|-------|
-| billId | INTEGER | PK, Auto | ID hóa đơn |
-| billNumber | VARCHAR(50) | UNIQUE, UUID | Mã hóa đơn |
-| orderId | INTEGER | FK, UNIQUE, NOT NULL | ID đơn hàng |
-| tableId | INTEGER | FK, NOT NULL | ID bàn |
-| staffId | INTEGER | FK, NULL | ID thu ngân |
-| subtotal | DECIMAL(12,2) | NOT NULL | Tổng tiền hàng |
-| taxAmount | DECIMAL(12,2) | DEFAULT 0 | Tiền thuế |
-| taxRate | DECIMAL(5,2) | DEFAULT 0 | Tỷ lệ thuế (%) |
-| discountAmount | DECIMAL(12,2) | DEFAULT 0 | Tiền giảm giá |
-| serviceCharge | DECIMAL(12,2) | DEFAULT 0 | Phí phục vụ |
-| totalAmount | DECIMAL(12,2) | NOT NULL | Tổng cộng |
-| paidAmount | DECIMAL(12,2) | DEFAULT 0 | Đã thanh toán |
-| changeAmount | DECIMAL(12,2) | DEFAULT 0 | Tiền thối |
-| paymentStatus | ENUM(PaymentStatus) | DEFAULT pending | Trạng thái TT |
-| paymentMethod | ENUM(PaymentMethod) | NULL | Phương thức TT |
-| notes | TEXT | NULL | Ghi chú |
-| createdAt | TIMESTAMP | DEFAULT now() | Ngày tạo |
-| paidAt | TIMESTAMP | NULL | Ngày thanh toán |
-| updatedAt | TIMESTAMP | AUTO UPDATE | Ngày cập nhật |
+| Trường         | Kiểu                | Ràng buộc            | Mô tả           |
+| -------------- | ------------------- | -------------------- | --------------- |
+| billId         | INTEGER             | PK, Auto             | ID hóa đơn      |
+| billNumber     | VARCHAR(50)         | UNIQUE, UUID         | Mã hóa đơn      |
+| orderId        | INTEGER             | FK, UNIQUE, NOT NULL | ID đơn hàng     |
+| tableId        | INTEGER             | FK, NOT NULL         | ID bàn          |
+| staffId        | INTEGER             | FK, NULL             | ID thu ngân     |
+| subtotal       | DECIMAL(12,2)       | NOT NULL             | Tổng tiền hàng  |
+| taxAmount      | DECIMAL(12,2)       | DEFAULT 0            | Tiền thuế       |
+| taxRate        | DECIMAL(5,2)        | DEFAULT 0            | Tỷ lệ thuế (%)  |
+| discountAmount | DECIMAL(12,2)       | DEFAULT 0            | Tiền giảm giá   |
+| serviceCharge  | DECIMAL(12,2)       | DEFAULT 0            | Phí phục vụ     |
+| totalAmount    | DECIMAL(12,2)       | NOT NULL             | Tổng cộng       |
+| paidAmount     | DECIMAL(12,2)       | DEFAULT 0            | Đã thanh toán   |
+| changeAmount   | DECIMAL(12,2)       | DEFAULT 0            | Tiền thối       |
+| paymentStatus  | ENUM(PaymentStatus) | DEFAULT pending      | Trạng thái TT   |
+| paymentMethod  | ENUM(PaymentMethod) | NULL                 | Phương thức TT  |
+| notes          | TEXT                | NULL                 | Ghi chú         |
+| createdAt      | TIMESTAMP           | DEFAULT now()        | Ngày tạo        |
+| paidAt         | TIMESTAMP           | NULL                 | Ngày thanh toán |
+| updatedAt      | TIMESTAMP           | AUTO UPDATE          | Ngày cập nhật   |
 
 **Indexes:**
 - `idx_bills_billNumber` trên `billNumber`
@@ -705,18 +705,18 @@ Hóa đơn thanh toán.
 #### 3.7.2. bill_items (Chi tiết hóa đơn)
 Chi tiết các món trong hóa đơn.
 
-| Trường | Kiểu | Ràng buộc | Mô tả |
-|--------|------|-----------|-------|
-| billItemId | INTEGER | PK, Auto | ID chi tiết HĐ |
-| billId | INTEGER | FK, NOT NULL | ID hóa đơn |
-| itemId | INTEGER | FK, NOT NULL | ID món ăn |
-| itemName | VARCHAR(100) | NOT NULL | Tên món (snapshot) |
-| quantity | INTEGER | NOT NULL | Số lượng |
-| unitPrice | DECIMAL(10,2) | NOT NULL | Đơn giá |
-| subtotal | DECIMAL(10,2) | NOT NULL | Thành tiền |
-| discount | DECIMAL(10,2) | DEFAULT 0 | Giảm giá |
-| total | DECIMAL(10,2) | NOT NULL | Tổng |
-| createdAt | TIMESTAMP | DEFAULT now() | Ngày tạo |
+| Trường     | Kiểu          | Ràng buộc     | Mô tả              |
+| ---------- | ------------- | ------------- | ------------------ |
+| billItemId | INTEGER       | PK, Auto      | ID chi tiết HĐ     |
+| billId     | INTEGER       | FK, NOT NULL  | ID hóa đơn         |
+| itemId     | INTEGER       | FK, NOT NULL  | ID món ăn          |
+| itemName   | VARCHAR(100)  | NOT NULL      | Tên món (snapshot) |
+| quantity   | INTEGER       | NOT NULL      | Số lượng           |
+| unitPrice  | DECIMAL(10,2) | NOT NULL      | Đơn giá            |
+| subtotal   | DECIMAL(10,2) | NOT NULL      | Thành tiền         |
+| discount   | DECIMAL(10,2) | DEFAULT 0     | Giảm giá           |
+| total      | DECIMAL(10,2) | NOT NULL      | Tổng               |
+| createdAt  | TIMESTAMP     | DEFAULT now() | Ngày tạo           |
 
 **Indexes:**
 - `idx_bill_items_billId` trên `billId`
@@ -730,19 +730,19 @@ Chi tiết các món trong hóa đơn.
 #### 3.7.3. payments (Thanh toán)
 Các khoản thanh toán cho hóa đơn.
 
-| Trường | Kiểu | Ràng buộc | Mô tả |
-|--------|------|-----------|-------|
-| paymentId | INTEGER | PK, Auto | ID thanh toán |
-| billId | INTEGER | FK, NOT NULL | ID hóa đơn |
-| paymentMethod | ENUM(PaymentMethod) | NOT NULL | Phương thức TT |
-| amount | DECIMAL(12,2) | NOT NULL | Số tiền |
-| transactionId | VARCHAR(100) | NULL | Mã giao dịch |
-| cardNumber | VARCHAR(20) | NULL | Số thẻ (4 số cuối) |
-| cardHolderName | VARCHAR(255) | NULL | Tên chủ thẻ |
-| status | ENUM(PaymentStatus) | DEFAULT pending | Trạng thái |
-| notes | TEXT | NULL | Ghi chú |
-| paymentDate | TIMESTAMP | DEFAULT now() | Ngày thanh toán |
-| createdAt | TIMESTAMP | DEFAULT now() | Ngày tạo |
+| Trường         | Kiểu                | Ràng buộc       | Mô tả              |
+| -------------- | ------------------- | --------------- | ------------------ |
+| paymentId      | INTEGER             | PK, Auto        | ID thanh toán      |
+| billId         | INTEGER             | FK, NOT NULL    | ID hóa đơn         |
+| paymentMethod  | ENUM(PaymentMethod) | NOT NULL        | Phương thức TT     |
+| amount         | DECIMAL(12,2)       | NOT NULL        | Số tiền            |
+| transactionId  | VARCHAR(100)        | NULL            | Mã giao dịch       |
+| cardNumber     | VARCHAR(20)         | NULL            | Số thẻ (4 số cuối) |
+| cardHolderName | VARCHAR(255)        | NULL            | Tên chủ thẻ        |
+| status         | ENUM(PaymentStatus) | DEFAULT pending | Trạng thái         |
+| notes          | TEXT                | NULL            | Ghi chú            |
+| paymentDate    | TIMESTAMP           | DEFAULT now()   | Ngày thanh toán    |
+| createdAt      | TIMESTAMP           | DEFAULT now()   | Ngày tạo           |
 
 **Indexes:**
 - `idx_payments_billId` trên `billId`
@@ -800,25 +800,25 @@ Reservation (1) ─── (N) Order
 
 ### 4.2. Ràng buộc tham chiếu (Foreign Keys)
 
-| Bảng con | Khóa ngoại | Bảng cha | Hành động xóa |
-|----------|-----------|----------|---------------|
-| refresh_tokens | accountId | accounts | CASCADE |
-| staff | accountId | accounts | CASCADE |
-| menu_items | categoryId | categories | RESTRICT |
-| reservations | tableId | restaurant_tables | RESTRICT |
-| orders | tableId | restaurant_tables | RESTRICT |
-| orders | staffId | staff | SET NULL |
-| orders | reservationId | reservations | SET NULL |
-| order_items | orderId | orders | CASCADE |
-| order_items | itemId | menu_items | RESTRICT |
-| kitchen_orders | orderId | orders | CASCADE |
-| kitchen_orders | staffId | staff | SET NULL |
-| bills | orderId | orders | RESTRICT |
-| bills | tableId | restaurant_tables | RESTRICT |
-| bills | staffId | staff | SET NULL |
-| bill_items | billId | bills | CASCADE |
-| bill_items | itemId | menu_items | RESTRICT |
-| payments | billId | bills | CASCADE |
+| Bảng con       | Khóa ngoại    | Bảng cha          | Hành động xóa |
+| -------------- | ------------- | ----------------- | ------------- |
+| refresh_tokens | accountId     | accounts          | CASCADE       |
+| staff          | accountId     | accounts          | CASCADE       |
+| menu_items     | categoryId    | categories        | RESTRICT      |
+| reservations   | tableId       | restaurant_tables | RESTRICT      |
+| orders         | tableId       | restaurant_tables | RESTRICT      |
+| orders         | staffId       | staff             | SET NULL      |
+| orders         | reservationId | reservations      | SET NULL      |
+| order_items    | orderId       | orders            | CASCADE       |
+| order_items    | itemId        | menu_items        | RESTRICT      |
+| kitchen_orders | orderId       | orders            | CASCADE       |
+| kitchen_orders | staffId       | staff             | SET NULL      |
+| bills          | orderId       | orders            | RESTRICT      |
+| bills          | tableId       | restaurant_tables | RESTRICT      |
+| bills          | staffId       | staff             | SET NULL      |
+| bill_items     | billId        | bills             | CASCADE       |
+| bill_items     | itemId        | menu_items        | RESTRICT      |
+| payments       | billId        | bills             | CASCADE       |
 
 **Giải thích:**
 - **CASCADE**: Xóa bản ghi con khi xóa bản ghi cha
@@ -838,16 +838,16 @@ Tất cả các bảng đều có primary key tự động tăng (AUTO_INCREMENT
 ### 5.2. Unique Indexes
 Các trường có ràng buộc UNIQUE:
 
-| Bảng | Trường | Mục đích |
-|------|--------|----------|
-| accounts | username, email, phoneNumber | Đăng nhập và liên hệ |
-| refresh_tokens | token | Bảo mật token |
-| categories | categoryName | Không trùng tên |
-| menu_items | itemCode | Mã món duy nhất |
-| restaurant_tables | tableNumber, qrCode | Số bàn và QR |
-| reservations | reservationCode | Mã đặt bàn |
-| orders | orderNumber | Mã đơn hàng |
-| bills | billNumber, orderId | Mã hóa đơn |
+| Bảng              | Trường                       | Mục đích             |
+| ----------------- | ---------------------------- | -------------------- |
+| accounts          | username, email, phoneNumber | Đăng nhập và liên hệ |
+| refresh_tokens    | token                        | Bảo mật token        |
+| categories        | categoryName                 | Không trùng tên      |
+| menu_items        | itemCode                     | Mã món duy nhất      |
+| restaurant_tables | tableNumber, qrCode          | Số bàn và QR         |
+| reservations      | reservationCode              | Mã đặt bàn           |
+| orders            | orderNumber                  | Mã đơn hàng          |
+| bills             | billNumber, orderId          | Mã hóa đơn           |
 
 ### 5.3. Regular Indexes
 Các index thông thường để tối ưu truy vấn:
@@ -1514,14 +1514,14 @@ Hoàn thành → status: completed
 
 #### 7.2.2. Các trạng thái đặt bàn
 
-| Status | Mô tả | Hành động tiếp theo |
-|--------|-------|---------------------|
-| `pending` | Chờ xác nhận | Nhân viên xác nhận/từ chối |
-| `confirmed` | Đã xác nhận | Đợi khách đến |
-| `seated` | Khách đã đến, đang ngồi | Tạo order |
-| `completed` | Hoàn thành | Đóng reservation |
-| `cancelled` | Đã hủy | Giải phóng bàn |
-| `no_show` | Khách không đến | Giải phóng bàn |
+| Status      | Mô tả                   | Hành động tiếp theo        |
+| ----------- | ----------------------- | -------------------------- |
+| `pending`   | Chờ xác nhận            | Nhân viên xác nhận/từ chối |
+| `confirmed` | Đã xác nhận             | Đợi khách đến              |
+| `seated`    | Khách đã đến, đang ngồi | Tạo order                  |
+| `completed` | Hoàn thành              | Đóng reservation           |
+| `cancelled` | Đã hủy                  | Giải phóng bàn             |
+| `no_show`   | Khách không đến         | Giải phóng bàn             |
 
 ### 7.3. Cấu trúc bảng đặt bàn
 
@@ -1577,12 +1577,12 @@ AND t.isActive = true;
 ### 7.5. Hệ thống thông báo
 
 #### 7.5.1. Loại thông báo
-| Sự kiện | Người nhận | Kênh | Nội dung |
-|---------|-----------|------|----------|
-| Đặt bàn mới | Nhân viên | Email/SMS | Có reservation mới cần xác nhận |
-| Xác nhận đặt bàn | Khách hàng | Email/SMS | Đặt bàn đã được xác nhận |
-| Nhắc nhở | Khách hàng | SMS | Nhắc 2h trước giờ đặt |
-| Hủy bàn | Cả hai | Email/SMS | Thông báo hủy |
+| Sự kiện          | Người nhận | Kênh      | Nội dung                        |
+| ---------------- | ---------- | --------- | ------------------------------- |
+| Đặt bàn mới      | Nhân viên  | Email/SMS | Có reservation mới cần xác nhận |
+| Xác nhận đặt bàn | Khách hàng | Email/SMS | Đặt bàn đã được xác nhận        |
+| Nhắc nhở         | Khách hàng | SMS       | Nhắc 2h trước giờ đặt           |
+| Hủy bàn          | Cả hai     | Email/SMS | Thông báo hủy                   |
 
 #### 7.5.2. Template thông báo
 

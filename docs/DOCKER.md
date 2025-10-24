@@ -111,11 +111,11 @@ make prod
 
 ### Required Software
 
-| Software | Minimum Version | Download |
-|----------|----------------|----------|
-| Docker Engine | 20.10+ | [Get Docker](https://docs.docker.com/get-docker/) |
-| Docker Compose | v2+ | Included with Docker Desktop |
-| Git | Any recent | [Get Git](https://git-scm.com/) |
+| Software       | Minimum Version | Download                                          |
+| -------------- | --------------- | ------------------------------------------------- |
+| Docker Engine  | 20.10+          | [Get Docker](https://docs.docker.com/get-docker/) |
+| Docker Compose | v2+             | Included with Docker Desktop                      |
+| Git            | Any recent      | [Get Git](https://git-scm.com/)                   |
 
 ### System Requirements
 
@@ -1032,15 +1032,15 @@ If you encounter issues:
 
 ### Key Files
 
-| File | Purpose |
-|------|---------|
-| `.env` | Environment configuration |
-| `docker-compose.yml` | Production setup |
-| `docker-compose.dev.yml` | Development setup |
-| `client/Dockerfile` | Client production build |
-| `server/Dockerfile` | Server production build |
-| `nginx/nginx.conf` | Reverse proxy config |
-| `docker.ps1` / `docker.sh` | Management scripts |
+| File                       | Purpose                   |
+| -------------------------- | ------------------------- |
+| `.env`                     | Environment configuration |
+| `docker-compose.yml`       | Production setup          |
+| `docker-compose.dev.yml`   | Development setup         |
+| `client/Dockerfile`        | Client production build   |
+| `server/Dockerfile`        | Server production build   |
+| `nginx/nginx.conf`         | Reverse proxy config      |
+| `docker.ps1` / `docker.sh` | Management scripts        |
 
 ---
 
