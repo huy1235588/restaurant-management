@@ -109,18 +109,18 @@ graph TB
 
 ```mermaid
 flowchart TD
-    Start([Bắt đầu]) --> CheckPerm{Có quyền<br/>quản lý kho?}
+    Start([Bắt đầu]) --> CheckPerm{Có quyền<br>quản lý kho?}
     CheckPerm -->|Không| Deny[Từ chối truy cập]
     CheckPerm -->|Có| Access[Truy cập Quản lý nguyên liệu]
     
-    Access --> Action{Chọn<br/>hành động}
+    Access --> Action{Chọn<br>hành động}
     
     Action -->|Tạo mới| CreateForm[Hiển thị form tạo]
-    CreateForm --> InputData[Nhập thông tin:<br/>- Mã, tên, đơn vị<br/>- Danh mục<br/>- Tồn kho tối thiểu]
-    InputData --> ValidateCreate{Dữ liệu<br/>hợp lệ?}
+    CreateForm --> InputData[Nhập thông tin:<br>- Mã, tên, đơn vị<br>- Danh mục<br>- Tồn kho tối thiểu]
+    InputData --> ValidateCreate{Dữ liệu<br>hợp lệ?}
     ValidateCreate -->|Không| ErrorCreate[Hiển thị lỗi]
     ErrorCreate --> InputData
-    ValidateCreate -->|Có| CheckCode{Mã đã<br/>tồn tại?}
+    ValidateCreate -->|Có| CheckCode{Mã đã<br>tồn tại?}
     CheckCode -->|Có| ErrorCode[Lỗi: Mã đã được sử dụng]
     ErrorCode --> InputData
     CheckCode -->|Không| SaveCreate[Lưu nguyên liệu]
@@ -128,16 +128,16 @@ flowchart TD
     LogCreate --> SuccessCreate[Thông báo thành công]
     
     Action -->|Xem danh sách| LoadList[Load danh sách nguyên liệu]
-    LoadList --> ShowList[Hiển thị bảng với:<br/>- Mã, tên<br/>- Tồn kho<br/>- Trạng thái]
-    ShowList --> FilterSort{Lọc/<br/>Sắp xếp?}
+    LoadList --> ShowList[Hiển thị bảng với:<br>- Mã, tên<br>- Tồn kho<br>- Trạng thái]
+    ShowList --> FilterSort{Lọc/<br>Sắp xếp?}
     FilterSort -->|Có| ApplyFilter[Áp dụng bộ lọc]
     ApplyFilter --> ShowList
-    FilterSort -->|Không| SelectItem{Chọn<br/>nguyên liệu?}
+    FilterSort -->|Không| SelectItem{Chọn<br>nguyên liệu?}
     
     Action -->|Cập nhật| SelectUpdate[Chọn nguyên liệu cần sửa]
     SelectUpdate --> ShowUpdateForm[Hiển thị form với dữ liệu hiện tại]
     ShowUpdateForm --> EditData[Chỉnh sửa thông tin]
-    EditData --> ValidateUpdate{Dữ liệu<br/>hợp lệ?}
+    EditData --> ValidateUpdate{Dữ liệu<br>hợp lệ?}
     ValidateUpdate -->|Không| ErrorUpdate[Hiển thị lỗi]
     ErrorUpdate --> EditData
     ValidateUpdate -->|Có| SaveUpdate[Lưu thay đổi]
@@ -145,7 +145,7 @@ flowchart TD
     LogUpdate --> SuccessUpdate[Thông báo thành công]
     
     Action -->|Vô hiệu hóa| SelectDeactivate[Chọn nguyên liệu]
-    SelectDeactivate --> ConfirmDeactivate{Xác nhận<br/>vô hiệu hóa?}
+    SelectDeactivate --> ConfirmDeactivate{Xác nhận<br>vô hiệu hóa?}
     ConfirmDeactivate -->|Không| Access
     ConfirmDeactivate -->|Có| SetInactive[Cập nhật isActive = false]
     SetInactive --> LogDeactivate[Ghi log]
@@ -168,30 +168,30 @@ flowchart TD
 flowchart TD
     Start([Bắt đầu]) --> SelectSupplier[Chọn nhà cung cấp]
     SelectSupplier --> CreatePO[Tạo đơn đặt hàng mới]
-    CreatePO --> InputInfo[Nhập thông tin:<br/>- Ngày dự kiến nhận<br/>- Ghi chú]
+    CreatePO --> InputInfo[Nhập thông tin:<br>- Ngày dự kiến nhận<br>- Ghi chú]
     
     InputInfo --> AddItems[Thêm nguyên liệu]
     AddItems --> SelectIngredient[Chọn nguyên liệu]
     SelectIngredient --> InputQuantity[Nhập số lượng và đơn giá]
     InputQuantity --> CalcSubtotal[Tính thành tiền]
-    CalcSubtotal --> MoreItems{Thêm<br/>nguyên liệu khác?}
+    CalcSubtotal --> MoreItems{Thêm<br>nguyên liệu khác?}
     MoreItems -->|Có| SelectIngredient
-    MoreItems -->|Không| CalcTotal[Tính tổng:<br/>- Subtotal<br/>- Tax (10%)<br/>- Total Amount]
+    MoreItems -->|Không| CalcTotal[Tính tổng:<br>- Subtotal<br>- Tax (10%)<br>- Total Amount]
     
     CalcTotal --> Preview[Xem trước đơn hàng]
-    Preview --> ValidatePO{Dữ liệu<br/>hợp lệ?}
+    Preview --> ValidatePO{Dữ liệu<br>hợp lệ?}
     ValidatePO -->|Không| Error[Hiển thị lỗi]
     Error --> AddItems
-    ValidatePO -->|Có| SaveDraft[Lưu đơn<br/>Status: pending]
+    ValidatePO -->|Có| SaveDraft[Lưu đơn<br>Status: pending]
     
-    SaveDraft --> Action{Chọn<br/>hành động}
-    Action -->|Gửi đơn| ConfirmSend{Xác nhận<br/>gửi?}
+    SaveDraft --> Action{Chọn<br>hành động}
+    Action -->|Gửi đơn| ConfirmSend{Xác nhận<br>gửi?}
     ConfirmSend -->|Không| SaveDraft
-    ConfirmSend -->|Có| SendOrder[Cập nhật Status: ordered<br/>Ghi nhận thời gian gửi]
-    SendOrder --> NotifySupplier[Thông báo nhà cung cấp<br/>Email/Print]
+    ConfirmSend -->|Có| SendOrder[Cập nhật Status: ordered<br>Ghi nhận thời gian gửi]
+    SendOrder --> NotifySupplier[Thông báo nhà cung cấp<br>Email/Print]
     NotifySupplier --> WaitReceive[Chờ nhận hàng]
     
-    Action -->|Hủy đơn| ConfirmCancel{Xác nhận<br/>hủy?}
+    Action -->|Hủy đơn| ConfirmCancel{Xác nhận<br>hủy?}
     ConfirmCancel -->|Không| SaveDraft
     ConfirmCancel -->|Có| InputReason[Nhập lý do hủy]
     InputReason --> CancelOrder[Cập nhật Status: cancelled]
@@ -201,27 +201,27 @@ flowchart TD
     WaitReceive --> ReceiveGoods[Nhận hàng]
     ReceiveGoods --> CheckQuality[Kiểm tra chất lượng]
     CheckQuality --> InputReceived[Nhập số lượng thực tế nhận]
-    InputReceived --> HasExpiry{Nguyên liệu<br/>có hạn SD?}
+    InputReceived --> HasExpiry{Nguyên liệu<br>có hạn SD?}
     
-    HasExpiry -->|Có| InputBatch[Nhập thông tin lô:<br/>- Số lô<br/>- Hạn sử dụng<br/>- Đơn giá]
+    HasExpiry -->|Có| InputBatch[Nhập thông tin lô:<br>- Số lô<br>- Hạn sử dụng<br>- Đơn giá]
     InputBatch --> CreateBatch[Tạo IngredientBatch]
     
-    HasExpiry -->|Không| CreateTransaction[Tạo StockTransaction<br/>Type: in]
+    HasExpiry -->|Không| CreateTransaction[Tạo StockTransaction<br>Type: in]
     CreateBatch --> CreateTransaction
     
-    CreateTransaction --> UpdateStock[Cập nhật currentStock<br/>+= quantity received]
-    UpdateStock --> UpdateUnitCost[Cập nhật unitCost<br/>trung bình]
-    UpdateUnitCost --> CheckComplete{Nhận đủ<br/>hàng?}
+    CreateTransaction --> UpdateStock[Cập nhật currentStock<br>+= quantity received]
+    UpdateStock --> UpdateUnitCost[Cập nhật unitCost<br>trung bình]
+    UpdateUnitCost --> CheckComplete{Nhận đủ<br>hàng?}
     
-    CheckComplete -->|Có| SetReceived[Status: received<br/>Ghi nhận receivedDate]
+    CheckComplete -->|Có| SetReceived[Status: received<br>Ghi nhận receivedDate]
     CheckComplete -->|Không| NoteShortage[Ghi chú số lượng thiếu]
     NoteShortage --> SetReceived
     
     SetReceived --> PrintReceipt[In phiếu nhập kho]
-    PrintReceipt --> CheckStockAlert{Kiểm tra<br/>cảnh báo}
-    CheckStockAlert --> CheckLowStock{Tồn kho<br/>thấp?}
+    PrintReceipt --> CheckStockAlert{Kiểm tra<br>cảnh báo}
+    CheckStockAlert --> CheckLowStock{Tồn kho<br>thấp?}
     CheckLowStock -->|Không| End
-    CheckLowStock -->|Có| ResolveAlert[Đánh dấu cảnh báo<br/>đã xử lý]
+    CheckLowStock -->|Có| ResolveAlert[Đánh dấu cảnh báo<br>đã xử lý]
     ResolveAlert --> End
 ```
 
@@ -233,40 +233,40 @@ flowchart TD
 flowchart TD
     Start([Đơn hàng được tạo]) --> LoadOrder[Load thông tin đơn hàng]
     LoadOrder --> GetItems[Lấy danh sách món ăn]
-    GetItems --> CheckRecipe{Món có<br/>công thức?}
+    GetItems --> CheckRecipe{Món có<br>công thức?}
     
     CheckRecipe -->|Không| ManualHandle[Xử lý thủ công]
     ManualHandle --> End([Kết thúc])
     
     CheckRecipe -->|Có| LoadRecipe[Load công thức món ăn]
-    LoadRecipe --> CalcNeeded[Tính tổng nguyên liệu cần:<br/>quantity × số phần]
-    CalcNeeded --> GroupIngredients[Gộp nguyên liệu<br/>giống nhau]
+    LoadRecipe --> CalcNeeded[Tính tổng nguyên liệu cần:<br>quantity × số phần]
+    CalcNeeded --> GroupIngredients[Gộp nguyên liệu<br>giống nhau]
     
     GroupIngredients --> ForEachIngredient[Với mỗi nguyên liệu]
-    ForEachIngredient --> CheckStock{currentStock<br/>>= quantity?}
+    ForEachIngredient --> CheckStock{currentStock<br>>= quantity?}
     
-    CheckStock -->|Không| NotEnough[Đánh dấu món<br/>không khả dụng]
+    CheckStock -->|Không| NotEnough[Đánh dấu món<br>không khả dụng]
     NotEnough --> NotifyStaff[Thông báo nhân viên]
     NotifyStaff --> SuggestAlternative[Gợi ý món thay thế]
     SuggestAlternative --> End
     
-    CheckStock -->|Có| OrderConfirmed{Đơn hàng<br/>confirmed?}
-    OrderConfirmed -->|Không| MoreIngredients{Còn nguyên<br/>liệu khác?}
-    OrderConfirmed -->|Có| StatusPreparing{Status =<br/>preparing?}
+    CheckStock -->|Có| OrderConfirmed{Đơn hàng<br>confirmed?}
+    OrderConfirmed -->|Không| MoreIngredients{Còn nguyên<br>liệu khác?}
+    OrderConfirmed -->|Có| StatusPreparing{Status =<br>preparing?}
     
     StatusPreparing -->|Không| MoreIngredients
     StatusPreparing -->|Có| DeductStock[Trừ tồn kho]
     
-    DeductStock --> FindBatches[Tìm các lô hàng<br/>còn tồn]
-    FindBatches --> SortBatches[Sắp xếp theo<br/>receivedDate ASC]
-    SortBatches --> DeductFIFO[Trừ theo FIFO:<br/>Lô cũ nhất trước]
-    DeductFIFO --> UpdateBatch[Cập nhật<br/>remainingQuantity]
-    UpdateBatch --> CreateStockTx[Tạo StockTransaction<br/>Type: out]
+    DeductStock --> FindBatches[Tìm các lô hàng<br>còn tồn]
+    FindBatches --> SortBatches[Sắp xếp theo<br>receivedDate ASC]
+    SortBatches --> DeductFIFO[Trừ theo FIFO:<br>Lô cũ nhất trước]
+    DeductFIFO --> UpdateBatch[Cập nhật<br>remainingQuantity]
+    UpdateBatch --> CreateStockTx[Tạo StockTransaction<br>Type: out]
     
-    CreateStockTx --> UpdateCurrentStock[Cập nhật currentStock<br/>-= quantity]
-    UpdateCurrentStock --> CheckLowStock{currentStock <<br/>minimumStock?}
+    CreateStockTx --> UpdateCurrentStock[Cập nhật currentStock<br>-= quantity]
+    UpdateCurrentStock --> CheckLowStock{currentStock <<br>minimumStock?}
     
-    CheckLowStock -->|Có| CreateAlert[Tạo StockAlert<br/>Type: low_stock]
+    CheckLowStock -->|Có| CreateAlert[Tạo StockAlert<br>Type: low_stock]
     CreateAlert --> NotifyManager[Thông báo quản lý kho]
     NotifyManager --> MoreIngredients
     
@@ -284,57 +284,57 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Start([Cron Job hàng ngày]) --> CheckTime{Đến giờ<br/>chạy job?}
+    Start([Cron Job hàng ngày]) --> CheckTime{Đến giờ<br>chạy job?}
     CheckTime -->|Không| Wait[Chờ]
     Wait --> CheckTime
     CheckTime -->|Có| StartJob[Bắt đầu kiểm tra]
     
-    StartJob --> LoadIngredients[Load tất cả nguyên liệu<br/>đang hoạt động]
+    StartJob --> LoadIngredients[Load tất cả nguyên liệu<br>đang hoạt động]
     LoadIngredients --> ForEachIng[Với mỗi nguyên liệu]
     
-    ForEachIng --> CheckLowStock{currentStock <<br/>minimumStock?}
-    CheckLowStock -->|Có| CheckExistingAlert{Đã có<br/>cảnh báo?}
+    ForEachIng --> CheckLowStock{currentStock <<br>minimumStock?}
+    CheckLowStock -->|Có| CheckExistingAlert{Đã có<br>cảnh báo?}
     CheckExistingAlert -->|Có| NextCheck1
-    CheckExistingAlert -->|Không| CreateLowAlert[Tạo StockAlert<br/>Type: low_stock]
-    CreateLowAlert --> CalcSuggest[Tính số lượng<br/>cần đặt]
-    CalcSuggest --> FindSupplier[Tìm nhà cung cấp<br/>ưu tiên]
-    FindSupplier --> NotifyLow[Gửi thông báo:<br/>- Quản lý kho<br/>- Nhân viên mua hàng]
+    CheckExistingAlert -->|Không| CreateLowAlert[Tạo StockAlert<br>Type: low_stock]
+    CreateLowAlert --> CalcSuggest[Tính số lượng<br>cần đặt]
+    CalcSuggest --> FindSupplier[Tìm nhà cung cấp<br>ưu tiên]
+    FindSupplier --> NotifyLow[Gửi thông báo:<br>- Quản lý kho<br>- Nhân viên mua hàng]
     NotifyLow --> NextCheck1[Tiếp tục kiểm tra]
     
     CheckLowStock -->|Không| NextCheck1
-    NextCheck1 --> LoadBatches[Load các lô hàng<br/>của nguyên liệu]
+    NextCheck1 --> LoadBatches[Load các lô hàng<br>của nguyên liệu]
     LoadBatches --> ForEachBatch[Với mỗi lô]
     
-    ForEachBatch --> CheckExpired{Đã<br/>hết hạn?}
-    CheckExpired -->|Có| CreateExpiredAlert[Tạo StockAlert<br/>Type: expired]
+    ForEachBatch --> CheckExpired{Đã<br>hết hạn?}
+    CheckExpired -->|Có| CreateExpiredAlert[Tạo StockAlert<br>Type: expired]
     CreateExpiredAlert --> NotifyExpired[Thông báo khẩn cấp]
     NotifyExpired --> NextBatch
     
-    CheckExpired -->|Không| CheckExpiringSoon{Sắp hết hạn?<br/>< 7 ngày}
-    CheckExpiringSoon -->|Có| CheckExpiringAlert{Đã có<br/>cảnh báo?}
+    CheckExpired -->|Không| CheckExpiringSoon{Sắp hết hạn?<br>< 7 ngày}
+    CheckExpiringSoon -->|Có| CheckExpiringAlert{Đã có<br>cảnh báo?}
     CheckExpiringAlert -->|Có| NextBatch
-    CheckExpiringAlert -->|Không| CreateExpiringAlert[Tạo StockAlert<br/>Type: expiring_soon]
+    CheckExpiringAlert -->|Không| CreateExpiringAlert[Tạo StockAlert<br>Type: expiring_soon]
     CreateExpiringAlert --> NotifyExpiring[Gửi thông báo]
     NotifyExpiring --> NextBatch
     
     CheckExpiringSoon -->|Không| NextBatch[Lô tiếp theo]
-    NextBatch --> MoreBatches{Còn lô<br/>khác?}
+    NextBatch --> MoreBatches{Còn lô<br>khác?}
     MoreBatches -->|Có| ForEachBatch
     MoreBatches -->|Không| NextIngredient
     
-    NextIngredient --> MoreIngredients{Còn nguyên<br/>liệu khác?}
+    NextIngredient --> MoreIngredients{Còn nguyên<br>liệu khác?}
     MoreIngredients -->|Có| ForEachIng
     MoreIngredients -->|Không| GenerateReport[Tạo báo cáo tổng hợp]
     
-    GenerateReport --> SendDailySummary[Gửi email tóm tắt<br/>cho quản lý]
-    SendDailySummary --> UpdateDashboard[Cập nhật dashboard<br/>cảnh báo]
+    GenerateReport --> SendDailySummary[Gửi email tóm tắt<br>cho quản lý]
+    SendDailySummary --> UpdateDashboard[Cập nhật dashboard<br>cảnh báo]
     UpdateDashboard --> End([Kết thúc job])
     
     subgraph "Xử lý cảnh báo bởi người dùng"
         UserView[Xem danh sách cảnh báo]
         UserView --> SelectAlert[Chọn cảnh báo]
         SelectAlert --> ReviewAlert[Xem chi tiết]
-        ReviewAlert --> DecideAction{Chọn<br/>hành động}
+        ReviewAlert --> DecideAction{Chọn<br>hành động}
         
         DecideAction -->|Tạo đơn hàng| CreatePO[Tạo đơn đặt hàng]
         DecideAction -->|Điều chỉnh tối thiểu| AdjustMin[Cập nhật minimumStock]
@@ -346,7 +346,7 @@ flowchart TD
         ProcessExpired --> ResolveAlert
         OtherAction --> ResolveAlert
         
-        ResolveAlert --> LogResolution[Ghi log xử lý:<br/>- Người xử lý<br/>- Hành động<br/>- Thời gian]
+        ResolveAlert --> LogResolution[Ghi log xử lý:<br>- Người xử lý<br>- Hành động<br>- Thời gian]
         LogResolution --> DoneAlert([Hoàn tất])
     end
 ```
@@ -367,58 +367,58 @@ flowchart TD
     RecordSheet --> CheckExpiry[Kiểm tra hạn sử dụng]
     CheckExpiry --> CheckQuality[Kiểm tra chất lượng]
     
-    CheckQuality --> MoreItems{Còn nguyên<br/>liệu khác?}
+    CheckQuality --> MoreItems{Còn nguyên<br>liệu khác?}
     MoreItems -->|Có| CountPhysical
     MoreItems -->|Không| InputSystem[Nhập số liệu vào hệ thống]
     
     InputSystem --> Compare[So sánh với tồn kho hệ thống]
     Compare --> ForEachItem[Với mỗi nguyên liệu]
-    ForEachItem --> CalcDiff[Tính chênh lệch:<br/>actual - system]
+    ForEachItem --> CalcDiff[Tính chênh lệch:<br>actual - system]
     
-    CalcDiff --> HasDiff{Có<br/>chênh lệch?}
+    CalcDiff --> HasDiff{Có<br>chênh lệch?}
     HasDiff -->|Không| NextItem
     HasDiff -->|Có| InvestigateReason[Điều tra nguyên nhân]
     
-    InvestigateReason --> ReasonFound{Tìm ra<br/>nguyên nhân?}
+    InvestigateReason --> ReasonFound{Tìm ra<br>nguyên nhân?}
     ReasonFound -->|Có| DocumentReason[Ghi nhận nguyên nhân]
     ReasonFound -->|Không| MarkUnknown[Đánh dấu chưa rõ]
     
-    DocumentReason --> NeedAdjust{Cần điều<br/>chỉnh?}
+    DocumentReason --> NeedAdjust{Cần điều<br>chỉnh?}
     MarkUnknown --> NeedAdjust
     
     NeedAdjust -->|Có| CreateAdjustment[Tạo giao dịch điều chỉnh]
-    CreateAdjustment --> SelectType{Chênh lệch<br/>dương/âm?}
+    CreateAdjustment --> SelectType{Chênh lệch<br>dương/âm?}
     
-    SelectType -->|Dương| AdjustIn[Type: adjustment<br/>Quantity: + diff]
-    SelectType -->|Âm| AdjustOut[Type: adjustment<br/>Quantity: - diff]
+    SelectType -->|Dương| AdjustIn[Type: adjustment<br>Quantity: + diff]
+    SelectType -->|Âm| AdjustOut[Type: adjustment<br>Quantity: - diff]
     
     AdjustIn --> UpdateStock[Cập nhật currentStock]
     AdjustOut --> UpdateStock
     
-    UpdateStock --> LogAdjust[Ghi log chi tiết:<br/>- Người thực hiện<br/>- Lý do<br/>- Số lượng]
+    UpdateStock --> LogAdjust[Ghi log chi tiết:<br>- Người thực hiện<br>- Lý do<br>- Số lượng]
     LogAdjust --> NextItem
     
     NeedAdjust -->|Không| NextItem[Nguyên liệu tiếp theo]
-    NextItem --> MoreToCheck{Còn nguyên<br/>liệu khác?}
+    NextItem --> MoreToCheck{Còn nguyên<br>liệu khác?}
     MoreToCheck -->|Có| ForEachItem
     MoreToCheck -->|Không| ProcessExpired[Xử lý hàng hết hạn]
     
     ProcessExpired --> ForEachExpired[Với mỗi hàng hết hạn]
-    ForEachExpired --> CreateWaste[Tạo giao dịch hao hụt<br/>Type: waste]
+    ForEachExpired --> CreateWaste[Tạo giao dịch hao hụt<br>Type: waste]
     CreateWaste --> DeductExpired[Trừ tồn kho]
-    DeductExpired --> MoreExpired{Còn hàng<br/>hết hạn khác?}
+    DeductExpired --> MoreExpired{Còn hàng<br>hết hạn khác?}
     MoreExpired -->|Có| ForEachExpired
     MoreExpired -->|Không| GenerateReport[Tạo báo cáo kiểm kê]
     
-    GenerateReport --> CalcAccuracy[Tính độ chính xác:<br/>accuracy %]
+    GenerateReport --> CalcAccuracy[Tính độ chính xác:<br>accuracy %]
     CalcAccuracy --> CalcLoss[Tính giá trị hao hụt]
     CalcLoss --> Recommendations[Đề xuất cải tiến]
-    Recommendations --> ApproveReport{Phê duyệt<br/>báo cáo?}
+    Recommendations --> ApproveReport{Phê duyệt<br>báo cáo?}
     
     ApproveReport -->|Không| ReviseReport[Xem xét lại]
     ReviseReport --> GenerateReport
     ApproveReport -->|Có| FinalizeReport[Hoàn tất báo cáo]
-    FinalizeReport --> SendToManagement[Gửi báo cáo<br/>cho ban quản lý]
+    FinalizeReport --> SendToManagement[Gửi báo cáo<br>cho ban quản lý]
     SendToManagement --> ArchiveReport[Lưu trữ hồ sơ]
     ArchiveReport --> End([Kết thúc])
 ```
@@ -454,7 +454,7 @@ sequenceDiagram
     Repo-->>PO: Valid
     
     PO->>PO: calculateTotals(items)
-    Note over PO: subtotal = Σ(quantity × unitPrice)<br/>taxAmount = subtotal × 0.1<br/>totalAmount = subtotal + taxAmount
+    Note over PO: subtotal = Σ(quantity × unitPrice)<br>taxAmount = subtotal × 0.1<br>totalAmount = subtotal + taxAmount
     
     PO->>Repo: createPurchaseOrder(orderData)
     Repo->>DB: INSERT INTO purchase_orders
@@ -527,13 +527,13 @@ sequenceDiagram
         DB-->>Repo: batchId
         
         Batch->>Stock: createStockTransaction(data)
-        Note over Stock: type = "in"<br/>quantity = receivedQuantity
+        Note over Stock: type = "in"<br>quantity = receivedQuantity
         Stock->>Repo: createTransaction(data)
         Repo->>DB: INSERT INTO stock_transactions
         DB-->>Repo: transactionId
         
         Stock->>Repo: updateIngredientStock(ingredientId)
-        Repo->>DB: UPDATE ingredients<br/>SET currentStock = currentStock + quantity
+        Repo->>DB: UPDATE ingredients<br>SET currentStock = currentStock + quantity
         DB-->>Repo: Success
         
         Stock->>Repo: updateUnitCost(ingredientId, newCost)
@@ -546,17 +546,17 @@ sequenceDiagram
         DB-->>Alert: Stock levels
         
         alt Tồn kho đã đủ
-            Alert->>DB: UPDATE stock_alerts<br/>SET isResolved = true<br/>WHERE type = 'low_stock'
+            Alert->>DB: UPDATE stock_alerts<br>SET isResolved = true<br>WHERE type = 'low_stock'
             DB-->>Alert: Success
         end
     end
     
     PO->>Repo: updatePurchaseOrderStatus(id, "received")
-    Repo->>DB: UPDATE purchase_orders<br/>SET status='received', receivedDate=NOW()
+    Repo->>DB: UPDATE purchase_orders<br>SET status='received', receivedDate=NOW()
     DB-->>Repo: Success
     
     PO->>Repo: updateReceivedQuantities(items)
-    Repo->>DB: UPDATE purchase_order_items<br/>SET receivedQuantity = ?
+    Repo->>DB: UPDATE purchase_order_items<br>SET receivedQuantity = ?
     DB-->>Repo: Success
     
     PO->>DB: COMMIT TRANSACTION
@@ -635,18 +635,18 @@ sequenceDiagram
         
         loop Cho mỗi nguyên liệu
             Stock->>Batch: deductFromBatches(ingredientId, quantity)
-            Batch->>DB: SELECT * FROM ingredient_batches<br/>WHERE remainingQuantity > 0<br/>ORDER BY receivedDate ASC
+            Batch->>DB: SELECT * FROM ingredient_batches<br>WHERE remainingQuantity > 0<br>ORDER BY receivedDate ASC
             DB-->>Batch: Batches (FIFO)
             
             loop Trừ dần từng lô
-                Batch->>DB: UPDATE ingredient_batches<br/>SET remainingQuantity -= ?
+                Batch->>DB: UPDATE ingredient_batches<br>SET remainingQuantity -= ?
                 DB-->>Batch: Success
             end
             
-            Stock->>DB: INSERT INTO stock_transactions<br/>type='out', referenceType='order'
+            Stock->>DB: INSERT INTO stock_transactions<br>type='out', referenceType='order'
             DB-->>Stock: transactionId
             
-            Stock->>DB: UPDATE ingredients<br/>SET currentStock -= quantity
+            Stock->>DB: UPDATE ingredients<br>SET currentStock -= quantity
             DB-->>Stock: Success
             
             Stock->>Alert: checkAfterDeduction(ingredientId)
@@ -654,7 +654,7 @@ sequenceDiagram
             DB-->>Alert: Stock levels
             
             alt Tồn kho thấp
-                Alert->>DB: INSERT INTO stock_alerts<br/>type='low_stock'
+                Alert->>DB: INSERT INTO stock_alerts<br>type='low_stock'
                 DB-->>Alert: alertId
                 Alert->>WS: notifyManagers(alertData)
                 WS-->>UI: Real-time notification
@@ -901,24 +901,24 @@ stateDiagram-v2
 ```mermaid
 flowchart TD
     Start([Hệ thống khởi động]) --> ScheduleJob[Đặt lịch job hàng ngày]
-    ScheduleJob --> WaitTrigger[Chờ đến giờ chạy<br/>6:00 AM mỗi ngày]
+    ScheduleJob --> WaitTrigger[Chờ đến giờ chạy<br>6:00 AM mỗi ngày]
     
     WaitTrigger --> StartJob[Bắt đầu job]
-    StartJob --> LoadBatches[Load tất cả lô hàng<br/>còn tồn]
+    StartJob --> LoadBatches[Load tất cả lô hàng<br>còn tồn]
     
-    LoadBatches --> CheckExpiry{Kiểm tra<br/>hạn sử dụng}
+    LoadBatches --> CheckExpiry{Kiểm tra<br>hạn sử dụng}
     
     CheckExpiry -->|Hết hạn| Expired[Đã hết hạn]
     CheckExpiry -->|< 7 ngày| ExpiringSoon[Sắp hết hạn]
     CheckExpiry -->|> 7 ngày| OK[Còn tốt]
     
-    Expired --> CreateExpiredAlert[Tạo cảnh báo<br/>Type: expired]
+    Expired --> CreateExpiredAlert[Tạo cảnh báo<br>Type: expired]
     CreateExpiredAlert --> NotifyUrgent[Thông báo khẩn cấp]
     NotifyUrgent --> MarkForRemoval[Đánh dấu cần xử lý]
     
-    ExpiringSoon --> CheckExistingAlert{Đã có<br/>cảnh báo?}
+    ExpiringSoon --> CheckExistingAlert{Đã có<br>cảnh báo?}
     CheckExistingAlert -->|Có| UpdateAlert[Cập nhật cảnh báo]
-    CheckExistingAlert -->|Không| CreateExpiringAlert[Tạo cảnh báo<br/>Type: expiring_soon]
+    CheckExistingAlert -->|Không| CreateExpiringAlert[Tạo cảnh báo<br>Type: expiring_soon]
     CreateExpiringAlert --> NotifyWarning[Gửi cảnh báo]
     UpdateAlert --> NotifyWarning
     NotifyWarning --> SuggestAction[Gợi ý hành động]
@@ -927,11 +927,11 @@ flowchart TD
     MarkForRemoval --> NextBatch
     SuggestAction --> NextBatch[Lô tiếp theo]
     
-    NextBatch --> MoreBatches{Còn lô<br/>khác?}
+    NextBatch --> MoreBatches{Còn lô<br>khác?}
     MoreBatches -->|Có| CheckExpiry
     MoreBatches -->|Không| GenerateSummary[Tạo báo cáo tóm tắt]
     
-    GenerateSummary --> SendReport[Gửi báo cáo<br/>cho quản lý]
+    GenerateSummary --> SendReport[Gửi báo cáo<br>cho quản lý]
     SendReport --> UpdateDashboard[Cập nhật dashboard]
     UpdateDashboard --> JobComplete[Hoàn thành job]
     JobComplete --> WaitTrigger
@@ -1037,13 +1037,13 @@ flowchart LR
     end
     
     subgraph "Process"
-        CreatePO[Tạo đơn<br/>đặt hàng]
+        CreatePO[Tạo đơn<br>đặt hàng]
         SendPO[Gửi đơn]
         ReceiveGoods[Nhận hàng]
         CreateBatch[Tạo lô hàng]
-        CreateTx[Tạo giao dịch<br/>nhập kho]
-        UpdateStock[Cập nhật<br/>tồn kho]
-        CheckAlert[Kiểm tra<br/>cảnh báo]
+        CreateTx[Tạo giao dịch<br>nhập kho]
+        UpdateStock[Cập nhật<br>tồn kho]
+        CheckAlert[Kiểm tra<br>cảnh báo]
     end
     
     subgraph "Data Store"
