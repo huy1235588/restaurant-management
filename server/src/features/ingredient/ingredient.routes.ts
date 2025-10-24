@@ -9,7 +9,7 @@ import {
     updateIngredientCategorySchema,
 } from '@/features/ingredient/validators/ingredient.validator';
 
-const router = Router();
+const router: Router = Router();
 
 // ============================================
 // INGREDIENT ROUTES

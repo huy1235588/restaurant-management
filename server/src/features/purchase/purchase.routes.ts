@@ -12,7 +12,7 @@ import {
     updateSupplierSchema,
 } from '@/features/purchase/validators/supplier.validator';
 
-const router = Router();
+const router: Router = Router();
 
 // ============================================
 // PURCHASE ORDER ROUTES

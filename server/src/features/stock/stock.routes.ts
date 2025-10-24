@@ -8,7 +8,7 @@ import {
     resolveStockAlertSchema,
 } from '@/features/stock/validators/stock.validator';
 
-const router = Router();
+const router: Router = Router();
 
 // ============================================
 // STOCK TRANSACTION ROUTES
