@@ -176,7 +176,7 @@ flowchart TD
     InputQuantity --> CalcSubtotal[Tính thành tiền]
     CalcSubtotal --> MoreItems{Thêm<br>nguyên liệu khác?}
     MoreItems -->|Có| SelectIngredient
-    MoreItems -->|Không| CalcTotal[Tính tổng:<br>- Subtotal<br>- Tax (10%)<br>- Total Amount]
+    MoreItems -->|Không| CalcTotal[Tính tổng:<br>Subtotal<br>Tax 10%<br>Total Amount]
     
     CalcTotal --> Preview[Xem trước đơn hàng]
     Preview --> ValidatePO{Dữ liệu<br>hợp lệ?}
