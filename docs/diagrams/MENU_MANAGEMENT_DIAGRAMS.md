@@ -54,7 +54,7 @@ sequenceDiagram
     User ->> UI: Nhấn "Tạo Danh Mục"
     UI ->> API: POST /categories
     API ->> API: Kiểm tra tên duy nhất
-    
+
     alt Tên Trùng
         API -->> UI: Lỗi - Tên đã tồn tại
         UI -->> User: Hiển thị cảnh báo
@@ -77,7 +77,7 @@ sequenceDiagram
     User ->> UI: Nhấn "Xóa Danh Mục"
     UI ->> API: DELETE /categories/:id
     API ->> API: Kiểm tra sản phẩm
-    
+
     alt Có Sản Phẩm
         API -->> UI: Lỗi - Còn sản phẩm
         UI -->> User: Hiển thị thông báo
@@ -97,31 +97,31 @@ sequenceDiagram
 ```mermaid
 stateDiagram-v2
     [*] --> Draft
-    
+
     Draft --> Active: Lưu & Xuất Bản
     Draft --> [*]: Hủy
-    
+
     Active --> Available: Có Sẵn
     Active --> OutOfStock: Hết Hàng
     Active --> Hidden: Ẩn
     Active --> Deleted: Xóa
-    
+
     Available --> OutOfStock: Báo Hết Hàng
     Available --> Hidden: Ẩn
     Available --> Editing: Chỉnh Sửa
-    
+
     OutOfStock --> Available: Có Hàng Lại
     OutOfStock --> Hidden: Ẩn
     OutOfStock --> Editing: Chỉnh Sửa
-    
+
     Hidden --> Available: Hiển Thị Lại
     Hidden --> OutOfStock: Hiển Thị Lại
     Hidden --> Deleted: Xóa
-    
+
     Editing --> Available: Lưu Thay Đổi
     Editing --> OutOfStock: Lưu Thay Đổi
     Editing --> Hidden: Lưu Thay Đổi
-    
+
     Deleted --> [*]
 ```
 
@@ -135,7 +135,7 @@ erDiagram
     MENU_ITEMS ||--o{ PRICE_HISTORY : has
     MENU_ITEMS ||--o{ ALLERGENS : contains
     MENU_ITEMS ||--o{ ORDER_ITEMS : "ordered in"
-    
+
     CATEGORIES {
         int id PK
         string name UK
@@ -146,7 +146,7 @@ erDiagram
         timestamp created_at
         timestamp updated_at
     }
-    
+
     MENU_ITEMS {
         int id PK
         int category_id FK
@@ -161,7 +161,7 @@ erDiagram
         timestamp created_at
         timestamp updated_at
     }
-    
+
     PRICE_HISTORY {
         int id PK
         int menu_item_id FK
@@ -171,14 +171,14 @@ erDiagram
         timestamp changed_at
         int changed_by_user_id FK
     }
-    
+
     ALLERGENS {
         int id PK
         int menu_item_id FK
         string allergen_name
         string notes
     }
-    
+
     ORDER_ITEMS {
         int id PK
         int menu_item_id FK
@@ -231,26 +231,26 @@ graph TB
     B --> E["👨‍🍳 Đầu Bếp"]
     B --> F["💼 Quản Lý"]
     B --> G["🔐 Admin"]
-    
+
     C --> C1["✓ Xem Menu"]
     C --> C2["✗ Tạo"]
     C --> C3["✗ Sửa"]
-    
+
     D --> D1["✓ Xem Menu"]
     D --> D2["✗ Tạo"]
     D --> D3["✗ Sửa"]
-    
+
     E --> E1["✓ Xem Menu"]
     E --> E2["✗ Tạo"]
     E --> E3["✗ Sửa"]
     E --> E4["✓ Cập Nhật Trạng Thái"]
-    
+
     F --> F1["✓ Xem Menu"]
     F --> F2["✓ Tạo"]
     F --> F3["✓ Sửa"]
     F --> F4["✓ Xóa"]
     F --> F5["✓ Ẩn/Hiển Thị"]
-    
+
     G --> G1["✓ Xem Menu"]
     G --> G2["✓ Tạo"]
     G --> G3["✓ Sửa"]
@@ -279,7 +279,7 @@ flowchart TD
     L --> M["📝 Ghi Log Thay Đổi"]
     M --> N["✅ Thông Báo Thành Công"]
     N --> O["🎯 Kết Thúc"]
-    
+
     style K fill:#e1f5ff
     style M fill:#f3e5f5
 ```
@@ -294,23 +294,23 @@ graph LR
         K1["Xem Menu"]
         K2["Đặt Hàng"]
     end
-    
+
     subgraph Bếp["👨‍🍳 Đầu Bếp"]
         B1["Báo Hết Hàng"]
         B2["Cập Nhật Trạng Thái"]
     end
-    
+
     subgraph Nhân["👨‍💼 Nhân Viên"]
         N1["Xem Trạng Thái"]
         N2["Thông Báo Khách"]
     end
-    
+
     subgraph Hệ["⚙️ Hệ Thống"]
         H1["Có Sẵn"]
         H2["Hết Hàng"]
         H3["Ẩn"]
     end
-    
+
     K1 --> H1
     K2 --> N2
     B1 --> B2
@@ -328,25 +328,25 @@ graph LR
 ```mermaid
 graph TD
     A["❌ Lỗi Hệ Thống"] --> B{Loại Lỗi}
-    
+
     B -->|Tên Trùng| C["Lỗi: Danh Mục/Sản Phẩm<br/>Đã Tồn Tại"]
     C --> C1["Cách Xử Lý: Thay Đổi Tên"]
-    
+
     B -->|Ảnh Quá Lớn| D["Lỗi: File > 5MB"]
     D --> D1["Cách Xử Lý: Nén Ảnh"]
-    
+
     B -->|Ảnh Không Hợp Lệ| E["Lỗi: Định Dạng Không<br/>Được Phép"]
     E --> E1["Cách Xử Lý: Dùng JPG/PNG/WebP"]
-    
+
     B -->|Không Xóa Được| F["Lỗi: Còn Dữ Liệu<br/>Liên Quan"]
     F --> F1["Cách Xử Lý: Xóa/Chuyển Trước"]
-    
+
     B -->|Giá Không Hợp Lệ| G["Lỗi: Giá ≤ 0"]
     G --> G1["Cách Xử Lý: Nhập Giá > 0"]
-    
+
     B -->|Lỗi Kết Nối| H["Lỗi: Không Thể Kết Nối"]
     H --> H1["Cách Xử Lý: Refresh/Thử Lại"]
-    
+
     style C fill:#ffcdd2
     style D fill:#ffcdd2
     style E fill:#ffcdd2
@@ -376,23 +376,23 @@ pie title Phân Tích Sản Phẩm Bán Chạy Nhất Tháng 10
 ```mermaid
 timeline
     title Hành Trình Sản Phẩm Từ Tạo Đến Xóa
-    
+
     section Tạo
         Nhân viên nhấn 'Thêm' : crit, 2h
         Nhập thông tin : crit, 3h
         Chọn ảnh : crit, 1h
         Xác nhận : crit, 0.5h
-    
+
     section Hoạt Động
         Sản phẩm có sẵn : active, 7d
         Cập nhật giá : 1d
         Thay đổi mô tả : 1d
-    
+
     section Không Hoạt Động
         Sản phẩm hết hàng : crit, 2d
         Báo hết hàng : crit, 1d
         Có sẵn lại : 1d
-    
+
     section Xóa
         Ẩn sản phẩm : crit, 1d
         Xóa vĩnh viễn : crit, 0.5h
@@ -409,23 +409,23 @@ graph TB
         Forms["📋 Forms & Validation"]
         State["🔄 State Management"]
     end
-    
+
     subgraph API["🔌 Backend API - Node.js/Express"]
         Controllers["⚙️ Controllers"]
         Services["🛠️ Services"]
         Middlewares["🚪 Middlewares"]
     end
-    
+
     subgraph Data["💾 Data Layer"]
         ORM["📊 Prisma ORM"]
         DB["🗄️ PostgreSQL"]
     end
-    
+
     subgraph Storage["💿 File Storage"]
         LocalStorage["📁 Local Storage"]
         CloudStorage["☁️ Cloud S3"]
     end
-    
+
     UI --> Forms
     Forms --> State
     State --> Controllers
@@ -435,7 +435,7 @@ graph TB
     ORM --> DB
     Services --> LocalStorage
     Services --> CloudStorage
-    
+
     style Client fill:#e3f2fd
     style API fill:#f3e5f5
     style Data fill:#e8f5e9
@@ -470,31 +470,31 @@ graph TD
     B --> C["✅ Kiểm Tra & Xác Nhận"]
     C --> D["🎯 Xuất Bản<br/>Trạng Thái: Active"]
     D --> E{Điều Hành}
-    
+
     E -->|Hàng Ngày| F["📊 Cập Nhật Trạng Thái"]
     E -->|Cần Sửa| G["🔧 Chỉnh Sửa Thông Tin"]
     E -->|Cần Ẩn| H["👁️ Ẩn Tạm Thời"]
-    
+
     F --> I{Trạng Thái Nào?}
     I -->|Có Sẵn| J["✓ Có Sẵn"]
     I -->|Hết Hàng| K["✗ Hết Hàng"]
-    
+
     J --> L{Cập Nhật Giá?}
     L -->|Có| M["💰 Cập Nhật Giá"]
     L -->|Không| N["📈 Tiếp Tục Bán"]
-    
+
     K --> O["⏱️ Chờ Hàng Về"]
     O --> J
-    
+
     G --> F
     H --> P{Quyết Định}
     P -->|Hiển Thị Lại| J
     P -->|Xóa Vĩnh Viễn| Q["🗑️ Xóa Sản Phẩm"]
-    
+
     M --> F
     N --> F
     Q --> R["❌ Kết Thúc"]
-    
+
     style A fill:#c8e6c9
     style D fill:#ffccbc
     style R fill:#ffcdd2
@@ -519,18 +519,18 @@ graph TB
         UC10["Cập Nhật Trạng Thái"]
         UC11["Báo Cáo & Phân Tích"]
     end
-    
+
     A["👤 Khách Hàng"] -->|Sử Dụng| UC2
     A -->|Sử Dụng| UC6
     A -->|Sử Dụng| UC11
-    
+
     B["👨‍💼 Nhân Viên Phục Vụ"] -->|Sử Dụng| UC2
     B -->|Sử Dụng| UC6
-    
+
     C["👨‍🍳 Đầu Bếp"] -->|Sử Dụng| UC2
     C -->|Sử Dụng| UC6
     C -->|Sử Dụng| UC10
-    
+
     D["💼 Quản Lý"] -->|Sử Dụng| UC1
     D -->|Sử Dụng| UC2
     D -->|Sử Dụng| UC3
@@ -542,7 +542,7 @@ graph TB
     D -->|Sử Dụng| UC9
     D -->|Sử Dụng| UC10
     D -->|Sử Dụng| UC11
-    
+
     E["🔐 Admin"] -->|Sử Dụng| UC1
     E -->|Sử Dụng| UC3
     E -->|Sử Dụng| UC4
@@ -552,7 +552,7 @@ graph TB
     E -->|Sử Dụng| UC9
     E -->|Sử Dụng| UC10
     E -->|Sử Dụng| UC11
-    
+
     style System fill:#e3f2fd
 ```
 
@@ -563,28 +563,28 @@ graph TB
 ```mermaid
 graph TD
     A["🗑️ Bắt Đầu: Xóa Sản Phẩm"] --> B{"Sản phẩm có<br/>trong đơn<br/>chưa thanh toán?"}
-    
+
     B -->|Có| C["⚠️ Cảnh Báo:<br/>Còn đơn liên quan"]
     C --> D["❓ Yêu Cầu:<br/>Xóa/Chuyển đơn?"]
     D -->|Xóa| E["🔄 Quay Lại"]
     D -->|Chuyển| F["🔄 Quay Lại"]
     E --> A
     F --> A
-    
+
     B -->|Không| G["📋 Hiển Thị<br/>Hộp Thoại Xác Nhận"]
     G --> H["❓ Người Dùng<br/>Xác Nhận Xóa?"]
-    
+
     H -->|Không| I["🚫 Hủy"]
     H -->|Có| J["🗑️ Xóa Sản Phẩm"]
-    
+
     J --> K["🖼️ Xóa Ảnh"]
     K --> L["📊 Xóa Lịch Sử Giá"]
     L --> M["📝 Ghi Log Xóa"]
     M --> N["✅ Thông Báo Thành Công"]
     N --> O["✔️ Kết Thúc"]
-    
+
     I --> P["🔴 Kết Thúc: Hủy"]
-    
+
     style G fill:#fff3e0
     style N fill:#c8e6c9
     style P fill:#ffcdd2
@@ -595,12 +595,14 @@ graph TD
 ## Ghi Chú
 
 Các biểu đồ này được tạo bằng **Mermaid** và có thể được:
-- Chỉnh sửa trực tiếp trong markdown
-- Xuất thành hình ảnh PNG/SVG
-- Nhúng vào tài liệu web hoặc wiki
-- Tích hợp vào các công cụ quản lý dự án
+
+-   Chỉnh sửa trực tiếp trong markdown
+-   Xuất thành hình ảnh PNG/SVG
+-   Nhúng vào tài liệu web hoặc wiki
+-   Tích hợp vào các công cụ quản lý dự án
 
 **Để sử dụng Mermaid:**
+
 1. GitHub hỗ trợ mermaid trực tiếp trong markdown
 2. Các công cụ khác có thể cần plugin (Notion, Confluence, v.v.)
 3. Online editor: https://mermaid.live

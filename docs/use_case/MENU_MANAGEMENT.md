@@ -9,29 +9,31 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 ## 2. Các Thành Phần Chính
 
 ### 2.1 Danh Mục (Categories)
-- **Định nghĩa**: Nhóm các món ăn theo loại (Khai vị, Chính, Tráng miệng, Đồ uống, v.v.)
-- **Mục đích**: Tổ chức menu một cách logic, giúp khách hàng dễ dàng tìm kiếm
-- **Thông tin chứa**:
-  - Tên danh mục
-  - Mô tả chi tiết
-  - Ảnh đại diện
-  - Thứ tự hiển thị
-  - Trạng thái (hoạt động/ẩn)
+
+-   **Định nghĩa**: Nhóm các món ăn theo loại (Khai vị, Chính, Tráng miệng, Đồ uống, v.v.)
+-   **Mục đích**: Tổ chức menu một cách logic, giúp khách hàng dễ dàng tìm kiếm
+-   **Thông tin chứa**:
+    -   Tên danh mục
+    -   Mô tả chi tiết
+    -   Ảnh đại diện
+    -   Thứ tự hiển thị
+    -   Trạng thái (hoạt động/ẩn)
 
 ### 2.2 Sản Phẩm (Menu Items)
-- **Định nghĩa**: Các món ăn, đồ uống cụ thể trong menu
-- **Mục đích**: Hiển thị danh sách các lựa chọn cho khách hàng
-- **Thông tin chứa**:
-  - Tên món ăn
-  - Mô tả chi tiết, công thức
-  - Giá tiền (có thể có nhiều mức giá)
-  - Ảnh sản phẩm
-  - Danh mục
-  - Thành phần chính (allergens)
-  - Thời gian chuẩn bị
-  - Trạng thái sẵn có
-  - Lịch sử thay đổi giá
-  - Ghi chú, hướng dẫn đặc biệt
+
+-   **Định nghĩa**: Các món ăn, đồ uống cụ thể trong menu
+-   **Mục đích**: Hiển thị danh sách các lựa chọn cho khách hàng
+-   **Thông tin chứa**:
+    -   Tên món ăn
+    -   Mô tả chi tiết, công thức
+    -   Giá tiền (có thể có nhiều mức giá)
+    -   Ảnh sản phẩm
+    -   Danh mục
+    -   Thành phần chính (allergens)
+    -   Thời gian chuẩn bị
+    -   Trạng thái sẵn có
+    -   Lịch sử thay đổi giá
+    -   Ghi chú, hướng dẫn đặc biệt
 
 ---
 
@@ -46,38 +48,41 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 **Người tham gia chính**: Quản lý nhà hàng, Admin
 
 **Điều kiện tiên quyết**:
-- Người dùng có quyền "Quản lý Menu"
-- Tên danh mục chưa tồn tại trong hệ thống
+
+-   Người dùng có quyền "Quản lý Menu"
+-   Tên danh mục chưa tồn tại trong hệ thống
 
 **Quy trình chi tiết**:
 
 1. **Bước 1**: Người dùng truy cập vào phần "Quản Lý Menu" → "Danh Mục"
 2. **Bước 2**: Nhấn nút "Tạo Danh Mục Mới"
 3. **Bước 3**: Điền thông tin:
-   - **Tên danh mục**: Nhập tên (ví dụ: "Khai vị", "Chính", "Tráng miệng")
-   - **Mô tả**: Nhập mô tả chi tiết về danh mục
-   - **Ảnh đại diện**: Tải lên ảnh (định dạng: JPG, PNG, tối đa 5MB)
-   - **Thứ tự hiển thị**: Số nguyên (1, 2, 3...) để sắp xếp thứ tự
-   - **Trạng thái**: Chọn "Hoạt động" hoặc "Ẩn"
+    - **Tên danh mục**: Nhập tên (ví dụ: "Khai vị", "Chính", "Tráng miệng")
+    - **Mô tả**: Nhập mô tả chi tiết về danh mục
+    - **Ảnh đại diện**: Tải lên ảnh (định dạng: JPG, PNG, tối đa 5MB)
+    - **Thứ tự hiển thị**: Số nguyên (1, 2, 3...) để sắp xếp thứ tự
+    - **Trạng thái**: Chọn "Hoạt động" hoặc "Ẩn"
 4. **Bước 4**: Hệ thống kiểm tra:
-   - Tên danh mục có duy nhất không
-   - Ảnh có hợp lệ không
-   - Dữ liệu có đầy đủ không
+    - Tên danh mục có duy nhất không
+    - Ảnh có hợp lệ không
+    - Dữ liệu có đầy đủ không
 5. **Bước 5**: Nếu hợp lệ, lưu vào database
 6. **Bước 6**: Thông báo thành công
 7. **Bước 7**: Hiển thị danh mục mới trên giao diện menu
 
 **Xử lý lỗi**:
-- Nếu tên danh mục đã tồn tại: Hiển thị lỗi "Danh mục đã tồn tại"
-- Nếu ảnh không hợp lệ: Hiển thị lỗi "Ảnh không hợp lệ hoặc quá lớn"
-- Nếu dữ liệu chưa đầy đủ: Hiển thị lỗi "Vui lòng điền đầy đủ thông tin"
+
+-   Nếu tên danh mục đã tồn tại: Hiển thị lỗi "Danh mục đã tồn tại"
+-   Nếu ảnh không hợp lệ: Hiển thị lỗi "Ảnh không hợp lệ hoặc quá lớn"
+-   Nếu dữ liệu chưa đầy đủ: Hiển thị lỗi "Vui lòng điền đầy đủ thông tin"
 
 **Ghi log**:
-- Người dùng: [username]
-- Hành động: Tạo danh mục
-- Tên danh mục: [name]
-- Thời gian: [timestamp]
-- Kết quả: Thành công/Thất bại
+
+-   Người dùng: [username]
+-   Hành động: Tạo danh mục
+-   Tên danh mục: [name]
+-   Thời gian: [timestamp]
+-   Kết quả: Thành công/Thất bại
 
 ---
 
@@ -91,22 +96,22 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 
 1. **Bước 1**: Truy cập "Quản Lý Menu" → "Danh Mục"
 2. **Bước 2**: Hệ thống hiển thị danh sách danh mục dưới dạng bảng hoặc lưới với:
-   - Tên danh mục
-   - Số lượng sản phẩm trong danh mục
-   - Ảnh đại diện
-   - Trạng thái (Hoạt động/Ẩn)
-   - Ngày tạo
-   - Ngày chỉnh sửa gần nhất
-   - Nút hành động (Sửa, Xóa, Ẩn/Hiển thị)
+    - Tên danh mục
+    - Số lượng sản phẩm trong danh mục
+    - Ảnh đại diện
+    - Trạng thái (Hoạt động/Ẩn)
+    - Ngày tạo
+    - Ngày chỉnh sửa gần nhất
+    - Nút hành động (Sửa, Xóa, Ẩn/Hiển thị)
 3. **Bước 3**: Có thể lọc theo:
-   - Trạng thái (Hoạt động, Ẩn)
-   - Ngày tạo (từ - đến)
+    - Trạng thái (Hoạt động, Ẩn)
+    - Ngày tạo (từ - đến)
 4. **Bước 4**: Có thể tìm kiếm theo tên danh mục
 5. **Bước 5**: Sắp xếp theo:
-   - Thứ tự hiển thị
-   - Tên (A-Z, Z-A)
-   - Ngày tạo (mới nhất, cũ nhất)
-   - Số sản phẩm
+    - Thứ tự hiển thị
+    - Tên (A-Z, Z-A)
+    - Ngày tạo (mới nhất, cũ nhất)
+    - Số sản phẩm
 
 ---
 
@@ -117,19 +122,20 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 **Người tham gia chính**: Quản lý nhà hàng, Admin
 
 **Điều kiện tiên quyết**:
-- Danh mục tồn tại
-- Người dùng có quyền chỉnh sửa
-- Các sản phẩm trong danh mục không bị ảnh hưởng
+
+-   Danh mục tồn tại
+-   Người dùng có quyền chỉnh sửa
+-   Các sản phẩm trong danh mục không bị ảnh hưởng
 
 **Quy trình chi tiết**:
 
 1. **Bước 1**: Từ danh sách danh mục, nhấn nút "Sửa" (edit icon)
 2. **Bước 2**: Mở form chỉnh sửa với thông tin hiện tại:
-   - Tên danh mục
-   - Mô tả
-   - Ảnh đại diện
-   - Thứ tự hiển thị
-   - Trạng thái
+    - Tên danh mục
+    - Mô tả
+    - Ảnh đại diện
+    - Thứ tự hiển thị
+    - Trạng thái
 3. **Bước 3**: Cập nhật thông tin cần thiết
 4. **Bước 4**: Nếu thay đổi ảnh, hệ thống xóa ảnh cũ
 5. **Bước 5**: Hệ thống kiểm tra dữ liệu
@@ -138,20 +144,22 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 8. **Bước 8**: Ghi log thay đổi
 
 **Các trường có thể chỉnh sửa**:
-- Tên danh mục: ✓ (kiểm tra duy nhất, ngoại trừ tên cũ)
-- Mô tả: ✓
-- Ảnh: ✓
-- Thứ tự hiển thị: ✓
-- Trạng thái: ✓
+
+-   Tên danh mục: ✓ (kiểm tra duy nhất, ngoại trừ tên cũ)
+-   Mô tả: ✓
+-   Ảnh: ✓
+-   Thứ tự hiển thị: ✓
+-   Trạng thái: ✓
 
 **Ghi log thay đổi**:
-- Người dùng: [username]
-- Hành động: Chỉnh sửa danh mục
-- Danh mục: [category_name]
-- Trường thay đổi: [field_name]
-- Giá trị cũ: [old_value]
-- Giá trị mới: [new_value]
-- Thời gian: [timestamp]
+
+-   Người dùng: [username]
+-   Hành động: Chỉnh sửa danh mục
+-   Danh mục: [category_name]
+-   Trường thay đổi: [field_name]
+-   Giá trị cũ: [old_value]
+-   Giá trị mới: [new_value]
+-   Thời gian: [timestamp]
 
 ---
 
@@ -172,9 +180,10 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 7. **Bước 7**: Ghi log hành động
 
 **Lưu ý**:
-- Ẩn danh mục không ảnh hưởng đến các sản phẩm trong đó (sản phẩm vẫn tồn tại)
-- Danh mục ẩn vẫn hiển thị trong phần quản lý cho admin
-- Có thể hiển thị lại bất cứ lúc nào
+
+-   Ẩn danh mục không ảnh hưởng đến các sản phẩm trong đó (sản phẩm vẫn tồn tại)
+-   Danh mục ẩn vẫn hiển thị trong phần quản lý cho admin
+-   Có thể hiển thị lại bất cứ lúc nào
 
 ---
 
@@ -185,20 +194,21 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 **Người tham gia chính**: Quản lý nhà hàng, Admin
 
 **Điều kiện tiên quyết**:
-- Danh mục không chứa sản phẩm nào (phải xóa hoặc chuyển hết sản phẩm trước)
-- Người dùng có quyền xóa
-- Xác nhận từ manager/admin
+
+-   Danh mục không chứa sản phẩm nào (phải xóa hoặc chuyển hết sản phẩm trước)
+-   Người dùng có quyền xóa
+-   Xác nhận từ manager/admin
 
 **Quy trình chi tiết**:
 
 1. **Bước 1**: Từ danh sách danh mục, nhấn nút "Xóa"
 2. **Bước 2**: Hệ thống kiểm tra:
-   - Danh mục có sản phẩm nào không?
-   - Nếu có, hiển thị danh sách sản phẩm
-   - Yêu cầu xóa hoặc chuyển sản phẩm trước
+    - Danh mục có sản phẩm nào không?
+    - Nếu có, hiển thị danh sách sản phẩm
+    - Yêu cầu xóa hoặc chuyển sản phẩm trước
 3. **Bước 3**: Nếu không có sản phẩm, hiển thị hộp thoại xác nhận
-   - "Bạn có chắc chắn muốn xóa danh mục [name]?"
-   - "Hành động này không thể hoàn tác"
+    - "Bạn có chắc chắn muốn xóa danh mục [name]?"
+    - "Hành động này không thể hoàn tác"
 4. **Bước 4**: Người dùng xác nhận (hoặc nhập lý do xóa)
 5. **Bước 5**: Xóa danh mục từ database
 6. **Bước 6**: Xóa ảnh đại diện khỏi storage
@@ -206,15 +216,17 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 8. **Bước 8**: Thông báo xóa thành công
 
 **Xử lý lỗi**:
-- Nếu danh mục còn sản phẩm: "Vui lòng xóa hoặc chuyển hết sản phẩm trước"
-- Nếu xóa thất bại: "Không thể xóa danh mục. Vui lòng thử lại"
+
+-   Nếu danh mục còn sản phẩm: "Vui lòng xóa hoặc chuyển hết sản phẩm trước"
+-   Nếu xóa thất bại: "Không thể xóa danh mục. Vui lòng thử lại"
 
 **Ghi log xóa**:
-- Người dùng: [username]
-- Hành động: Xóa danh mục
-- Danh mục: [category_name]
-- Lý do xóa: [reason]
-- Thời gian: [timestamp]
+
+-   Người dùng: [username]
+-   Hành động: Xóa danh mục
+-   Danh mục: [category_name]
+-   Lý do xóa: [reason]
+-   Thời gian: [timestamp]
 
 ---
 
@@ -227,9 +239,10 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 **Người tham gia chính**: Quản lý nhà hàng, Admin, Đầu bếp
 
 **Điều kiện tiên quyết**:
-- Danh mục đã tồn tại
-- Người dùng có quyền "Quản lý Menu"
-- Tên sản phẩm chưa tồn tại trong danh mục
+
+-   Danh mục đã tồn tại
+-   Người dùng có quyền "Quản lý Menu"
+-   Tên sản phẩm chưa tồn tại trong danh mục
 
 **Quy trình chi tiết**:
 
@@ -260,17 +273,19 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 9. **Bước 9**: Ghi log tạo
 
 **Xử lý lỗi**:
-- Tên sản phẩm trùng: "Sản phẩm này đã tồn tại trong danh mục"
-- Giá không hợp lệ: "Giá phải lớn hơn 0"
-- Ảnh không hợp lệ: "Ảnh không đúng định dạng hoặc quá lớn"
+
+-   Tên sản phẩm trùng: "Sản phẩm này đã tồn tại trong danh mục"
+-   Giá không hợp lệ: "Giá phải lớn hơn 0"
+-   Ảnh không hợp lệ: "Ảnh không đúng định dạng hoặc quá lớn"
 
 **Ghi log**:
-- Người dùng: [username]
-- Hành động: Tạo sản phẩm
-- Sản phẩm: [product_name]
-- Danh mục: [category_name]
-- Giá: [price]
-- Thời gian: [timestamp]
+
+-   Người dùng: [username]
+-   Hành động: Tạo sản phẩm
+-   Sản phẩm: [product_name]
+-   Danh mục: [category_name]
+-   Giá: [price]
+-   Thời gian: [timestamp]
 
 ---
 
@@ -284,22 +299,23 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 
 1. **Bước 1**: Truy cập "Quản Lý Menu" → Chọn danh mục
 2. **Bước 2**: Hiển thị danh sách sản phẩm với:
-   - Ảnh sản phẩm
-   - Tên sản phẩm
-   - Mô tả ngắn
-   - Giá tiền
-   - Trạng thái (Có sẵn/Hết hàng)
-   - Thời gian chuẩn bị
-   - Nút hành động (Xem chi tiết, Sửa, Xóa)
+
+    - Ảnh sản phẩm
+    - Tên sản phẩm
+    - Mô tả ngắn
+    - Giá tiền
+    - Trạng thái (Có sẵn/Hết hàng)
+    - Thời gian chuẩn bị
+    - Nút hành động (Xem chi tiết, Sửa, Xóa)
 
 3. **Bước 3**: Tính năng lọc:
-   - Trạng thái (Có sẵn, Hết hàng, Tất cả)
-   - Khoảng giá (từ - đến)
+    - Trạng thái (Có sẵn, Hết hàng, Tất cả)
+    - Khoảng giá (từ - đến)
 4. **Bước 4**: Tìm kiếm theo tên sản phẩm
 5. **Bước 5**: Sắp xếp:
-   - Tên (A-Z, Z-A)
-   - Giá (Thấp nhất, Cao nhất)
-   - Ngày tạo (Mới nhất, Cũ nhất)
+    - Tên (A-Z, Z-A)
+    - Giá (Thấp nhất, Cao nhất)
+    - Ngày tạo (Mới nhất, Cũ nhất)
 
 ---
 
@@ -311,24 +327,25 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 
 1. **Bước 1**: Từ danh sách sản phẩm, nhấn vào tên hoặc nút "Xem chi tiết"
 2. **Bước 2**: Mở trang chi tiết hiển thị:
-   - Ảnh sản phẩm (lớn)
-   - Tên sản phẩm
-   - Mô tả chi tiết
-   - Giá tiền hiện tại
-   - Danh mục
-   - Thành phần chính (allergens)
-   - Thời gian chuẩn bị
-   - Trạng thái
-   - Lịch sử thay đổi giá (bảng)
-   - Ghi chú
-   - Ngày tạo, người tạo
-   - Ngày chỉnh sửa gần nhất, người chỉnh sửa
+
+    - Ảnh sản phẩm (lớn)
+    - Tên sản phẩm
+    - Mô tả chi tiết
+    - Giá tiền hiện tại
+    - Danh mục
+    - Thành phần chính (allergens)
+    - Thời gian chuẩn bị
+    - Trạng thái
+    - Lịch sử thay đổi giá (bảng)
+    - Ghi chú
+    - Ngày tạo, người tạo
+    - Ngày chỉnh sửa gần nhất, người chỉnh sửa
 
 3. **Bước 3**: Hiển thị các nút hành động:
-   - Sửa
-   - Xóa
-   - Ẩn/Hiển thị
-   - Quay lại
+    - Sửa
+    - Xóa
+    - Ẩn/Hiển thị
+    - Quay lại
 
 ---
 
@@ -343,14 +360,14 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 1. **Bước 1**: Từ danh sách hoặc chi tiết sản phẩm, nhấn nút "Sửa"
 2. **Bước 2**: Mở form chỉnh sửa với dữ liệu hiện tại
 3. **Bước 3**: Cập nhật thông tin cần thiết:
-   - Tên sản phẩm
-   - Mô tả
-   - Giá tiền
-   - Ảnh
-   - Thành phần chính
-   - Thời gian chuẩn bị
-   - Trạng thái
-   - Ghi chú
+    - Tên sản phẩm
+    - Mô tả
+    - Giá tiền
+    - Ảnh
+    - Thành phần chính
+    - Thời gian chuẩn bị
+    - Trạng thái
+    - Ghi chú
 4. **Bước 4**: Hệ thống kiểm tra dữ liệu
 5. **Bước 5**: Nếu thay đổi giá, lưu lịch sử giá cũ
 6. **Bước 6**: Lưu thay đổi
@@ -358,20 +375,22 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 8. **Bước 8**: Ghi log thay đổi
 
 **Ghi log thay đổi**:
-- Người dùng: [username]
-- Hành động: Chỉnh sửa sản phẩm
-- Sản phẩm: [product_name]
-- Trường thay đổi: [field_name]
-- Giá trị cũ: [old_value]
-- Giá trị mới: [new_value]
-- Thời gian: [timestamp]
+
+-   Người dùng: [username]
+-   Hành động: Chỉnh sửa sản phẩm
+-   Sản phẩm: [product_name]
+-   Trường thay đổi: [field_name]
+-   Giá trị cũ: [old_value]
+-   Giá trị mới: [new_value]
+-   Thời gian: [timestamp]
 
 **Lưu ý đặc biệt**:
-- Nếu thay đổi giá: Ghi vào bảng lịch sử giá
-  - Giá cũ: [old_price]
-  - Giá mới: [new_price]
-  - Ngày thay đổi: [timestamp]
-  - Lý do: [reason] (tùy chọn)
+
+-   Nếu thay đổi giá: Ghi vào bảng lịch sử giá
+    -   Giá cũ: [old_price]
+    -   Giá mới: [new_price]
+    -   Ngày thay đổi: [timestamp]
+    -   Lý do: [reason] (tùy chọn)
 
 ---
 
@@ -385,21 +404,22 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 
 1. **Bước 1**: Từ chi tiết sản phẩm, nhấn nút "Cập Nhật Giá"
 2. **Bước 2**: Mở hộp thoại với:
-   - Giá cũ: [display hiện tại, read-only]
-   - Giá mới: [input field, bắt buộc]
-   - Lý do thay đổi: [optional text]
-   - Ngày có hiệu lực: [date picker, default: hôm nay]
+    - Giá cũ: [display hiện tại, read-only]
+    - Giá mới: [input field, bắt buộc]
+    - Lý do thay đổi: [optional text]
+    - Ngày có hiệu lực: [date picker, default: hôm nay]
 3. **Bước 3**: Nhập giá mới
 4. **Bước 4**: Nhập lý do (ví dụ: "Tăng giá theo mùa vụ", "Giảm khuyến mãi")
 5. **Bước 5**: Chọn ngày có hiệu lực (cho phép lên lịch thay đổi giá)
 6. **Bước 6**: Xác nhận
 7. **Bước 7**: Hệ thống lưu:
-   - Cập nhật giá sản phẩm
-   - Lưu vào lịch sử giá (PriceHistory table)
+    - Cập nhật giá sản phẩm
+    - Lưu vào lịch sử giá (PriceHistory table)
 8. **Bước 8**: Cập nhật menu ngay lập tức (hoặc theo ngày lên lịch)
 9. **Bước 9**: Ghi log
 
 **Lịch sử giá cần ghi nhận**:
+
 ```
 - Sản phẩm ID
 - Giá cũ
@@ -411,9 +431,10 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 ```
 
 **Báo cáo thay đổi giá**:
-- Có thể xem lịch sử thay đổi giá của sản phẩm
-- Xem trend giá theo thời gian
-- Xuất báo cáo
+
+-   Có thể xem lịch sử thay đổi giá của sản phẩm
+-   Xem trend giá theo thời gian
+-   Xuất báo cáo
 
 ---
 
@@ -424,45 +445,51 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 **Người tham gia chính**: Đầu bếp, Nhân viên, Quản lý
 
 **Trạng thái sản phẩm**:
-- **Có sẵn (Available)**: Sản phẩm có thể đặt
-- **Hết hàng (Out of Stock)**: Tạm thời không có
-- **Không sẵn có (Unavailable)**: Vĩnh viễn bỏ khỏi menu (không hiển thị)
+
+-   **Có sẵn (Available)**: Sản phẩm có thể đặt
+-   **Hết hàng (Out of Stock)**: Tạm thời không có
+-   **Không sẵn có (Unavailable)**: Vĩnh viễn bỏ khỏi menu (không hiển thị)
 
 **Quy trình chi tiết**:
 
 1. **Từ danh sách sản phẩm**:
-   - Click vào toggle trạng thái để thay đổi nhanh
-   - Toggle giữa "Có sẵn" ↔ "Hết hàng"
+
+    - Click vào toggle trạng thái để thay đổi nhanh
+    - Toggle giữa "Có sẵn" ↔ "Hết hàng"
 
 2. **Từ chi tiết sản phẩm**:
-   - Nhấn nút "Thay Đổi Trạng Thái"
-   - Chọn trạng thái mới
-   - Nhập lý do (ví dụ: "Hết nguyên liệu", "Sửa chữa thiết bị")
-   - Xác nhận
+
+    - Nhấn nút "Thay Đổi Trạng Thái"
+    - Chọn trạng thái mới
+    - Nhập lý do (ví dụ: "Hết nguyên liệu", "Sửa chữa thiết bị")
+    - Xác nhận
 
 3. **Bếp báo hết hàng**:
-   - Từ dashboard bếp, báo sản phẩm hết
-   - Hệ thống cập nhật trạng thái ngay
-   - Thông báo nhân viên phục vụ
+
+    - Từ dashboard bếp, báo sản phẩm hết
+    - Hệ thống cập nhật trạng thái ngay
+    - Thông báo nhân viên phục vụ
 
 4. **Cập nhật tự động**:
-   - Nếu kho thấp, có thể cảnh báo
-   - Có tuỳ chọn tự động đánh dấu hết nếu kho = 0
+    - Nếu kho thấp, có thể cảnh báo
+    - Có tuỳ chọn tự động đánh dấu hết nếu kho = 0
 
 **Hiệu ứng khi đánh dấu hết hàng**:
-- Sản phẩm vẫn hiển thị trên menu nhưng có badge "Hết hàng"
-- Khách không thể đặt (button bị disable)
-- Nhân viên phục vụ không thể chọn sản phẩm này
-- Thông báo "Hiện tại chúng tôi không có sản phẩm này"
+
+-   Sản phẩm vẫn hiển thị trên menu nhưng có badge "Hết hàng"
+-   Khách không thể đặt (button bị disable)
+-   Nhân viên phục vụ không thể chọn sản phẩm này
+-   Thông báo "Hiện tại chúng tôi không có sản phẩm này"
 
 **Ghi log**:
-- Người dùng: [username]
-- Hành động: Thay đổi trạng thái
-- Sản phẩm: [product_name]
-- Trạng thái cũ: [old_status]
-- Trạng thái mới: [new_status]
-- Lý do: [reason]
-- Thời gian: [timestamp]
+
+-   Người dùng: [username]
+-   Hành động: Thay đổi trạng thái
+-   Sản phẩm: [product_name]
+-   Trạng thái cũ: [old_status]
+-   Trạng thái mới: [new_status]
+-   Lý do: [reason]
+-   Thời gian: [timestamp]
 
 ---
 
@@ -481,8 +508,9 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 5. **Bước 5**: Ghi log hành động
 
 **Khác biệt giữa Ẩn và Hết hàng**:
-- **Hết hàng**: Sản phẩm vẫn hiển thị nhưng không thể đặt (tạm thời)
-- **Ẩn**: Sản phẩm không hiển thị trên menu (lâu dài hoặc bảo trì)
+
+-   **Hết hàng**: Sản phẩm vẫn hiển thị nhưng không thể đặt (tạm thời)
+-   **Ẩn**: Sản phẩm không hiển thị trên menu (lâu dài hoặc bảo trì)
 
 ---
 
@@ -493,18 +521,19 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 **Người tham gia chính**: Quản lý, Admin
 
 **Điều kiện tiên quyết**:
-- Sản phẩm không còn trong các đơn hàng đang xử lý
-- Người dùng có quyền xóa
+
+-   Sản phẩm không còn trong các đơn hàng đang xử lý
+-   Người dùng có quyền xóa
 
 **Quy trình chi tiết**:
 
 1. **Bước 1**: Từ danh sách hoặc chi tiết sản phẩm, nhấn nút "Xóa"
 2. **Bước 2**: Hệ thống kiểm tra:
-   - Sản phẩm có trong đơn hàng chưa thanh toán không?
-   - Nếu có, yêu cầu xóa hoặc chuyển đơn trước
+    - Sản phẩm có trong đơn hàng chưa thanh toán không?
+    - Nếu có, yêu cầu xóa hoặc chuyển đơn trước
 3. **Bước 3**: Hiển thị hộp thoại xác nhận:
-   - "Bạn có chắc chắn muốn xóa sản phẩm [name]?"
-   - "Hành động này không thể hoàn tác"
+    - "Bạn có chắc chắn muốn xóa sản phẩm [name]?"
+    - "Hành động này không thể hoàn tác"
 4. **Bước 4**: Người dùng xác nhận
 5. **Bước 5**: Xóa sản phẩm và lịch sử giá liên quan
 6. **Bước 6**: Xóa ảnh khỏi storage
@@ -512,12 +541,13 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 8. **Bước 8**: Thông báo thành công
 
 **Ghi log xóa**:
-- Người dùng: [username]
-- Hành động: Xóa sản phẩm
-- Sản phẩm: [product_name]
-- Danh mục: [category_name]
-- Giá cũ: [price]
-- Thời gian: [timestamp]
+
+-   Người dùng: [username]
+-   Hành động: Xóa sản phẩm
+-   Sản phẩm: [product_name]
+-   Danh mục: [category_name]
+-   Giá cũ: [price]
+-   Thời gian: [timestamp]
 
 ---
 
@@ -526,41 +556,44 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 **Mục tiêu**: Quản lý thành phần gây dị ứng trong sản phẩm
 
 **Danh sách Allergens phổ biến**:
-- Tôm
-- Cua
-- Cá
-- Cua xà
-- Sò huyết
-- Hàu
-- Cũ Mực
-- Trứng
-- Sữa
-- Đậu phộng
-- Hạt mắc ca
-- Tất cả hạt
-- Gluten
-- Đậu nành
-- Với Mù Tạt
-- Vừng
-- Hạt điều
-- Có thể chứa các dấu vết của...
+
+-   Tôm
+-   Cua
+-   Cá
+-   Cua xà
+-   Sò huyết
+-   Hàu
+-   Cũ Mực
+-   Trứng
+-   Sữa
+-   Đậu phộng
+-   Hạt mắc ca
+-   Tất cả hạt
+-   Gluten
+-   Đậu nành
+-   Với Mù Tạt
+-   Vừng
+-   Hạt điều
+-   Có thể chứa các dấu vết của...
 
 **Quy trình quản lý**:
 
 1. **Thêm Allergen vào sản phẩm**:
-   - Khi tạo/chỉnh sửa sản phẩm
-   - Chọn từ danh sách allergens
-   - Có thể chọn multiple
-   - Ghi chú tùy chọn (ví dụ: "Có thể chứa dấu vết cua")
+
+    - Khi tạo/chỉnh sửa sản phẩm
+    - Chọn từ danh sách allergens
+    - Có thể chọn multiple
+    - Ghi chú tùy chọn (ví dụ: "Có thể chứa dấu vết cua")
 
 2. **Hiển thị Allergen**:
-   - Trên menu cho khách
-   - Trên hóa đơn
-   - Trên chi tiết sản phẩm
+
+    - Trên menu cho khách
+    - Trên hóa đơn
+    - Trên chi tiết sản phẩm
 
 3. **Cảnh báo**:
-   - Khi nhân viên phục vụ tạo đơn, cảnh báo allergen
-   - Khi khách đặt online, hiển thị allergen rõ ràng
+    - Khi nhân viên phục vụ tạo đơn, cảnh báo allergen
+    - Khi khách đặt online, hiển thị allergen rõ ràng
 
 ---
 
@@ -569,12 +602,14 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 #### 3.3.1 Tải Lên Ảnh
 
 **Quy chuẩn ảnh**:
-- Định dạng: JPG, PNG, WebP
-- Kích thước tối đa: 5MB
-- Kích thước ảnh: Tối thiểu 300x300px, Tối đa 4000x4000px
-- Tỷ lệ khuyến nghị: 1:1 (vuông) hoặc 4:3
+
+-   Định dạng: JPG, PNG, WebP
+-   Kích thước tối đa: 5MB
+-   Kích thước ảnh: Tối thiểu 300x300px, Tối đa 4000x4000px
+-   Tỷ lệ khuyến nghị: 1:1 (vuông) hoặc 4:3
 
 **Quy trình**:
+
 1. Chọn ảnh từ máy tính
 2. Hệ thống xác thực kích thước, định dạng
 3. Nén ảnh tự động (nếu cần)
@@ -583,15 +618,17 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 6. Lưu đường dẫn vào database
 
 **Xử lý lỗi**:
-- Ảnh quá lớn: "Ảnh không được vượt quá 5MB"
-- Định dạng không được phép: "Chỉ hỗ trợ JPG, PNG, WebP"
-- Kích thước nhỏ: "Ảnh phải ít nhất 300x300px"
+
+-   Ảnh quá lớn: "Ảnh không được vượt quá 5MB"
+-   Định dạng không được phép: "Chỉ hỗ trợ JPG, PNG, WebP"
+-   Kích thước nhỏ: "Ảnh phải ít nhất 300x300px"
 
 ---
 
 #### 3.3.2 Xóa/Thay Thế Ảnh
 
 **Quy trình**:
+
 1. Từ form chỉnh sửa sản phẩm, nhấn "Xóa Ảnh"
 2. Xóa ảnh cũ từ storage
 3. Có thể tải lên ảnh mới ngay
@@ -606,18 +643,19 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 **Mục tiêu**: Xác định sản phẩm nào bán tốt nhất
 
 **Quy trình**:
+
 1. Truy cập "Báo Cáo" → "Menu"
 2. Chọn khoảng thời gian (Hôm nay, Tuần này, Tháng này, Tùy chọn)
 3. Hiển thị:
-   - Tên sản phẩm
-   - Số lượng bán
-   - Doanh thu
-   - % so với tổng
-   - Tốc độ bán (số/giờ)
+    - Tên sản phẩm
+    - Số lượng bán
+    - Doanh thu
+    - % so với tổng
+    - Tốc độ bán (số/giờ)
 4. Sắp xếp theo:
-   - Số lượng
-   - Doanh thu
-   - Phần trăm
+    - Số lượng
+    - Doanh thu
+    - Phần trăm
 5. Xuất báo cáo (PDF, Excel)
 
 ---
@@ -627,13 +665,14 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 **Mục tiêu**: Xác định sản phẩm cần cải thiện hoặc loại bỏ
 
 **Quy trình**:
+
 1. Hiển thị sản phẩm có ít người mua
 2. Thống kê doanh thu
 3. Gợi ý:
-   - Thay đổi giá
-   - Cải thiện mô tả
-   - Chuyển vị trí trong menu
-   - Xem xét loại bỏ
+    - Thay đổi giá
+    - Cải thiện mô tả
+    - Chuyển vị trí trong menu
+    - Xem xét loại bỏ
 
 ---
 
@@ -642,10 +681,11 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 **Mục tiêu**: Xem danh mục nào bán chạy nhất
 
 **Hiển thị**:
-- Doanh thu từng danh mục
-- Số lượng sản phẩm bán
-- Xu hướng theo thời gian
-- Biểu đồ so sánh
+
+-   Doanh thu từng danh mục
+-   Số lượng sản phẩm bán
+-   Xu hướng theo thời gian
+-   Biểu đồ so sánh
 
 ---
 
@@ -656,12 +696,14 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 **Mục tiêu**: Lên lịch cập nhật menu cho các thời điểm khác nhau
 
 **Ví dụ**:
-- Thực đơn buổi sáng (6h-11h)
-- Thực đơn buổi trưa (11h-14h)
-- Thực đơn buổi chiều (14h-18h)
-- Thực đơn buổi tối (18h-22h)
+
+-   Thực đơn buổi sáng (6h-11h)
+-   Thực đơn buổi trưa (11h-14h)
+-   Thực đơn buổi chiều (14h-18h)
+-   Thực đơn buổi tối (18h-22h)
 
 **Quy trình**:
+
 1. Tạo phiên bản menu khác nhau
 2. Lên lịch hiển thị theo giờ
 3. Hệ thống tự động chuyển menu
@@ -673,6 +715,7 @@ Hệ thống quản lý menu và danh mục là một phần thiết yếu của
 **Mục tiêu**: Nhập nhiều sản phẩm cùng lúc từ file Excel/CSV
 
 **Định dạng tệp**:
+
 ```
 Tên Sản Phẩm | Danh Mục | Giá | Mô Tả | Thời Gian | Allergens
 Phở Bò | Chính | 50000 | Phở bò truyền thống | 15 | Tôm,Cua
@@ -680,6 +723,7 @@ Phở Bò | Chính | 50000 | Phở bò truyền thống | 15 | Tôm,Cua
 ```
 
 **Quy trình**:
+
 1. Nhấn "Nhập Từ File"
 2. Tải lên file
 3. Hệ thống kiểm tra dữ liệu
@@ -694,15 +738,17 @@ Phở Bò | Chính | 50000 | Phở bò truyền thống | 15 | Tôm,Cua
 **Mục tiêu**: Xuất danh sách menu cho in ấn hoặc sử dụng khác
 
 **Định dạng**:
-- PDF (in menu)
-- Excel (báo cáo)
-- CSV (import vào hệ thống khác)
+
+-   PDF (in menu)
+-   Excel (báo cáo)
+-   CSV (import vào hệ thống khác)
 
 **Nội dung**:
-- Tên, giá, mô tả
-- Hình ảnh (nếu PDF)
-- Allergens
-- Thời gian chuẩn bị
+
+-   Tên, giá, mô tả
+-   Hình ảnh (nếu PDF)
+-   Allergens
+-   Thời gian chuẩn bị
 
 ---
 
@@ -767,19 +813,19 @@ Phở Bò | Chính | 50000 | Phở bò truyền thống | 15 | Tôm,Cua
 
 ### 6.1 Công Nghệ Sử Dụng
 
-- **Frontend**: Next.js, React, TypeScript, Tailwind CSS
-- **Backend**: Node.js, Express, TypeScript
-- **Database**: PostgreSQL, Prisma ORM
-- **Storage**: Local/Cloud (S3, Firebase Storage)
-- **Real-time**: Socket.io (cập nhật trạng thái menu)
-- **API**: RESTful API
+-   **Frontend**: Next.js, React, TypeScript, Tailwind CSS
+-   **Backend**: Node.js, Express, TypeScript
+-   **Database**: PostgreSQL, Prisma ORM
+-   **Storage**: Local/Cloud (S3, Firebase Storage)
+-   **Real-time**: Socket.io (cập nhật trạng thái menu)
+-   **API**: RESTful API
 
 ### 6.2 Công Cụ Quản Lý
 
-- Lập trình tự động để cập nhật trạng thái
-- Công cụ nhập/xuất file
-- Hệ thống log toàn diện
-- Báo cáo tự động hàng ngày
+-   Lập trình tự động để cập nhật trạng thái
+-   Công cụ nhập/xuất file
+-   Hệ thống log toàn diện
+-   Báo cáo tự động hàng ngày
 
 ---
 
@@ -799,14 +845,14 @@ Phở Bò | Chính | 50000 | Phở bò truyền thống | 15 | Tôm,Cua
 
 ## 8. Tính Năng Nâng Cao (Trong Tương Lai)
 
-- **AI Recommendation**: Gợi ý sản phẩm dựa trên lịch sử đặt hàng
-- **Multi-language Menu**: Menu đa ngôn ngữ
-- **QR Code Menu**: Menu điện tử qua QR code
-- **Menu theo mùa**: Lên lịch menu theo mùa vụ
-- **Nutritional Info**: Thêm thông tin dinh dưỡng
-- **Recipe Management**: Quản lý công thức nấu
-- **Supplier Integration**: Tích hợp nhà cung cấp
-- **Inventory Tracking**: Theo dõi tồn kho chi tiết
+-   **AI Recommendation**: Gợi ý sản phẩm dựa trên lịch sử đặt hàng
+-   **Multi-language Menu**: Menu đa ngôn ngữ
+-   **QR Code Menu**: Menu điện tử qua QR code
+-   **Menu theo mùa**: Lên lịch menu theo mùa vụ
+-   **Nutritional Info**: Thêm thông tin dinh dưỡng
+-   **Recipe Management**: Quản lý công thức nấu
+-   **Supplier Integration**: Tích hợp nhà cung cấp
+-   **Inventory Tracking**: Theo dõi tồn kho chi tiết
 
 ---
 
@@ -825,4 +871,3 @@ Phở Bò | Chính | 50000 | Phở bò truyền thống | 15 | Tôm,Cua
 ## 10. Kết Luận
 
 Hệ thống quản lý menu và danh mục là trái tim của ứng dụng quản lý nhà hàng. Nó cần phải linh hoạt, dễ sử dụng, và đáng tin cậy để hỗ trợ hoạt động kinh doanh hàng ngày. Tài liệu này cung cấp hướng dẫn toàn diện cho các nhà phát triển, quản lý, và người dùng của hệ thống.
-
