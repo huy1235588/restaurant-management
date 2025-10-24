@@ -9,6 +9,9 @@ import reservationRoutes from '../features/reservation/reservation.routes';
 import kitchenRoutes from '../features/kitchen/kitchen.routes';
 import staffRoutes from '../features/staff/staff.routes';
 import paymentRoutes from '../features/payment/payment.routes';
+import ingredientRoutes from '../features/ingredient/ingredient.routes';
+import purchaseRoutes from '../features/purchase/purchase.routes';
+import stockRoutes from '../features/stock/stock.routes';
 
 const router: Router = Router();
 
@@ -23,6 +26,10 @@ router.use('/reservations', reservationRoutes);
 router.use('/kitchen', kitchenRoutes);
 router.use('/staff', staffRoutes);
 router.use('/payments', paymentRoutes);
+router.use('/ingredients', ingredientRoutes);
+router.use('/purchase-orders', purchaseRoutes);
+router.use('/suppliers', purchaseRoutes);
+router.use('/stock', stockRoutes);
 
 // Health check
 router.get('/health', (_req, res) => {

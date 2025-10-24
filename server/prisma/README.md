@@ -139,7 +139,7 @@ pnpm add -D @types/bcryptjs
 ### Lỗi kết nối database
 Kiểm tra file `.env` có đúng `DATABASE_URL` không:
 ```env
-DATABASE_URL="postgresql://username:password@localhost:5432/restaurant_management"
+DATABASE_URL="postgresql://username:password@localhost:5432/restaurant_db"
 ```
 
 ## Tùy chỉnh dữ liệu seed
