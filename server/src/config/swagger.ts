@@ -49,6 +49,9 @@ const swaggerOptions: swaggerJsdoc.Options = {
             { name: 'Kitchen', description: 'Kitchen management endpoints' },
             { name: 'Payments', description: 'Payment management endpoints' },
             { name: 'Staff', description: 'Staff management endpoints' },
+            { name: 'Ingredients', description: 'Ingredient management endpoints' },
+            { name: 'Purchase', description: 'Purchase order management endpoints' },
+            { name: 'Stock', description: 'Stock management endpoints' },
         ],
     },
     apis: [
