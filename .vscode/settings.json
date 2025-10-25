@@ -1,0 +1,25 @@
+{
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/.git": true,
+        "**/dist": true,
+        "**/build": true,
+        "**/logs": true,
+        "**/prisma/migrations": true,
+        "**/generated": true,
+        "**/.next": true,
+        "**/coverage": true,
+        "**/.cache": true
+    },
+    "files.exclude": {
+        "**/node_modules": true,
+        "**/.git": true,
+        "**/dist": true,
+        "**/build": true,
+        "**/logs": true,
+        "**/prisma/migrations": true,
+        "**/.next": true,
+        "**/coverage": true,
+        "**/.cache": true
+    }
+}

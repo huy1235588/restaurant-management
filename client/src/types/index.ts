@@ -234,12 +234,15 @@ export interface ApiResponse<T> {
 }
 
 export interface PaginatedResponse<T> {
-    data: T[];
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
+    items: T[];
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+    };
 }
+
 
 export interface ApiError {
     message: string;
@@ -570,15 +573,4 @@ export interface CreateStockTransactionDto {
     referenceType?: string;
     referenceId?: number;
     notes?: string;
-}
-
-// Pagination Types
-export interface PaginatedResponse<T> {
-    data: T[];
-    pagination: {
-        page: number;
-        limit: number;
-        total: number;
-        totalPages: number;
-    };
 }

@@ -3,10 +3,11 @@ import { SocketOrder, SocketTable, KitchenOrder } from '@/types';
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001';
 
+type SocketEventCallback<T = unknown> = (data: T) => void;
+
 class SocketService {
     private socket: Socket | null = null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private listeners: Map<string, Set<(...args: any[]) => void>> = new Map();
+    private listeners: Map<string, Set<SocketEventCallback>> = new Map();
 
     connect(token?: string) {
         if (this.socket?.connected) {
@@ -53,42 +54,41 @@ class SocketService {
 
     // Order events
     onOrderCreated(callback: (order: SocketOrder) => void) {
-        this.addEventListener('order:created', callback);
+        this.addEventListener<SocketOrder>('order:created', callback);
     }
 
     onOrderUpdated(callback: (order: SocketOrder) => void) {
-        this.addEventListener('order:updated', callback);
+        this.addEventListener<SocketOrder>('order:updated', callback);
     }
 
     onOrderStatusChanged(callback: (data: { orderId: number; status: string }) => void) {
-        this.addEventListener('order:status-changed', callback);
+        this.addEventListener<{ orderId: number; status: string }>('order:status-changed', callback);
     }
 
     // Table events
     onTableStatusChanged(callback: (table: SocketTable) => void) {
-        this.addEventListener('table:status-changed', callback);
+        this.addEventListener<SocketTable>('table:status-changed', callback);
     }
 
     onTableOccupied(callback: (table: SocketTable) => void) {
-        this.addEventListener('table:occupied', callback);
+        this.addEventListener<SocketTable>('table:occupied', callback);
     }
 
     onTableFreed(callback: (table: SocketTable) => void) {
-        this.addEventListener('table:freed', callback);
+        this.addEventListener<SocketTable>('table:freed', callback);
     }
 
     // Kitchen events
     onKitchenOrderReceived(callback: (order: KitchenOrder) => void) {
-        this.addEventListener('kitchen:order-received', callback);
+        this.addEventListener<KitchenOrder>('kitchen:order-received', callback);
     }
 
     onKitchenOrderUpdated(callback: (order: KitchenOrder) => void) {
-        this.addEventListener('kitchen:order-updated', callback);
+        this.addEventListener<KitchenOrder>('kitchen:order-updated', callback);
     }
 
     // Generic event listener
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private addEventListener(event: string, callback: (...args: any[]) => void) {
+    private addEventListener<T = unknown>(event: string, callback: SocketEventCallback<T>) {
         if (!this.socket) {
             console.warn('Socket not connected');
             return;
@@ -98,23 +98,22 @@ class SocketService {
             this.listeners.set(event, new Set());
 
             // Set up socket listener
-            this.socket.on(event, (...args: unknown[]) => {
+            this.socket.on(event, (data: T) => {
                 const callbacks = this.listeners.get(event);
                 if (callbacks) {
-                    callbacks.forEach(cb => cb(...args));
+                    callbacks.forEach((cb: SocketEventCallback) => cb(data));
                 }
             });
         }
 
-        this.listeners.get(event)?.add(callback);
+        this.listeners.get(event)?.add(callback as SocketEventCallback);
     }
 
     // Remove event listener
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    removeEventListener(event: string, callback: (...args: any[]) => void) {
+    removeEventListener<T = unknown>(event: string, callback: SocketEventCallback<T>) {
         const callbacks = this.listeners.get(event);
         if (callbacks) {
-            callbacks.delete(callback);
+            callbacks.delete(callback as SocketEventCallback);
 
             if (callbacks.size === 0) {
                 this.socket?.off(event);
