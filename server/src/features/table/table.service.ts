@@ -1,6 +1,7 @@
 import { TableStatus } from '@prisma/client';
 import tableRepository from '@/features/table/table.repository';
 import { NotFoundError, BadRequestError } from '@/shared/utils/errors';
+import { BaseFindOptions } from '@/shared/base';
 
 interface TableFilters {
     status?: TableStatus;
@@ -41,8 +42,8 @@ export class TableService {
     /**
      * Get all tables
      */
-    async getAllTables(filters: TableFilters = {}) {
-        return tableRepository.findAll(filters);
+    async getAllTables(options?: BaseFindOptions<TableFilters>) {
+        return tableRepository.findAllPaginated(options);
     }
 
     /**
@@ -133,26 +134,24 @@ export class TableService {
      */
     async getTableWithCurrentOrder(tableId: number) {
         const table = await tableRepository.findByIdWithDetails(tableId, {
-            include: {
-                orders: {
-                    where: {
-                        status: {
-                            notIn: ['served', 'cancelled']
+            orders: {
+                where: {
+                    status: {
+                        notIn: ['served', 'cancelled']
+                    }
+                },
+                include: {
+                    orderItems: {
+                        include: {
+                            menuItem: true
                         }
                     },
-                    include: {
-                        orderItems: {
-                            include: {
-                                menuItem: true
-                            }
-                        },
-                        staff: true
-                    },
-                    orderBy: {
-                        orderTime: 'desc'
-                    },
-                    take: 1
-                }
+                    staff: true
+                },
+                orderBy: {
+                    orderTime: 'desc'
+                },
+                take: 1
             }
         });
 

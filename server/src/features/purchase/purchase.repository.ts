@@ -1,80 +1,59 @@
 import { prisma } from '@/config/database';
-import { Prisma } from '@prisma/client';
+import { BaseFilter, BaseFindOptions, BaseRepository } from '@/shared';
+import { Prisma, PurchaseOrder } from '@prisma/client';
 
-export interface PurchaseOrderFilters {
+export interface PurchaseOrderFilters extends BaseFilter {
     supplierId?: number;
     status?: 'pending' | 'ordered' | 'received' | 'cancelled';
     fromDate?: string;
     toDate?: string;
+    search?: string;
 }
 
-class PurchaseOrderRepository {
+export class PurchaseOrderRepository extends BaseRepository<PurchaseOrder, PurchaseOrderFilters> {
+    protected buildWhereClause(filters?: PurchaseOrderFilters): Prisma.PurchaseOrderWhereInput {
+        if (!filters) return {};
+
+        const where: Prisma.PurchaseOrderWhereInput = {};
+
+        if (filters.status) where.status = filters.status;
+        if (filters.supplierId) where.supplierId = filters.supplierId;
+        if (filters.search) {
+            where.OR = [
+                {
+                    orderNumber: {
+                        contains: filters.search,
+                        mode: 'insensitive'
+                    }
+                },
+            ];
+        }
+
+        return where;
+    }
+
     /**
      * Find all purchase orders with filters and pagination
      */
-    async findAll(
-        filters: PurchaseOrderFilters = {},
-        page: number = 1,
-        limit: number = 20
-    ) {
-        const where: Prisma.PurchaseOrderWhereInput = {};
+    async findAll(options?: BaseFindOptions<PurchaseOrderFilters>): Promise<PurchaseOrder[]> {
+        const { filters, skip = 0, take = 10, sortBy = 'createdAt', sortOrder = 'desc' } = options || {};
 
-        if (filters.supplierId) {
-            where.supplierId = filters.supplierId;
-        }
+        return prisma.purchaseOrder.findMany({
+            where: this.buildWhereClause(filters),
+            include: { supplier: true, items: true },
+            skip,
+            take,
+            orderBy: this.buildOrderBy(sortBy, sortOrder),
+        });
+    }
 
-        if (filters.status) {
-            where.status = filters.status;
-        }
-
-        if (filters.fromDate || filters.toDate) {
-            where.orderDate = {};
-            if (filters.fromDate) {
-                where.orderDate.gte = new Date(filters.fromDate);
-            }
-            if (filters.toDate) {
-                where.orderDate.lte = new Date(filters.toDate);
-            }
-        }
-
-        const [orders, total] = await Promise.all([
-            prisma.purchaseOrder.findMany({
-                where,
-                include: {
-                    supplier: true,
-                    staff: {
-                        select: {
-                            staffId: true,
-                            fullName: true,
-                        },
-                    },
-                    items: {
-                        include: {
-                            ingredient: true,
-                        },
-                    },
-                    _count: {
-                        select: {
-                            items: true,
-                        },
-                    },
-                },
-                skip: (page - 1) * limit,
-                take: limit,
-                orderBy: { orderDate: 'desc' },
-            }),
-            prisma.purchaseOrder.count({ where }),
-        ]);
-
-        return {
-            data: orders,
-            pagination: {
-                page,
-                limit,
-                total,
-                totalPages: Math.ceil(total / limit),
-            },
-        };
+    /**     
+     * Count purchase orders based on filters
+     */
+    async count(filters?: PurchaseOrderFilters): Promise<number> {
+        return prisma.purchaseOrder.count({
+            where: this.buildWhereClause(filters),
+        });
     }
 
     /**

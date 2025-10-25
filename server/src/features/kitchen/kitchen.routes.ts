@@ -18,11 +18,56 @@ router.use(authenticate);
  * @swagger
  * /kitchen:
  *   get:
- *     summary: Get all kitchen orders
- *     description: Retrieve a list of all kitchen orders
+ *     summary: Get all kitchen orders with pagination
+ *     description: Retrieve a paginated list of kitchen orders with filtering and sorting options
  *     tags: [Kitchen]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *           minimum: 1
+ *           maximum: 100
+ *         description: Number of items per page
+ *       - in: query
+ *         name: status
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [pending, preparing, completed, cancelled]
+ *         description: Filter by kitchen order status
+ *       - in: query
+ *         name: staffId
+ *         required: false
+ *         schema:
+ *           type: integer
+ *         description: Filter by assigned chef/staff ID
+ *       - in: query
+ *         name: sortBy
+ *         required: false
+ *         schema:
+ *           type: string
+ *           default: createdAt
+ *         description: Field to sort by (e.g., createdAt, priority, status)
+ *       - in: query
+ *         name: sortOrder
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: Sort order (asc for ascending, desc for descending)
  *     responses:
  *       200:
  *         description: Kitchen orders retrieved successfully
@@ -38,41 +83,56 @@ router.use(authenticate);
  *                   type: string
  *                   example: Kitchen orders retrieved successfully
  *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                       orderId:
- *                         type: integer
- *                       status:
- *                         type: string
- *                         enum: [pending, preparing, completed, cancelled]
- *                       priority:
- *                         type: string
- *                         enum: [low, medium, high, urgent]
- *                       assignedChefId:
- *                         type: integer
- *                         nullable: true
- *                       startedAt:
- *                         type: string
- *                         format: date-time
- *                         nullable: true
- *                       completedAt:
- *                         type: string
- *                         format: date-time
- *                         nullable: true
- *                       estimatedTime:
- *                         type: integer
- *                       notes:
- *                         type: string
- *                       createdAt:
- *                         type: string
- *                         format: date-time
- *                       updatedAt:
- *                         type: string
- *                         format: date-time
+ *                   type: object
+ *                   properties:
+ *                     items:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           kitchenOrderId:
+ *                             type: integer
+ *                           orderId:
+ *                             type: integer
+ *                           status:
+ *                             type: string
+ *                             enum: [pending, preparing, completed, cancelled]
+ *                           priority:
+ *                             type: integer
+ *                           staffId:
+ *                             type: integer
+ *                             nullable: true
+ *                           startedAt:
+ *                             type: string
+ *                             format: date-time
+ *                             nullable: true
+ *                           completedAt:
+ *                             type: string
+ *                             format: date-time
+ *                             nullable: true
+ *                           estimatedTime:
+ *                             type: integer
+ *                           notes:
+ *                             type: string
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                           updatedAt:
+ *                             type: string
+ *                             format: date-time
+ *                     pagination:
+ *                       type: object
+ *                       properties:
+ *                         page:
+ *                           type: integer
+ *                           example: 1
+ *                         limit:
+ *                           type: integer
+ *                           example: 20
+ *                         total:
+ *                           type: integer
+ *                         totalPages:
+ *                           type: integer
  *       401:
  *         description: Unauthorized
  *       500:

@@ -19,32 +19,59 @@ const router: Router = Router();
  * @swagger
  * /ingredients:
  *   get:
- *     summary: Get all ingredients
- *     description: Retrieve a list of all ingredients with optional filters
+ *     summary: Get all ingredients with pagination
+ *     description: Retrieve a paginated list of ingredients with optional filters and sorting
  *     tags: [Ingredients]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
+ *         required: false
  *         schema:
  *           type: integer
- *         description: Page number
+ *           default: 1
+ *         description: Page number for pagination
  *       - in: query
  *         name: limit
+ *         required: false
  *         schema:
  *           type: integer
+ *           default: 10
  *         description: Number of items per page
  *       - in: query
  *         name: search
+ *         required: false
  *         schema:
  *           type: string
- *         description: Search term
+ *         description: Search by ingredient name or code
  *       - in: query
  *         name: categoryId
+ *         required: false
  *         schema:
  *           type: integer
- *         description: Filter by category ID
+ *         description: Filter by ingredient category ID
+ *       - in: query
+ *         name: isActive
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *         description: Filter by active status (true/false)
+ *       - in: query
+ *         name: sortBy
+ *         required: false
+ *         schema:
+ *           type: string
+ *           default: name
+ *         description: Field to sort by (e.g., name, currentStock, createdAt)
+ *       - in: query
+ *         name: sortOrder
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: asc
+ *         description: Sort order (asc for ascending, desc for descending)
  *     responses:
  *       200:
  *         description: Ingredients retrieved successfully
@@ -60,24 +87,50 @@ const router: Router = Router();
  *                   type: string
  *                   example: Ingredients retrieved successfully
  *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                       code:
- *                         type: string
- *                       name:
- *                         type: string
- *                       description:
- *                         type: string
- *                       unit:
- *                         type: string
- *                       currentStock:
- *                         type: number
- *                       minStock:
- *                         type: number
+ *                   type: object
+ *                   properties:
+ *                     items:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           ingredientId:
+ *                             type: integer
+ *                           ingredientCode:
+ *                             type: string
+ *                           ingredientName:
+ *                             type: string
+ *                           description:
+ *                             type: string
+ *                           unit:
+ *                             type: string
+ *                           currentStock:
+ *                             type: number
+ *                           minStock:
+ *                             type: number
+ *                           categoryId:
+ *                             type: integer
+ *                           isActive:
+ *                             type: boolean
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                           updatedAt:
+ *                             type: string
+ *                             format: date-time
+ *                     pagination:
+ *                       type: object
+ *                       properties:
+ *                         page:
+ *                           type: integer
+ *                           example: 1
+ *                         limit:
+ *                           type: integer
+ *                           example: 10
+ *                         total:
+ *                           type: integer
+ *                         totalPages:
+ *                           type: integer
  *                       maxStock:
  *                         type: number
  *                       category:

@@ -3,6 +3,8 @@ import { Server, Socket } from 'socket.io';
 import config from '@/config';
 import logger from '@/config/logger';
 
+type SocketEmitData = Record<string, unknown>;
+
 export class SocketService {
     private io: Server | null = null;
 
@@ -58,26 +60,26 @@ export class SocketService {
     }
 
     // Emit events
-    emitToTable(tableId: number, event: string, data: any): void {
+    emitToTable(tableId: number, event: string, data: SocketEmitData): void {
         if (this.io) {
             this.io.to(`table:${tableId}`).emit(event, data);
         }
     }
 
-    emitToKitchen(event: string, data: any): void {
+    emitToKitchen(event: string, data: SocketEmitData): void {
         if (this.io) {
             this.io.to('kitchen').emit(event, data);
         }
     }
 
-    emitToAll(event: string, data: any): void {
+    emitToAll(event: string, data: SocketEmitData): void {
         if (this.io) {
             this.io.emit(event, data);
         }
     }
 
     // Order events
-    emitNewOrder(orderId: number, tableId: number, orderData: any): void {
+    emitNewOrder(orderId: number, tableId: number, orderData: SocketEmitData): void {
         this.emitToKitchen('order:new', { orderId, tableId, ...orderData });
         this.emitToTable(tableId, 'order:created', { orderId, ...orderData });
     }
@@ -88,16 +90,16 @@ export class SocketService {
     }
 
     // Kitchen events
-    emitKitchenOrderUpdate(kitchenOrderId: number, status: string, data: any): void {
+    emitKitchenOrderUpdate(kitchenOrderId: number, status: string, data: SocketEmitData): void {
         this.emitToKitchen('kitchen:order:update', { kitchenOrderId, status, ...data });
     }
 
     // Bill events
-    emitNewBill(billId: number, tableId: number, billData: any): void {
+    emitNewBill(billId: number, tableId: number, billData: SocketEmitData): void {
         this.emitToTable(tableId, 'bill:created', { billId, ...billData });
     }
 
-    emitPaymentReceived(billId: number, tableId: number, paymentData: any): void {
+    emitPaymentReceived(billId: number, tableId: number, paymentData: SocketEmitData): void {
         this.emitToTable(tableId, 'payment:received', { billId, ...paymentData });
     }
 

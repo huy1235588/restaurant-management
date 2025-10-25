@@ -13,7 +13,20 @@ export class StockController {
      */
     async getAllTransactions(req: Request, res: Response, next: NextFunction) {
         try {
-            const result = await stockService.getAllTransactions(req.query as any);
+            const { ingredientId, transactionType, fromDate, toDate, page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
+
+            const result = await stockService.getAllTransactions({
+                filters: {
+                    ingredientId: ingredientId ? parseInt(ingredientId as string) : undefined,
+                    transactionType: transactionType as 'in' | 'out' | 'adjustment' | 'waste' | undefined,
+                    fromDate: fromDate as string,
+                    toDate: toDate as string,
+                },
+                skip: (parseInt(page as string) - 1) * parseInt(limit as string),
+                take: parseInt(limit as string),
+                sortBy: sortBy as string,
+                sortOrder: (sortOrder as string).toLowerCase() as 'asc' | 'desc',
+            });
             return ResponseHandler.success(res, 'Stock transactions retrieved successfully', result);
         } catch (error) {
             return next(error);

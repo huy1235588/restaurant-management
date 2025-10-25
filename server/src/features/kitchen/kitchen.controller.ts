@@ -8,11 +8,17 @@ export class KitchenController {
      */
     async getAll(req: Request, res: Response, next: NextFunction) {
         try {
-            const { status, priority } = req.query;
+            const { status, staffId, page = 1, limit = 20, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
 
             const kitchenOrders = await kitchenService.getAllKitchenOrders({
-                status: status as any,
-                priority: priority ? parseInt(priority as string) : undefined,
+                filters: {
+                    status: status as any,
+                    staffId: staffId ? parseInt(staffId as string) : undefined,
+                },
+                skip: (parseInt(page as string) - 1) * parseInt(limit as string),
+                take: parseInt(limit as string),
+                sortBy: sortBy as string,
+                sortOrder: (sortOrder as string).toLowerCase() as 'asc' | 'desc',
             });
 
             res.json(ApiResponse.success(kitchenOrders, 'Kitchen orders retrieved successfully'));

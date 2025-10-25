@@ -35,14 +35,16 @@ export class OrderController {
      */
     async getAllOrders(req: AuthRequest, res: Response, next: NextFunction) {
         try {
-            const { tableId, status, startDate, endDate, page, limit } = req.query;
+            const { tableId, status, startDate, endDate, page = 1, limit = 20, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
             const result = await orderService.getAllOrders({
                 tableId: tableId ? parseInt(tableId as string, 10) : undefined,
                 status: status as any,
                 startDate: startDate as string,
                 endDate: endDate as string,
-                page: page ? parseInt(page as string, 10) : undefined,
-                limit: limit ? parseInt(limit as string, 10) : undefined,
+                page: page ? parseInt(page as string, 10) : 1,
+                limit: limit ? parseInt(limit as string, 10) : 20,
+                sortBy: sortBy as string,
+                sortOrder: (sortOrder as string).toLowerCase() as 'asc' | 'desc',
             });
             ResponseHandler.success(res, 'Orders retrieved successfully', result);
         } catch (error) {

@@ -8,12 +8,18 @@ export class PaymentController {
      */
     async getAll(req: Request, res: Response, next: NextFunction) {
         try {
-            const { billId, status, paymentMethod } = req.query;
+            const { billId, status, paymentMethod, page = 1, limit = 10, sortBy = 'paymentDate', sortOrder = 'desc' } = req.query;
 
             const payments = await paymentService.getAllPayments({
-                billId: billId ? parseInt(billId as string) : undefined,
-                status: status as any,
-                paymentMethod: paymentMethod as any,
+                filters: {
+                    billId: billId ? parseInt(billId as string) : undefined,
+                    status: status as any,
+                    paymentMethod: paymentMethod as any,
+                },
+                skip: (parseInt(page as string) - 1) * parseInt(limit as string),
+                take: parseInt(limit as string),
+                sortBy: sortBy as string,
+                sortOrder: (sortOrder as string).toLowerCase() as 'asc' | 'desc',
             });
 
             res.json(ApiResponse.success(payments, 'Payments retrieved successfully'));

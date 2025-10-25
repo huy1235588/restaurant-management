@@ -1,6 +1,15 @@
 import { prisma } from '@/config/database';
 import { Prisma, Order, OrderItem } from '@prisma/client';
 import { OrderStatus } from '@/shared/types';
+import { BaseRepository, BaseFindOptions, BaseFilter } from '@/shared/base';
+
+interface OrderFilter extends BaseFilter {
+    tableId?: number;
+    status?: OrderStatus;
+    startDate?: Date;
+    endDate?: Date;
+    search?: string;
+}
 
 // Type for Order with relations
 type OrderWithRelations = Prisma.OrderGetPayload<{
@@ -18,7 +27,65 @@ type OrderWithRelations = Prisma.OrderGetPayload<{
     };
 }>;
 
-export class OrderRepository {
+export class OrderRepository extends BaseRepository<Order, OrderFilter> {
+    protected buildWhereClause(filters?: OrderFilter): Prisma.OrderWhereInput {
+        if (!filters) {
+            return {};
+        }
+
+        const { tableId, status, startDate, endDate, search } = filters;
+
+        const where: Prisma.OrderWhereInput = {};
+
+        if (tableId) {
+            where.tableId = tableId;
+        }
+        if (status) {
+            where.status = status;
+        }
+        if (startDate || endDate) {
+            where.orderTime = {};
+            if (startDate) {
+                where.orderTime.gte = startDate;
+            }
+            if (endDate) {
+                where.orderTime.lte = endDate;
+            }
+        }
+        if (search) {
+            where.OR = [
+                { orderNumber: { contains: search, mode: 'insensitive' } },
+                { notes: { contains: search, mode: 'insensitive' } },
+            ];
+        }
+
+        return where;
+    }
+
+    async findAll(options?: BaseFindOptions<OrderFilter>): Promise<Order[]> {
+        const { filters, skip = 0, take = 10, sortBy = 'orderTime', sortOrder = 'desc' } = options || {};
+
+        return prisma.order.findMany({
+            where: this.buildWhereClause(filters),
+            include: {
+                table: true,
+                staff: true,
+                orderItems: {
+                    include: { menuItem: true },
+                },
+            },
+            skip,
+            take,
+            orderBy: this.buildOrderBy(sortBy, sortOrder) as Prisma.OrderOrderByWithRelationInput,
+        });
+    }
+
+    async count(filters?: OrderFilter): Promise<number> {
+        return prisma.order.count({
+            where: this.buildWhereClause(filters),
+        });
+    }
+
     async create(
         data: Prisma.OrderCreateInput,
         items: Omit<Prisma.OrderItemCreateManyInput, 'orderId'>[]
@@ -82,62 +149,6 @@ export class OrderRepository {
                 orderItems: {
                     include: { menuItem: true },
                 },
-            },
-        });
-    }
-
-    async findAll(params?: {
-        tableId?: number;
-        status?: OrderStatus;
-        startDate?: Date;
-        endDate?: Date;
-        skip?: number;
-        take?: number;
-    }): Promise<Order[]> {
-        const { tableId, status, startDate, endDate, skip, take } = params || {};
-        return prisma.order.findMany({
-            where: {
-                ...(tableId && { tableId }),
-                ...(status && { status }),
-                ...(startDate &&
-                    endDate && {
-                    orderTime: {
-                        gte: startDate,
-                        lte: endDate,
-                    },
-                }),
-            },
-            include: {
-                table: true,
-                staff: true,
-                orderItems: {
-                    include: { menuItem: true },
-                },
-            },
-            skip,
-            take,
-            orderBy: { orderTime: 'desc' },
-        });
-    }
-
-    async count(params?: {
-        tableId?: number;
-        status?: OrderStatus;
-        startDate?: Date;
-        endDate?: Date;
-    }): Promise<number> {
-        const { tableId, status, startDate, endDate } = params || {};
-        return prisma.order.count({
-            where: {
-                ...(tableId && { tableId }),
-                ...(status && { status }),
-                ...(startDate &&
-                    endDate && {
-                    orderTime: {
-                        gte: startDate,
-                        lte: endDate,
-                    },
-                }),
             },
         });
     }

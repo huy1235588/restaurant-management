@@ -1,8 +1,69 @@
 import { prisma } from '@/config/database';
 import { Prisma, Bill } from '@prisma/client';
 import { PaymentStatus, PaymentMethod } from '@/shared/types';
+import { BaseRepository, BaseFindOptions, BaseFilter } from '@/shared/base';
 
-export class BillRepository {
+interface BillFilter extends BaseFilter {
+    paymentStatus?: PaymentStatus;
+    startDate?: Date;
+    endDate?: Date;
+    search?: string;
+}
+
+export class BillRepository extends BaseRepository<Bill, BillFilter> {
+    protected buildWhereClause(filters?: BillFilter): Prisma.BillWhereInput {
+        if (!filters) {
+            return {};
+        }
+
+        const { paymentStatus, startDate, endDate, search } = filters;
+
+        const where: Prisma.BillWhereInput = {};
+
+        if (paymentStatus) {
+            where.paymentStatus = paymentStatus;
+        }
+        if (startDate || endDate) {
+            where.createdAt = {};
+            if (startDate) {
+                where.createdAt.gte = startDate;
+            }
+            if (endDate) {
+                where.createdAt.lte = endDate;
+            }
+        }
+        if (search) {
+            where.OR = [
+                { billNumber: { contains: search, mode: 'insensitive' } },
+            ];
+        }
+
+        return where;
+    }
+
+    async findAll(options?: BaseFindOptions<BillFilter>): Promise<Bill[]> {
+        const { filters, skip = 0, take = 10, sortBy = 'createdAt', sortOrder = 'desc' } = options || {};
+
+        return prisma.bill.findMany({
+            where: this.buildWhereClause(filters),
+            include: {
+                order: true,
+                table: true,
+                staff: true,
+                billItems: true,
+            },
+            skip,
+            take,
+            orderBy: this.buildOrderBy(sortBy, sortOrder) as Prisma.BillOrderByWithRelationInput,
+        });
+    }
+
+    async count(filters?: BillFilter): Promise<number> {
+        return prisma.bill.count({
+            where: this.buildWhereClause(filters),
+        });
+    }
+
     async create(data: Prisma.BillCreateInput): Promise<Bill> {
         return prisma.bill.create({
             data,
@@ -66,57 +127,6 @@ export class BillRepository {
                     include: { menuItem: true },
                 },
                 payments: true,
-            },
-        });
-    }
-
-    async findAll(params?: {
-        paymentStatus?: PaymentStatus;
-        startDate?: Date;
-        endDate?: Date;
-        skip?: number;
-        take?: number;
-    }): Promise<Bill[]> {
-        const { paymentStatus, startDate, endDate, skip, take } = params || {};
-        return prisma.bill.findMany({
-            where: {
-                ...(paymentStatus && { paymentStatus }),
-                ...(startDate &&
-                    endDate && {
-                    createdAt: {
-                        gte: startDate,
-                        lte: endDate,
-                    },
-                }),
-            },
-            include: {
-                order: true,
-                table: true,
-                staff: true,
-                billItems: true,
-            },
-            skip,
-            take,
-            orderBy: { createdAt: 'desc' },
-        });
-    }
-
-    async count(params?: {
-        paymentStatus?: PaymentStatus;
-        startDate?: Date;
-        endDate?: Date;
-    }): Promise<number> {
-        const { paymentStatus, startDate, endDate } = params || {};
-        return prisma.bill.count({
-            where: {
-                ...(paymentStatus && { paymentStatus }),
-                ...(startDate &&
-                    endDate && {
-                    createdAt: {
-                        gte: startDate,
-                        lte: endDate,
-                    },
-                }),
             },
         });
     }

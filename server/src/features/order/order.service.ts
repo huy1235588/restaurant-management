@@ -97,22 +97,30 @@ export class OrderService {
         endDate?: string;
         page?: number;
         limit?: number;
+        sortBy?: string;
+        sortOrder?: 'asc' | 'desc';
     }) {
         const page = params?.page || 1;
         const limit = params?.limit || 20;
         const skip = (page - 1) * limit;
+        const sortBy = params?.sortBy || 'createdAt';
+        const sortOrder = params?.sortOrder || 'desc';
 
         const filters = {
             tableId: params?.tableId,
             status: params?.status,
             startDate: params?.startDate ? new Date(params.startDate) : undefined,
             endDate: params?.endDate ? new Date(params.endDate) : undefined,
-            skip,
-            take: limit,
         };
 
         const [orders, total] = await Promise.all([
-            orderRepository.findAll(filters),
+            orderRepository.findAll({
+                filters,
+                skip,
+                take: limit,
+                sortBy,
+                sortOrder,
+            }),
             orderRepository.count(filters),
         ]);
 

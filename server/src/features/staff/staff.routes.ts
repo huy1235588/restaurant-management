@@ -17,11 +17,62 @@ router.use(authenticate);
  * @swagger
  * /staff:
  *   get:
- *     summary: Get all staff
- *     description: Retrieve a list of all staff members
+ *     summary: Get all staff with pagination
+ *     description: Retrieve a paginated list of staff members with filtering and sorting options
  *     tags: [Staff]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *           minimum: 1
+ *           maximum: 100
+ *         description: Number of items per page
+ *       - in: query
+ *         name: role
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [admin, manager, waiter, chef, cashier]
+ *         description: Filter by staff role
+ *       - in: query
+ *         name: isActive
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *         description: Filter by active status (true/false)
+ *       - in: query
+ *         name: search
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Search by staff full name
+ *       - in: query
+ *         name: sortBy
+ *         required: false
+ *         schema:
+ *           type: string
+ *           default: fullName
+ *         description: Field to sort by (e.g., fullName, hireDate, createdAt)
+ *       - in: query
+ *         name: sortOrder
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: asc
+ *         description: Sort order (asc for ascending, desc for descending)
  *     responses:
  *       200:
  *         description: Staff retrieved successfully
@@ -37,34 +88,48 @@ router.use(authenticate);
  *                   type: string
  *                   example: Staff retrieved successfully
  *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                       username:
- *                         type: string
- *                       fullName:
- *                         type: string
- *                       email:
- *                         type: string
- *                       phone:
- *                         type: string
- *                       role:
- *                         type: string
- *                         enum: [admin, manager, waiter, chef, cashier]
- *                       isActive:
- *                         type: boolean
- *                       hireDate:
- *                         type: string
- *                         format: date
- *                       createdAt:
- *                         type: string
- *                         format: date-time
- *                       updatedAt:
- *                         type: string
- *                         format: date-time
+ *                   type: object
+ *                   properties:
+ *                     items:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           staffId:
+ *                             type: integer
+ *                           fullName:
+ *                             type: string
+ *                           email:
+ *                             type: string
+ *                           phone:
+ *                             type: string
+ *                           role:
+ *                             type: string
+ *                             enum: [admin, manager, waiter, chef, cashier]
+ *                           isActive:
+ *                             type: boolean
+ *                           hireDate:
+ *                             type: string
+ *                             format: date
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                           updatedAt:
+ *                             type: string
+ *                             format: date-time
+ *                     pagination:
+ *                       type: object
+ *                       properties:
+ *                         page:
+ *                           type: integer
+ *                           example: 1
+ *                         limit:
+ *                           type: integer
+ *                           example: 10
+ *                         total:
+ *                           type: integer
+ *                         totalPages:
+ *                           type: integer
  *       401:
  *         description: Unauthorized
  *       500:

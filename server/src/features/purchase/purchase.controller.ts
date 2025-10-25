@@ -13,7 +13,20 @@ export class PurchaseController {
      */
     async getAllPurchaseOrders(req: Request, res: Response, next: NextFunction) {
         try {
-            const result = await purchaseService.getAllPurchaseOrders(req.query as any);
+            const { supplierId, status, fromDate, toDate, page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
+
+            const result = await purchaseService.getAllPurchaseOrders({
+                filters: {
+                    supplierId: supplierId ? parseInt(supplierId as string) : undefined,
+                    status: status as 'pending' | 'ordered' | 'received' | 'cancelled' | undefined,
+                    fromDate: fromDate as string,
+                    toDate: toDate as string,
+                },
+                skip: (parseInt(page as string) - 1) * parseInt(limit as string),
+                take: parseInt(limit as string),
+                sortBy: sortBy as string,
+                sortOrder: (sortOrder as string).toLowerCase() as 'asc' | 'desc',
+            });
             return ResponseHandler.success(res, 'Purchase orders retrieved successfully', result);
         } catch (error) {
             return next(error);

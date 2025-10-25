@@ -1,11 +1,60 @@
 import { prisma } from '@/config/database';
 import { Prisma, Category } from '@prisma/client';
+import { BaseRepository, BaseFindOptions, BaseFilter } from '@/shared/base';
 
 export type CategoryWithItems = Prisma.CategoryGetPayload<{
     include: { menuItems: true }
 }>;
 
-export class CategoryRepository {
+interface CategoryFilter extends BaseFilter {
+    search?: string;
+    isActive?: boolean;
+}
+
+export class CategoryRepository extends BaseRepository<Category, CategoryFilter> {
+    protected buildWhereClause(filters?: CategoryFilter): Prisma.CategoryWhereInput {
+        if (!filters) {
+            return {};
+        }
+
+        const where: Prisma.CategoryWhereInput = {};
+
+        if (filters.isActive !== undefined) {
+            where.isActive = filters.isActive;
+        }
+
+        if (filters.search) {
+            where.OR = [
+                { categoryName: { contains: filters.search, mode: 'insensitive' } },
+                { description: { contains: filters.search, mode: 'insensitive' } },
+            ];
+        }
+
+        return where;
+    }
+
+    async findAll(options?: BaseFindOptions<CategoryFilter>): Promise<Category[]> {
+        const { filters, skip = 0, take = 10, sortBy = 'displayOrder', sortOrder = 'asc' } = options || {};
+
+        return prisma.category.findMany({
+            where: this.buildWhereClause(filters),
+            include: {
+                menuItems: {
+                    where: { isActive: true },
+                },
+            },
+            skip,
+            take,
+            orderBy: this.buildOrderBy(sortBy, sortOrder) as Prisma.CategoryOrderByWithRelationInput,
+        });
+    }
+
+    async count(filters?: CategoryFilter): Promise<number> {
+        return prisma.category.count({
+            where: this.buildWhereClause(filters),
+        });
+    }
+
     async create(data: Prisma.CategoryCreateInput): Promise<Category> {
         return prisma.category.create({ data });
     }
@@ -32,21 +81,6 @@ export class CategoryRepository {
                     orderBy: { displayOrder: 'asc' }
                 }
             }
-        });
-    }
-
-    async findAll(params?: { isActive?: boolean }): Promise<Category[]> {
-        const { isActive } = params || {};
-        return prisma.category.findMany({
-            where: {
-                ...(isActive !== undefined && { isActive }),
-            },
-            orderBy: { displayOrder: 'asc' },
-            include: {
-                menuItems: {
-                    where: { isActive: true },
-                },
-            },
         });
     }
 

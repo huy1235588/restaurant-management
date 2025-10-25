@@ -1,9 +1,11 @@
 import { PaymentStatus, PaymentMethod } from '@prisma/client';
 import { prisma } from '@/config/database';
 import billRepository from '@/features/bill/bill.repository';
+import paymentRepository from '@/features/payment/payment.repository';
 import { NotFoundError, BadRequestError } from '@/shared/utils/errors';
+import { BaseFindOptions, BaseFilter } from '@/shared';
 
-interface PaymentFilters {
+interface PaymentFilters extends BaseFilter {
     billId?: number;
     status?: PaymentStatus;
     paymentMethod?: PaymentMethod;
@@ -33,25 +35,8 @@ export class PaymentService {
     /**
      * Get all payments
      */
-    async getAllPayments(filters: PaymentFilters = {}) {
-        return prisma.payment.findMany({
-            where: {
-                ...(filters.billId && { billId: filters.billId }),
-                ...(filters.status && { status: filters.status }),
-                ...(filters.paymentMethod && { paymentMethod: filters.paymentMethod }),
-            },
-            include: {
-                bill: {
-                    include: {
-                        order: true,
-                        table: true,
-                    },
-                },
-            },
-            orderBy: {
-                createdAt: 'desc',
-            },
-        });
+    async getAllPayments(options?: BaseFindOptions<PaymentFilters>) {
+        return paymentRepository.findAllPaginated(options);
     }
 
     /**

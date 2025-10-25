@@ -1,8 +1,9 @@
 import menuItemRepository from '@/features/menu/menuItem.repository';
 import categoryRepository from '@/features/category/category.repository';
 import { NotFoundError, BadRequestError } from '@/shared/utils/errors';
+import { BaseFindOptions } from '@/shared/base';
 
-interface MenuItemFilters {
+interface MenuItemFilter {
     categoryId?: number;
     isAvailable?: boolean;
     isActive?: boolean;
@@ -45,10 +46,10 @@ interface UpdateMenuItemData {
 
 export class MenuService {
     /**
-     * Get all menu items
+     * Get all menu items with pagination
      */
-    async getAllMenuItems(filters: MenuItemFilters = {}) {
-        return menuItemRepository.findAll(filters);
+    async getAllMenuItems(options?: BaseFindOptions<MenuItemFilter>) {
+        return menuItemRepository.findAllPaginated(options);
     }
 
     /**
@@ -96,15 +97,15 @@ export class MenuService {
         }
 
         // Transform data to match Prisma input
-        const createData: any = {
+        const createData: Omit<CreateMenuItemData, 'categoryId'> & { category: { connect: { categoryId: number } } } = {
             ...data,
             category: {
                 connect: { categoryId: data.categoryId }
             }
         };
-        delete createData.categoryId;
+        delete (createData as any).categoryId;
 
-        return menuItemRepository.create(createData);
+        return menuItemRepository.create(createData as any);
     }
 
     /**
@@ -164,8 +165,10 @@ export class MenuService {
         }
 
         return menuItemRepository.findAll({
-            categoryId,
-            isActive: true,
+            filters: {
+                categoryId,
+                isActive: true,
+            },
         });
     }
 }

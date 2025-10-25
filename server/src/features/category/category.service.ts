@@ -26,7 +26,7 @@ export class CategoryService {
      * Get all categories
      */
     async getAllCategories(filters: CategoryFilters = {}) {
-        return categoryRepository.findAll(filters);
+        return categoryRepository.findAll({ filters });
     }
 
     /**

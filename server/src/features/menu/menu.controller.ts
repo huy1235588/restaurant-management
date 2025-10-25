@@ -4,20 +4,26 @@ import { ApiResponse } from '@/shared/utils/response';
 
 export class MenuController {
     /**
-     * Get all menu items
+     * Get all menu items with pagination
      */
     async getAll(req: Request, res: Response, next: NextFunction) {
         try {
-            const { categoryId, isAvailable, isActive, search } = req.query;
+            const { categoryId, isAvailable, isActive, search, page = 1, limit = 10, sortBy = 'displayOrder', sortOrder = 'asc' } = req.query;
 
-            const menuItems = await menuService.getAllMenuItems({
-                categoryId: categoryId ? parseInt(categoryId as string) : undefined,
-                isAvailable: isAvailable === 'true' ? true : isAvailable === 'false' ? false : undefined,
-                isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined,
-                search: search as string,
+            const paginatedMenuItems = await menuService.getAllMenuItems({
+                filters: {
+                    categoryId: categoryId ? parseInt(categoryId as string) : undefined,
+                    isAvailable: isAvailable === 'true' ? true : isAvailable === 'false' ? false : undefined,
+                    isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined,
+                    search: search as string,
+                },
+                skip: (parseInt(page as string) - 1) * parseInt(limit as string),
+                take: parseInt(limit as string),
+                sortBy: sortBy as string,
+                sortOrder: (sortOrder as string).toLowerCase() as 'asc' | 'desc',
             });
 
-            res.json(ApiResponse.success(menuItems, 'Menu items retrieved successfully'));
+            res.json(ApiResponse.success(paginatedMenuItems, 'Menu items retrieved successfully'));
         } catch (error) {
             next(error);
         }

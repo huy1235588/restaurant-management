@@ -1,12 +1,70 @@
 import { prisma } from '@/config/database';
 import { Prisma, RestaurantTable } from '@prisma/client';
 import { TableStatus } from '@/shared/types';
+import { BaseRepository, BaseFindOptions, BaseFilter } from '@/shared/base';
+
+interface TableFilter extends BaseFilter {
+    status?: TableStatus;
+    floor?: number;
+    isActive?: boolean;
+    search?: string;
+}
 
 export type TableWithOrders = Prisma.RestaurantTableGetPayload<{
     include: { orders: true; reservations: true }
 }>;
 
-export class RestaurantTableRepository {
+export class RestaurantTableRepository extends BaseRepository<RestaurantTable, TableFilter> {
+    protected buildWhereClause(filters?: TableFilter): Prisma.RestaurantTableWhereInput {
+        if (!filters) {
+            return {};
+        }
+
+        const { status, floor, isActive, search } = filters;
+
+        const where: Prisma.RestaurantTableWhereInput = {};
+
+        if (status) {
+            where.status = status;
+        }
+        if (floor) {
+            where.floor = floor;
+        }
+        if (isActive !== undefined) {
+            where.isActive = isActive;
+        }
+        if (search) {
+            where.OR = [
+                { tableNumber: { contains: search, mode: 'insensitive' } },
+                { tableName: { contains: search, mode: 'insensitive' } },
+            ];
+        }
+
+        return where;
+    }
+
+    async findAll(options?: BaseFindOptions<TableFilter>): Promise<RestaurantTable[]> {
+        const { filters, skip = 0, take = 10, sortBy = 'tableNumber', sortOrder = 'asc' } = options || {};
+
+        return prisma.restaurantTable.findMany({
+            where: this.buildWhereClause(filters),
+            include: {
+                reservations: {
+                    where: { status: { in: ['pending', 'confirmed'] } },
+                },
+            },
+            skip,
+            take,
+            orderBy: this.buildOrderBy(sortBy, sortOrder) as Prisma.RestaurantTableOrderByWithRelationInput,
+        });
+    }
+
+    async count(filters?: TableFilter): Promise<number> {
+        return prisma.restaurantTable.count({
+            where: this.buildWhereClause(filters),
+        });
+    }
+
     async create(data: Prisma.RestaurantTableCreateInput): Promise<RestaurantTable> {
         return prisma.restaurantTable.create({ data });
     }
@@ -25,56 +83,16 @@ export class RestaurantTableRepository {
         });
     }
 
-    async findByIdWithDetails(tableId: number, includeOptions?: any) {
+    async findByIdWithDetails(tableId: number, includeOptions?: Prisma.RestaurantTableFindUniqueArgs['include']) {
         return prisma.restaurantTable.findUnique({
             where: { tableId },
-            ...includeOptions,
+            include: includeOptions,
         });
     }
 
     async findByNumber(tableNumber: string): Promise<RestaurantTable | null> {
         return prisma.restaurantTable.findUnique({
             where: { tableNumber },
-        });
-    }
-
-    async findAll(params?: {
-        status?: TableStatus;
-        floor?: number;
-        isActive?: boolean;
-        skip?: number;
-        take?: number;
-    }): Promise<RestaurantTable[]> {
-        const { status, floor, isActive, skip, take } = params || {};
-        return prisma.restaurantTable.findMany({
-            where: {
-                ...(status && { status }),
-                ...(floor && { floor }),
-                ...(isActive !== undefined && { isActive }),
-            },
-            include: {
-                reservations: {
-                    where: { status: { in: ['pending', 'confirmed'] } },
-                },
-            },
-            skip,
-            take,
-            orderBy: { tableNumber: 'asc' },
-        });
-    }
-
-    async count(params?: {
-        status?: TableStatus;
-        floor?: number;
-        isActive?: boolean;
-    }): Promise<number> {
-        const { status, floor, isActive } = params || {};
-        return prisma.restaurantTable.count({
-            where: {
-                ...(status && { status }),
-                ...(floor && { floor }),
-                ...(isActive !== undefined && { isActive }),
-            },
         });
     }
 

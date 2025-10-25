@@ -17,11 +17,63 @@ router.use(authenticate);
  * @swagger
  * /reservations:
  *   get:
- *     summary: Get all reservations
- *     description: Retrieve a list of all reservations
+ *     summary: Get all reservations with pagination
+ *     description: Retrieve a paginated list of reservations with filtering and sorting options
  *     tags: [Reservations]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *           minimum: 1
+ *           maximum: 100
+ *         description: Number of items per page
+ *       - in: query
+ *         name: status
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [pending, confirmed, cancelled, seated, completed]
+ *         description: Filter by reservation status
+ *       - in: query
+ *         name: date
+ *         required: false
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Filter by reservation date
+ *       - in: query
+ *         name: tableId
+ *         required: false
+ *         schema:
+ *           type: integer
+ *         description: Filter by table ID
+ *       - in: query
+ *         name: sortBy
+ *         required: false
+ *         schema:
+ *           type: string
+ *           default: reservationDate
+ *         description: Field to sort by (e.g., reservationDate, createdAt, status)
+ *       - in: query
+ *         name: sortOrder
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: asc
+ *         description: Sort order (asc for ascending, desc for descending)
  *     responses:
  *       200:
  *         description: Reservations retrieved successfully
@@ -37,36 +89,58 @@ router.use(authenticate);
  *                   type: string
  *                   example: Reservations retrieved successfully
  *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                       code:
- *                         type: string
- *                       customerName:
- *                         type: string
- *                       customerPhone:
- *                         type: string
- *                       tableId:
- *                         type: integer
- *                       partySize:
- *                         type: integer
- *                       reservationDate:
- *                         type: string
- *                         format: date-time
- *                       status:
- *                         type: string
- *                         enum: [pending, confirmed, cancelled, seated, completed]
- *                       notes:
- *                         type: string
- *                       createdAt:
- *                         type: string
- *                         format: date-time
- *                       updatedAt:
- *                         type: string
- *                         format: date-time
+ *                   type: object
+ *                   properties:
+ *                     items:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           reservationId:
+ *                             type: integer
+ *                           reservationCode:
+ *                             type: string
+ *                           customerName:
+ *                             type: string
+ *                           phoneNumber:
+ *                             type: string
+ *                           email:
+ *                             type: string
+ *                           tableId:
+ *                             type: integer
+ *                           headCount:
+ *                             type: integer
+ *                           reservationDate:
+ *                             type: string
+ *                             format: date-time
+ *                           reservationTime:
+ *                             type: string
+ *                           status:
+ *                             type: string
+ *                             enum: [pending, confirmed, cancelled, seated, completed]
+ *                           depositAmount:
+ *                             type: number
+ *                           notes:
+ *                             type: string
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                           updatedAt:
+ *                             type: string
+ *                             format: date-time
+ *                     pagination:
+ *                       type: object
+ *                       properties:
+ *                         page:
+ *                           type: integer
+ *                           example: 1
+ *                         limit:
+ *                           type: integer
+ *                           example: 10
+ *                         total:
+ *                           type: integer
+ *                         totalPages:
+ *                           type: integer
  *       401:
  *         description: Unauthorized
  *       500:

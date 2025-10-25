@@ -1,8 +1,56 @@
 import { prisma } from '@/config/database';
 import { Prisma, Staff } from '@prisma/client';
 import { Role } from '@/shared/types';
+import { BaseFilter, BaseFindOptions, BaseRepository } from '@/shared';
 
-export class StaffRepository {
+interface StaffFilter extends BaseFilter {
+    role?: Role;
+    isActive?: boolean;
+    createdAfter?: Date;
+}
+
+export class StaffRepository extends BaseRepository<Staff, StaffFilter> {
+    protected buildWhereClause(filters?: StaffFilter): Prisma.StaffWhereInput {
+        if (!filters) return {};
+
+        const where: Prisma.StaffWhereInput = {};
+
+        if (filters.isActive !== undefined) {
+            where.isActive = filters.isActive;
+        }
+        if (filters.role) {
+            where.role = filters.role;
+        }
+        if (filters.createdAfter) {
+            where.createdAt = { gte: filters.createdAfter };
+        }
+        if (filters.search) {
+            where.OR = [
+                { fullName: { contains: filters.search, mode: 'insensitive' } },
+            ];
+        }
+
+        return where;
+    }
+
+    async findAll(options?: BaseFindOptions<StaffFilter>): Promise<Staff[]> {
+        const { filters, skip = 0, take = 10, sortBy = 'fullName', sortOrder = 'asc' } = options || {};
+
+        return prisma.staff.findMany({
+            where: this.buildWhereClause(filters),
+            include: { account: true },
+            skip,
+            take,
+            orderBy: this.buildOrderBy(sortBy, sortOrder),
+        });
+    }
+
+    async count(filters?: StaffFilter): Promise<number> {
+        return prisma.staff.count({
+            where: this.buildWhereClause(filters),
+        });
+    }
+
     async create(data: Prisma.StaffCreateInput): Promise<Staff> {
         return prisma.staff.create({
             data,
@@ -21,35 +69,6 @@ export class StaffRepository {
         return prisma.staff.findUnique({
             where: { accountId },
             include: { account: true },
-        });
-    }
-
-    async findAll(params?: {
-        role?: Role;
-        isActive?: boolean;
-        skip?: number;
-        take?: number;
-    }): Promise<Staff[]> {
-        const { role, isActive, skip, take } = params || {};
-        return prisma.staff.findMany({
-            where: {
-                ...(role && { role }),
-                ...(isActive !== undefined && { isActive }),
-            },
-            include: { account: true },
-            skip,
-            take,
-            orderBy: { createdAt: 'desc' },
-        });
-    }
-
-    async count(params?: { role?: Role; isActive?: boolean }): Promise<number> {
-        const { role, isActive } = params || {};
-        return prisma.staff.count({
-            where: {
-                ...(role && { role }),
-                ...(isActive !== undefined && { isActive }),
-            },
         });
     }
 

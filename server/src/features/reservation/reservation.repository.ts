@@ -1,8 +1,72 @@
 import { prisma } from '@/config/database';
 import { Prisma, Reservation } from '@prisma/client';
 import { ReservationStatus } from '@/shared/types';
+import { BaseRepository, BaseFindOptions, BaseFilter } from '@/shared/base';
 
-export class ReservationRepository {
+interface ReservationFilter extends BaseFilter {
+    status?: ReservationStatus;
+    tableId?: number;
+    reservationDate?: Date;
+    phoneNumber?: string;
+    search?: string;
+}
+
+export class ReservationRepository extends BaseRepository<Reservation, ReservationFilter> {
+    protected buildWhereClause(filters?: ReservationFilter): Prisma.ReservationWhereInput {
+        if (!filters) {
+            return {};
+        }
+
+        const { status, tableId, reservationDate, phoneNumber, search } = filters;
+
+        const where: Prisma.ReservationWhereInput = {};
+
+        if (status) {
+            where.status = status;
+        }
+        if (tableId) {
+            where.tableId = tableId;
+        }
+        if (reservationDate) {
+            where.reservationDate = {
+                gte: new Date(reservationDate.setHours(0, 0, 0, 0)),
+                lt: new Date(reservationDate.setHours(23, 59, 59, 999)),
+            };
+        }
+        if (phoneNumber) {
+            where.phoneNumber = { contains: phoneNumber };
+        }
+        if (search) {
+            where.OR = [
+                { customerName: { contains: search, mode: 'insensitive' } },
+                { phoneNumber: { contains: search, mode: 'insensitive' } },
+                { reservationCode: { contains: search, mode: 'insensitive' } },
+            ];
+        }
+
+        return where;
+    }
+
+    async findAll(options?: BaseFindOptions<ReservationFilter>): Promise<Reservation[]> {
+        const { filters, skip = 0, take = 10, sortBy = 'reservationDate', sortOrder = 'asc' } = options || {};
+
+        return prisma.reservation.findMany({
+            where: this.buildWhereClause(filters),
+            include: {
+                table: true,
+            },
+            skip,
+            take,
+            orderBy: this.buildOrderBy(sortBy, sortOrder) as Prisma.ReservationOrderByWithRelationInput,
+        });
+    }
+
+    async count(filters?: ReservationFilter): Promise<number> {
+        return prisma.reservation.count({
+            where: this.buildWhereClause(filters),
+        });
+    }
+
     async create(data: Prisma.ReservationCreateInput): Promise<Reservation> {
         return prisma.reservation.create({
             data,
@@ -31,36 +95,6 @@ export class ReservationRepository {
         });
     }
 
-    async findAll(params?: {
-        status?: ReservationStatus;
-        tableId?: number;
-        reservationDate?: Date;
-        phoneNumber?: string;
-        skip?: number;
-        take?: number;
-    }): Promise<Reservation[]> {
-        const { status, tableId, reservationDate, phoneNumber, skip, take } = params || {};
-        return prisma.reservation.findMany({
-            where: {
-                ...(status && { status }),
-                ...(tableId && { tableId }),
-                ...(reservationDate && {
-                    reservationDate: {
-                        gte: new Date(reservationDate.setHours(0, 0, 0, 0)),
-                        lt: new Date(reservationDate.setHours(23, 59, 59, 999)),
-                    },
-                }),
-                ...(phoneNumber && { phoneNumber: { contains: phoneNumber } }),
-            },
-            include: {
-                table: true,
-            },
-            skip,
-            take,
-            orderBy: [{ reservationDate: 'asc' }, { reservationTime: 'asc' }],
-        });
-    }
-
     async findByPhone(phoneNumber: string): Promise<Reservation[]> {
         return prisma.reservation.findMany({
             where: { phoneNumber },
@@ -83,26 +117,6 @@ export class ReservationRepository {
             },
             take: limit || 10,
             orderBy: [{ reservationDate: 'asc' }, { reservationTime: 'asc' }],
-        });
-    }
-
-    async count(params?: {
-        status?: ReservationStatus;
-        tableId?: number;
-        reservationDate?: Date;
-    }): Promise<number> {
-        const { status, tableId, reservationDate } = params || {};
-        return prisma.reservation.count({
-            where: {
-                ...(status && { status }),
-                ...(tableId && { tableId }),
-                ...(reservationDate && {
-                    reservationDate: {
-                        gte: new Date(reservationDate.setHours(0, 0, 0, 0)),
-                        lt: new Date(reservationDate.setHours(23, 59, 59, 999)),
-                    },
-                }),
-            },
         });
     }
 

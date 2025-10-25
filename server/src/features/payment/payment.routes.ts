@@ -16,11 +16,63 @@ router.use(authenticate);
  * @swagger
  * /payments:
  *   get:
- *     summary: Get all payments
- *     description: Retrieve a list of all payments
+ *     summary: Get all payments with pagination
+ *     description: Retrieve a paginated list of payments with filtering and sorting options
  *     tags: [Payments]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *           minimum: 1
+ *           maximum: 100
+ *         description: Number of items per page
+ *       - in: query
+ *         name: billId
+ *         required: false
+ *         schema:
+ *           type: integer
+ *         description: Filter by bill ID
+ *       - in: query
+ *         name: status
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [pending, completed, failed, refunded, cancelled]
+ *         description: Filter by payment status
+ *       - in: query
+ *         name: paymentMethod
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [cash, card, digital_wallet, bank_transfer]
+ *         description: Filter by payment method
+ *       - in: query
+ *         name: sortBy
+ *         required: false
+ *         schema:
+ *           type: string
+ *           default: paymentDate
+ *         description: Field to sort by (e.g., paymentDate, amount, createdAt)
+ *       - in: query
+ *         name: sortOrder
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: Sort order (asc for ascending, desc for descending)
  *     responses:
  *       200:
  *         description: Payments retrieved successfully
@@ -36,39 +88,55 @@ router.use(authenticate);
  *                   type: string
  *                   example: Payments retrieved successfully
  *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                       billId:
- *                         type: integer
- *                       amount:
- *                         type: number
- *                       method:
- *                         type: string
- *                         enum: [cash, card, digital_wallet, bank_transfer]
- *                       status:
- *                         type: string
- *                         enum: [pending, completed, failed, refunded, cancelled]
- *                       transactionId:
- *                         type: string
- *                         nullable: true
- *                       processedAt:
- *                         type: string
- *                         format: date-time
- *                         nullable: true
- *                       refundedAt:
- *                         type: string
- *                         format: date-time
- *                         nullable: true
- *                       createdAt:
- *                         type: string
- *                         format: date-time
- *                       updatedAt:
- *                         type: string
- *                         format: date-time
+ *                   type: object
+ *                   properties:
+ *                     items:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           paymentId:
+ *                             type: integer
+ *                           billId:
+ *                             type: integer
+ *                           amount:
+ *                             type: number
+ *                           paymentMethod:
+ *                             type: string
+ *                             enum: [cash, card, digital_wallet, bank_transfer]
+ *                           status:
+ *                             type: string
+ *                             enum: [pending, completed, failed, refunded, cancelled]
+ *                           transactionId:
+ *                             type: string
+ *                             nullable: true
+ *                           cardNumber:
+ *                             type: string
+ *                             nullable: true
+ *                           cardHolderName:
+ *                             type: string
+ *                             nullable: true
+ *                           notes:
+ *                             type: string
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                           updatedAt:
+ *                             type: string
+ *                             format: date-time
+ *                     pagination:
+ *                       type: object
+ *                       properties:
+ *                         page:
+ *                           type: integer
+ *                           example: 1
+ *                         limit:
+ *                           type: integer
+ *                           example: 10
+ *                         total:
+ *                           type: integer
+ *                         totalPages:
+ *                           type: integer
  *       401:
  *         description: Unauthorized
  *       500:

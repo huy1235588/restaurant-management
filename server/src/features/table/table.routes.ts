@@ -17,11 +17,62 @@ router.use(authenticate);
  * @swagger
  * /tables:
  *   get:
- *     summary: Get all tables
- *     description: Retrieve a list of all restaurant tables
+ *     summary: Get all tables with pagination
+ *     description: Retrieve a paginated list of restaurant tables with filtering and sorting options
  *     tags: [Tables]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *           minimum: 1
+ *           maximum: 100
+ *         description: Number of items per page
+ *       - in: query
+ *         name: status
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [available, occupied, reserved, maintenance]
+ *         description: Filter by table status
+ *       - in: query
+ *         name: floor
+ *         required: false
+ *         schema:
+ *           type: integer
+ *         description: Filter by floor number
+ *       - in: query
+ *         name: isActive
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *         description: Filter by active status (true/false)
+ *       - in: query
+ *         name: sortBy
+ *         required: false
+ *         schema:
+ *           type: string
+ *           default: tableNumber
+ *         description: Field to sort by (e.g., tableNumber, capacity, floor)
+ *       - in: query
+ *         name: sortOrder
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: asc
+ *         description: Sort order (asc for ascending, desc for descending)
  *     responses:
  *       200:
  *         description: Tables retrieved successfully
@@ -37,27 +88,51 @@ router.use(authenticate);
  *                   type: string
  *                   example: Tables retrieved successfully
  *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                       number:
- *                         type: integer
- *                       capacity:
- *                         type: integer
- *                       status:
- *                         type: string
- *                         enum: [available, occupied, reserved, cleaning]
- *                       location:
- *                         type: string
- *                       createdAt:
- *                         type: string
- *                         format: date-time
- *                       updatedAt:
- *                         type: string
- *                         format: date-time
+ *                   type: object
+ *                   properties:
+ *                     items:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           tableId:
+ *                             type: integer
+ *                           tableNumber:
+ *                             type: string
+ *                           tableName:
+ *                             type: string
+ *                           capacity:
+ *                             type: integer
+ *                           minCapacity:
+ *                             type: integer
+ *                           floor:
+ *                             type: integer
+ *                           section:
+ *                             type: string
+ *                           status:
+ *                             type: string
+ *                             enum: [available, occupied, reserved, maintenance]
+ *                           isActive:
+ *                             type: boolean
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                           updatedAt:
+ *                             type: string
+ *                             format: date-time
+ *                     pagination:
+ *                       type: object
+ *                       properties:
+ *                         page:
+ *                           type: integer
+ *                           example: 1
+ *                         limit:
+ *                           type: integer
+ *                           example: 10
+ *                         total:
+ *                           type: integer
+ *                         totalPages:
+ *                           type: integer
  *       401:
  *         description: Unauthorized
  *       500:

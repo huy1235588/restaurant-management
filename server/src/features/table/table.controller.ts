@@ -8,12 +8,18 @@ export class TableController {
      */
     async getAll(req: Request, res: Response, next: NextFunction) {
         try {
-            const { status, floor, isActive } = req.query;
+            const { status, floor, isActive, page = 1, limit = 10, sortBy = 'tableNumber', sortOrder = 'asc' } = req.query;
 
             const tables = await tableService.getAllTables({
-                status: status as any,
-                floor: floor ? parseInt(floor as string) : undefined,
-                isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined,
+                filters: {
+                    status: status as any,
+                    floor: floor ? parseInt(floor as string) : undefined,
+                    isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined,
+                },
+                skip: (parseInt(page as string) - 1) * parseInt(limit as string),
+                take: parseInt(limit as string),
+                sortBy: sortBy as string,
+                sortOrder: (sortOrder as string).toLowerCase() as 'asc' | 'desc',
             });
 
             res.json(ApiResponse.success(tables, 'Tables retrieved successfully'));

@@ -2,10 +2,12 @@ import { Role } from '@prisma/client';
 import staffRepository from '@/features/staff/staff.repository';
 import accountRepository from '@/features/auth/account.repository';
 import { NotFoundError, BadRequestError } from '@/shared/utils/errors';
+import { BaseFindOptions } from '@/shared';
 
 interface StaffFilters {
     role?: Role;
     isActive?: boolean;
+    search?: string;
 }
 
 interface CreateStaffData {
@@ -33,8 +35,8 @@ export class StaffService {
     /**
      * Get all staff
      */
-    async getAllStaff(filters: StaffFilters = {}) {
-        return staffRepository.findAll(filters);
+    async getAllStaff(options?: BaseFindOptions<StaffFilters>) {
+        return staffRepository.findAll(options);
     }
 
     /**
@@ -120,7 +122,9 @@ export class StaffService {
      * Get staff by role
      */
     async getStaffByRole(role: Role) {
-        return staffRepository.findAll({ role, isActive: true });
+        return staffRepository.findAll({
+            filters: { role, isActive: true },
+        });
     }
 
     /**

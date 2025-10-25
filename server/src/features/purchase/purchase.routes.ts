@@ -22,33 +22,54 @@ const router: Router = Router();
  * @swagger
  * /purchase-orders:
  *   get:
- *     summary: Get all purchase orders
- *     description: Retrieve a list of all purchase orders with optional filters
+ *     summary: Get all purchase orders with pagination
+ *     description: Retrieve a paginated list of purchase orders with optional filters and sorting
  *     tags: [Purchase]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
+ *         required: false
  *         schema:
  *           type: integer
- *         description: Page number
+ *           default: 1
+ *         description: Page number for pagination
  *       - in: query
  *         name: limit
+ *         required: false
  *         schema:
  *           type: integer
+ *           default: 10
  *         description: Number of items per page
  *       - in: query
  *         name: status
+ *         required: false
  *         schema:
  *           type: string
  *           enum: [pending, received, cancelled]
  *         description: Filter by order status
  *       - in: query
  *         name: supplierId
+ *         required: false
  *         schema:
  *           type: integer
  *         description: Filter by supplier ID
+ *       - in: query
+ *         name: sortBy
+ *         required: false
+ *         schema:
+ *           type: string
+ *           default: createdAt
+ *         description: Field to sort by (e.g., createdAt, totalAmount, status)
+ *       - in: query
+ *         name: sortOrder
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: Sort order (asc for ascending, desc for descending)
  *     responses:
  *       200:
  *         description: Purchase orders retrieved successfully
@@ -64,20 +85,51 @@ const router: Router = Router();
  *                   type: string
  *                   example: Purchase orders retrieved successfully
  *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                       orderNumber:
- *                         type: string
- *                       status:
- *                         type: string
- *                         enum: [pending, received, cancelled]
- *                       totalAmount:
- *                         type: number
- *                       supplier:
+ *                   type: object
+ *                   properties:
+ *                     items:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           purchaseOrderId:
+ *                             type: integer
+ *                           purchaseOrderCode:
+ *                             type: string
+ *                           status:
+ *                             type: string
+ *                             enum: [pending, received, cancelled]
+ *                           totalAmount:
+ *                             type: number
+ *                           supplierId:
+ *                             type: integer
+ *                           orderDate:
+ *                             type: string
+ *                             format: date-time
+ *                           expectedDeliveryDate:
+ *                             type: string
+ *                             format: date
+ *                           notes:
+ *                             type: string
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                           updatedAt:
+ *                             type: string
+ *                             format: date-time
+ *                     pagination:
+ *                       type: object
+ *                       properties:
+ *                         page:
+ *                           type: integer
+ *                           example: 1
+ *                         limit:
+ *                           type: integer
+ *                           example: 10
+ *                         total:
+ *                           type: integer
+ *                         totalPages:
+ *                           type: integer
  *                         type: object
  *                         properties:
  *                           id:

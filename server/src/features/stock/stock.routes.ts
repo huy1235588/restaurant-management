@@ -18,45 +18,68 @@ const router: Router = Router();
  * @swagger
  * /stock/transactions:
  *   get:
- *     summary: Get all stock transactions
- *     description: Retrieve a list of all stock transactions with optional filters
+ *     summary: Get all stock transactions with pagination
+ *     description: Retrieve a paginated list of stock transactions with optional filters and sorting
  *     tags: [Stock]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
+ *         required: false
  *         schema:
  *           type: integer
- *         description: Page number
+ *           default: 1
+ *         description: Page number for pagination
  *       - in: query
  *         name: limit
+ *         required: false
  *         schema:
  *           type: integer
+ *           default: 10
  *         description: Number of items per page
  *       - in: query
  *         name: ingredientId
+ *         required: false
  *         schema:
  *           type: integer
  *         description: Filter by ingredient ID
  *       - in: query
  *         name: type
+ *         required: false
  *         schema:
  *           type: string
  *           enum: [in, out, adjustment]
  *         description: Filter by transaction type
  *       - in: query
  *         name: startDate
+ *         required: false
  *         schema:
  *           type: string
  *           format: date
  *         description: Start date for filtering
  *       - in: query
  *         name: endDate
+ *         required: false
  *         schema:
  *           type: string
  *           format: date
  *         description: End date for filtering
+ *       - in: query
+ *         name: sortBy
+ *         required: false
+ *         schema:
+ *           type: string
+ *           default: createdAt
+ *         description: Field to sort by (e.g., createdAt, quantity, type)
+ *       - in: query
+ *         name: sortOrder
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: Sort order (asc for ascending, desc for descending)
  *     responses:
  *       200:
  *         description: Stock transactions retrieved successfully
@@ -72,12 +95,45 @@ const router: Router = Router();
  *                   type: string
  *                   example: Stock transactions retrieved successfully
  *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
+ *                   type: object
+ *                   properties:
+ *                     items:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           transactionId:
+ *                             type: integer
+ *                           ingredientId:
+ *                             type: integer
+ *                           type:
+ *                             type: string
+ *                             enum: [in, out, adjustment]
+ *                           quantity:
+ *                             type: number
+ *                           unit:
+ *                             type: string
+ *                           notes:
+ *                             type: string
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                           updatedAt:
+ *                             type: string
+ *                             format: date-time
+ *                     pagination:
+ *                       type: object
+ *                       properties:
+ *                         page:
+ *                           type: integer
+ *                           example: 1
+ *                         limit:
+ *                           type: integer
+ *                           example: 10
+ *                         total:
+ *                           type: integer
+ *                         totalPages:
+ *                           type: integer
  *                       ingredientId:
  *                         type: integer
  *                       type:

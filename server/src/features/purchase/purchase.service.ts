@@ -24,8 +24,14 @@ export class PurchaseService {
      * Get all purchase orders with filters
      */
     async getAllPurchaseOrders(query: PurchaseOrderQueryDto) {
-        const { page = 1, limit = 20, ...filters } = query;
-        return purchaseOrderRepository.findAll(filters, page, limit);
+        const { filters, skip = 0, take = 20, sortBy = 'createdAt', sortOrder = 'desc' } = query;
+        return purchaseOrderRepository.findAll({
+            filters: filters as any,
+            skip,
+            take,
+            sortBy,
+            sortOrder,
+        });
     }
 
     /**
@@ -141,17 +147,17 @@ export class PurchaseService {
             }
         }
 
-        const updateData: any = {
+        const updateData: Record<string, unknown> = {
             expectedDate: data.expectedDate ? new Date(data.expectedDate) : undefined,
             notes: data.notes,
             status: data.status,
         };
 
         if (data.supplierId) {
-            updateData.supplier = { connect: { supplierId: data.supplierId } };
+            updateData['supplier'] = { connect: { supplierId: data.supplierId } };
         }
 
-        return purchaseOrderRepository.update(purchaseOrderId, updateData);
+        return purchaseOrderRepository.update(purchaseOrderId, updateData as any);
     }
 
     /**

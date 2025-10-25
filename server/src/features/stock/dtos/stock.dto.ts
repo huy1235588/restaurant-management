@@ -15,12 +15,16 @@ export interface StockAdjustmentDto {
 }
 
 export interface StockTransactionQueryDto {
-    page?: number;
-    limit?: number;
-    ingredientId?: number;
-    transactionType?: 'in' | 'out' | 'adjustment' | 'waste';
-    fromDate?: string;
-    toDate?: string;
+    filters?: {
+        ingredientId?: number;
+        transactionType?: 'in' | 'out' | 'adjustment' | 'waste';
+        fromDate?: string;
+        toDate?: string;
+    };
+    skip?: number;
+    take?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
 }
 
 export interface CreateIngredientBatchDto {

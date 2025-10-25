@@ -8,12 +8,18 @@ export class ReservationController {
      */
     async getAll(req: Request, res: Response, next: NextFunction) {
         try {
-            const { status, date, tableId } = req.query;
+            const { status, date, tableId, page = 1, limit = 10, sortBy = 'reservationDate', sortOrder = 'asc' } = req.query;
 
             const reservations = await reservationService.getAllReservations({
-                status: status as any,
-                date: date ? new Date(date as string) : undefined,
-                tableId: tableId ? parseInt(tableId as string) : undefined,
+                filters: {
+                    status: status as any,
+                    date: date ? new Date(date as string) : undefined,
+                    tableId: tableId ? parseInt(tableId as string) : undefined,
+                },
+                skip: (parseInt(page as string) - 1) * parseInt(limit as string),
+                take: parseInt(limit as string),
+                sortBy: sortBy as string,
+                sortOrder: (sortOrder as string).toLowerCase() as 'asc' | 'desc',
             });
 
             res.json(ApiResponse.success(reservations, 'Reservations retrieved successfully'));

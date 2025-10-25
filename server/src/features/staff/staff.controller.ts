@@ -8,11 +8,18 @@ export class StaffController {
      */
     async getAll(req: Request, res: Response, next: NextFunction) {
         try {
-            const { role, isActive } = req.query;
+            const { role, isActive, search, page = 1, limit = 10, sortBy = 'fullName', sortOrder = 'asc' } = req.query;
 
             const staff = await staffService.getAllStaff({
-                role: role as any,
-                isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined,
+                filters: {
+                    role: role as any,
+                    isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined,
+                    search: search as string,
+                },
+                skip: (parseInt(page as string) - 1) * parseInt(limit as string),
+                take: parseInt(limit as string),
+                sortBy: sortBy as string,
+                sortOrder: (sortOrder as string).toLowerCase() as 'asc' | 'desc',
             });
 
             res.json(ApiResponse.success(staff, 'Staff retrieved successfully'));

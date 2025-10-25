@@ -32,10 +32,14 @@ export interface ReceivePurchaseOrderItemDto {
 }
 
 export interface PurchaseOrderQueryDto {
-    page?: number;
-    limit?: number;
-    supplierId?: number;
-    status?: 'pending' | 'ordered' | 'received' | 'cancelled';
-    fromDate?: string;
-    toDate?: string;
+    filters?: {
+        supplierId?: number;
+        status?: 'pending' | 'ordered' | 'received' | 'cancelled';
+        fromDate?: string;
+        toDate?: string;
+    };
+    skip?: number;
+    take?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
 }

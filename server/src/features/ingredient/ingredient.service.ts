@@ -1,6 +1,7 @@
 import ingredientRepository from './ingredient.repository';
 import ingredientCategoryRepository from './ingredientCategory.repository';
 import { NotFoundError, BadRequestError } from '@/shared/utils/errors';
+import { Prisma } from '@prisma/client';
 import {
     CreateIngredientDto,
     UpdateIngredientDto,
@@ -19,7 +20,7 @@ export class IngredientService {
      */
     async getAllIngredients(query: IngredientQueryDto) {
         const { page = 1, limit = 20, ...filters } = query;
-        return ingredientRepository.findAll(filters, page, limit);
+        return ingredientRepository.findAll({ filters, skip: (page - 1) * limit, take: limit });
     }
 
     /**
@@ -117,7 +118,7 @@ export class IngredientService {
             }
         }
 
-        const updateData: any = {
+        const updateData: Prisma.IngredientUpdateInput = {
             ingredientCode: data.ingredientCode,
             ingredientName: data.ingredientName,
             unit: data.unit,

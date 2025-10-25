@@ -2,6 +2,7 @@ import stockRepository from './stock.repository';
 import ingredientRepository from '../ingredient/ingredient.repository';
 import { prisma } from '@/config/database';
 import { NotFoundError, BadRequestError } from '@/shared/utils/errors';
+import { Prisma } from '@prisma/client';
 import {
     CreateStockTransactionDto,
     StockAdjustmentDto,
@@ -19,8 +20,14 @@ export class StockService {
      * Get all stock transactions with filters
      */
     async getAllTransactions(query: StockTransactionQueryDto) {
-        const { page = 1, limit = 20, ...filters } = query;
-        return stockRepository.findAllTransactions(filters, page, limit);
+        const { filters, skip = 0, take = 20, sortBy = 'createdAt', sortOrder = 'desc' } = query;
+        return stockRepository.findAll({ 
+            filters, 
+            skip, 
+            take, 
+            sortBy,
+            sortOrder
+        });
     }
 
     /**
@@ -298,7 +305,7 @@ export class StockService {
     // PRIVATE HELPER METHODS
     // ============================================
 
-    private async createLowStockAlert(ingredientId: number, tx?: any) {
+    private async createLowStockAlert(ingredientId: number, tx?: Prisma.TransactionClient) {
         const prismaClient = tx || prisma;
 
         // Check if alert already exists

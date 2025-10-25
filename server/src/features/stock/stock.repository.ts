@@ -1,22 +1,21 @@
 import { prisma } from '@/config/database';
-import { Prisma } from '@prisma/client';
+import { Prisma, StockTransaction } from '@prisma/client';
+import { BaseRepository, BaseFindOptions, BaseFilter } from '@/shared/base';
 
-export interface StockTransactionFilters {
+export interface StockTransactionFilters extends BaseFilter {
     ingredientId?: number;
     transactionType?: 'in' | 'out' | 'adjustment' | 'waste';
     fromDate?: string;
     toDate?: string;
+    search?: string;
 }
 
-class StockRepository {
-    /**
-     * Find all stock transactions with filters and pagination
-     */
-    async findAllTransactions(
-        filters: StockTransactionFilters = {},
-        page: number = 1,
-        limit: number = 20
-    ) {
+export class StockRepository extends BaseRepository<StockTransaction, StockTransactionFilters> {
+    protected buildWhereClause(filters?: StockTransactionFilters): Prisma.StockTransactionWhereInput {
+        if (!filters) {
+            return {};
+        }
+
         const where: Prisma.StockTransactionWhereInput = {};
 
         if (filters.ingredientId) {
@@ -37,34 +36,40 @@ class StockRepository {
             }
         }
 
-        const [transactions, total] = await Promise.all([
-            prisma.stockTransaction.findMany({
-                where,
-                include: {
-                    ingredient: true,
-                    staff: {
-                        select: {
-                            staffId: true,
-                            fullName: true,
-                        },
+        if (filters.search) {
+            where.OR = [
+                { referenceType: { contains: filters.search, mode: 'insensitive' } },
+                { notes: { contains: filters.search, mode: 'insensitive' } },
+            ];
+        }
+
+        return where;
+    }
+
+    async findAll(options?: BaseFindOptions<StockTransactionFilters>): Promise<StockTransaction[]> {
+        const { filters, skip = 0, take = 20, sortBy = 'transactionDate', sortOrder = 'desc' } = options || {};
+
+        return prisma.stockTransaction.findMany({
+            where: this.buildWhereClause(filters),
+            include: {
+                ingredient: true,
+                staff: {
+                    select: {
+                        staffId: true,
+                        fullName: true,
                     },
                 },
-                skip: (page - 1) * limit,
-                take: limit,
-                orderBy: { transactionDate: 'desc' },
-            }),
-            prisma.stockTransaction.count({ where }),
-        ]);
-
-        return {
-            data: transactions,
-            pagination: {
-                page,
-                limit,
-                total,
-                totalPages: Math.ceil(total / limit),
             },
-        };
+            skip,
+            take,
+            orderBy: this.buildOrderBy(sortBy, sortOrder) as Prisma.StockTransactionOrderByWithRelationInput,
+        });
+    }
+
+    async count(filters?: StockTransactionFilters): Promise<number> {
+        return prisma.stockTransaction.count({
+            where: this.buildWhereClause(filters),
+        });
     }
 
     /**

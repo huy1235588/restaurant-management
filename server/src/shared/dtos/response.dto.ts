@@ -9,7 +9,7 @@ export class ResponseDto {
         };
     }
 
-    static error(message: string, error?: any): ApiResponse {
+    static error(message: string, error?: unknown): ApiResponse {
         return {
             success: false,
             message,

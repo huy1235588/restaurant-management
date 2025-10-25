@@ -124,7 +124,7 @@ router.post(
  * @swagger
  * /orders:
  *   get:
- *     summary: Get all orders with filtering and pagination
+ *     summary: Get all orders with filtering, pagination and sorting
  *     tags: [Orders]
  *     security:
  *       - bearerAuth: []
@@ -165,8 +165,23 @@ router.post(
  *           type: integer
  *           minimum: 1
  *           maximum: 100
- *           default: 10
+ *           default: 20
  *         description: Number of items per page
+ *       - in: query
+ *         name: sortBy
+ *         required: false
+ *         schema:
+ *           type: string
+ *           default: createdAt
+ *         description: Field to sort by (e.g., createdAt, status, tableId)
+ *       - in: query
+ *         name: sortOrder
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: Sort order (asc for ascending, desc for descending)
  *     responses:
  *       200:
  *         description: Orders retrieved successfully

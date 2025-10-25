@@ -3,10 +3,12 @@ import kitchenRepository from '@/features/kitchen/kitchen.repository';
 import orderRepository from '@/features/order/order.repository';
 import staffRepository from '@/features/staff/staff.repository';
 import { NotFoundError, BadRequestError } from '@/shared/utils/errors';
+import { BaseFindOptions } from '@/shared';
 
 interface KitchenOrderFilters {
     status?: OrderStatus;
-    priority?: number;
+    staffId?: number;
+    search?: string;
 }
 
 interface CreateKitchenOrderData {
@@ -32,8 +34,8 @@ export class KitchenService {
     /**
      * Get all kitchen orders
      */
-    async getAllKitchenOrders(filters: KitchenOrderFilters = {}) {
-        return kitchenRepository.findAll(filters);
+    async getAllKitchenOrders(options?: BaseFindOptions<KitchenOrderFilters>) {
+        return kitchenRepository.findAllPaginated(options);
     }
 
     /**
@@ -176,7 +178,9 @@ export class KitchenService {
      * Get pending orders
      */
     async getPendingOrders() {
-        return kitchenRepository.findAll({ status: 'pending' });
+        return kitchenRepository.findAll({
+            filters: { status: 'pending' },
+        });
     }
 
     /**
@@ -193,7 +197,9 @@ export class KitchenService {
             throw new BadRequestError('Staff member is not a chef');
         }
 
-        return kitchenRepository.findAll({ staffId });
+        return kitchenRepository.findAll({
+            filters: { staffId },
+        });
     }
 }
 

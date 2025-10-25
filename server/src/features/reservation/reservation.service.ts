@@ -2,8 +2,9 @@ import { ReservationStatus } from '@prisma/client';
 import reservationRepository from '@/features/reservation/reservation.repository';
 import tableRepository from '@/features/table/table.repository';
 import { NotFoundError, BadRequestError } from '@/shared/utils/errors';
+import { BaseFindOptions, BaseFilter } from '@/shared/base';
 
-interface ReservationFilters {
+interface ReservationFilters extends BaseFilter {
     status?: ReservationStatus;
     date?: Date;
     tableId?: number;
@@ -43,8 +44,8 @@ export class ReservationService {
     /**
      * Get all reservations
      */
-    async getAllReservations(filters: ReservationFilters = {}) {
-        return reservationRepository.findAll(filters);
+    async getAllReservations(options?: BaseFindOptions<ReservationFilters>) {
+        return reservationRepository.findAllPaginated(options);
     }
 
     /**
@@ -106,15 +107,15 @@ export class ReservationService {
         }
 
         // Transform data to match Prisma input
-        const createData: any = {
+        const createData: Omit<CreateReservationData, 'tableId'> & { table: { connect: { tableId: number } } } = {
             ...data,
             table: {
                 connect: { tableId: data.tableId }
             }
         };
-        delete createData.tableId;
+        delete (createData as any).tableId;
 
-        return reservationRepository.create(createData);
+        return reservationRepository.create(createData as any);
     }
 
     /**
@@ -202,8 +203,10 @@ export class ReservationService {
     ): Promise<boolean> {
         // Get all reservations for this table on this date
         const reservations = await reservationRepository.findAll({
-            tableId,
-            reservationDate: date,
+            filters: {
+                tableId,
+                reservationDate: date,
+            },
         });
 
         // Parse the requested time

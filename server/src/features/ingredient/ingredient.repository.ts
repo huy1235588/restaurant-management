@@ -1,22 +1,20 @@
 import { prisma } from '@/config/database';
-import { Prisma } from '@prisma/client';
+import { Prisma, Ingredient } from '@prisma/client';
+import { BaseRepository, BaseFindOptions, BaseFilter } from '@/shared/base';
 
-export interface IngredientFilters {
+export interface IngredientFilters extends BaseFilter {
     categoryId?: number;
     isActive?: boolean;
     lowStock?: boolean;
     search?: string;
 }
 
-class IngredientRepository {
-    /**
-     * Find all ingredients with filters and pagination
-     */
-    async findAll(
-        filters: IngredientFilters = {},
-        page: number = 1,
-        limit: number = 20
-    ) {
+export class IngredientRepository extends BaseRepository<Ingredient, IngredientFilters> {
+    protected buildWhereClause(filters?: IngredientFilters): Prisma.IngredientWhereInput {
+        if (!filters) {
+            return {};
+        }
+
         const where: Prisma.IngredientWhereInput = {};
 
         if (filters.categoryId) {
@@ -34,34 +32,45 @@ class IngredientRepository {
             ];
         }
 
-        const [ingredients, total] = await Promise.all([
-            prisma.ingredient.findMany({
-                where,
-                include: {
-                    category: true,
-                    _count: {
-                        select: {
-                            recipes: true,
-                            batches: true,
-                        },
+        return where;
+    }
+
+    async findAll(options?: BaseFindOptions<IngredientFilters>): Promise<Ingredient[]> {
+        const { filters, skip = 0, take = 20, sortBy = 'createdAt', sortOrder = 'desc' } = options || {};
+
+        let where = this.buildWhereClause(filters);
+
+        // Apply lowStock filter separately if needed
+        if (filters?.lowStock) {
+            const lowStockIngredients = await this.findLowStock();
+            const lowStockIds = (lowStockIngredients as any[]).map(ing => ing.ingredientId);
+            where = {
+                ...where,
+                ingredientId: { in: lowStockIds },
+            };
+        }
+
+        return prisma.ingredient.findMany({
+            where,
+            include: {
+                category: true,
+                _count: {
+                    select: {
+                        recipes: true,
+                        batches: true,
                     },
                 },
-                skip: (page - 1) * limit,
-                take: limit,
-                orderBy: { createdAt: 'desc' },
-            }),
-            prisma.ingredient.count({ where }),
-        ]);
-
-        return {
-            data: ingredients,
-            pagination: {
-                page,
-                limit,
-                total,
-                totalPages: Math.ceil(total / limit),
             },
-        };
+            skip,
+            take,
+            orderBy: this.buildOrderBy(sortBy, sortOrder) as Prisma.IngredientOrderByWithRelationInput,
+        });
+    }
+
+    async count(filters?: IngredientFilters): Promise<number> {
+        return prisma.ingredient.count({
+            where: this.buildWhereClause(filters),
+        });
     }
 
     /**

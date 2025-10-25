@@ -17,11 +17,67 @@ router.use(authenticate);
  * @swagger
  * /menu:
  *   get:
- *     summary: Get all menu items
- *     description: Retrieve a list of all menu items
+ *     summary: Get all menu items with pagination
+ *     description: Retrieve a paginated list of menu items with filtering and sorting options
  *     tags: [Menu]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *           minimum: 1
+ *           maximum: 100
+ *         description: Number of items per page
+ *       - in: query
+ *         name: categoryId
+ *         required: false
+ *         schema:
+ *           type: integer
+ *         description: Filter by category ID
+ *       - in: query
+ *         name: isAvailable
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *         description: Filter by availability status (true/false)
+ *       - in: query
+ *         name: isActive
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *         description: Filter by active status (true/false)
+ *       - in: query
+ *         name: search
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Search by item name, code, or description
+ *       - in: query
+ *         name: sortBy
+ *         required: false
+ *         schema:
+ *           type: string
+ *           default: displayOrder
+ *         description: Field to sort by (e.g., displayOrder, price, itemName)
+ *       - in: query
+ *         name: sortOrder
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: asc
+ *         description: Sort order (asc for ascending, desc for descending)
  *     responses:
  *       200:
  *         description: Menu items retrieved successfully
@@ -37,32 +93,71 @@ router.use(authenticate);
  *                   type: string
  *                   example: Menu items retrieved successfully
  *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                       code:
- *                         type: string
- *                       name:
- *                         type: string
- *                       description:
- *                         type: string
- *                       price:
- *                         type: number
- *                       categoryId:
- *                         type: integer
- *                       isAvailable:
- *                         type: boolean
- *                       imageUrl:
- *                         type: string
- *                       createdAt:
- *                         type: string
- *                         format: date-time
- *                       updatedAt:
- *                         type: string
- *                         format: date-time
+ *                   type: object
+ *                   properties:
+ *                     items:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           itemId:
+ *                             type: integer
+ *                           itemCode:
+ *                             type: string
+ *                           itemName:
+ *                             type: string
+ *                           description:
+ *                             type: string
+ *                           price:
+ *                             type: number
+ *                           cost:
+ *                             type: number
+ *                           categoryId:
+ *                             type: integer
+ *                           isAvailable:
+ *                             type: boolean
+ *                           isActive:
+ *                             type: boolean
+ *                           imageUrl:
+ *                             type: string
+ *                           preparationTime:
+ *                             type: integer
+ *                           spicyLevel:
+ *                             type: integer
+ *                           isVegetarian:
+ *                             type: boolean
+ *                           calories:
+ *                             type: integer
+ *                           displayOrder:
+ *                             type: integer
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                           updatedAt:
+ *                             type: string
+ *                             format: date-time
+ *                           category:
+ *                             type: object
+ *                             properties:
+ *                               categoryId:
+ *                                 type: integer
+ *                               categoryName:
+ *                                 type: string
+ *                     pagination:
+ *                       type: object
+ *                       properties:
+ *                         page:
+ *                           type: integer
+ *                           example: 1
+ *                         limit:
+ *                           type: integer
+ *                           example: 10
+ *                         total:
+ *                           type: integer
+ *                           example: 25
+ *                         totalPages:
+ *                           type: integer
+ *                           example: 3
  *       401:
  *         description: Unauthorized
  *       500:

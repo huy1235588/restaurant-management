@@ -13,7 +13,7 @@ export class IngredientController {
      */
     async getAllIngredients(req: Request, res: Response, next: NextFunction) {
         try {
-            const result = await ingredientService.getAllIngredients(req.query as any);
+            const result = await ingredientService.getAllIngredients(req.query);
             return ResponseHandler.success(res, 'Ingredients retrieved successfully', result);
         } catch (error) {
             return next(error);
