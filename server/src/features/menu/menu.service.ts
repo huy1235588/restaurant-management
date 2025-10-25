@@ -2,13 +2,7 @@ import menuItemRepository from '@/features/menu/menuItem.repository';
 import categoryRepository from '@/features/category/category.repository';
 import { NotFoundError, BadRequestError } from '@/shared/utils/errors';
 import { BaseFindOptions } from '@/shared/base';
-
-interface MenuItemFilter {
-    categoryId?: number;
-    isAvailable?: boolean;
-    isActive?: boolean;
-    search?: string;
-}
+import { MenuItemFilterDto } from './dtos';
 
 interface CreateMenuItemData {
     itemCode: string;
@@ -45,10 +39,22 @@ interface UpdateMenuItemData {
 }
 
 export class MenuService {
+
+    /**
+     * Count menu items by filter
+     */
+    async countMenuItems(filter?: MenuItemFilterDto) {
+        return menuItemRepository.count({
+            categoryId: filter?.categoryId,
+            isAvailable: filter?.isAvailable,
+            isActive: filter?.isActive,
+        });
+    }
+
     /**
      * Get all menu items with pagination
      */
-    async getAllMenuItems(options?: BaseFindOptions<MenuItemFilter>) {
+    async getAllMenuItems(options?: BaseFindOptions<MenuItemFilterDto>) {
         return menuItemRepository.findAllPaginated(options);
     }
 

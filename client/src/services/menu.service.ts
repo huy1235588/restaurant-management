@@ -10,6 +10,8 @@ export const menuApi = {
         search?: string;
         page?: number;
         limit?: number;
+        sortBy?: string;
+        sortOrder?: string;
     }): Promise<PaginatedResponse<MenuItem>> => {
         const response = await axiosInstance.get<ApiResponse<PaginatedResponse<MenuItem>>>(
             '/menu',

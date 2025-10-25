@@ -3,6 +3,28 @@ import { menuService } from '@/features/menu/menu.service';
 import { ApiResponse } from '@/shared/utils/response';
 
 export class MenuController {
+
+    /**
+     * Count menu items by filter
+     */
+    async count(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { categoryId, isAvailable, isActive } = req.query;
+            const count = await menuService.countMenuItems({
+                categoryId: categoryId ? parseInt(categoryId as string) : undefined,
+                isAvailable: isAvailable === 'true' ? true : isAvailable === 'false' ? false : undefined,
+                isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined,
+            });
+            let message = 'Menu items count retrieved successfully';
+            if (categoryId) message += ` for category ${categoryId}`;
+            if (isAvailable !== undefined) message += ` with availability ${isAvailable}`;
+            if (isActive !== undefined) message += ` with active status ${isActive}`;
+            res.json(ApiResponse.success({ count }, message));
+        } catch (error) {
+            next(error);
+        }
+    }
+
     /**
      * Get all menu items with pagination
      */

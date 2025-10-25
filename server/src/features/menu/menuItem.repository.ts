@@ -1,16 +1,10 @@
 import { prisma } from '@/config/database';
 import { Prisma, MenuItem } from '@prisma/client';
 import { BaseRepository, BaseFindOptions } from '@/shared/base';
+import { MenuItemFilterDto } from './dtos';
 
-interface MenuItemFilter {
-    categoryId?: number;
-    isAvailable?: boolean;
-    isActive?: boolean;
-    search?: string;
-}
-
-export class MenuItemRepository extends BaseRepository<MenuItem, MenuItemFilter> {
-    protected buildWhereClause(filters?: MenuItemFilter): Prisma.MenuItemWhereInput {
+export class MenuItemRepository extends BaseRepository<MenuItem, MenuItemFilterDto> {
+    protected buildWhereClause(filters?: MenuItemFilterDto): Prisma.MenuItemWhereInput {
         if (!filters) {
             return {};
         }
@@ -39,7 +33,7 @@ export class MenuItemRepository extends BaseRepository<MenuItem, MenuItemFilter>
         return where;
     }
 
-    async findAll(options?: BaseFindOptions<MenuItemFilter>): Promise<MenuItem[]> {
+    async findAll(options?: BaseFindOptions<MenuItemFilterDto>): Promise<MenuItem[]> {
         const { filters, skip = 0, take = 10, sortBy = 'displayOrder', sortOrder = 'asc' } = options || {};
 
         return prisma.menuItem.findMany({
@@ -51,7 +45,7 @@ export class MenuItemRepository extends BaseRepository<MenuItem, MenuItemFilter>
         });
     }
 
-    async count(filters?: MenuItemFilter): Promise<number> {
+    async count(filters?: MenuItemFilterDto): Promise<number> {
         return prisma.menuItem.count({
             where: this.buildWhereClause(filters),
         });

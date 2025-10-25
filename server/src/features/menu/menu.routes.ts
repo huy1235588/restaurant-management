@@ -15,6 +15,67 @@ router.use(authenticate);
 
 /**
  * @swagger
+ * /menu/count:
+ *   get:
+ *     summary: Get menu items count
+ *     description: Retrieve the total count of menu items with optional filtering
+ *     tags: [Menu]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: categoryId
+ *         required: false
+ *         schema:
+ *           type: integer
+ *         description: Filter by category ID
+ *       - in: query
+ *         name: isAvailable
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *         description: Filter by availability status
+ *       - in: query
+ *         name: isActive
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *         description: Filter by active status
+ *       - in: query
+ *         name: search
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Search by item name, code, or description
+ *     responses:
+ *       200:
+ *         description: Count retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Menu items count retrieved successfully for category 1 with availability true with active status true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     count:
+ *                       type: integer
+ *                       example: 25
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/count', menuController.count.bind(menuController));
+
+/**
+ * @swagger
  * /menu:
  *   get:
  *     summary: Get all menu items with pagination
