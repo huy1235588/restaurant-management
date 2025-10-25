@@ -13,6 +13,8 @@ Tài liệu này cung cấp tổng quan về các nghiệp vụ chính của h�
 | **Quản Lý Menu** | [MENU_MANAGEMENT.md](./use_case/MENU_MANAGEMENT.md) | [Biểu đồ](./diagrams/MENU_MANAGEMENT_DIAGRAMS.md) |
 | **Quản Lý Đặt Bàn** | [RESERVATION_MANAGEMENT.md](./use_case/RESERVATION_MANAGEMENT.md) | [Biểu đồ](./diagrams/RESERVATION_MANAGEMENT_DIAGRAMS.md) |
 | **Quản Lý Đơn Hàng** | [ORDER_MANAGEMENT.md](./use_case/ORDER_MANAGEMENT.md) | [Biểu đồ](./diagrams/ORDER_MANAGEMENT_DIAGRAMS.md) |
+| **Quản Lý Hóa Đơn và Thanh Toán** | [BILL_PAYMENT_MANAGEMENT.md](./use_case/BILL_PAYMENT_MANAGEMENT.md) | [Biểu đồ](./diagrams/BILL_PAYMENT_MANAGEMENT_DIAGRAMS.md) |
+| **Quản Lý Nhân Sự** | [STAFF_MANAGEMENT.md](./use_case/STAFF_MANAGEMENT.md) | [Biểu đồ](./diagrams/STAFF_MANAGEMENT_DIAGRAMS.md) |
 | **Quản Lý Tồn Kho** | [INVENTORY_MANAGEMENT.md](./use_case/INVENTORY_MANAGEMENT.md) | [Biểu đồ](./diagrams/INVENTORY_MANAGEMENT_DIAGRAMS.md) |
 
 Mỗi tài liệu chi tiết bao gồm:
@@ -254,6 +256,9 @@ Mỗi tài liệu chi tiết bao gồm:
 ---
 
 ### 2.5 Quản Lý Hóa Đơn và Thanh Toán
+
+> **📖 Tài liệu chi tiết**: [Quản Lý Hóa Đơn và Thanh Toán](./use_case/BILL_PAYMENT_MANAGEMENT.md)  
+> **📊 Biểu đồ**: [Biểu Đồ Quản Lý Hóa Đơn và Thanh Toán](./diagrams/BILL_PAYMENT_MANAGEMENT_DIAGRAMS.md)
 
 #### 2.5.1 Tạo Hóa Đơn
 
@@ -587,6 +592,9 @@ Mỗi tài liệu chi tiết bao gồm:
 ---
 
 ### 2.8 Quản Lý Nhân Sự
+
+> **📖 Tài liệu chi tiết**: [Quản Lý Nhân Sự](./use_case/STAFF_MANAGEMENT.md)  
+> **📊 Biểu đồ**: [Biểu Đồ Quản Lý Nhân Sự](./diagrams/STAFF_MANAGEMENT_DIAGRAMS.md)
 
 #### 2.8.1 Quản Lý Tài Khoản Nhân Viên
 
