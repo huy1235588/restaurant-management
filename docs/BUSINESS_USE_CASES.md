@@ -561,8 +561,6 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
 
 ### 2.8 Quản Lý Nhân Sự
 
-### 2.8 Quản Lý Nhân Sự
-
 #### 2.8.1 Quản Lý Tài Khoản Nhân Viên
 
 -   **Mô tả**: Tạo, cập nhật, xóa tài khoản nhân viên
@@ -618,7 +616,7 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
 
 ### 2.9 Quản Lý Đặt Bàn Trước
 
-#### 2.8.1 Tạo Yêu Cầu Đặt Bàn
+#### 2.9.1 Tạo Yêu Cầu Đặt Bàn
 
 -   **Mô tả**: Khách hoặc nhân viên tạo đặt bàn trước
 -   **Người tham gia**: Khách, Nhân viên tiếp nhận
@@ -630,7 +628,7 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
     5. Xác nhận đặt
     6. Nhận mã xác nhận
 
-#### 2.8.2 Xác Nhận Đặt Bàn
+#### 2.9.2 Xác Nhận Đặt Bàn
 
 -   **Mô tả**: Hệ thống xác nhận bàn còn trống và lưu đặt bàn
 -   **Quy trình**:
@@ -640,7 +638,7 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
     4. Gửi email xác nhận cho khách
     5. Ghi lịch cho nhân viên tiếp nhận
 
-#### 2.8.3 Quản Lý Đặt Bàn
+#### 2.9.3 Quản Lý Đặt Bàn
 
 -   **Mô tả**: Xem, chỉnh sửa, hủy đặt bàn
 -   **Người tham gia**: Nhân viên tiếp nhận, Quản lý
@@ -651,7 +649,7 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
     4. Gán bàn cho khách
     5. Nếu khách không đến, đánh dấu đặt bàn bị bỏ
 
-#### 2.8.4 Thông Báo Nhắc Lịch
+#### 2.9.4 Thông Báo Nhắc Lịch
 
 -   **Mô tả**: Gửi thông báo cho khách trước khi đến
 -   **Quy trình**:
@@ -660,7 +658,7 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
     3. Khách có thể xác nhận hoặc hủy
     4. Nếu hủy, hệ thống giải phóng bàn
 
-#### 2.8.5 Xử Lý Khách Không Đến (No-show)
+#### 2.9.5 Xử Lý Khách Không Đến (No-show)
 
 -   **Mô tả**: Quản lý tình huống khách đặt bàn nhưng không đến
 -   **Quy trình**:
@@ -671,9 +669,9 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
 
 ---
 
-### 2.9 Quản Lý Thư Viện Hóa Đơn
+### 2.10 Quản Lý Thư Viện Hóa Đơn
 
-#### 2.9.1 In Hóa Đơn
+#### 2.10.1 In Hóa Đơn
 
 -   **Mô tả**: In hóa đơn cho khách
 -   **Người tham gia**: Nhân viên phục vụ, Quản lý
@@ -683,7 +681,7 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
     3. In hóa đơn
     4. Đưa cho khách
 
-#### 2.9.2 Lưu Trữ và Tìm Kiếm Hóa Đơn
+#### 2.10.2 Lưu Trữ và Tìm Kiếm Hóa Đơn
 
 -   **Mô tả**: Lưu trữ tất cả hóa đơn và có khả năng tìm kiếm
 -   **Người tham gia**: Quản lý, Kế toán
@@ -693,7 +691,7 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
     3. Xuất dữ liệu (PDF, Excel)
     4. Ghi chú hoặc đánh dấu hóa đơn
 
-#### 2.9.3 Tìm Kiếm Hóa Đơn
+#### 2.10.3 Tìm Kiếm Hóa Đơn
 
 -   **Mô tả**: Tìm kiếm hóa đơn theo nhiều tiêu chí
 -   **Tiêu chí tìm kiếm**:
@@ -706,9 +704,9 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
 
 ---
 
-### 2.10 Quản Lý Hệ Thống
+### 2.11 Quản Lý Hệ Thống
 
-#### 2.10.1 Sao Lưu Dữ Liệu
+#### 2.11.1 Sao Lưu Dữ Liệu
 
 -   **Mô tả**: Tạo bản sao lưu dữ liệu hệ thống
 -   **Người tham gia**: Quản trị viên
@@ -719,7 +717,7 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
     4. Ghi log khi sao lưu
     5. Thông báo khi hoàn tất
 
-#### 2.10.2 Phục Hồi Dữ Liệu
+#### 2.11.2 Phục Hồi Dữ Liệu
 
 -   **Mô tả**: Phục hồi dữ liệu từ bản sao lưu khi cần
 -   **Người tham gia**: Quản trị viên
@@ -731,7 +729,7 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
     5. Khởi động lại hệ thống
     6. Kiểm tra tính toàn vẹn
 
-#### 2.10.3 Ghi Log Hệ Thống
+#### 2.11.3 Ghi Log Hệ Thống
 
 -   **Mô tả**: Ghi lại tất cả các hoạt động trong hệ thống
 -   **Quy trình**:
@@ -741,7 +739,7 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
     4. Cho phép tìm kiếm và xem log
     5. Tự động xóa log cũ hơn một khoảng thời gian
 
-#### 2.10.4 Quản Lý Phiên Bản Hệ Thống
+#### 2.11.4 Quản Lý Phiên Bản Hệ Thống
 
 -   **Mô tả**: Cập nhật hệ thống lên phiên bản mới
 -   **Người tham gia**: Quản trị viên
@@ -753,7 +751,7 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
     5. Kiểm tra tất cả chức năng
     6. Thông báo cho người dùng
 
-#### 2.10.5 Quản Lý Cấu Hình Hệ Thống
+#### 2.11.5 Quản Lý Cấu Hình Hệ Thống
 
 -   **Mô tả**: Điều chỉnh các cấu hình chung của nhà hàng
 -   **Người tham gia**: Quản lý, Quản trị viên
@@ -771,9 +769,9 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
 
 ---
 
-### 2.11 Truyền Thông Thực Thời (Real-time Communication)
+### 2.12 Truyền Thông Thực Thời (Real-time Communication)
 
-#### 2.11.1 Thông Báo Đơn Hàng Mới
+#### 2.12.1 Thông Báo Đơn Hàng Mới
 
 -   **Mô tả**: Thông báo ngay lập tức khi có đơn hàng mới đến bếp
 -   **Người tham gia**: Đầu bếp
@@ -783,7 +781,7 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
     3. Âm thanh/nhạc chuông thông báo
     4. Hiển thị đơn hàng trên màn hình nhà bếp
 
-#### 2.11.2 Thông Báo Món Ăn Sẵn Sàng
+#### 2.12.2 Thông Báo Món Ăn Sẵn Sàng
 
 -   **Mô tả**: Thông báo khi món ăn xong cho nhân viên phục vụ
 -   **Người tham gia**: Nhân viên phục vụ
@@ -793,7 +791,7 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
     3. Nhân viên phục vụ lấy món ăn
     4. Phục vụ cho khách
 
-#### 2.11.3 Yêu Cầu Hỗ Trợ
+#### 2.12.3 Yêu Cầu Hỗ Trợ
 
 -   **Mô tả**: Khách gọi nhân viên phục vụ nếu cần
 -   **Quy trình**:
@@ -803,7 +801,7 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
     4. Ghi nhận nhu cầu của khách
     5. Thực hiện hành động cần thiết
 
-#### 2.11.4 Cập Nhật Trạng Thái Bàn Thực Thời
+#### 2.12.4 Cập Nhật Trạng Thái Bàn Thực Thời
 
 -   **Mô tả**: Tất cả người dùng liên quan thấy cập nhật trạng thái bàn ngay lập tức
 -   **Quy trình**:
@@ -813,9 +811,9 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
 
 ---
 
-### 2.12 Báo Cáo và Phân Tích
+### 2.13 Báo Cáo và Phân Tích
 
-#### 2.12.1 Báo Cáo Doanh Thu
+#### 2.13.1 Báo Cáo Doanh Thu
 
 -   **Mô tả**: Lập báo cáo doanh thu theo khoảng thời gian
 -   **Người tham gia**: Quản lý, Kế toán
@@ -826,7 +824,7 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
     4. Xuất báo cáo (PDF, Excel)
     5. Gửi email cho quản lý
 
-#### 2.12.2 Báo Cáo Sản Phẩm
+#### 2.13.2 Báo Cáo Sản Phẩm
 
 -   **Mô tả**: Báo cáo về sản phẩm bán chạy, bán chậm
 -   **Quy trình**:
@@ -836,7 +834,7 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
     4. So sánh với các khoảng thời gian trước
     5. Xuất báo cáo
 
-#### 2.12.3 Báo Cáo Hiệu Suất Nhân Viên
+#### 2.13.3 Báo Cáo Hiệu Suất Nhân Viên
 
 -   **Mô tả**: Đánh giá hiệu suất từng nhân viên
 -   **Quy trình**:
@@ -846,7 +844,7 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
     4. Ghi nhận lỗi hoặc khen thưởng
     5. Lập báo cáo xếp hạng
 
-#### 2.12.4 Phân Tích Xu Hướng
+#### 2.13.4 Phân Tích Xu Hướng
 
 -   **Mô tả**: Phân tích xu hướng kinh doanh theo thời gian
 -   **Quy trình**:
