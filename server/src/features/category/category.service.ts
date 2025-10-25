@@ -23,6 +23,13 @@ interface UpdateCategoryData {
 
 export class CategoryService {
     /**
+     * Count categories
+     */
+    async countCategories(filters: CategoryFilters = {}) {
+        return categoryRepository.count(filters);
+    }
+
+    /**
      * Get all categories
      */
     async getAllCategories(filters: CategoryFilters = {}) {

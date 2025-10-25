@@ -3,6 +3,24 @@ import { categoryService } from '@/features/category/category.service';
 import { ApiResponse } from '@/shared/utils/response';
 
 export class CategoryController {
+
+    /**
+     * Count categories
+     */
+    async count(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { isActive } = req.query;
+            const count = await categoryService.countCategories({
+                isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined,
+            });
+            let message = 'Categories count retrieved successfully';
+            if (isActive !== undefined) message += ` with active status ${isActive}`;
+            res.json(ApiResponse.success({ count }, message));
+        } catch (error) {
+            next(error);
+        }
+    }
+
     /**
      * Get all categories
      */

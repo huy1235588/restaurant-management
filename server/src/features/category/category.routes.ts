@@ -11,6 +11,49 @@ router.use(authenticate);
 
 /**
  * @swagger
+ * /categories/count:
+ *   get:
+ *     summary: Get categories count
+ *     description: Retrieve the total count of categories with optional filtering
+ *     tags: [Categories]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: isActive
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *         description: Filter by active status
+ *     responses:
+ *       200:
+ *         description: Count retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Categories count retrieved successfully with active status true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     count:
+ *                       type: integer
+ *                       example: 10
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/count', categoryController.count.bind(categoryController));
+
+/**
+ * @swagger
  * /categories:
  *   get:
  *     summary: Get all categories with pagination
