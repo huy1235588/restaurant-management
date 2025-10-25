@@ -49,6 +49,12 @@ export const config = {
          * - public folder
          * - api routes
          */
-        '/((?!api|_next/static|_next/image|favicon.ico|public).*)',
+        // Exclude image/public asset paths so image optimization and static assets
+        // are not intercepted by the auth/proxy middleware. Requests from
+        // Next.js image optimizer fetch the original image at e.g. /images/...;
+        // if we intercept those without cookies the optimizer may receive a
+        // redirect or HTML and fail with "received null". Adding 'images'
+        // to the exclusions prevents this.
+        '/((?!api|_next/static|_next/image|favicon.ico|public|images).*)',
     ],
 };

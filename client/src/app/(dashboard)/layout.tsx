@@ -18,78 +18,105 @@ import {
 import { useAuthStore } from '@/stores/authStore';
 import { hasPermission } from '@/types';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
-import { DashboardSidebar, NavItem } from '@/components/layouts/DashboardSidebar';
+import { DashboardSidebar, NavItem, NavGroup } from '@/components/layouts/DashboardSidebar';
 import { MobileSidebar } from '@/components/layouts/MobileSidebar';
 import { TopBar } from '@/components/layouts/TopBar';
+import { useTranslation } from 'react-i18next';
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 
-const navItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutDashboard,
-    },
-    {
-        title: 'Orders',
-        href: '/orders',
-        icon: ShoppingCart,
-        permission: 'orders.read',
-    },
-    {
-        title: 'Kitchen',
-        href: '/kitchen',
-        icon: ChefHat,
-        permission: 'kitchen.read',
-    },
-    {
-        title: 'Tables',
-        href: '/tables',
-        icon: Table,
-        permission: 'tables.read',
-    },
-    {
-        title: 'Menu',
-        href: '/menu',
-        icon: UtensilsCrossed,
-        permission: 'menu.read',
-    },
-    {
-        title: 'Reservations',
-        href: '/reservations',
-        icon: Calendar,
-        permission: 'reservations.read',
-    },
-    {
-        title: 'Bills',
-        href: '/bills',
-        icon: Receipt,
-        permission: 'bills.read',
-    },
-    {
-        title: 'Staff',
-        href: '/staff',
-        icon: Users,
-        permission: 'staff.read',
-        roles: ['admin', 'manager'],
-    },
-    {
-        title: 'Reports',
-        href: '/reports',
-        icon: BarChart3,
-        permission: 'reports.read',
-        roles: ['admin', 'manager'],
-    },
-    {
-        title: 'Settings',
-        href: '/settings',
-        icon: Settings,
-    },
-];
 
 export default function DashboardLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
+
+    const { t } = useTranslation();
+
+    // Define navigation groups for better organization
+    const navGroups: NavGroup[] = [
+        {
+            title: t('sidebar.overview') || 'Overview',
+            items: [
+                {
+                    title: t('sidebar.dashboard'),
+                    href: '/dashboard',
+                    icon: LayoutDashboard,
+                },
+            ],
+        },
+        {
+            title: t('sidebar.operations') || 'Operations',
+            items: [
+                {
+                    title: t('sidebar.orders'),
+                    href: '/orders',
+                    icon: ShoppingCart,
+                    permission: 'orders.read',
+                },
+                {
+                    title: t('sidebar.kitchen'),
+                    href: '/kitchen',
+                    icon: ChefHat,
+                    permission: 'kitchen.read',
+                },
+                {
+                    title: t('sidebar.tables'),
+                    href: '/tables',
+                    icon: Table,
+                    permission: 'tables.read',
+                },
+            ],
+        },
+        {
+            title: t('sidebar.management') || 'Management',
+            items: [
+                {
+                    title: t('sidebar.menu'),
+                    href: '/menu',
+                    icon: UtensilsCrossed,
+                    permission: 'menu.read',
+                },
+                {
+                    title: t('sidebar.reservations'),
+                    href: '/reservations',
+                    icon: Calendar,
+                    permission: 'reservations.read',
+                },
+                {
+                    title: t('sidebar.bills'),
+                    href: '/bills',
+                    icon: Receipt,
+                    permission: 'bills.read',
+                },
+            ],
+        },
+        {
+            title: t('sidebar.administration') || 'Administration',
+            items: [
+                {
+                    title: t('sidebar.staff'),
+                    href: '/staff',
+                    icon: Users,
+                    permission: 'staff.read',
+                    roles: ['admin', 'manager'],
+                },
+                {
+                    title: t('sidebar.reports'),
+                    href: '/reports',
+                    icon: BarChart3,
+                    permission: 'reports.read',
+                    roles: ['admin', 'manager'],
+                },
+                {
+                    title: t('sidebar.settings'),
+                    href: '/settings',
+                    icon: Settings,
+                },
+            ],
+        },
+    ];
+
     const router = useRouter();
     const { user, isAuthenticated, isLoading, logout } = useAuthStore();
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -111,21 +138,30 @@ export default function DashboardLayout({
         router.replace('/login');
     };
 
-    const filteredNavItems = navItems.filter((item) => {
-        if (!user) return false;
+    // Filter navigation groups based on user permissions and roles
+    const filteredNavGroups: NavGroup[] = navGroups.map((group) => ({
+        ...group,
+        items: group.items.filter((item) => {
+            if (!user) return false;
 
-        // Check role-based access
-        if (item.roles && !item.roles.includes(user.role)) {
-            return false;
-        }
+            // Check role-based access
+            if (item.roles && !item.roles.includes(user.role)) {
+                return false;
+            }
 
-        // Check permission-based access
-        if (item.permission && !hasPermission(user.role, item.permission)) {
-            return false;
-        }
+            // Check permission-based access
+            if (item.permission && !hasPermission(user.role, item.permission)) {
+                return false;
+            }
 
-        return true;
-    });
+            return true;
+        }),
+    })).filter((group) => group.items.length > 0);
+
+    // Flatten nav groups for mobile sidebar
+    const flattenedNavItems: NavItem[] = filteredNavGroups.flatMap(
+        (group) => group.items
+    );
 
     // Show loading state while verifying authentication
     if (isLoading) {
@@ -142,31 +178,30 @@ export default function DashboardLayout({
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <SidebarProvider>
             {/* Sidebar - Desktop */}
-            <DashboardSidebar navItems={filteredNavItems} />
+            <DashboardSidebar navGroups={filteredNavGroups} />
 
             {/* Mobile sidebar */}
             <MobileSidebar
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)}
-                navItems={filteredNavItems}
+                navItems={flattenedNavItems}
             />
 
-            {/* Main content */}
-            <div className="lg:pl-64">
+            {/* Main content area */}
+            <SidebarInset>
                 {/* Top bar */}
                 <TopBar
                     user={user}
-                    onMenuClick={() => setSidebarOpen(true)}
                     onLogout={handleLogout}
                 />
 
                 {/* Page content */}
-                <main className="py-8 px-4 sm:px-6 lg:px-8">
+                <main className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
                     {children}
                 </main>
-            </div>
-        </div>
+            </SidebarInset>
+        </SidebarProvider>
     );
 }
