@@ -10,6 +10,7 @@ Tài liệu này cung cấp tổng quan về các nghiệp vụ chính của h�
 
 | Nghiệp Vụ | Tài Liệu Chi Tiết | Biểu Đồ |
 |-----------|-------------------|---------|
+| **Quản Lý Xác Thực** | [AUTHENTICATION_MANAGEMENT.md](./use_case/AUTHENTICATION_MANAGEMENT.md) | [Biểu đồ](./diagrams/AUTHENTICATION_MANAGEMENT_DIAGRAMS.md) |
 | **Quản Lý Menu** | [MENU_MANAGEMENT.md](./use_case/MENU_MANAGEMENT.md) | [Biểu đồ](./diagrams/MENU_MANAGEMENT_DIAGRAMS.md) |
 | **Quản Lý Đặt Bàn** | [RESERVATION_MANAGEMENT.md](./use_case/RESERVATION_MANAGEMENT.md) | [Biểu đồ](./diagrams/RESERVATION_MANAGEMENT_DIAGRAMS.md) |
 | **Quản Lý Đơn Hàng** | [ORDER_MANAGEMENT.md](./use_case/ORDER_MANAGEMENT.md) | [Biểu đồ](./diagrams/ORDER_MANAGEMENT_DIAGRAMS.md) |
@@ -29,6 +30,9 @@ Mỗi tài liệu chi tiết bao gồm:
 ## 2. Các Nghiệp Vụ Chính
 
 ### 2.1 Quản Lý Tài Khoản Người Dùng (Authentication & User Management)
+
+> **📖 Tài liệu chi tiết**: [Quản Lý Xác Thực và Tài Khoản](./use_case/AUTHENTICATION_MANAGEMENT.md)  
+> **📊 Biểu đồ**: [Biểu Đồ Quản Lý Xác Thực](./diagrams/AUTHENTICATION_MANAGEMENT_DIAGRAMS.md)
 
 #### 2.1.1 Đăng Ký Tài Khoản
 
