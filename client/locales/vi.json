@@ -260,5 +260,15 @@
         "minValue": "Giá trị tối thiểu là {{min}}",
         "maxValue": "Giá trị tối đa là {{max}}",
         "invalidFormat": "Định dạng không hợp lệ"
+    },
+    "imageUpload": {
+        "uploadImage": "Tải lên Ảnh",
+        "dragAndDrop": "Kéo và thả ảnh của bạn vào đây, hoặc nhấp để chọn",
+        "dropHere": "Thả ảnh của bạn vào đây",
+        "supportedFormats": "Định dạng hỗ trợ: PNG, JPG, GIF, WebP",
+        "cropImage": "Cắt Ảnh",
+        "cropDescription": "Điều chỉnh và cắt ảnh của bạn. Sử dụng các điều khiển bên dưới để phóng to và định vị.",
+        "zoom": "Phóng to",
+        "cropAndSave": "Cắt & Lưu"
     }
 }

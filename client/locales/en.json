@@ -260,5 +260,15 @@
         "minValue": "Minimum value is {{min}}",
         "maxValue": "Maximum value is {{max}}",
         "invalidFormat": "Invalid format"
+    },
+    "imageUpload": {
+        "uploadImage": "Upload Image",
+        "dragAndDrop": "Drag and drop your image here, or click to select",
+        "dropHere": "Drop your image here",
+        "supportedFormats": "Supported formats: PNG, JPG, GIF, WebP",
+        "cropImage": "Crop Image",
+        "cropDescription": "Adjust and crop your image. Use the controls below to zoom and position.",
+        "zoom": "Zoom",
+        "cropAndSave": "Crop & Save"
     }
 }
