@@ -4,11 +4,35 @@
 
 Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được thiết kế để hỗ trợ các hoạt động kinh doanh hàng ngày của nhà hàng. Hệ thống bao gồm các nghiệp vụ liên quan đến quản lý bàn ăn, đơn hàng, menu, hóa đơn, nhân viên và các dịch vụ khác.
 
+### 1.1 Tài Liệu Chi Tiết Nghiệp Vụ
+
+Tài liệu này cung cấp tổng quan về các nghiệp vụ chính của hệ thống. Để biết thêm chi tiết về từng nghiệp vụ đã được triển khai, vui lòng tham khảo các tài liệu chi tiết sau:
+
+| Nghiệp Vụ | Tài Liệu Chi Tiết | Biểu Đồ |
+|-----------|-------------------|---------|
+| **Quản Lý Xác Thực** | [AUTHENTICATION_MANAGEMENT.md](./use_case/AUTHENTICATION_MANAGEMENT.md) | [Biểu đồ](./diagrams/AUTHENTICATION_MANAGEMENT_DIAGRAMS.md) |
+| **Quản Lý Menu** | [MENU_MANAGEMENT.md](./use_case/MENU_MANAGEMENT.md) | [Biểu đồ](./diagrams/MENU_MANAGEMENT_DIAGRAMS.md) |
+| **Quản Lý Đặt Bàn** | [RESERVATION_MANAGEMENT.md](./use_case/RESERVATION_MANAGEMENT.md) | [Biểu đồ](./diagrams/RESERVATION_MANAGEMENT_DIAGRAMS.md) |
+| **Quản Lý Đơn Hàng** | [ORDER_MANAGEMENT.md](./use_case/ORDER_MANAGEMENT.md) | [Biểu đồ](./diagrams/ORDER_MANAGEMENT_DIAGRAMS.md) |
+| **Quản Lý Hóa Đơn và Thanh Toán** | [BILL_PAYMENT_MANAGEMENT.md](./use_case/BILL_PAYMENT_MANAGEMENT.md) | [Biểu đồ](./diagrams/BILL_PAYMENT_MANAGEMENT_DIAGRAMS.md) |
+| **Quản Lý Nhân Sự** | [STAFF_MANAGEMENT.md](./use_case/STAFF_MANAGEMENT.md) | [Biểu đồ](./diagrams/STAFF_MANAGEMENT_DIAGRAMS.md) |
+| **Quản Lý Tồn Kho** | [INVENTORY_MANAGEMENT.md](./use_case/INVENTORY_MANAGEMENT.md) | [Biểu đồ](./diagrams/INVENTORY_MANAGEMENT_DIAGRAMS.md) |
+
+Mỗi tài liệu chi tiết bao gồm:
+- Quy trình nghiệp vụ chi tiết từng bước
+- Ma trận phân quyền theo vai trò
+- Xử lý lỗi và các trường hợp đặc biệt
+- Biểu đồ Mermaid (flowchart, sequence, state, ERD, v.v.)
+- Các tính năng nâng cao và tương lai
+
 ---
 
 ## 2. Các Nghiệp Vụ Chính
 
 ### 2.1 Quản Lý Tài Khoản Người Dùng (Authentication & User Management)
+
+> **📖 Tài liệu chi tiết**: [Quản Lý Xác Thực và Tài Khoản](./use_case/AUTHENTICATION_MANAGEMENT.md)  
+> **📊 Biểu đồ**: [Biểu Đồ Quản Lý Xác Thực](./diagrams/AUTHENTICATION_MANAGEMENT_DIAGRAMS.md)
 
 #### 2.1.1 Đăng Ký Tài Khoản
 
@@ -55,6 +79,9 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
 ---
 
 ### 2.2 Quản Lý Menu và Danh Mục
+
+> **📖 Tài liệu chi tiết**: [Quản Lý Menu và Danh Mục](./use_case/MENU_MANAGEMENT.md)  
+> **📊 Biểu đồ**: [Biểu Đồ Quản Lý Menu](./diagrams/MENU_MANAGEMENT_DIAGRAMS.md)
 
 #### 2.2.1 Tạo Danh Mục Thực Phẩm
 
@@ -172,6 +199,9 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
 
 ### 2.4 Quản Lý Đơn Hàng
 
+> **📖 Tài liệu chi tiết**: [Quản Lý Đơn Hàng](./use_case/ORDER_MANAGEMENT.md)  
+> **📊 Biểu đồ**: [Biểu Đồ Quản Lý Đơn Hàng](./diagrams/ORDER_MANAGEMENT_DIAGRAMS.md)
+
 #### 2.4.1 Tạo Đơn Hàng Mới
 
 -   **Mô tả**: Nhân viên phục vụ tiếp nhận đơn hàng từ khách
@@ -230,6 +260,9 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
 ---
 
 ### 2.5 Quản Lý Hóa Đơn và Thanh Toán
+
+> **📖 Tài liệu chi tiết**: [Quản Lý Hóa Đơn và Thanh Toán](./use_case/BILL_PAYMENT_MANAGEMENT.md)  
+> **📊 Biểu đồ**: [Biểu Đồ Quản Lý Hóa Đơn và Thanh Toán](./diagrams/BILL_PAYMENT_MANAGEMENT_DIAGRAMS.md)
 
 #### 2.5.1 Tạo Hóa Đơn
 
@@ -362,6 +395,9 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
 ---
 
 ### 2.7 Quản Lý Tồn Kho và Nguyên Liệu
+
+> **📖 Tài liệu chi tiết**: [Quản Lý Tồn Kho](./use_case/INVENTORY_MANAGEMENT.md)  
+> **📊 Biểu đồ**: [Biểu Đồ Quản Lý Tồn Kho](./diagrams/INVENTORY_MANAGEMENT_DIAGRAMS.md)
 
 #### 2.7.1 Quản Lý Danh Mục Nguyên Liệu
 
@@ -561,6 +597,9 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
 
 ### 2.8 Quản Lý Nhân Sự
 
+> **📖 Tài liệu chi tiết**: [Quản Lý Nhân Sự](./use_case/STAFF_MANAGEMENT.md)  
+> **📊 Biểu đồ**: [Biểu Đồ Quản Lý Nhân Sự](./diagrams/STAFF_MANAGEMENT_DIAGRAMS.md)
+
 #### 2.8.1 Quản Lý Tài Khoản Nhân Viên
 
 -   **Mô tả**: Tạo, cập nhật, xóa tài khoản nhân viên
@@ -615,6 +654,9 @@ Hệ thống quản lý nhà hàng là một ứng dụng toàn diện được 
 ---
 
 ### 2.9 Quản Lý Đặt Bàn Trước
+
+> **📖 Tài liệu chi tiết**: [Quản Lý Đặt Bàn](./use_case/RESERVATION_MANAGEMENT.md)  
+> **📊 Biểu đồ**: [Biểu Đồ Quản Lý Đặt Bàn](./diagrams/RESERVATION_MANAGEMENT_DIAGRAMS.md)
 
 #### 2.9.1 Tạo Yêu Cầu Đặt Bàn
 
