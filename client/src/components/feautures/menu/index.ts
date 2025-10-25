@@ -3,6 +3,7 @@ export { MenuStats } from './MenuStats';
 export { MenuFilters } from './MenuFilters';
 export { MenuItemRow } from './MenuItemRow';
 export { MenuItemsTable } from './MenuItemsTable';
+export { MenuItemsGrid } from './MenuItemsGrid';
 export { MenuPagination } from './MenuPagination';
 export { MenuDialogs } from './MenuDialogs';
 export { MenuItemForm } from './MenuItemForm';

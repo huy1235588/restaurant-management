@@ -1,8 +1,9 @@
-import { Edit, Trash2, Eye, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Edit, Trash2, Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { MenuItem } from '@/types';
 
 interface MenuItemRowProps {
@@ -72,28 +73,15 @@ export function MenuItemRow({
                 </span>
             </TableCell>
             <TableCell>
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onToggleAvailability(item)}
-                    className="gap-2"
-                >
-                    {item.isAvailable ? (
-                        <>
-                            <ToggleRight className="h-4 w-4 text-green-500" />
-                            <span className="text-green-600 font-medium">
-                                {t('menu.available', 'Available')}
-                            </span>
-                        </>
-                    ) : (
-                        <>
-                            <ToggleLeft className="h-4 w-4 text-gray-400" />
-                            <span className="text-gray-500">
-                                {t('menu.unavailable', 'Unavailable')}
-                            </span>
-                        </>
-                    )}
-                </Button>
+                <div className="flex items-center gap-3">
+                    <Switch
+                        checked={item.isAvailable}
+                        onCheckedChange={() => onToggleAvailability(item)}
+                    />
+                    <span className={`font-medium text-sm ${item.isAvailable ? 'text-green-600' : 'text-gray-500'}`}>
+                        {item.isAvailable ? t('menu.available', 'Available') : t('menu.unavailable', 'Unavailable')}
+                    </span>
+                </div>
             </TableCell>
             <TableCell>
                 <Badge variant={item.isActive ? 'default' : 'secondary'}>

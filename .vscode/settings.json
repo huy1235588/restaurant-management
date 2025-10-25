@@ -9,7 +9,7 @@
         "**/generated": true,
         "**/.next": true,
         "**/coverage": true,
-        "**/.cache": true
+        "**/.cache": true,
     },
     "files.exclude": {
         "**/node_modules": true,
@@ -20,6 +20,10 @@
         "**/prisma/migrations": true,
         "**/.next": true,
         "**/coverage": true,
-        "**/.cache": true
+        "**/.cache": true,
+        "**.svg": true,
+        "**/package-lock.json": true,
+        "**/yarn.lock": true,
+        "**/pnpm-lock.yaml": true
     }
 }

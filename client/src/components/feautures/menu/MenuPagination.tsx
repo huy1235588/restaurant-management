@@ -1,6 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 
 interface MenuPaginationProps {
     currentPage: number;
@@ -8,6 +15,7 @@ interface MenuPaginationProps {
     totalItems: number;
     itemsPerPage: number;
     onPageChange: (page: number) => void;
+    onItemsPerPageChange?: (itemsPerPage: number) => void;
 }
 
 export function MenuPagination({
@@ -16,6 +24,7 @@ export function MenuPagination({
     totalItems,
     itemsPerPage,
     onPageChange,
+    onItemsPerPageChange,
 }: MenuPaginationProps) {
     const { t } = useTranslation();
 
@@ -53,10 +62,31 @@ export function MenuPagination({
 
     return (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t">
-            <div className="text-sm text-muted-foreground">
-                {t('menu.showing', 'Showing')} <span className="font-medium">{startItem}</span> -{' '}
-                <span className="font-medium">{endItem}</span> {t('menu.of', 'of')}{' '}
-                <span className="font-medium">{totalItems}</span> {t('menu.items', 'items')}
+            <div className="flex items-center gap-4">
+                <div className="text-sm text-muted-foreground">
+                    {t('menu.showing', 'Showing')} <span className="font-medium">{startItem}</span> -{' '}
+                    <span className="font-medium">{endItem}</span> {t('menu.of', 'of')}{' '}
+                    <span className="font-medium">{totalItems}</span> {t('menu.items', 'items')}
+                </div>
+                {onItemsPerPageChange && (
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">{t('menu.itemsPerPage', 'Items per page')}:</span>
+                        <Select
+                            value={itemsPerPage.toString()}
+                            onValueChange={(value) => onItemsPerPageChange(parseInt(value))}
+                        >
+                            <SelectTrigger className="w-20 h-8">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="10">10</SelectItem>
+                                <SelectItem value="20">20</SelectItem>
+                                <SelectItem value="50">50</SelectItem>
+                                <SelectItem value="100">100</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                )}
             </div>
             <div className="flex items-center gap-1">
                 <Button

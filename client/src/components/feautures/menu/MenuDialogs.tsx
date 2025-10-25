@@ -65,7 +65,7 @@ export function MenuDialogs({
         <>
             {/* Create Dialog */}
             <Dialog open={showCreateDialog} onOpenChange={onCreateDialogChange}>
-                <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>{t('menu.createItem', 'Create Menu Item')}</DialogTitle>
                         <DialogDescription>
@@ -82,7 +82,7 @@ export function MenuDialogs({
 
             {/* Edit Dialog */}
             <Dialog open={showEditDialog} onOpenChange={onEditDialogChange}>
-                <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>{t('menu.editItem', 'Edit Menu Item')}</DialogTitle>
                         <DialogDescription>
@@ -105,7 +105,7 @@ export function MenuDialogs({
 
             {/* Detail Dialog */}
             <Dialog open={showDetailDialog} onOpenChange={onDetailDialogChange}>
-                <DialogContent className="sm:max-w-2xl">
+                <DialogContent className="sm:max-w-4xl">
                     <DialogHeader>
                         <DialogTitle>{t('menu.itemDetails', 'Menu Item Details')}</DialogTitle>
                     </DialogHeader>

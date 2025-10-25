@@ -2,21 +2,43 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { UtensilsCrossed, Check, X, Tag } from 'lucide-react';
 import { MenuItem, Category } from '@/types';
+import { useEffect, useState } from 'react';
+import { categoryApi, menuApi } from '@/services/menu.service';
+import { toast } from 'sonner';
 
-interface MenuStatsProps {
-    menuItems: MenuItem[];
-    categories: Category[];
-}
 
-export function MenuStats({ menuItems, categories }: MenuStatsProps) {
+export function MenuStats() {
     const { t } = useTranslation();
+    const [stats, setStats] = useState({ 
+        categories: 0,
+        total: 0,
+        available: 0,
+        unavailable: 0,
+    });
 
-    const stats = {
-        total: menuItems.length,
-        available: menuItems.filter(item => item.isAvailable).length,
-        unavailable: menuItems.filter(item => !item.isAvailable).length,
-        categories: categories.length,
-    };
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const categoriesCount = await categoryApi.count();
+                const menuCount = await menuApi.count();
+                const menuAvailableCount = await menuApi.count({ isAvailable: true });
+
+                setStats({
+                    categories: categoriesCount,
+                    total: menuCount,
+                    available: menuAvailableCount,
+                    unavailable: menuCount - menuAvailableCount,
+                });
+            } catch (error) {
+                console.error('Failed to load categories:', error);
+                toast.error(t('menu.loadCategoriesError'));
+
+            }
+        };
+
+        fetchStats();
+
+    }, []);
 
     const statItems = [
         {

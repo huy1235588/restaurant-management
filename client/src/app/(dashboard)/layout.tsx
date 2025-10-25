@@ -197,9 +197,11 @@ export default function DashboardLayout({
                     onLogout={handleLogout}
                 />
 
-                {/* Page content */}
-                <main className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
-                    {children}
+                {/* Page content with responsive padding based on sidebar state */}
+                <main className="flex-1 overflow-auto transition-all duration-300">
+                    <div className="sm:p-6 md:p-6 lg:p-8 grid-adaptive">
+                        {children}
+                    </div>
                 </main>
             </SidebarInset>
         </SidebarProvider>

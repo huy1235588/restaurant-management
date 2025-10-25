@@ -2,6 +2,19 @@ import axiosInstance from '@/lib/axios';
 import { MenuItem, Category, ApiResponse, PaginatedResponse } from '@/types';
 
 export const menuApi = {
+    // Count menu items
+    count: async (params?: {
+        categoryId?: number;
+        isAvailable?: boolean;
+        isActive?: boolean;
+    }): Promise<number> => {
+        const response = await axiosInstance.get<ApiResponse<{ count: number }>>(
+            '/menu/count',
+            { params }
+        );
+        return response.data.data.count;
+    },
+
     // Get all menu items
     getAll: async (params?: {
         categoryId?: number;
@@ -62,6 +75,15 @@ export const menuApi = {
 };
 
 export const categoryApi = {
+    // Count categories
+    count: async (params?: { isActive?: boolean }): Promise<number> => {
+        const response = await axiosInstance.get<ApiResponse<{ count: number }>>(
+            '/categories/count',
+            { params }
+        );
+        return response.data.data.count;
+    },
+
     // Get all categories
     getAll: async (params?: { isActive?: boolean }): Promise<Category[]> => {
         const response = await axiosInstance.get<ApiResponse<Category[]>>(
