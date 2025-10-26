@@ -1,4 +1,5 @@
 import express, { Application } from 'express';
+import path from 'path';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -57,6 +58,13 @@ export function createApp(): Application {
         message: 'Too many requests from this IP, please try again later.',
     });
     app.use('/api', limiter);
+
+    // Serve static files - uploads folder
+    app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
+        maxAge: '1d', // Cache for 1 day
+        etag: true,
+        lastModified: true,
+    }));
 
     // API Routes
     app.use(`/api/${config.apiVersion}`, routes);

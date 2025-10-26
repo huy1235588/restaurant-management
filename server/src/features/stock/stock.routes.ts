@@ -134,18 +134,6 @@ const router: Router = Router();
  *                           type: integer
  *                         totalPages:
  *                           type: integer
- *                       ingredientId:
- *                         type: integer
- *                       type:
- *                         type: string
- *                         enum: [in, out, adjustment]
- *                       quantity:
- *                         type: number
- *                       reason:
- *                         type: string
- *                       createdAt:
- *                         type: string
- *                         format: date-time
  *       401:
  *         description: Unauthorized
  *       403:

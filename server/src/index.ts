@@ -5,6 +5,7 @@ import DatabaseClient from '@/config/database';
 import socketService from '@/shared/utils/socket';
 import logger from '@/config/logger';
 import { scheduleTokenCleanup } from './jobs/cleanupTokens';
+import { startCleanupUploadsJob } from './jobs/cleanupUploads';
 
 async function startServer() {
     try {
@@ -24,6 +25,10 @@ async function startServer() {
         // Schedule token cleanup job
         scheduleTokenCleanup();
         logger.info('✅ Token cleanup job scheduled');
+
+        // Schedule uploads cleanup job
+        startCleanupUploadsJob();
+        logger.info('✅ Uploads cleanup job scheduled');
 
         // Start server
         httpServer.listen(config.port, () => {

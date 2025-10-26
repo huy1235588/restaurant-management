@@ -12,6 +12,7 @@ import paymentRoutes from '../features/payment/payment.routes';
 import ingredientRoutes from '../features/ingredient/ingredient.routes';
 import purchaseRoutes from '../features/purchase/purchase.routes';
 import stockRoutes from '../features/stock/stock.routes';
+import storageRoutes from '../features/storage/storage.routes';
 
 const router: Router = Router();
 
@@ -30,6 +31,7 @@ router.use('/ingredients', ingredientRoutes);
 router.use('/purchase-orders', purchaseRoutes);
 router.use('/suppliers', purchaseRoutes);
 router.use('/stock', stockRoutes);
+router.use('/storage', storageRoutes);
 
 // Health check
 router.get('/health', (_req, res) => {

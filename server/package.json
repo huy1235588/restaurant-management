@@ -37,6 +37,7 @@
         "@types/jsonwebtoken": "^9.0.7",
         "@types/morgan": "^1.9.9",
         "@types/node": "^24.9.1",
+        "@types/node-cron": "^3.0.11",
         "@types/swagger-jsdoc": "^6.0.4",
         "@types/swagger-ui-express": "^4.1.8",
         "bcryptjs": "^3.0.2",
@@ -60,7 +61,11 @@
         "zod": "^4.1.12"
     },
     "dependencies": {
+        "@types/multer": "^2.0.0",
+        "cloudinary": "^2.8.0",
         "cookie-parser": "^1.4.7",
+        "multer": "^2.0.2",
+        "node-cron": "^4.2.1",
         "swagger-jsdoc": "^6.2.8",
         "swagger-ui-express": "^5.0.1"
     },

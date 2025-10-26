@@ -28,6 +28,17 @@ interface Config {
 
     // Logging
     logLevel: string;
+
+    // Storage
+    storageType: 'local' | 'cloudinary';
+    baseUrl: string;
+    uploadDir: string;
+    maxFileSize: number;
+
+    // Cloudinary (optional)
+    cloudinaryCloudName?: string;
+    cloudinaryApiKey?: string;
+    cloudinaryApiSecret?: string;
 }
 
 const config: Config = {
@@ -54,6 +65,17 @@ const config: Config = {
 
     // Logging
     logLevel: process.env['LOG_LEVEL'] || 'info',
+
+    // Storage
+    storageType: (process.env['STORAGE_TYPE'] || 'local') as 'local' | 'cloudinary',
+    baseUrl: process.env['BASE_URL'] || 'http://localhost:5000',
+    uploadDir: process.env['UPLOAD_DIR'] || './uploads',
+    maxFileSize: parseInt(process.env['MAX_FILE_SIZE'] || '5242880', 10),
+
+    // Cloudinary
+    cloudinaryCloudName: process.env['CLOUDINARY_CLOUD_NAME'],
+    cloudinaryApiKey: process.env['CLOUDINARY_API_KEY'],
+    cloudinaryApiSecret: process.env['CLOUDINARY_API_SECRET'],
 };
 
 // Validate required environment variables
