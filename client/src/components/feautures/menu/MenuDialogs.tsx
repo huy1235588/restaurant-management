@@ -105,7 +105,7 @@ export function MenuDialogs({
 
             {/* Detail Dialog */}
             <Dialog open={showDetailDialog} onOpenChange={onDetailDialogChange}>
-                <DialogContent className="sm:max-w-4xl">
+                <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>{t('menu.itemDetails', 'Menu Item Details')}</DialogTitle>
                     </DialogHeader>

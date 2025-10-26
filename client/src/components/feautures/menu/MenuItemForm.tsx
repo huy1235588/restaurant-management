@@ -25,6 +25,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { MenuItem, Category } from '@/types';
 import { Loader2 } from 'lucide-react';
+import { ImageUploadCropper } from '@/components/shared/ImageUploadCropper';
 
 interface MenuItemFormProps {
     item?: MenuItem;
@@ -36,6 +37,8 @@ interface MenuItemFormProps {
 export function MenuItemForm({ item, categories, onSubmit, onCancel }: MenuItemFormProps) {
     const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [tempImagePath, setTempImagePath] = useState<string | null>(null);
 
     const form = useForm<Partial<MenuItem>>({
         defaultValues: item || {
@@ -58,10 +61,18 @@ export function MenuItemForm({ item, categories, onSubmit, onCancel }: MenuItemF
     const handleSubmit = async (data: Partial<MenuItem>) => {
         try {
             setLoading(true);
-            await onSubmit(data);
+            const submitData = { ...data };
+            
+            await onSubmit(submitData);
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleImageSelect = async (file: File, preview: string) => {
+        setImageFile(file);
+        // Update form with preview for immediate visual feedback
+        form.setValue('imageUrl', preview);
     };
 
     return (
@@ -258,23 +269,21 @@ export function MenuItemForm({ item, categories, onSubmit, onCancel }: MenuItemF
                     )}
                 />
 
-                {/* Image URL */}
-                <FormField
-                    control={form.control}
-                    name="imageUrl"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>{t('menu.imageUrl', 'Image URL')}</FormLabel>
-                            <FormControl>
-                                <Input placeholder="https://example.com/image.jpg" {...field} />
-                            </FormControl>
-                            <FormDescription>
-                                {t('menu.imageUrlDescription', 'Enter a URL for the item image')}
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                {/* Image Upload */}
+                <FormItem>
+                    <FormLabel>{t('menu.image', 'Menu Item Image')}</FormLabel>
+                    <FormControl>
+                        <ImageUploadCropper
+                            onImageSelect={handleImageSelect}
+                            currentImage={item?.imageUrl}
+                            label={t('menu.uploadImage', 'Upload Image')}
+                        />
+                    </FormControl>
+                    <FormDescription>
+                        {t('menu.imageDescription', 'Upload and crop your image. The image will be optimized automatically.')}
+                    </FormDescription>
+                    <FormMessage />
+                </FormItem>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Is Vegetarian */}
@@ -332,7 +341,7 @@ export function MenuItemForm({ item, categories, onSubmit, onCancel }: MenuItemF
 
                 {/* Form Actions */}
                 <div className="flex justify-end gap-4 pt-4">
-                    <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
+                    <Button type="button" variant="outline" disabled={loading}>
                         {t('common.cancel', 'Cancel')}
                     </Button>
                     <Button type="submit" disabled={loading}>

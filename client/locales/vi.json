@@ -128,6 +128,8 @@
         "description": "Mô tả",
         "descriptionPlaceholder": "Nhập mô tả món ăn",
         "image": "Hình ảnh",
+        "uploadImage": "Tải lên hình ảnh",
+        "imageDescription": "Tải lên và cắt hình ảnh. Hình ảnh sẽ được tối ưu hóa tự động.",
         "imageUrl": "URL Hình Ảnh",
         "imageUrlDescription": "Nhập đường dẫn URL cho hình ảnh món ăn",
         "available": "Còn hàng",
@@ -176,7 +178,12 @@
         "deleteSuccess": "Xóa món ăn thành công",
         "deleteError": "Không thể xóa món ăn",
         "availabilityUpdated": "Cập nhật tình trạng thành công",
-        "availabilityError": "Không thể cập nhật tình trạng"
+        "availabilityError": "Không thể cập nhật tình trạng",
+        "imageUploadedSuccess": "Tải hình ảnh thành công",
+        "imageUploadFailed": "Không thể tải hình ảnh",
+        "imageRemovedSuccess": "Xóa hình ảnh thành công",
+        "imageRemoveFailed": "Không thể xóa hình ảnh",
+        "uploadingImage": "Đang tải hình ảnh..."
     },
     "tables": {
         "title": "Bàn",
