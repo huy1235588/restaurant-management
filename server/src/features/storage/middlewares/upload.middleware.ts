@@ -41,20 +41,10 @@ const generateFileName = (originalName: string): string => {
  * Configure storage
  */
 const storage = multer.diskStorage({
-    destination: (req: Request, _file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
-        // Get folder from request or use temp as default
-        const folder = (req.body.folder || 'temp') as string;
-
-        const folderMap: Record<string, string> = {
-            'temp': UPLOAD_DIRS.TEMP,
-            'menu': UPLOAD_DIRS.MENU,
-            'staff': UPLOAD_DIRS.STAFF,
-            'documents': UPLOAD_DIRS.DOCUMENTS,
-            'images': UPLOAD_DIRS.IMAGES,
-            'others': UPLOAD_DIRS.OTHERS,
-        };
-
-        const uploadPath = folderMap[folder] || UPLOAD_DIRS.TEMP;
+    destination: (_req: Request, _file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
+        // Always save to temp first, then LocalStorageProvider will move to the correct folder
+        // This is because req.body is not fully parsed when multer processes the file
+        const uploadPath = UPLOAD_DIRS.TEMP;
 
         // Directory already exists from initialization above
         cb(null, uploadPath);

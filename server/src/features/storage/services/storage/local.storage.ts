@@ -17,9 +17,21 @@ export class LocalStorageProvider implements StorageProvider {
             // Ensure directory exists
             await fs.mkdir(uploadDir, { recursive: true });
 
-            // File is already saved by multer with diskStorage
-            // We just need to return the info
-            const relativePath = path.relative(process.cwd(), file.path).replace(/\\/g, '/');
+            // Check if file is in temp folder and needs to be moved
+            const currentDir = path.dirname(file.path);
+            const targetDir = uploadDir;
+
+            let finalPath = file.path;
+            
+            // Move file to target folder if needed
+            if (path.normalize(currentDir) !== path.normalize(targetDir)) {
+                const newPath = path.join(targetDir, file.filename);
+                await fs.rename(file.path, newPath);
+                finalPath = newPath;
+                logger.info(`Moved file from ${file.path} to ${newPath}`);
+            }
+
+            const relativePath = path.relative(process.cwd(), finalPath).replace(/\\/g, '/');
             const baseUrl = process.env['BASE_URL'] || 'http://localhost:3000';
             const url = `${baseUrl}/${relativePath}`;
 
