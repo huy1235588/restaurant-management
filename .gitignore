@@ -46,3 +46,6 @@ docs/.obsidian/workspace.json
 docs/.obsidian/themes/AnuPpuccin/manifest.json
 docs/.obsidian/themes/AnuPpuccin/theme.css
 server/uploads/
+# Rust/Tauri build artifacts
+src-tauri/target/
+src-tauri/Cargo.lock
