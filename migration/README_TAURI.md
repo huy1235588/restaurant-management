@@ -98,6 +98,8 @@ This will:
 
 ### 3. Production Build
 
+> ⚠️ **Important:** Before building for production, you must configure Next.js for static export (see Configuration section below). The current Next.js configuration uses `standalone` output which is incompatible with Tauri.
+
 Build the application for distribution:
 
 ```bash
@@ -130,7 +132,15 @@ The main configuration file is `src-tauri/tauri.conf.json`. Key settings:
 }
 ```
 
-**Important:** For production builds, Next.js must be configured to output static files. Update `client/next.config.ts`:
+### Next.js Static Export Configuration (Required for Production Builds)
+
+> ⚠️ **TODO (Phase 2):** The current Next.js configuration needs to be updated for Tauri compatibility.
+
+**Current Configuration** (`client/next.config.ts`):
+- Uses conditional `standalone` output for production
+- Not compatible with Tauri's static file serving
+
+**Required Changes** for Tauri production builds:
 
 ```typescript
 const nextConfig: NextConfig = {
@@ -138,8 +148,19 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,  // Required for static export
   },
+  // Note: This will require adjusting API calls and SSR features
+  // to be compatible with static export
 };
 ```
+
+**Important Considerations:**
+- Static export doesn't support Next.js SSR, ISR, or API routes
+- All API calls must target the separate Express backend server
+- Image optimization must be disabled or handled differently
+- Dynamic routes need to be pre-generated
+- This is a Phase 2 task in the migration plan
+
+For now, development mode (`cargo tauri dev`) works with the current configuration.
 
 ### Environment Variables
 

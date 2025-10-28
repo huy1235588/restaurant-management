@@ -98,6 +98,55 @@ This document outlines the comprehensive plan for migrating the Restaurant Manag
 
 ---
 
+## 🔧 Next.js Static Export Configuration
+
+### Current Status
+The existing Next.js application uses conditional `standalone` output, which is incompatible with Tauri's static file serving. This must be addressed in Phase 2.
+
+### Required Changes
+
+**File:** `client/next.config.ts`
+
+```typescript
+const nextConfig: NextConfig = {
+  output: 'export',  // Enable static HTML export
+  images: {
+    unoptimized: true,  // Required for static export
+  },
+  // Remove or conditionally disable 'standalone' output
+};
+```
+
+### Implications
+
+1. **No Server-Side Features:**
+   - No SSR (Server-Side Rendering)
+   - No ISR (Incremental Static Regeneration)
+   - No API routes in Next.js
+   - All pages must be pre-rendered at build time
+
+2. **API Communication:**
+   - Frontend must call the separate Express backend
+   - Cannot use Next.js API routes
+   - May need to adjust CORS settings
+
+3. **Dynamic Routes:**
+   - Dynamic routes need `generateStaticParams`
+   - Or convert to client-side routing
+
+4. **Images:**
+   - Next.js Image optimization disabled
+   - Consider alternative image handling
+
+### Migration Strategy
+
+1. **Phase 1** (Current): Document requirements, scaffold ready
+2. **Phase 2**: Configure Next.js for static export
+3. **Phase 3**: Test and adjust features for static compatibility
+4. **Phase 4**: Optimize static build size and performance
+
+---
+
 ## 🗺️ Feature Mapping: Web → Desktop
 
 | Web Feature | Desktop Implementation | Priority | Notes |
@@ -327,9 +376,10 @@ jobs:
 
 ### Immediate (Sprint 1-2)
 1. **Complete Tauri Setup** ✅ (This PR)
-   - Initialize src-tauri scaffold
+   - Initialize src-tauri scaffold ✅
    - Configure basic build
    - Test build on all platforms
+   - **Configure Next.js for static export** (required for production builds)
 
 2. **Database Design**
    - Choose SQLite vs PostgreSQL
