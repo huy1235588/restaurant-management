@@ -138,7 +138,7 @@ The main configuration file is `src-tauri/tauri.conf.json`. Key settings:
 
 **Current Configuration** (`client/next.config.ts`):
 - Uses conditional `standalone` output (production builds on non-Windows platforms only)
-- Default behavior on Windows and development mode
+- Uses default Next.js output (`.next` directory) on Windows and in development mode
 - Not compatible with Tauri's static file serving
 
 **Required Changes** for Tauri production builds:
