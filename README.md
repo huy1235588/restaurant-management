@@ -7,6 +7,8 @@
 ![Next.js](https://img.shields.io/badge/Next.js-15-black)
 ![Node.js](https://img.shields.io/badge/Node.js-20-green)
 
+> **📢 Desktop Migration in Progress:** We are migrating this web application to a cross-platform desktop app using Tauri! See [Issue #11](https://github.com/huy1235588/restaurant-management/issues/11) and the [Tauri Migration Plan](./migration/TAURI_MIGRATION_PLAN.md) for details.
+
 ## 🌟 Features
 
 - **🔐 Authentication & Authorization** - JWT-based secure authentication
