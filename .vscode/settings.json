@@ -10,6 +10,9 @@
         "**/.next": true,
         "**/coverage": true,
         "**/.cache": true,
+        "**/.idea": true,
+        "**/tauri/src-tauri/gen": true,
+        "**/tauri/src-tauri/target": true
     },
     "files.exclude": {
         "**/node_modules": true,
@@ -24,6 +27,7 @@
         "**.svg": true,
         "**/package-lock.json": true,
         "**/yarn.lock": true,
-        "**/pnpm-lock.yaml": true
+        "**/pnpm-lock.yaml": true,
+        "**/tauri/src-tauri/Cargo.lock": true
     }
 }
