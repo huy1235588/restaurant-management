@@ -137,7 +137,8 @@ The main configuration file is `src-tauri/tauri.conf.json`. Key settings:
 > ⚠️ **TODO (Phase 2):** The current Next.js configuration needs to be updated for Tauri compatibility.
 
 **Current Configuration** (`client/next.config.ts`):
-- Uses conditional `standalone` output for production
+- Uses conditional `standalone` output (production builds on non-Windows platforms only)
+- Default behavior on Windows and development mode
 - Not compatible with Tauri's static file serving
 
 **Required Changes** for Tauri production builds:
