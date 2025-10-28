@@ -121,13 +121,24 @@ The main configuration file is `src-tauri/tauri.conf.json`. Key settings:
 {
   "build": {
     "devPath": "http://localhost:3000",  // Next.js dev server
-    "distDir": "../client/.next"          // Production build output
+    "distDir": "../client/out"            // Static export output (production)
   },
   "package": {
     "productName": "Restaurant Management",
     "version": "0.1.0"
   }
 }
+```
+
+**Important:** For production builds, Next.js must be configured to output static files. Update `client/next.config.ts`:
+
+```typescript
+const nextConfig: NextConfig = {
+  output: 'export',  // Enable static export for Tauri
+  images: {
+    unoptimized: true,  // Required for static export
+  },
+};
 ```
 
 ### Environment Variables

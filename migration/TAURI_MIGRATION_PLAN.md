@@ -25,6 +25,7 @@ This document outlines the comprehensive plan for migrating the Restaurant Manag
 - [x] Initialize Tauri project structure (src-tauri/)
 - [x] Configure basic Cargo.toml with dependencies
 - [x] Set up tauri.conf.json for Next.js integration
+- [ ] Configure Next.js for static export (output: 'export' in next.config.ts)
 - [ ] Configure build scripts for development and production
 - [ ] Set up cross-platform build targets
 - [ ] Create application icons for all platforms
