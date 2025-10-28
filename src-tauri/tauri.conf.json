@@ -1,0 +1,18 @@
+{
+  "build": {
+    "beforeDevCommand": "",
+    "beforeBuildCommand": ""
+  },
+  "package": {
+    "productName": "Restaurant Management (Tauri scaffold)",
+    "version": "0.1.0"
+  },
+  "tauri": {
+    "bundle": {
+      "identifier": "com.huy1235588.restaurant-management"
+    },
+    "updater": {
+      "active": false
+    }
+  }
+}

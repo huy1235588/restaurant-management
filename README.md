@@ -459,3 +459,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Made with ❤️ using Next.js, Express, and Docker**
 
 ⭐ If you find this project helpful, please consider giving it a star!
+
+<!-- migration note appended by PR: minimal, non-invasive -->
+
+## Migration note: Desktop (Tauri) scaffold
+
+This repository has an initial minimal scaffold to begin migrating the Next.js web app to a Tauri desktop application. See docs/migration/ for the migration plan and next steps.

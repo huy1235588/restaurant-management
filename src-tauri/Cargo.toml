@@ -1,0 +1,11 @@
+[package]
+name = "restaurant_management_tauri"
+version = "0.1.0"
+edition = "2021"
+authors = ["huy1235588 <noreply@example.com>"]
+
+# Minimal Cargo.toml for the initial Tauri scaffold. Keep dependencies intentionally small;
+# maintainers can iterate and add features/commands as needed.
+
+[dependencies]
+tauri = { version = "1" }
