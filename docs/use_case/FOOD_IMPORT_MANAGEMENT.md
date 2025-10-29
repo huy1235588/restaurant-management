@@ -7,46 +7,46 @@ Quy trình nhập món ăn là một phần quan trọng trong quản lý danh m
 ## Giao Diện Mẫu (UI Mockup)
 
 ### 1. Giao Diện Danh Sách Các Món Ăn
-![[images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_list_management.png]]
+![Giao diện danh sách quản lý các món ăn với bảng hiển thị thông tin chi tiết](..//images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_list_management.png)
 
 ### 2. Giao Diện Tạo Món Ăn Mới (Form Multi-Tab)
-![[images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_creation_form.png]]
+![Form tạo món ăn mới với nhiều tab thông tin](..//images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_creation_form.png)
 
 ### 3. Giao Diện Tab Giá Cả
-![[images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_price_tab.png]]
+![Tab cấu hình giá cả và chi phí của món ăn](..//images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_price_tab.png)
 
 ### 4. Giao Diện Tab Thành Phần
-![[images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_ingredients_tab.png]]
+![Tab quản lý thành phần và nguyên liệu của món ăn](..//images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_ingredients_tab.png)
 
 ### 5. Giao Diện Tab Cấu Hình Nâng Cao
-![[images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_configuration_tab.png]]
+![Tab cấu hình các thuộc tính nâng cao của món ăn](..//images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_configuration_tab.png)
 
 ### 6. Giao Diện Tab Xem Trước (Preview)
-![[images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_preview_tab.png]]
+![Tab xem trước cách hiển thị món ăn cho khách hàng](..//images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_preview_tab.png)
 
 ### 7. Giao Diện Trang Chi Tiết Món Ăn
-![[images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_detail_page.png]]
+![Trang chi tiết đầy đủ thông tin của một món ăn](..//images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_detail_page.png)
 
 ### 8. Giao Diện Trang Chi Tiết Món Ăn - Các Tab giá
-![[images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_detail_price_tab.png]]
+![Tab giá cả trong trang chi tiết món ăn](..//images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_detail_price_tab.png)
 
 ### 9. Giao Diện Trang Chi Tiết Món Ăn - Các Tab nguyên liệu
-![[images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_detail_ingredients_tab.png]]
+![Tab thành phần nguyên liệu trong trang chi tiết món ăn](..//images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_detail_ingredients_tab.png)
 
 ### 10. Giao Diện Trang Chi Tiết Món Ăn - Các Tab lịch sử
-![[images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_detail_history_tab.png]]
+![Tab lịch sử thay đổi trong trang chi tiết món ăn](..//images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_detail_history_tab.png)
 
 ### 11. Giao Diện Trang Chi Tiết Món Ăn - Các Tab thống kê
-![[images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_detail_statistics_tab.png]]
+![Tab thống kê bán hàng trong trang chi tiết món ăn](..//images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_detail_statistics_tab.png)
 
 ### 12. Giao Diện Nhập Hàng Loạt (Bulk Import)
-![[images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_bulk_import.png]]
+![Giao diện nhập hàng loạt nhiều món ăn từ file](..//images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_bulk_import.png)
 
 ### 13. Giao Diện Tiến Trình Nhập
-![[images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_import_progress.png]]
+![Giao diện hiển thị tiến trình nhập hàng loạt](..//images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_import_progress.png)
 
 ### 14. Giao Diện Báo Cáo Nhập
-![[images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_import_report.png]]
+![Giao diện báo cáo kết quả sau khi nhập hàng loạt](..//images/use_case/FOOD_IMPORT_MANAGEMENT/food_item_import_report.png)
 
 ## Quy Trình Chi Tiết
 
