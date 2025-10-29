@@ -7,6 +7,7 @@
 import multer, { FileFilterCallback } from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { randomUUID } from 'crypto';
 import { Request, Response, NextFunction } from 'express';
 import {
     UPLOAD_DIRS,
@@ -29,12 +30,8 @@ Object.values(UPLOAD_DIRS).forEach(dir => {
  * Generate unique filename with better format
  */
 const generateFileName = (originalName: string): string => {
-    const timestamp = Date.now();
-    const randomString = Math.random().toString(36).substring(2, 8);
     const ext = path.extname(originalName).toLowerCase();
-    const nameWithoutExt = path.basename(originalName, ext);
-    const sanitizedName = nameWithoutExt.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50); // Limit name length
-    return `${sanitizedName}_${timestamp}_${randomString}${ext}`;
+    return `${randomUUID()}${ext}`;
 };
 
 /**

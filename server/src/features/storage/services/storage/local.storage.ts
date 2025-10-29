@@ -32,7 +32,7 @@ export class LocalStorageProvider implements StorageProvider {
             }
 
             const relativePath = path.relative(process.cwd(), finalPath).replace(/\\/g, '/');
-            const baseUrl = process.env['BASE_URL'] || 'http://localhost:3000';
+            const baseUrl = process.env['API_BASE_URL'] || 'http://localhost:5000';
             const url = `${baseUrl}/${relativePath}`;
 
             return {

@@ -24,8 +24,10 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { MenuItem, Category } from '@/types';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
 import { ImageUploadCropper } from '@/components/shared/ImageUploadCropper';
+import { useFileUpload } from '@/hooks/useFileUpload';
+import { uploadApi } from '@/services/upload.service';
 
 interface MenuItemFormProps {
     item?: MenuItem;
@@ -38,7 +40,18 @@ export function MenuItemForm({ item, categories, onSubmit, onCancel }: MenuItemF
     const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [imageFile, setImageFile] = useState<File | null>(null);
-    const [tempImagePath, setTempImagePath] = useState<string | null>(null);
+    const [uploadError, setUploadError] = useState<string | null>(null);
+    
+    // Use upload hook for file upload management
+    const { upload, uploading, error: uploadHookError } = useFileUpload({
+        onSuccess: (file) => {
+            console.log('File uploaded successfully:', file);
+        },
+        onError: (error) => {
+            console.error('Upload failed:', error);
+            setUploadError(error.message);
+        },
+    });
 
     const form = useForm<Partial<MenuItem>>({
         defaultValues: item || {
@@ -61,9 +74,32 @@ export function MenuItemForm({ item, categories, onSubmit, onCancel }: MenuItemF
     const handleSubmit = async (data: Partial<MenuItem>) => {
         try {
             setLoading(true);
+            setUploadError(null);
             const submitData = { ...data };
             
+            // Upload image if a new file is selected
+            if (imageFile) {
+                console.log('Uploading image file...');
+                const uploadedFile = await upload(imageFile, 'menu', 'image');
+                
+                if (!uploadedFile) {
+                    throw new Error(uploadHookError?.message || 'Failed to upload image');
+                }
+                
+                // Update form data with uploaded file URL
+                submitData.imageUrl = uploadedFile.url;
+                console.log('Image uploaded successfully. URL:', uploadedFile.url);
+            }
+            
+            // Submit form data with image URL to parent handler
             await onSubmit(submitData);
+            
+            // Clear image file after successful submit
+            setImageFile(null);
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+            setUploadError(errorMessage);
+            console.error('Submit error:', error);
         } finally {
             setLoading(false);
         }
@@ -282,6 +318,28 @@ export function MenuItemForm({ item, categories, onSubmit, onCancel }: MenuItemF
                     <FormDescription>
                         {t('menu.imageDescription', 'Upload and crop your image. The image will be optimized automatically.')}
                     </FormDescription>
+                    
+                    {/* Upload Status Messages */}
+                    {uploading && (
+                        <div className="flex items-center gap-2 mt-2 text-sm text-blue-600">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            {t('common.uploading', 'Uploading...')}
+                        </div>
+                    )}
+                    
+                    {uploadError && (
+                        <div className="flex items-center gap-2 mt-2 text-sm text-red-600">
+                            <AlertCircle className="h-4 w-4" />
+                            {uploadError}
+                        </div>
+                    )}
+                    
+                    {imageFile && !uploading && !uploadError && (
+                        <div className="text-sm text-green-600 mt-2">
+                            ✓ {t('common.ready', 'Ready to upload')}
+                        </div>
+                    )}
+                    
                     <FormMessage />
                 </FormItem>
 
@@ -341,11 +399,19 @@ export function MenuItemForm({ item, categories, onSubmit, onCancel }: MenuItemF
 
                 {/* Form Actions */}
                 <div className="flex justify-end gap-4 pt-4">
-                    <Button type="button" variant="outline" disabled={loading}>
+                    <Button 
+                        type="button" 
+                        variant="outline" 
+                        disabled={loading || uploading}
+                        onClick={onCancel}
+                    >
                         {t('common.cancel', 'Cancel')}
                     </Button>
-                    <Button type="submit" disabled={loading}>
-                        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    <Button 
+                        type="submit" 
+                        disabled={loading || uploading}
+                    >
+                        {(loading || uploading) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         {item ? t('common.update', 'Update') : t('common.create', 'Create')}
                     </Button>
                 </div>

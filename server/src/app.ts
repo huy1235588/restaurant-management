@@ -60,10 +60,14 @@ export function createApp(): Application {
     app.use('/api', limiter);
 
     // Serve static files - uploads folder
+    app.use('/uploads', cors({ origin: config.corsOrigin, credentials: true }));
     app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
         maxAge: '1d', // Cache for 1 day
         etag: true,
         lastModified: true,
+        setHeaders: (res) => {
+            res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+        },
     }));
 
     // API Routes
