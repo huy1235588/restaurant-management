@@ -100,7 +100,9 @@ make prod
 
 | Document | Description |
 |----------|-------------|
+| [**PROJECT_DOCUMENTATION.md**](./docs/PROJECT_DOCUMENTATION.md) | 📋 **Complete project documentation** - Scope, objectives, features, timeline |
 | [**DATABASE.md**](./docs/DATABASE.md) | Complete database documentation |
+| [**BUSINESS_USE_CASES.md**](./docs/BUSINESS_USE_CASES.md) | Business processes and use cases |
 | [**DOCKER.md**](./DOCKER.md) | Complete Docker deployment guide |
 | [**DOCKER_OPTIMIZATION.md**](./DOCKER_OPTIMIZATION.md) | Docker optimization details |
 
