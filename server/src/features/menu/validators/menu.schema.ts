@@ -27,7 +27,7 @@ export const createMenuItemSchema = z.object({
         .string()
         .max(VALIDATION_RULES.DESCRIPTION_MAX_LENGTH)
         .optional(),
-    imageUrl: z.string().url().optional().or(z.literal('')),
+    imageUrl: z.url().optional().or(z.literal('')),
     isAvailable: z.boolean().optional().default(true),
     isActive: z.boolean().optional().default(true),
     preparationTime: z.number().int().positive().optional(),

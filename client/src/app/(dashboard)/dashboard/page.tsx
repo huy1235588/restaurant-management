@@ -68,23 +68,23 @@ export default function DashboardPage() {
             ]);
 
             // Calculate today's data
-            const todayOrders = orders.data.filter(
+            const todayOrders = orders.items.filter(
                 (order) => order.orderTime.startsWith(today)
             );
-            const todayBills = bills.data.filter(
+            const todayBills = bills.items.filter(
                 (bill) => bill.billDate.startsWith(today)
             );
-            const todayReservations = reservations.data.filter(
+            const todayReservations = reservations.items.filter(
                 (reservation) => reservation.reservationDate === today
             );
 
             // Calculate statistics
             const todayRevenue = todayBills.reduce((sum, bill) => sum + bill.totalAmount, 0);
-            const activeOrders = orders.data.filter(
+            const activeOrders = orders.items.filter(
                 (order) => ['pending', 'confirmed', 'preparing'].includes(order.status)
             ).length;
-            const availableTables = tables.data.filter((table) => table.status === 'available').length;
-            const occupiedTables = tables.data.filter((table) => table.status === 'occupied').length;
+            const availableTables = tables.items.filter((table) => table.status === 'available').length;
+            const occupiedTables = tables.items.filter((table) => table.status === 'occupied').length;
 
             // Calculate changes (mock data - you can implement real comparison)
             const revenueChange = 15.3; // Mock percentage change
@@ -97,16 +97,16 @@ export default function DashboardPage() {
                 availableTables,
                 occupiedTables,
                 todayReservations: todayReservations.length,
-                pendingOrders: orders.data.filter((o) => o.status === 'pending').length,
-                completedOrders: orders.data.filter((o) => o.status === 'served').length,
+                pendingOrders: orders.items.filter((o) => o.status === 'pending').length,
+                completedOrders: orders.items.filter((o) => o.status === 'served').length,
                 revenueChange,
                 ordersChange,
             });
 
             setRecentActivity({
-                orders: orders.data.slice(0, 5),
-                bills: bills.data.slice(0, 5),
-                reservations: reservations.data.slice(0, 5),
+                orders: orders.items.slice(0, 5),
+                bills: bills.items.slice(0, 5),
+                reservations: reservations.items.slice(0, 5),
             });
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
