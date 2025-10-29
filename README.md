@@ -103,6 +103,8 @@ make prod
 | [**DATABASE.md**](./docs/DATABASE.md) | Complete database documentation |
 | [**DOCKER.md**](./DOCKER.md) | Complete Docker deployment guide |
 | [**DOCKER_OPTIMIZATION.md**](./DOCKER_OPTIMIZATION.md) | Docker optimization details |
+| [**TAI_LIEU_MO_TA_DU_AN.docx**](./docs/TAI_LIEU_MO_TA_DU_AN.docx) | Comprehensive project documentation (Vietnamese) |
+| [**Document Generator**](./docs/README_DOCUMENT_GENERATOR.md) | How to generate project documentation |
 
 ## 🛠️ Tech Stack
 
