@@ -133,7 +133,8 @@ make prod
 
 ```
 restaurant-management/
-├── client/                 # Next.js frontend
+├── apps/
+│   ├── client/             # Next.js frontend
 │   ├── src/
 │   │   ├── app/           # Next.js app directory
 │   │   ├── components/    # React components
@@ -147,7 +148,9 @@ restaurant-management/
 │   ├── locales/           # i18n translations
 │   └── Dockerfile         # Production build
 │
-├── server/                # Express backend
+│   └── server/            # Express backend
+│
+├── desktop/               # Desktop app (tauri/electron)
 │   ├── src/
 │   │   ├── config/        # Configuration
 │   │   ├── controllers/   # Route controllers
@@ -187,17 +190,17 @@ restaurant-management/
 - PostgreSQL 16+ (or use Docker)
 - Redis 7+ (or use Docker)
 
-### Local Setup (without Docker)
+# Local Setup (without Docker)
 
 #### 1. Install Dependencies
 
 ```bash
 # Client
-cd client
+cd apps/client
 pnpm install
 
 # Server
-cd ../server
+cd ../../apps/server
 pnpm install
 ```
 
@@ -205,6 +208,7 @@ pnpm install
 
 ```bash
 # In server directory
+cd apps/server
 pnpm run prisma:generate
 pnpm run prisma:migrate
 pnpm run prisma:seed
@@ -214,11 +218,11 @@ pnpm run prisma:seed
 
 ```bash
 # Terminal 1 - Server
-cd server
+cd apps/server
 pnpm run dev
 
 # Terminal 2 - Client
-cd client
+cd apps/client
 pnpm run dev
 ```
 
@@ -316,7 +320,7 @@ See [DOCKER.md](./DOCKER.md) for complete deployment guide.
 #### Build Client
 
 ```bash
-cd client
+cd apps/client
 pnpm run build
 pnpm run start  # or deploy to Vercel/Netlify
 ```
@@ -324,7 +328,7 @@ pnpm run start  # or deploy to Vercel/Netlify
 #### Build Server
 
 ```bash
-cd server
+cd apps/server
 pnpm run build
 pnpm run prisma:generate
 pnpm run prisma:migrate:deploy

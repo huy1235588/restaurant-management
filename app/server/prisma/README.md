@@ -1,4 +1,74 @@
-# Prisma Seed - Restaurant Management
+# Prisma - Restaurant Management Database
+
+## Tổng quan
+
+Dự án sử dụng Prisma ORM với PostgreSQL để quản lý database. Schema được định nghĩa trong file `schema.prisma` với các bảng chính: accounts, staff, categories, menu_items, restaurant_tables, reservations, orders, bills, v.v.
+
+## Khởi tạo bảng (Database Setup)
+
+### 1. Chuẩn bị môi trường
+
+Trước khi khởi tạo bảng, đảm bảo:
+
+- Database PostgreSQL đang chạy
+- Biến môi trường `DATABASE_URL` được thiết lập trong file `.env`:
+  ```
+  DATABASE_URL="postgresql://restaurant_admin:restaurant_password@localhost:5432/restaurant_db?schema=public"
+  ```
+- Dependencies đã được cài đặt:
+  ```bash
+  cd server
+  pnpm install
+  ```
+
+### 2. Tạo và áp dụng migrations
+
+#### Chạy trên máy local (development)
+
+```bash
+# Tạo migration và áp dụng lên database
+pnpm exec prisma migrate dev --name init
+
+# Hoặc đẩy schema trực tiếp (không tạo lịch sử migration)
+pnpm exec prisma db push
+
+# Generate Prisma Client
+pnpm run prisma:generate
+```
+
+#### Chạy với Docker Compose
+
+Nếu sử dụng Docker:
+
+```bash
+# Khởi động database container
+docker-compose up -d postgres redis
+
+# Chạy migration trong container server
+docker-compose run --rm server pnpm exec prisma migrate dev --name init
+
+# Hoặc chạy script package.json
+docker-compose run --rm server pnpm run prisma:migrate -- --name init
+```
+
+### 3. Kiểm tra kết quả
+
+- Mở Prisma Studio để xem các bảng:
+  ```bash
+  pnpm run prisma:studio
+  ```
+
+- Kiểm tra kết nối database:
+  ```bash
+  pnpm exec prisma db pull
+  ```
+
+### 4. Lưu ý quan trọng
+
+- **Development**: Sử dụng `prisma migrate dev` để tạo lịch sử migrations
+- **Production**: Sử dụng `prisma migrate deploy` để áp dụng migrations đã tạo
+- Nếu gặp lỗi kết nối, kiểm tra `DATABASE_URL` và trạng thái database
+- Để reset database: `pnpm run prisma:reset` (cẩn thận, sẽ xóa toàn bộ dữ liệu)
 
 ## Hướng dẫn sử dụng
 
@@ -7,7 +77,6 @@
 ```bash
 cd server
 pnpm install
-pnpm add -D @types/bcryptjs
 ```
 
 ### 2. Chạy seed data

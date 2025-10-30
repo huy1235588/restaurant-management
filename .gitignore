@@ -41,10 +41,11 @@ next-env.d.ts
 
 public/videos/*
 
-server/node_modules
+app/server/node_modules
 docs/.obsidian/workspace.json
 docs/.obsidian/themes/AnuPpuccin/manifest.json
 docs/.obsidian/themes/AnuPpuccin/theme.css
-server/uploads/
+app/server/uploads/
 data/*
 reports/*
+app/server/prisma/migrations/*
