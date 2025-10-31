@@ -47,5 +47,5 @@ docs/.obsidian/themes/AnuPpuccin/manifest.json
 docs/.obsidian/themes/AnuPpuccin/theme.css
 app/server/uploads/
 data/*
-reports/*
+docs/reports/*
 app/server/prisma/migrations/*
