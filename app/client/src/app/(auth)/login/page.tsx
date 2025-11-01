@@ -59,7 +59,6 @@ export default function LoginPage() {
                 manager: '/dashboard',
                 waiter: '/orders',
                 chef: '/kitchen',
-                bartender: '/bar',
                 cashier: '/bills',
             };
 

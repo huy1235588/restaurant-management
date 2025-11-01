@@ -19,7 +19,6 @@ enum Role {
     manager
     waiter
     chef
-    bartender
     cashier
 }
 

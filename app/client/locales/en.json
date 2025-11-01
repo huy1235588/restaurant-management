@@ -256,7 +256,6 @@
         "manager": "Manager",
         "waiter": "Waiter",
         "chef": "Chef",
-        "bartender": "Bartender",
         "cashier": "Cashier"
     },
     "validation": {

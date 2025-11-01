@@ -1,5 +1,5 @@
 // User và Authentication Types
-export type UserRole = 'admin' | 'manager' | 'waiter' | 'chef' | 'bartender' | 'cashier';
+export type UserRole = 'admin' | 'manager' | 'waiter' | 'chef' | 'cashier';
 
 export interface User {
     accountId: number;
@@ -310,12 +310,6 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
         'reservations.create',
     ],
     chef: [
-        'kitchen.view',
-        'orders.view',
-        'orders.update',
-        'menu.view',
-    ],
-    bartender: [
         'kitchen.view',
         'orders.view',
         'orders.update',

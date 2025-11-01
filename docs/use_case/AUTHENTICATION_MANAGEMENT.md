@@ -38,7 +38,6 @@ Hệ thống quản lý xác thực và tài khoản là nền tảng bảo mậ
 -   **Manager**: Quản lý nhà hàng, xem báo cáo
 -   **Waiter**: Phục vụ, tạo đơn hàng
 -   **Chef**: Quản lý bếp, cập nhật đơn hàng
--   **Bartender**: Pha chế đồ uống
 -   **Cashier**: Thu ngân, thanh toán
 
 ---
@@ -458,31 +457,31 @@ saltRounds = 10
 
 ## 4. Ma Trận Phân Quyền Chi Tiết
 
-| Resource               | Admin | Manager | Waiter | Chef | Bartender | Cashier |
-| ---------------------- | ----- | ------- | ------ | ---- | --------- | ------- |
-| **Tài Khoản**          |       |         |        |      |           |         |
-| Tạo tài khoản          | ✓     | ✓*      | ✗      | ✗    | ✗         | ✗       |
-| Xem tài khoản          | ✓     | ✓       | ✓**    | ✓**  | ✓**       | ✓**     |
-| Sửa tài khoản          | ✓     | ✓*      | ✓**    | ✓**  | ✓**       | ✓**     |
-| Xóa tài khoản          | ✓     | ✗       | ✗      | ✗    | ✗         | ✗       |
-| Đổi vai trò            | ✓     | ✗       | ✗      | ✗    | ✗         | ✗       |
-| Khóa/mở tài khoản      | ✓     | ✓       | ✗      | ✗    | ✗         | ✗       |
-| **Menu**               |       |         |        |      |           |         |
-| Tạo món ăn             | ✓     | ✓       | ✗      | ✗    | ✗         | ✗       |
-| Xem menu               | ✓     | ✓       | ✓      | ✓    | ✓         | ✓       |
-| **Đơn Hàng**           |       |         |        |      |           |         |
-| Tạo đơn                | ✓     | ✓       | ✓      | ✗    | ✗         | ✗       |
-| Xem đơn                | ✓     | ✓       | ✓      | ✓    | ✓         | ✓       |
-| Cập nhật đơn bếp       | ✓     | ✓       | ✗      | ✓    | ✓         | ✗       |
-| **Thanh Toán**         |       |         |        |      |           |         |
-| Tạo hóa đơn            | ✓     | ✓       | ✓      | ✗    | ✗         | ✓       |
-| Thanh toán             | ✓     | ✓       | ✓      | ✗    | ✗         | ✓       |
-| Hoàn tiền              | ✓     | ✓       | ✗      | ✗    | ✗         | ✗       |
-| **Báo Cáo**            |       |         |        |      |           |         |
-| Xem báo cáo            | ✓     | ✓       | ✗      | ✗    | ✗         | ✗       |
+| Resource          | Admin | Manager | Waiter | Chef | Cashier |
+| ----------------- | ----- | ------- | ------ | ---- | ------- |
+| **Tài Khoản**     |       |         |        |      |         |
+| Tạo tài khoản     | ✓     | ✓*      | ✗      | ✗    | ✗       |
+| Xem tài khoản     | ✓     | ✓       | ✓**    | ✓**  | ✓**     |
+| Sửa tài khoản     | ✓     | ✓*      | ✓**    | ✓**  | ✓**     |
+| Xóa tài khoản     | ✓     | ✗       | ✗      | ✗    | ✗       |
+| Đổi vai trò       | ✓     | ✗       | ✗      | ✗    | ✗       |
+| Khóa/mở tài khoản | ✓     | ✓       | ✗      | ✗    | ✗       |
+| **Menu**          |       |         |        |      |         |
+| Tạo món ăn        | ✓     | ✓       | ✗      | ✗    | ✗       |
+| Xem menu          | ✓     | ✓       | ✓      | ✓    | ✓       |
+| **Đơn Hàng**      |       |         |        |      |         |
+| Tạo đơn           | ✓     | ✓       | ✓      | ✗    | ✗       |
+| Xem đơn           | ✓     | ✓       | ✓      | ✓    | ✓       |
+| Cập nhật đơn bếp  | ✓     | ✓       | ✗      | ✓    | ✗       |
+| **Thanh Toán**    |       |         |        |      |         |
+| Tạo hóa đơn       | ✓     | ✓       | ✓      | ✗    | ✓       |
+| Thanh toán        | ✓     | ✓       | ✓      | ✗    | ✓       |
+| Hoàn tiền         | ✓     | ✓       | ✗      | ✗    | ✗       |
+| **Báo Cáo**       |       |         |        |      |         |
+| Xem báo cáo       | ✓     | ✓       | ✗      | ✗    | ✗       |
 
-*Có giới hạn  
-**Chỉ tài khoản của mình
+\*: Có giới hạn  
+\*\*: Chỉ tài khoản của mình
 
 ---
 

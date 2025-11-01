@@ -10,7 +10,7 @@ A comprehensive, full-stack restaurant management system designed to streamline 
 - Real-time updates via WebSocket
 - Multi-language support (EN/VI)
 
-**Target Users**: Restaurant owners, managers, waitstaff, kitchen staff, cashiers, and bartenders.
+**Target Users**: Restaurant owners, managers, waitstaff, kitchen staff, and cashiers.
 
 ## Tech Stack
 
@@ -112,7 +112,7 @@ A comprehensive, full-stack restaurant management system designed to streamline 
   - Swagger documentation at `/api-docs`
 - **Security**:
   - JWT-based authentication with refresh tokens
-  - Role-based access control (RBAC) with 6 roles: admin, manager, waiter, chef, bartender, cashier
+  - Role-based access control (RBAC) with 5 roles: admin, manager, waiter, chef, cashier
   - Helmet for HTTP headers security
   - Rate limiting on API endpoints
   - CORS configured for client URL
@@ -149,7 +149,7 @@ A comprehensive, full-stack restaurant management system designed to streamline 
 This system manages a full-service restaurant with:
 
 **Core Entities**:
-- **Users/Staff**: admin, manager, waiter, chef, bartender, cashier with RBAC
+- **Users/Staff**: admin, manager, waiter, chef, cashier with RBAC
 - **Menu**: Categories (appetizers, mains, desserts, drinks) and food items
 - **Tables**: Table management with statuses (available, occupied, reserved, maintenance)
 - **Reservations**: Online table booking system

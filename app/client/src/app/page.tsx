@@ -22,7 +22,6 @@ export default function HomePage() {
                 manager: '/dashboard',
                 waiter: '/orders',
                 chef: '/kitchen',
-                bartender: '/bar',
                 cashier: '/bills',
             };
 

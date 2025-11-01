@@ -5,7 +5,7 @@ export interface CreateStaffDto {
     dateOfBirth?: string;
     hireDate?: string;
     salary?: number;
-    role: 'admin' | 'manager' | 'waiter' | 'chef' | 'bartender' | 'cashier';
+    role: 'admin' | 'manager' | 'waiter' | 'chef' | 'cashier';
     isActive?: boolean;
 }
 
@@ -15,7 +15,7 @@ export interface UpdateStaffDto {
     dateOfBirth?: string;
     hireDate?: string;
     salary?: number;
-    role?: 'admin' | 'manager' | 'waiter' | 'chef' | 'bartender' | 'cashier';
+    role?: 'admin' | 'manager' | 'waiter' | 'chef' | 'cashier';
     isActive?: boolean;
 }
 
@@ -27,7 +27,7 @@ export interface StaffResponseDto {
     dateOfBirth?: Date;
     hireDate: Date;
     salary?: number;
-    role: 'admin' | 'manager' | 'waiter' | 'chef' | 'bartender' | 'cashier';
+    role: 'admin' | 'manager' | 'waiter' | 'chef' | 'cashier';
     isActive: boolean;
     createdAt: Date;
     updatedAt: Date;

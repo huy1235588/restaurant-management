@@ -37,7 +37,7 @@ const swaggerOptions: Options = {
                 // Enums
                 Role: {
                     type: 'string',
-                    enum: ['admin', 'manager', 'waiter', 'chef', 'bartender', 'cashier'],
+                    enum: ['admin', 'manager', 'waiter', 'chef', 'cashier'],
                     description: 'Staff role in the restaurant',
                 },
                 TableStatus: {

@@ -310,7 +310,6 @@ enum Role {
   manager    // Quản lý
   waiter     // Phục vụ
   chef       // Đầu bếp
-  bartender  // Pha chế
   cashier    // Thu ngân
 }
 ```
@@ -2837,7 +2836,7 @@ server/prisma/schema.prisma
 Tất cả các enums được định nghĩa trong schema Prisma:
 
 ```prisma
-enum Role { admin, manager, waiter, chef, bartender, cashier }
+enum Role { admin, manager, waiter, chef, cashier }
 enum TableStatus { available, occupied, reserved, maintenance }
 enum OrderStatus { pending, confirmed, preparing, ready, served, cancelled }
 enum PaymentStatus { pending, paid, refunded, cancelled }

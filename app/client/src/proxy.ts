@@ -10,7 +10,6 @@ const publicRoutes = ['/login', '/register', '/'];
 //     manager: ['/dashboard', '/orders', '/menu', '/tables', '/reservations', '/bills', '/staff', '/reports', '/kitchen'],
 //     waiter: ['/dashboard', '/orders', '/menu', '/tables', '/reservations'],
 //     chef: ['/kitchen', '/orders', '/menu'],
-//     bartender: ['/kitchen', '/orders', '/menu'],
 //     cashier: ['/dashboard', '/orders', '/bills', '/payments'],
 // };
 

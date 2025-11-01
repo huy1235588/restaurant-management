@@ -241,8 +241,7 @@ graph TB
     B --> C["🔐 Admin"]
     B --> D["💼 Manager"]
     B --> E["👨‍💼 Waiter"]
-    B --> F["👨‍�� Chef"]
-    B --> G["🍸 Bartender"]
+    B --> F["👨‍ Chef"]
     B --> H["💰 Cashier"]
 
     C --> C1["✓ Toàn quyền hệ thống"]
@@ -603,10 +602,6 @@ graph TB
     B --> G["👨‍🍳 Chef"]
     G --> G1["Level: 2/5"]
     G --> G2["Bếp only"]
-    
-    B --> H["🍸 Bartender"]
-    H --> H1["Level: 2/5"]
-    H --> H2["Đồ uống only"]
 ```
 
 ---

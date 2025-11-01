@@ -15,7 +15,7 @@ export const createStaffSchema = z.object({
         .min(VALIDATION_RULES.SALARY_MIN)
         .max(VALIDATION_RULES.SALARY_MAX)
         .optional(),
-    role: z.enum(['admin', 'manager', 'waiter', 'chef', 'bartender', 'cashier'], {
+    role: z.enum(['admin', 'manager', 'waiter', 'chef', 'cashier'], {
         message: VALIDATION_MESSAGES.ROLE_INVALID,
     }),
     isActive: z.boolean().optional().default(true),
@@ -31,7 +31,7 @@ export const updateStaffSchema = z.object({
     dateOfBirth: z.string().datetime().optional(),
     hireDate: z.string().datetime().optional(),
     salary: z.number().min(VALIDATION_RULES.SALARY_MIN).max(VALIDATION_RULES.SALARY_MAX).optional(),
-    role: z.enum(['admin', 'manager', 'waiter', 'chef', 'bartender', 'cashier']).optional(),
+    role: z.enum(['admin', 'manager', 'waiter', 'chef', 'cashier']).optional(),
     isActive: z.boolean().optional(),
 });
 

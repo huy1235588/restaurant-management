@@ -85,7 +85,7 @@ const router: Router = Router();
  *                               type: string
  *                             role:
  *                               type: string
- *                               enum: [admin, manager, waiter, chef, bartender, cashier]
+ *                               enum: [admin, manager, waiter, chef, cashier]
  *       400:
  *         description: Bad request - Invalid input
  *       401:
@@ -139,7 +139,7 @@ router.post('/login', validate(loginSchema), authController.login.bind(authContr
  *                       example: Admin User
  *                     role:
  *                       type: string
- *                       enum: [admin, manager, waiter, chef, bartender, cashier]
+ *                       enum: [admin, manager, waiter, chef, cashier]
  *                       example: admin
  *                     isActive:
  *                       type: boolean
@@ -346,7 +346,7 @@ router.post(
  *                 description: Monthly salary (optional)
  *               role:
  *                 type: string
- *                 enum: [admin, manager, waiter, chef, bartender, cashier]
+ *                 enum: [admin, manager, waiter, chef, cashier]
  *                 description: Staff role
  *           examples:
  *             waiter:

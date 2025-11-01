@@ -31,7 +31,7 @@ Hệ thống quản lý nhân sự là module quan trọng giúp quản lý toà
     -   Ngày sinh (Date of Birth)
     -   Ngày vào làm (Hire Date)
     -   Lương (Salary)
-    -   Vai trò (Role): Admin, Manager, Waiter, Chef, Bartender, Cashier
+    -   Vai trò (Role): Admin, Manager, Waiter, Chef, Cashier
     -   Trạng thái (Active/Inactive)
 
 ### 2.3 Vai Trò và Quyền Hạn (Roles & Permissions)
@@ -40,7 +40,6 @@ Hệ thống quản lý nhân sự là module quan trọng giúp quản lý toà
 -   **Manager**: Quản lý nhà hàng, xem báo cáo, phê duyệt
 -   **Waiter**: Nhân viên phục vụ, tạo đơn hàng
 -   **Chef**: Đầu bếp, xem đơn bếp, cập nhật tiến độ
--   **Bartender**: Pha chế, quản lý đồ uống
 -   **Cashier**: Thu ngân, xử lý thanh toán
 
 ---
@@ -129,7 +128,7 @@ Hệ thống quản lý nhân sự là module quan trọng giúp quản lý toà
     - Ngày vào làm
     - Nút hành động (Xem, Sửa, Khóa/Mở khóa)
 3. **Bước 3**: Tính năng lọc:
-    - Vai trò (Admin, Manager, Waiter, Chef, Bartender, Cashier)
+    - Vai trò (Admin, Manager, Waiter, Chef, Cashier)
     - Trạng thái (Active, Inactive)
     - Ngày vào làm (Mới nhất, Cũ nhất)
 4. **Bước 4**: Tìm kiếm theo:
