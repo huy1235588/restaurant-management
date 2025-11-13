@@ -8,7 +8,7 @@ import multer, { FileFilterCallback } from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { randomUUID } from 'crypto';
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, RequestHandler } from 'express';
 import {
     UPLOAD_DIRS,
     ALLOWED_MIME_TYPES,
@@ -131,21 +131,21 @@ const createUpload = (category?: FileCategory) => {
 /**
  * Upload single file middleware
  */
-export const uploadSingle = (fieldName: string = 'file', category?: FileCategory) => {
+export const uploadSingle = (fieldName: string = 'file', category?: FileCategory): RequestHandler => {
     return createUpload(category).single(fieldName);
 };
 
 /**
  * Upload multiple files middleware
  */
-export const uploadMultiple = (fieldName: string = 'files', maxCount: number = 10, category?: FileCategory) => {
+export const uploadMultiple = (fieldName: string = 'files', maxCount: number = 10, category?: FileCategory): RequestHandler => {
     return createUpload(category).array(fieldName, maxCount);
 };
 
 /**
  * Upload fields (multiple fields with different names)
  */
-export const uploadFields = (fields: { name: string; maxCount: number }[], category?: FileCategory) => {
+export const uploadFields = (fields: { name: string; maxCount: number }[], category?: FileCategory): RequestHandler => {
     return createUpload(category).fields(fields);
 };
 

@@ -24,6 +24,12 @@ interface CreateTableData {
     status?: TableStatus;
     qrCode?: string;
     isActive?: boolean;
+    // Floor plan positioning
+    positionX?: number;
+    positionY?: number;
+    shape?: string;
+    width?: number;
+    height?: number;
 }
 
 interface UpdateTableData {
@@ -36,6 +42,12 @@ interface UpdateTableData {
     status?: TableStatus;
     qrCode?: string;
     isActive?: boolean;
+    // Floor plan positioning
+    positionX?: number;
+    positionY?: number;
+    shape?: string;
+    width?: number;
+    height?: number;
 }
 
 export class TableService {

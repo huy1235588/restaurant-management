@@ -9,7 +9,7 @@ import { uploadController } from '@/features/storage/upload.controller';
 import { authenticate } from '@/shared/middlewares/auth';
 import { uploadSingle, uploadMultiple, handleUploadError } from '@/features/storage/middlewares/upload.middleware';
 
-const router = Router();
+const router: Router = Router();
 
 // Apply authentication middleware to all routes
 router.use(authenticate);
