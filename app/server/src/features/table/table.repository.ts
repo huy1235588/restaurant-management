@@ -8,6 +8,7 @@ interface TableFilter extends BaseFilter {
     floor?: number;
     isActive?: boolean;
     search?: string;
+    section?: string;
 }
 
 export type TableWithOrders = Prisma.RestaurantTableGetPayload<{
@@ -20,7 +21,7 @@ export class RestaurantTableRepository extends BaseRepository<RestaurantTable, T
             return {};
         }
 
-        const { status, floor, isActive, search } = filters;
+    const { status, floor, isActive, search, section } = filters;
 
         const where: Prisma.RestaurantTableWhereInput = {};
 
@@ -38,6 +39,12 @@ export class RestaurantTableRepository extends BaseRepository<RestaurantTable, T
                 { tableNumber: { contains: search, mode: 'insensitive' } },
                 { tableName: { contains: search, mode: 'insensitive' } },
             ];
+        }
+        if (section) {
+            where.section = {
+                equals: section,
+                mode: 'insensitive',
+            };
         }
 
         return where;

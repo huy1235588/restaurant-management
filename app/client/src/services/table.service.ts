@@ -6,7 +6,11 @@ export const tableApi = {
     getAll: async (params?: {
         status?: TableStatus;
         floor?: number;
+        section?: string;
         isActive?: boolean;
+        search?: string;
+        sortBy?: string;
+        sortOrder?: 'asc' | 'desc';
         page?: number;
         limit?: number;
     }): Promise<PaginatedResponse<Table>> => {
