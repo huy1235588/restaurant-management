@@ -1,16 +1,28 @@
 import { Button } from '@/components/ui/button';
-import { Plus, RefreshCw, LayoutList, LayoutGrid } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Plus, RefreshCw, LayoutList, LayoutGrid, Download } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Table } from '@/types';
+import { exportTablesToCsv, exportTablesToJson } from '@/utils/table-export';
 
 interface TableHeaderProps {
+    tables?: Table[];
     onCreateTable: () => void;
     onRefresh: () => void;
     viewMode: 'list' | 'floor';
     onViewModeChange: (mode: 'list' | 'floor') => void;
 }
 
-export function TableHeader({ onCreateTable, onRefresh, viewMode, onViewModeChange }: TableHeaderProps) {
+export function TableHeader({ tables = [], onCreateTable, onRefresh, viewMode, onViewModeChange }: TableHeaderProps) {
     const { t } = useTranslation();
+
+    const handleExportCsv = () => {
+        exportTablesToCsv(tables, `tables-${new Date().toISOString().split('T')[0]}.csv`);
+    };
+
+    const handleExportJson = () => {
+        exportTablesToJson(tables, `tables-${new Date().toISOString().split('T')[0]}.json`);
+    };
 
     return (
         <div className="flex items-center justify-between">
@@ -47,6 +59,22 @@ export function TableHeader({ onCreateTable, onRefresh, viewMode, onViewModeChan
                     <RefreshCw className="w-4 h-4 mr-2" />
                     {t('common.refresh', 'Refresh')}
                 </Button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm">
+                            <Download className="w-4 h-4 mr-2" />
+                            {t('tables.export', 'Export')}
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={handleExportCsv}>
+                            {t('tables.exportCsv', 'Export as CSV')}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleExportJson}>
+                            {t('tables.exportJson', 'Export as JSON')}
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
                 <Button size="sm" onClick={onCreateTable}>
                     <Plus className="w-4 h-4 mr-2" />
                     {t('tables.createTable', 'New Table')}

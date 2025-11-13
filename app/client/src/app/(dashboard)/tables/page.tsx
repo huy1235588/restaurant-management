@@ -16,6 +16,8 @@ import { FloorPlanView } from '@/components/features/tables/FloorPlanView';
 import { TablePagination } from '@/components/features/tables/TablePagination';
 import { TableDialogs } from '@/components/features/tables/TableDialogs';
 import { BulkStatusChangeDialog } from '@/components/features/tables/dialogs/BulkStatusChangeDialog';
+import { KeyboardShortcutsDialog } from '@/components/features/tables/dialogs/KeyboardShortcutsDialog';
+import { QuickViewPanel } from '@/components/features/tables/QuickViewPanel';
 import { useTableSocket } from '@/hooks/useTableSocket';
 
 type ViewMode = 'list' | 'floor';
@@ -45,6 +47,8 @@ export default function TablesPage() {
     // Selection state
     const [selectedTableIds, setSelectedTableIds] = useState<number[]>([]);
     const [showBulkStatusDialog, setShowBulkStatusDialog] = useState(false);
+    const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
+    const [selectedTable, setSelectedTable] = useState<Table | null>(null);
 
     // Dialog states
     const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -52,7 +56,6 @@ export default function TablesPage() {
     const [showStatusDialog, setShowStatusDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showQRDialog, setShowQRDialog] = useState(false);
-    const [selectedTable, setSelectedTable] = useState<Table | null>(null);
 
     // Initialize WebSocket connection
     useTableSocket();
@@ -81,7 +84,7 @@ export default function TablesPage() {
     // Update URL with filters
     const updateURL = useCallback((params: Record<string, string>) => {
         const newSearchParams = new URLSearchParams(searchParams.toString());
-        
+
         Object.entries(params).forEach(([key, value]) => {
             if (value && value !== 'all' && value !== '') {
                 newSearchParams.set(key, value);
@@ -139,10 +142,41 @@ export default function TablesPage() {
         fetchStats();
     }, [fetchTables, fetchStats]);
 
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Shift+N: Create new table
+            if (e.shiftKey && e.key === 'N') {
+                e.preventDefault();
+                handleCreateTable();
+            }
+            // /: Focus search
+            if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) {
+                e.preventDefault();
+                const searchInput = document.querySelector('input[placeholder*="Search"]') as HTMLInputElement;
+                searchInput?.focus();
+            }
+            // ?: Show keyboard shortcuts
+            if (e.key === '?' && !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) {
+                e.preventDefault();
+                setShowKeyboardShortcuts(true);
+            }
+            // Escape: Close dialogs and clear selection
+            if (e.key === 'Escape') {
+                handleCloseDialogs();
+                setSelectedTableIds([]);
+                setShowKeyboardShortcuts(false);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
+
     // Handlers
     const handleSearch = useCallback((term: string) => {
         setLocalSearchTerm(term);
-        
+
         // Clear previous timeout
         if (searchTimeoutRef.current) {
             clearTimeout(searchTimeoutRef.current);
@@ -256,6 +290,7 @@ export default function TablesPage() {
     return (
         <div className="container mx-auto p-6 space-y-6">
             <TableHeader
+                tables={tables}
                 onCreateTable={handleCreateTable}
                 onRefresh={handleRefresh}
                 viewMode={viewMode}
@@ -314,6 +349,7 @@ export default function TablesPage() {
                         onDelete={handleDeleteTable}
                         onViewQR={handleViewQR}
                         onSelectionChange={handleSelectionChange}
+                        onRowClick={setSelectedTable}
                     />
                     <TablePagination
                         currentPage={filters.currentPage}
@@ -352,6 +388,18 @@ export default function TablesPage() {
                 onClose={() => setShowBulkStatusDialog(false)}
                 onConfirm={handleBulkStatusChange}
             />
+
+            <KeyboardShortcutsDialog
+                open={showKeyboardShortcuts}
+                onClose={() => setShowKeyboardShortcuts(false)}
+            />
+
+            {selectedTable && (
+                <QuickViewPanel
+                    table={selectedTable}
+                    onClose={() => setSelectedTable(null)}
+                />
+            )}
         </div>
     );
 }

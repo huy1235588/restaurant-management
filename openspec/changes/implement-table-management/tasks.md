@@ -344,10 +344,26 @@
   - **Validation**: History displays chronologically with user info
 
 - [ ] **Task 9.3**: Add keyboard shortcuts
-  - [ ] Implement shortcuts: `Ctrl+N` (new table), `/` (focus search), `Esc` (close dialogs)
-  - [ ] Show shortcut hints in tooltips
-  - [ ] Add keyboard shortcut help modal (`?` key)
+  - [x] Implement shortcuts: `Ctrl+N` (new table), `/` (focus search), `Esc` (close dialogs), `?` (help)
+  - [x] Show shortcut hints in tooltips
+  - [x] Add keyboard shortcut help modal (`?` key)
   - **Validation**: All shortcuts work correctly
+
+- [ ] **Task 9.4**: Add Quick View panel
+  - [x] Create QuickViewPanel component showing table details
+  - [x] Display table number, name, status, capacity, floor, section, active status
+  - [x] Add click handler on table rows to open panel
+  - [x] Add close button to panel
+  - [ ] Add edit button in quick view to open edit dialog
+  - [ ] Add status change button in quick view
+  - **Validation**: Panel opens when clicking rows, displays correct data
+
+- [ ] **Task 9.5**: Add export functionality
+  - [x] Implement CSV export of tables
+  - [x] Implement JSON export of tables
+  - [x] Add export dropdown in table header
+  - [ ] Add bulk export selected tables
+  - **Validation**: Exported files contain correct data
 
 ## Phase 3: Polish & Testing (Week 4-5)
 

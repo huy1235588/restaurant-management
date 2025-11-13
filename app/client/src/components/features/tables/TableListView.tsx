@@ -22,6 +22,7 @@ interface TableListViewProps {
     onDelete: (table: TableType) => void;
     onViewQR: (table: TableType) => void;
     onSelectionChange?: (selectedIds: number[]) => void;
+    onRowClick?: (table: TableType) => void;
 }
 
 export function TableListView({
@@ -36,6 +37,7 @@ export function TableListView({
     onDelete,
     onViewQR,
     onSelectionChange,
+    onRowClick,
 }: TableListViewProps) {
     const { t } = useTranslation();
     const [localSelectedIds, setLocalSelectedIds] = useState<number[]>(selectedTableIds);
@@ -142,7 +144,11 @@ export function TableListView({
                 </TableHeader>
                 <TableBody>
                     {tables.map((table) => (
-                        <TableRow key={table.tableId}>
+                        <TableRow 
+                            key={table.tableId}
+                            onClick={() => onRowClick?.(table)}
+                            className="cursor-pointer hover:bg-muted/50"
+                        >
                             {onSelectionChange && (
                                 <TableCell>
                                     <Checkbox
