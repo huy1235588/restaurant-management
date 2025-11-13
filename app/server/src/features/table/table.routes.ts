@@ -143,6 +143,26 @@ router.get('/', tableController.getAll.bind(tableController));
 
 /**
  * @swagger
+ * /tables/stats:
+ *   get:
+ *     summary: Get table statistics
+ *     description: Retrieve statistics about all tables including counts by status
+ *     tags: [Tables]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Statistics retrieved successfully
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+// GET /api/tables/stats - Get table statistics
+router.get('/stats', tableController.getStats.bind(tableController));
+
+/**
+ * @swagger
  * /tables/available:
  *   get:
  *     summary: Get available tables
@@ -253,6 +273,76 @@ router.get('/available', tableController.getAvailable.bind(tableController));
  */
 // GET /api/tables/number/:number - Get table by number
 router.get('/number/:number', tableController.getByNumber.bind(tableController));
+
+/**
+ * @swagger
+ * /tables/bulk:
+ *   patch:
+ *     summary: Bulk update tables
+ *     description: Update multiple tables at once
+ *     tags: [Tables]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               updates:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     tableId:
+ *                       type: integer
+ *                     data:
+ *                       type: object
+ *     responses:
+ *       200:
+ *         description: Bulk update completed
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+// PATCH /api/tables/bulk - Bulk update tables
+router.patch('/bulk', tableController.bulkUpdate.bind(tableController));
+
+/**
+ * @swagger
+ * /tables/bulk-status:
+ *   patch:
+ *     summary: Bulk update table status
+ *     description: Update status for multiple tables at once
+ *     tags: [Tables]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               tableIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *               status:
+ *                 type: string
+ *                 enum: [available, occupied, reserved, maintenance]
+ *     responses:
+ *       200:
+ *         description: Bulk status update completed
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+// PATCH /api/tables/bulk-status - Bulk update table status
+router.patch('/bulk-status', tableController.bulkUpdateStatus.bind(tableController));
 
 /**
  * @swagger

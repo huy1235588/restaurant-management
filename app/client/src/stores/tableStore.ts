@@ -1,9 +1,17 @@
 import { create } from 'zustand';
 import { Table, TableStatus } from '@/types';
 
+interface TableFilters {
+    status?: TableStatus | 'all';
+    floor?: number | 'all';
+    section?: string | 'all';
+    search?: string;
+}
+
 interface TableState {
     tables: Table[];
     selectedTable: Table | null;
+    filters: TableFilters;
     isLoading: boolean;
     error: string | null;
 
@@ -14,14 +22,17 @@ interface TableState {
     updateTableStatus: (tableId: number, status: TableStatus) => void;
     removeTable: (tableId: number) => void;
     setSelectedTable: (table: Table | null) => void;
+    setFilters: (filters: Partial<TableFilters>) => void;
     setLoading: (isLoading: boolean) => void;
     setError: (error: string | null) => void;
     clearTables: () => void;
+    bulkUpdateStatus: (tableIds: number[], status: TableStatus) => void;
 }
 
 export const useTableStore = create<TableState>((set) => ({
     tables: [],
     selectedTable: null,
+    filters: {},
     isLoading: false,
     error: null,
 
@@ -67,6 +78,11 @@ export const useTableStore = create<TableState>((set) => ({
 
     setSelectedTable: (table) => set({ selectedTable: table }),
 
+    setFilters: (filters) =>
+        set((state) => ({
+            filters: { ...state.filters, ...filters },
+        })),
+
     setLoading: (isLoading) => set({ isLoading }),
 
     setError: (error) => set({ error, isLoading: false }),
@@ -75,7 +91,16 @@ export const useTableStore = create<TableState>((set) => ({
         set({
             tables: [],
             selectedTable: null,
+            filters: {},
             isLoading: false,
             error: null,
         }),
+
+    bulkUpdateStatus: (tableIds, status) =>
+        set((state) => ({
+            tables: state.tables.map((table) =>
+                tableIds.includes(table.tableId) ? { ...table, status } : table
+            ),
+            error: null,
+        })),
 }));

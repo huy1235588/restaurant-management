@@ -72,4 +72,35 @@ export const tableApi = {
     delete: async (id: number): Promise<void> => {
         await axiosInstance.delete(`/tables/${id}`);
     },
+
+    // Get table statistics
+    getStats: async (): Promise<{
+        total: number;
+        available: number;
+        occupied: number;
+        reserved: number;
+        maintenance: number;
+        active: number;
+        inactive: number;
+        totalCapacity: number;
+        occupancyRate: string;
+    }> => {
+        const response = await axiosInstance.get<ApiResponse<any>>('/tables/stats');
+        return response.data.data;
+    },
+
+    // Bulk update tables
+    bulkUpdate: async (updates: Array<{ tableId: number; data: Partial<Table> }>): Promise<any> => {
+        const response = await axiosInstance.patch<ApiResponse<any>>('/tables/bulk', { updates });
+        return response.data.data;
+    },
+
+    // Bulk update table status
+    bulkUpdateStatus: async (tableIds: number[], status: TableStatus): Promise<any> => {
+        const response = await axiosInstance.patch<ApiResponse<any>>('/tables/bulk-status', {
+            tableIds,
+            status,
+        });
+        return response.data.data;
+    },
 };

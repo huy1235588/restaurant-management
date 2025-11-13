@@ -107,6 +107,22 @@ export class SocketService {
     emitTableStatusUpdate(tableId: number, status: string): void {
         this.emitToAll('table:status', { tableId, status });
     }
+
+    emitTableCreated(tableData: SocketEmitData): void {
+        this.emitToAll('table:created', tableData);
+    }
+
+    emitTableUpdated(tableId: number, tableData: SocketEmitData): void {
+        this.emitToAll('table:updated', { tableId, ...tableData });
+    }
+
+    emitTableDeleted(tableId: number): void {
+        this.emitToAll('table:deleted', { tableId });
+    }
+
+    emitTableStatusChanged(tableId: number, status: string, previousStatus?: string): void {
+        this.emitToAll('table:status_changed', { tableId, status, previousStatus });
+    }
 }
 
 export default new SocketService();

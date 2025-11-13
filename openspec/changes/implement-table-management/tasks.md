@@ -3,101 +3,101 @@
 ## Phase 1: Core Features (Week 1-2)
 
 ### Backend Enhancements
-- [ ] **Task 1.1**: Add WebSocket events for table status changes
-  - [ ] Create `table:status_changed` event emitter
-  - [ ] Create `table:created` event emitter
-  - [ ] Create `table:updated` event emitter
-  - [ ] Create `table:deleted` event emitter
-  - [ ] Add event listeners in socket handler
+- [x] **Task 1.1**: Add WebSocket events for table status changes
+  - [x] Create `table:status_changed` event emitter
+  - [x] Create `table:created` event emitter
+  - [x] Create `table:updated` event emitter
+  - [x] Create `table:deleted` event emitter
+  - [x] Add event listeners in socket handler
   - [ ] Test event broadcasting to all connected clients
   - **Validation**: WebSocket events emit within 100ms of database changes
 
-- [ ] **Task 1.2**: Enhance table API endpoints
-  - [ ] Add `GET /tables/stats` endpoint for dashboard statistics
+- [x] **Task 1.2**: Enhance table API endpoints
+  - [x] Add `GET /tables/stats` endpoint for dashboard statistics
   - [ ] Add validation for table status transitions
   - [ ] Add optimistic locking for concurrent updates
-  - [ ] Add bulk update endpoint `PATCH /tables/bulk`
+  - [x] Add bulk update endpoint `PATCH /tables/bulk`
   - **Validation**: All endpoints return correct HTTP status codes and error messages
 
 ### Frontend Setup
-- [ ] **Task 2.1**: Create table page structure
-  - [ ] Create `app/client/src/app/(dashboard)/tables/page.tsx`
+- [x] **Task 2.1**: Create table page structure
+  - [x] Create `app/client/src/app/(dashboard)/tables/page.tsx`
   - [ ] Create `app/client/src/app/(dashboard)/tables/layout.tsx`
   - [ ] Add route metadata and SEO tags
-  - [ ] Implement loading and error states
+  - [x] Implement loading and error states
   - **Validation**: Page renders at `/tables` route without errors
 
-- [ ] **Task 2.2**: Set up Zustand store for table state
-  - [ ] Extend `tableStore.ts` with full CRUD actions
-  - [ ] Add real-time sync actions (WebSocket integration)
-  - [ ] Add optimistic UI update logic
-  - [ ] Add error handling and rollback logic
+- [x] **Task 2.2**: Set up Zustand store for table state
+  - [x] Extend `tableStore.ts` with full CRUD actions
+  - [x] Add real-time sync actions (WebSocket integration)
+  - [x] Add optimistic UI update logic
+  - [x] Add error handling and rollback logic
   - **Validation**: Store updates trigger component re-renders correctly
 
-- [ ] **Task 2.3**: Create shared table components
-  - [ ] Create `TableStatusBadge` component
-  - [ ] Create `TableCard` component (for floor plan)
-  - [ ] Create `TableRowActions` component (for list view)
-  - [ ] Create `FloorSelector` component
+- [x] **Task 2.3**: Create shared table components
+  - [x] Create `TableStatusBadge` component
+  - [x] Create `TableCard` component (for floor plan)
+  - [x] Create `TableRowActions` component (for list view)
+  - [x] Create `FloorSelector` component
   - **Validation**: Components render with correct styling and props
 
 ### List View Implementation
-- [ ] **Task 3.1**: Build table list/grid view
-  - [ ] Create data table with sortable columns
-  - [ ] Implement column headers (Number, Name, Capacity, Floor, Section, Status, QR Code, Actions)
+- [x] **Task 3.1**: Build table list/grid view
+  - [x] Create data table with sortable columns
+  - [x] Implement column headers (Number, Name, Capacity, Floor, Section, Status, QR Code, Actions)
   - [ ] Add row selection (single/multi)
-  - [ ] Add pagination controls
-  - [ ] Add empty state illustration
+  - [x] Add pagination controls
+  - [x] Add empty state illustration
   - **Validation**: List displays all tables with correct data
 
-- [ ] **Task 3.2**: Implement search and filtering
-  - [ ] Add search input (by table number/name)
-  - [ ] Add status filter dropdown (all, available, occupied, reserved, maintenance)
-  - [ ] Add floor filter
-  - [ ] Add section filter
+- [x] **Task 3.2**: Implement search and filtering
+  - [x] Add search input (by table number/name)
+  - [x] Add status filter dropdown (all, available, occupied, reserved, maintenance)
+  - [x] Add floor filter
+  - [x] Add section filter
   - [ ] Add active/inactive toggle
   - [ ] Implement debounced search (300ms)
   - **Validation**: Filters update results correctly, URL params sync with filters
 
-- [ ] **Task 3.3**: Add quick actions menu
-  - [ ] Add "Edit" action button
-  - [ ] Add "Change Status" dropdown
-  - [ ] Add "View QR Code" action
-  - [ ] Add "Delete" action with confirmation
+- [x] **Task 3.3**: Add quick actions menu
+  - [x] Add "Edit" action button
+  - [x] Add "Change Status" dropdown
+  - [x] Add "View QR Code" action
+  - [x] Add "Delete" action with confirmation
   - [ ] Add "Assign to Order" action
   - **Validation**: All actions trigger correct API calls and UI updates
 
 ### Table Forms
-- [ ] **Task 4.1**: Create table creation dialog
-  - [ ] Build modal/dialog component with React Hook Form
-  - [ ] Add form fields: tableNumber (required), tableName (optional), capacity (required), minCapacity, floor, section
-  - [ ] Implement Zod validation schema
-  - [ ] Add client-side validation with error messages
-  - [ ] Add submit handler with loading state
-  - [ ] Show success/error toast notifications
+- [x] **Task 4.1**: Create table creation dialog
+  - [x] Build modal/dialog component with React Hook Form
+  - [x] Add form fields: tableNumber (required), tableName (optional), capacity (required), minCapacity, floor, section
+  - [x] Implement Zod validation schema
+  - [x] Add client-side validation with error messages
+  - [x] Add submit handler with loading state
+  - [x] Show success/error toast notifications
   - **Validation**: Form validates all fields, shows errors, submits successfully
 
-- [ ] **Task 4.2**: Create table edit dialog
-  - [ ] Pre-populate form with existing table data
-  - [ ] Allow editing all fields except tableId
-  - [ ] Add "Save" and "Cancel" buttons
+- [x] **Task 4.2**: Create table edit dialog
+  - [x] Pre-populate form with existing table data
+  - [x] Allow editing all fields except tableId
+  - [x] Add "Save" and "Cancel" buttons
   - [ ] Implement optimistic UI updates
   - **Validation**: Edits persist correctly, optimistic updates rollback on error
 
-- [ ] **Task 4.3**: Implement status change dialog
-  - [ ] Create status selection dropdown with icons
+- [x] **Task 4.3**: Implement status change dialog
+  - [x] Create status selection dropdown with icons
   - [ ] Add transition validation (e.g., can't go from maintenance to occupied directly)
   - [ ] Add confirmation for destructive changes
   - [ ] Add optional notes field
   - **Validation**: Invalid transitions show warning, valid transitions update immediately
 
 ### Real-time Updates
-- [ ] **Task 5.1**: Set up WebSocket connection for tables
-  - [ ] Create `useTableSocket` hook
-  - [ ] Connect to Socket.io server on component mount
-  - [ ] Subscribe to table events (`table:status_changed`, etc.)
-  - [ ] Update Zustand store on event receipt
-  - [ ] Handle connection/disconnection events
+- [x] **Task 5.1**: Set up WebSocket connection for tables
+  - [x] Create `useTableSocket` hook
+  - [x] Connect to Socket.io server on component mount
+  - [x] Subscribe to table events (`table:status_changed`, etc.)
+  - [x] Update Zustand store on event receipt
+  - [x] Handle connection/disconnection events
   - [ ] Implement auto-reconnect logic (exponential backoff)
   - **Validation**: Status changes from other clients reflect within 500ms
 
@@ -111,26 +111,26 @@
 ## Phase 2: Floor Plan & Enhanced Features (Week 3)
 
 ### Basic Floor Plan View
-- [ ] **Task 6.1**: Create basic floor plan canvas
-  - [ ] Build canvas component with responsive sizing
+- [x] **Task 6.1**: Create basic floor plan canvas
+  - [x] Build canvas component with responsive sizing
   - [ ] Implement zoom controls (+, -, reset)
   - [ ] Add pan/drag canvas functionality (mouse + touch)
   - [ ] Add grid overlay (optional toggle)
   - [ ] Add minimap for navigation (optional)
   - **Validation**: Canvas scales and pans smoothly on all devices
 
-- [ ] **Task 6.2**: Render table cards on canvas
-  - [ ] Position tables in grid layout (if no coordinates stored)
-  - [ ] Render TableCard components with status colors
-  - [ ] Add hover effects and tooltips
-  - [ ] Show occupancy indicator (e.g., "3/4 seats occupied")
-  - [ ] Add click handler to open table details
+- [x] **Task 6.2**: Render table cards on canvas
+  - [x] Position tables in grid layout (if no coordinates stored)
+  - [x] Render TableCard components with status colors
+  - [x] Add hover effects and tooltips
+  - [x] Show occupancy indicator (e.g., "3/4 seats occupied")
+  - [x] Add click handler to open table details
   - **Validation**: All tables visible and interactive
 
-- [ ] **Task 6.3**: Implement floor/section filtering
-  - [ ] Add floor selector dropdown in toolbar
-  - [ ] Add section filter chips
-  - [ ] Filter tables displayed on canvas
+- [x] **Task 6.3**: Implement floor/section filtering
+  - [x] Add floor selector dropdown in toolbar
+  - [x] Add section filter chips
+  - [x] Filter tables displayed on canvas
   - [ ] Update table count indicator
   - **Validation**: Filters update canvas instantly
 
@@ -293,19 +293,19 @@
   - **Validation**: All endpoints work with correct validation
 
 ### QR Code Management
-- [ ] **Task 7.1**: Implement QR code generation
-  - [ ] Install `qrcode` library
-  - [ ] Create QR code generation utility
-  - [ ] Generate unique codes for each table (format: `TABLE-{tableNumber}`)
-  - [ ] Add "Generate QR" button in table form
+- [x] **Task 7.1**: Implement QR code generation
+  - [ ] Install `qrcode` library (NOTE: needs to be installed via npm)
+  - [x] Create QR code generation utility
+  - [x] Generate unique codes for each table (format: `TABLE-{tableNumber}`)
+  - [x] Add "Generate QR" button in table form
   - [ ] Auto-generate on table creation (optional)
   - **Validation**: QR codes scan correctly to table URL
 
-- [ ] **Task 7.2**: Create QR code display dialog
-  - [ ] Build modal showing QR code image
-  - [ ] Add download button (PNG format)
-  - [ ] Add print button
-  - [ ] Show table details alongside QR code
+- [x] **Task 7.2**: Create QR code display dialog
+  - [x] Build modal showing QR code image
+  - [x] Add download button (PNG format)
+  - [x] Add print button
+  - [x] Show table details alongside QR code
   - **Validation**: QR codes download as 300x300px PNG files
 
 - [ ] **Task 7.3**: Bulk QR code generation

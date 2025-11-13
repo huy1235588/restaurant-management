@@ -166,6 +166,49 @@ export class TableController {
             next(error);
         }
     }
+
+    /**
+     * Get table statistics
+     */
+    async getStats(req: Request, res: Response, next: NextFunction) {
+        try {
+            const stats = await tableService.getTableStats();
+
+            res.json(ApiResponse.success(stats, 'Table statistics retrieved successfully'));
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
+     * Bulk update tables
+     */
+    async bulkUpdate(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { updates } = req.body;
+
+            const result = await tableService.bulkUpdateTables(updates);
+
+            res.json(ApiResponse.success(result, 'Bulk update completed'));
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
+     * Bulk update table status
+     */
+    async bulkUpdateStatus(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { tableIds, status } = req.body;
+
+            const result = await tableService.bulkUpdateStatus(tableIds, status);
+
+            res.json(ApiResponse.success(result, 'Bulk status update completed'));
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 export const tableController = new TableController();
