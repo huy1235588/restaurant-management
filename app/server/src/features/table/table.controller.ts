@@ -8,18 +8,35 @@ export class TableController {
      */
     async getAll(req: Request, res: Response, next: NextFunction) {
         try {
-            const { status, floor, isActive, page = 1, limit = 10, sortBy = 'tableNumber', sortOrder = 'asc' } = req.query;
+            const {
+                status,
+                floor,
+                isActive,
+                page = '1',
+                limit = '20',
+                sortBy = 'tableNumber',
+                sortOrder = 'asc',
+                search,
+                section,
+            } = req.query;
+
+            const pageNumber = parseInt(page as string, 10);
+            const pageSize = parseInt(limit as string, 10);
+            const searchValue = typeof search === 'string' && search.trim() !== '' ? search.trim() : undefined;
+            const sectionValue = typeof section === 'string' && section.trim() !== '' ? section.trim() : undefined;
 
             const tables = await tableService.getAllTables({
                 filters: {
                     status: status as any,
-                    floor: floor ? parseInt(floor as string) : undefined,
+                    floor: floor ? parseInt(floor as string, 10) : undefined,
                     isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined,
+                    search: searchValue,
+                    section: sectionValue,
                 },
-                skip: (parseInt(page as string) - 1) * parseInt(limit as string),
-                take: parseInt(limit as string),
+                skip: (pageNumber - 1) * pageSize,
+                take: pageSize,
                 sortBy: sortBy as string,
-                sortOrder: (sortOrder as string).toLowerCase() as 'asc' | 'desc',
+                sortOrder: (sortOrder as string).toLowerCase() === 'desc' ? 'desc' : 'asc',
             });
 
             res.json(ApiResponse.success(tables, 'Tables retrieved successfully'));

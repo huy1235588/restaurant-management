@@ -7,6 +7,8 @@ interface TableFilters {
     status?: TableStatus;
     floor?: number;
     isActive?: boolean;
+    search?: string;
+    section?: string;
 }
 
 interface AvailableTableFilters {
