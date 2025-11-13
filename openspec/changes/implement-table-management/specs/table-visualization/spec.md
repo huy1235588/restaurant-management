@@ -228,7 +228,7 @@ The system SHALL display appropriate empty states when no tables match the curre
 **Category**: User Interface  
 **Owner**: Frontend Team
 
-The system SHALL allow users to switch between Floor Plan view and List view.
+The system SHALL allow users to switch between Floor Plan view, Visual Floor Plan view, and List view.
 
 #### Scenario: User switches to List view
 **Given** the user is viewing the Floor Plan  
@@ -238,18 +238,330 @@ The system SHALL allow users to switch between Floor Plan view and List view.
 **And** the current filters SHALL be preserved  
 **And** the view preference SHALL be saved to user settings/local storage
 
+#### Scenario: User switches to Visual Floor Plan view
+**Given** the user is viewing the Floor Plan or List view  
+**When** the user clicks the "Visual Floor Plan" tab/button  
+**Then** the system SHALL navigate to the Visual Floor Plan view  
+**And** the URL SHALL update to `/tables?view=visual`  
+**And** the current filters SHALL be preserved  
+**And** the system SHALL load the saved floor plan layout (if exists)
+
 #### Scenario: User returns to Floor Plan view
-**Given** the user is in List view  
+**Given** the user is in List view or Visual Floor Plan view  
 **When** the user clicks the "Floor Plan" tab/button  
 **Then** the system SHALL return to the Floor Plan view  
 **And** the previously selected floor and filters SHALL be restored  
 
 **Acceptance Criteria**:
-- ✅ View toggle is prominently placed (tabs or segmented control)
+- ✅ View toggle is prominently placed (tabs or segmented control with 3 options)
 - ✅ Active view is clearly indicated
 - ✅ View preference persists across sessions
-- ✅ Both views share the same data source and filters
+- ✅ All three views share the same data source and filters
 - ✅ Switching views is instant (< 100ms)
+- ✅ Visual Floor Plan view preserves custom layouts between switches
+
+---
+
+### Requirement: TV-008 - Visual Floor Plan Editor
+**Priority**: P1 (High)  
+**Category**: User Interface  
+**Owner**: Frontend Team
+
+The system SHALL provide an enhanced visual floor plan editor with advanced table positioning, sizing, and customization capabilities.
+
+#### Scenario: User accesses Visual Floor Plan editor
+**Given** the user is authenticated as a manager  
+**And** the user navigates to `/tables?view=visual`  
+**When** the Visual Floor Plan view loads  
+**Then** the system SHALL display an interactive canvas with all tables  
+**And** each table SHALL be draggable, resizable, and rotatable  
+**And** the system SHALL show an editor toolbar with layout tools  
+**And** the system SHALL display saved floor plan layouts if available
+
+#### Scenario: User drags and positions table
+**Given** the user is in Visual Floor Plan view  
+**When** the user clicks and drags a table card  
+**Then** the table SHALL move smoothly following the cursor  
+**And** the system SHALL show grid snapping indicators  
+**And** the system SHALL show alignment guides when table aligns with other tables  
+**And** the cursor SHALL change to a "grabbing" icon  
+**And** the new position SHALL be temporarily saved (before final save)
+
+#### Scenario: User resizes table
+**Given** the user is in Visual Floor Plan view  
+**When** the user hovers over a table card edge  
+**Then** resize handles SHALL appear on all four corners and edges  
+**When** the user drags a resize handle  
+**Then** the table SHALL resize proportionally or by edge depending on handle  
+**And** the table dimensions SHALL be displayed (e.g., "150x100")  
+**And** the system SHALL enforce minimum size limits (50x50 pixels)
+
+#### Scenario: User rotates table
+**Given** the user is in Visual Floor Plan view  
+**When** the user clicks on a table and drags the rotation handle  
+**Then** the table SHALL rotate around its center point  
+**And** the rotation angle SHALL be displayed (e.g., "45°")  
+**And** the system SHALL snap to 15° increments when Shift key is pressed
+
+**Acceptance Criteria**:
+- ✅ Drag-and-drop is smooth (60fps performance)
+- ✅ Grid snapping can be toggled on/off
+- ✅ Alignment guides appear within 5px threshold
+- ✅ Resize maintains aspect ratio when Shift is pressed
+- ✅ Rotation range: 0-360 degrees
+- ✅ All positioning changes are reversible with Undo (Ctrl+Z)
+
+---
+
+### Requirement: TV-009 - Custom Table Shapes and Styles
+**Priority**: P2 (Medium)  
+**Category**: User Interface  
+**Owner**: Frontend Team
+
+The system SHALL support custom table shapes, styles, and visual properties in the Visual Floor Plan view.
+
+#### Scenario: User changes table shape
+**Given** the user is in Visual Floor Plan view  
+**And** the user has selected a table  
+**When** the user opens the table properties panel  
+**And** the user selects a shape from the dropdown (Rectangle, Circle, Square, Oval)  
+**Then** the table SHALL update to the selected shape  
+**And** the capacity indicator SHALL adjust to fit the new shape  
+**And** the shape preference SHALL be saved to the database
+
+#### Scenario: User customizes table appearance
+**Given** the user is in Visual Floor Plan view  
+**And** the user has selected a table  
+**When** the user opens the appearance settings  
+**Then** the user SHALL be able to customize:
+- Border color and thickness
+- Background color (status colors by default)
+- Label font size and color
+- Icon display (show/hide capacity, status icons)
+**And** customizations SHALL be previewed in real-time  
+**And** a "Reset to Default" option SHALL be available
+
+**Acceptance Criteria**:
+- ✅ 4 basic shapes supported: Rectangle, Circle, Square, Oval
+- ✅ Shape changes preserve table dimensions where possible
+- ✅ Custom styles persist in database
+- ✅ Style changes sync across all connected clients
+- ✅ Accessibility: custom colors must meet WCAG AA contrast ratio
+
+---
+
+### Requirement: TV-010 - Floor Plan Background and Layers
+**Priority**: P2 (Medium)  
+**Category**: User Interface  
+**Owner**: Frontend Team
+
+The system SHALL support background images and multiple layers in the Visual Floor Plan view.
+
+#### Scenario: User uploads floor plan background image
+**Given** the user is in Visual Floor Plan view  
+**And** the user has manager permissions  
+**When** the user clicks "Upload Background" button  
+**And** the user selects an image file (PNG, JPG, SVG)  
+**Then** the system SHALL upload the image to the server  
+**And** the image SHALL be displayed as the canvas background  
+**And** the image SHALL be resizable and repositionable  
+**And** the opacity SHALL be adjustable (0-100%)  
+**And** the system SHALL save the background configuration per floor
+
+#### Scenario: User manages canvas layers
+**Given** the user is in Visual Floor Plan view  
+**When** the user opens the layers panel  
+**Then** the system SHALL display all layers:
+- Background Image layer (bottom)
+- Grid/Guide layer (optional)
+- Table layer (top)
+- Annotation layer (optional)  
+**And** the user SHALL be able to toggle layer visibility  
+**And** the user SHALL be able to lock/unlock layers
+
+**Acceptance Criteria**:
+- ✅ Supports PNG, JPG, SVG image formats (max 10MB)
+- ✅ Background images are stored per floor
+- ✅ Image aspect ratio is preserved
+- ✅ Opacity range: 0% (invisible) to 100% (opaque)
+- ✅ Layer order is fixed but visibility is toggleable
+
+---
+
+### Requirement: TV-011 - Layout Templates and Presets
+**Priority**: P2 (Medium)  
+**Category**: User Interface  
+**Owner**: Frontend Team
+
+The system SHALL provide layout templates and the ability to save/load multiple floor plan configurations.
+
+#### Scenario: User saves current floor plan layout
+**Given** the user is in Visual Floor Plan view  
+**And** the user has customized table positions and styles  
+**When** the user clicks "Save Layout" button  
+**And** the user enters a layout name (e.g., "Weekend Setup", "Private Event")  
+**Then** the system SHALL save all table positions, sizes, rotations, and styles  
+**And** the layout SHALL appear in the "Saved Layouts" dropdown  
+**And** a success notification SHALL be shown
+
+#### Scenario: User loads saved layout
+**Given** the user is in Visual Floor Plan view  
+**And** saved layouts exist for the current floor  
+**When** the user selects a layout from the "Saved Layouts" dropdown  
+**Then** the system SHALL prompt for confirmation if unsaved changes exist  
+**And** the system SHALL apply the saved layout configuration  
+**And** all tables SHALL animate to their saved positions  
+**And** the animation SHALL take 500ms
+
+#### Scenario: User uses a layout template
+**Given** the user is setting up a new floor  
+**And** no tables have been positioned yet  
+**When** the user clicks "Use Template" button  
+**Then** the system SHALL show template options:
+- "Fine Dining" (square tables, formal spacing)
+- "Casual Dining" (mixed shapes, flexible spacing)
+- "Bar/Lounge" (high tables along walls)
+- "Banquet Hall" (long rectangular tables)  
+**When** the user selects a template  
+**Then** the system SHALL auto-generate table positions based on template  
+**And** the user SHALL be able to customize after applying
+
+**Acceptance Criteria**:
+- ✅ Users can save unlimited layouts per floor
+- ✅ Layouts include positions, sizes, rotations, styles, and background
+- ✅ Loading layouts shows smooth animation
+- ✅ Template system provides 4+ starter templates
+- ✅ Layouts can be exported as JSON for backup
+
+---
+
+### Requirement: TV-012 - Visual Floor Plan Grid and Snapping
+**Priority**: P1 (High)  
+**Category**: User Interface  
+**Owner**: Frontend Team
+
+The system SHALL provide a grid system and snapping functionality for precise table alignment.
+
+#### Scenario: User toggles grid visibility
+**Given** the user is in Visual Floor Plan view  
+**When** the user clicks the "Show Grid" toggle button  
+**Then** a grid overlay SHALL appear on the canvas  
+**And** grid lines SHALL be evenly spaced (default 20px intervals)  
+**And** grid color SHALL be subtle (gray with low opacity)  
+**And** grid setting SHALL persist in user preferences
+
+#### Scenario: User enables snap-to-grid
+**Given** the user is in Visual Floor Plan view  
+**And** the grid is visible  
+**When** the user enables "Snap to Grid" option  
+**And** the user drags a table  
+**Then** the table SHALL snap to the nearest grid intersection  
+**And** snapping SHALL provide haptic feedback (visual pulse)  
+**And** the snap threshold SHALL be 10 pixels
+
+#### Scenario: User uses alignment guides
+**Given** the user is in Visual Floor Plan view  
+**And** the user is dragging a table  
+**When** the table aligns horizontally or vertically with another table  
+**Then** a colored guide line SHALL appear (magenta for horizontal, cyan for vertical)  
+**And** the table SHALL snap to the alignment  
+**And** the guide SHALL disappear when alignment is broken
+
+**Acceptance Criteria**:
+- ✅ Grid intervals are configurable (10px, 20px, 50px)
+- ✅ Grid can be hidden/shown with keyboard shortcut (G key)
+- ✅ Snap-to-grid can be temporarily disabled with Ctrl key
+- ✅ Alignment guides work for center, edges, and corners
+- ✅ Performance: grid rendering doesn't impact drag performance
+
+---
+
+### Requirement: TV-013 - Visual Floor Plan Actions and Undo
+**Priority**: P1 (High)  
+**Category**: User Interface  
+**Owner**: Frontend Team
+
+The system SHALL provide action history with undo/redo capabilities and a comprehensive action toolbar.
+
+#### Scenario: User undoes layout change
+**Given** the user is in Visual Floor Plan view  
+**And** the user has made changes (moved, resized, or styled tables)  
+**When** the user presses Ctrl+Z or clicks the "Undo" button  
+**Then** the last action SHALL be reversed  
+**And** the table SHALL animate back to its previous state  
+**And** the undo history count SHALL decrement
+
+#### Scenario: User redoes undone action
+**Given** the user is in Visual Floor Plan view  
+**And** the user has undone one or more actions  
+**When** the user presses Ctrl+Shift+Z or clicks the "Redo" button  
+**Then** the last undone action SHALL be reapplied  
+**And** the redo history count SHALL decrement
+
+#### Scenario: User saves floor plan layout
+**Given** the user is in Visual Floor Plan view  
+**And** the user has made unsaved changes  
+**When** the user clicks the "Save" button  
+**Then** the system SHALL persist all table positions, sizes, rotations, and styles  
+**And** the system SHALL clear the undo/redo history  
+**And** a success toast SHALL appear ("Layout saved successfully")  
+**And** the "Unsaved Changes" indicator SHALL disappear
+
+**Acceptance Criteria**:
+- ✅ Undo history supports up to 50 actions
+- ✅ Undo/redo works for: move, resize, rotate, style changes
+- ✅ Keyboard shortcuts: Ctrl+Z (undo), Ctrl+Shift+Z (redo), Ctrl+S (save)
+- ✅ Unsaved changes warning appears on view switch or page exit
+- ✅ Action toolbar shows undo/redo availability (disabled when history empty)
+
+---
+
+### Requirement: TV-014 - Visual Floor Plan Toolbar and Controls
+**Priority**: P1 (High)  
+**Category**: User Interface  
+**Owner**: Frontend Team
+
+The system SHALL provide a comprehensive toolbar with essential controls and tools for the Visual Floor Plan editor.
+
+#### Scenario: User accesses editor toolbar
+**Given** the user is in Visual Floor Plan view  
+**When** the page loads  
+**Then** a toolbar SHALL be displayed at the top or side of the canvas  
+**And** the toolbar SHALL contain the following tools:
+- Selection tool (default)
+- Pan tool (hand icon)
+- Add table tool (+ icon)
+- Delete tool (trash icon)
+- Zoom controls (+, -, fit to screen)
+- Grid toggle
+- Snap to grid toggle
+- Undo/redo buttons
+- Save layout button
+- Load layout dropdown
+- Settings button
+
+#### Scenario: User uses selection tool
+**Given** the user is in Visual Floor Plan view  
+**And** the selection tool is active (default)  
+**When** the user clicks on a table  
+**Then** the table SHALL be selected (highlighted border)  
+**And** the properties panel SHALL show table details  
+**And** resize and rotation handles SHALL appear
+
+#### Scenario: User uses pan tool
+**Given** the user is in Visual Floor Plan view  
+**When** the user activates the pan tool  
+**Then** the cursor SHALL change to a hand icon  
+**And** clicking and dragging SHALL pan the entire canvas  
+**And** tables SHALL not be selectable while pan tool is active  
+**And** the user can toggle back to selection tool by pressing Esc or clicking the tool
+
+**Acceptance Criteria**:
+- ✅ Toolbar is docked and doesn't overlap canvas
+- ✅ Tool icons have tooltips explaining functionality
+- ✅ Active tool is visually highlighted
+- ✅ Keyboard shortcuts switch tools: V (select), H (pan), T (add table), Delete (delete)
+- ✅ Toolbar adapts to mobile (collapsible menu)
 
 ---
 

@@ -110,8 +110,8 @@
 
 ## Phase 2: Floor Plan & Enhanced Features (Week 3)
 
-### Floor Plan View
-- [ ] **Task 6.1**: Create floor plan canvas
+### Basic Floor Plan View
+- [ ] **Task 6.1**: Create basic floor plan canvas
   - [ ] Build canvas component with responsive sizing
   - [ ] Implement zoom controls (+, -, reset)
   - [ ] Add pan/drag canvas functionality (mouse + touch)
@@ -134,13 +134,163 @@
   - [ ] Update table count indicator
   - **Validation**: Filters update canvas instantly
 
-- [ ] **Task 6.4**: Add drag-and-drop positioning (optional)
-  - [ ] Make table cards draggable
-  - [ ] Show drop zones on canvas
-  - [ ] Save positions to backend (requires schema update)
-  - [ ] Add "Save Layout" button
-  - [ ] Add "Reset to Default" button
-  - **Validation**: Positions persist after page reload
+## Phase 3: Visual Floor Plan (Week 4-5)
+
+### View Mode and Navigation
+- [ ] **Task 10.1**: Add Visual Floor Plan tab
+  - [ ] Update view toggle to include "Visual Floor Plan" option
+  - [ ] Create route `/tables?view=visual`
+  - [ ] Implement view switching with state preservation
+  - [ ] Add view mode persistence in localStorage
+  - **Validation**: Three tabs (Floor Plan, Visual Floor Plan, List) work correctly
+
+### Visual Editor Setup
+- [ ] **Task 10.2**: Set up Visual Floor Plan canvas infrastructure
+  - [ ] Install `dnd-kit` library for drag-and-drop
+  - [ ] Create `VisualFloorPlanCanvas` component
+  - [ ] Set up canvas state management (zoom, pan, grid settings)
+  - [ ] Implement HTML5 Canvas for background and grid rendering
+  - [ ] Create hybrid rendering (Canvas + DOM elements)
+  - **Validation**: Canvas renders without errors, supports zoom/pan
+
+- [ ] **Task 10.3**: Create editor toolbar
+  - [ ] Build toolbar component with tool palette
+  - [ ] Add tools: Select, Pan, Add Table, Delete, Zoom, Grid, Save
+  - [ ] Implement tool activation/deactivation logic
+  - [ ] Add keyboard shortcuts (V, H, T, Delete, G, Ctrl+S)
+  - [ ] Add tooltips for all tools
+  - **Validation**: All tools functional with keyboard shortcuts
+
+### Drag, Resize, and Rotate
+- [ ] **Task 10.4**: Implement advanced drag-and-drop
+  - [ ] Make table cards draggable with `dnd-kit`
+  - [ ] Add visual feedback during drag (shadow, cursor)
+  - [ ] Implement grid snapping with configurable threshold
+  - [ ] Add alignment guides (horizontal, vertical, center)
+  - [ ] Support multi-select drag (Shift + click)
+  - [ ] Save positions to local state on drag end
+  - **Validation**: Drag is smooth (60fps), snapping works, guides appear
+
+- [ ] **Task 10.5**: Implement table resizing
+  - [ ] Add resize handles (corners and edges) to selected tables
+  - [ ] Implement proportional resize (Shift key)
+  - [ ] Show dimensions during resize
+  - [ ] Enforce minimum size limits (50x50px)
+  - [ ] Update table width/height in state
+  - **Validation**: Resize handles work, dimensions update correctly
+
+- [ ] **Task 10.6**: Implement table rotation
+  - [ ] Add rotation handle to selected tables
+  - [ ] Implement rotation around center point
+  - [ ] Show rotation angle during rotation
+  - [ ] Add snap-to-angle (15° increments with Shift)
+  - [ ] Update rotation value (0-360°) in state
+  - **Validation**: Rotation is smooth, angle snapping works
+
+### Grid and Alignment
+- [ ] **Task 10.7**: Build grid system
+  - [ ] Render grid overlay using Canvas API
+  - [ ] Make grid configurable (10px, 20px, 50px intervals)
+  - [ ] Add grid toggle button (keyboard: G)
+  - [ ] Implement snap-to-grid logic (disable with Ctrl)
+  - [ ] Add visual snap feedback (pulse effect)
+  - **Validation**: Grid renders correctly, snapping accurate
+
+- [ ] **Task 10.8**: Implement alignment guides
+  - [ ] Detect alignment during drag (center, edges, corners)
+  - [ ] Render dynamic guide lines (magenta horizontal, cyan vertical)
+  - [ ] Snap to alignment within 5px threshold
+  - [ ] Remove guides when alignment broken
+  - **Validation**: Guides appear/disappear correctly, snap works
+
+### Custom Table Shapes and Styles
+- [ ] **Task 10.9**: Create properties panel
+  - [ ] Build side panel component
+  - [ ] Show selected table properties
+  - [ ] Add shape selector (Rectangle, Circle, Square, Oval)
+  - [ ] Add style customization (border color, background, font size)
+  - [ ] Add dimension inputs (width, height, rotation)
+  - [ ] Real-time preview of changes
+  - **Validation**: Properties panel updates table appearance
+
+- [ ] **Task 10.10**: Implement shape rendering
+  - [ ] Render tables with custom shapes (CSS border-radius)
+  - [ ] Adjust capacity indicator position per shape
+  - [ ] Ensure hit detection works for all shapes
+  - [ ] Save shape preference to database
+  - **Validation**: All 4 shapes render and interact correctly
+
+### Background and Layers
+- [ ] **Task 10.11**: Implement background image upload
+  - [ ] Create background upload dialog
+  - [ ] Add file input (PNG, JPG, SVG, max 10MB)
+  - [ ] Upload image to server (use existing file storage API)
+  - [ ] Render background image on canvas
+  - [ ] Add opacity slider (0-100%)
+  - [ ] Allow repositioning and scaling background
+  - [ ] Save background config per floor
+  - **Validation**: Images upload, render, and persist correctly
+
+- [ ] **Task 10.12**: Build layer manager
+  - [ ] Create layers panel showing all layers
+  - [ ] Add visibility toggles for each layer
+  - [ ] Add lock/unlock functionality
+  - [ ] Implement layer order (background → grid → tables → annotations)
+  - **Validation**: Layer visibility and locking work correctly
+
+### Layout Management
+- [ ] **Task 10.13**: Implement save/load layouts
+  - [ ] Add "Save Layout" button with name input dialog
+  - [ ] Save all table positions, sizes, rotations, styles to database
+  - [ ] Create `FloorPlanLayout` table (migration required)
+  - [ ] Add "Load Layout" dropdown showing saved layouts
+  - [ ] Implement layout loading with animation (500ms transition)
+  - [ ] Show confirmation dialog if unsaved changes exist
+  - **Validation**: Layouts save and load correctly with animations
+
+- [ ] **Task 10.14**: Create layout templates
+  - [ ] Design 4 layout templates (Fine Dining, Casual, Bar/Lounge, Banquet)
+  - [ ] Implement template application algorithm
+  - [ ] Add "Use Template" button and template selector
+  - [ ] Auto-generate table positions based on template
+  - [ ] Allow customization after applying template
+  - **Validation**: Templates apply correctly and are customizable
+
+### Undo/Redo and Actions
+- [ ] **Task 10.15**: Implement action history
+  - [ ] Create action history stack (max 50 actions)
+  - [ ] Record actions: move, resize, rotate, style change
+  - [ ] Implement undo (Ctrl+Z) functionality
+  - [ ] Implement redo (Ctrl+Shift+Z) functionality
+  - [ ] Add undo/redo buttons to toolbar
+  - [ ] Clear history on save
+  - **Validation**: Undo/redo works for all action types
+
+- [ ] **Task 10.16**: Implement save functionality
+  - [ ] Add "Save" button (keyboard: Ctrl+S)
+  - [ ] Persist all changes to database via API
+  - [ ] Show success/error notifications
+  - [ ] Update "unsaved changes" indicator
+  - [ ] Add confirmation dialog on view switch with unsaved changes
+  - **Validation**: Save persists all changes correctly
+
+### Database Migrations
+- [ ] **Task 10.17**: Create database migrations for Visual Floor Plan
+  - [ ] Add columns to `RestaurantTable`: positionX, positionY, rotation, shape, width, height, customStyles
+  - [ ] Create `FloorPlanLayout` table
+  - [ ] Create `FloorPlanBackground` table
+  - [ ] Add indexes for performance
+  - [ ] Run migrations in dev and staging
+  - **Validation**: Migrations run without errors, schema updated
+
+### API Endpoints
+- [ ] **Task 10.18**: Create API endpoints for Visual Floor Plan
+  - [ ] Add `PATCH /tables/bulk-positions` for saving positions
+  - [ ] Add `POST /floor-plans/layouts` for saving layouts
+  - [ ] Add `GET /floor-plans/layouts?floor={floor}` for loading layouts
+  - [ ] Add `POST /floor-plans/backgrounds` for uploading backgrounds
+  - [ ] Add `GET /floor-plans/backgrounds/{floor}` for loading backgrounds
+  - **Validation**: All endpoints work with correct validation
 
 ### QR Code Management
 - [ ] **Task 7.1**: Implement QR code generation

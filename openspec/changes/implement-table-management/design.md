@@ -91,7 +91,85 @@ interface TableState {
 }
 ```
 
-### 2. List View
+### 2. Visual Floor Plan View
+
+**Purpose**: Enhanced interactive floor plan editor with advanced positioning and customization
+
+**Key Components**:
+- `VisualFloorPlanCanvas`: Advanced canvas with drag-and-drop, resize, rotate
+- `EditorToolbar`: Tool palette (select, pan, add table, delete, zoom, grid, save)
+- `PropertiesPanel`: Side panel for table customization (shape, size, rotation, style)
+- `LayerManager`: Background image and layer visibility controls
+- `LayoutManager`: Save/load floor plan layouts and templates
+- `GridOverlay`: Visual grid with configurable spacing
+- `AlignmentGuides`: Dynamic guides for table alignment
+- `ActionHistory`: Undo/redo stack manager
+
+**Data Flow**:
+```typescript
+User Action (drag table) 
+  → Update local canvas state (optimistic)
+  → Show visual feedback (grid snapping, alignment guides)
+  → On drag end → Save position to store
+  → On "Save Layout" → API call to persist positions
+  → Backend saves positions to database
+  → Broadcast WebSocket event (optional for real-time collaboration)
+```
+
+**State Management**:
+```typescript
+interface VisualFloorPlanState {
+  tables: Table[];
+  selectedTableIds: number[];
+  canvasSettings: {
+    zoom: number; // 0.5 to 2.0
+    pan: { x: number; y: number };
+    gridVisible: boolean;
+    gridSize: number; // 10, 20, 50
+    snapToGrid: boolean;
+  };
+  backgroundImage: {
+    url: string | null;
+    opacity: number; // 0-100
+    position: { x: number; y: number };
+    scale: number;
+  };
+  activeLayout: string | null; // Currently loaded layout name
+  unsavedChanges: boolean;
+  actionHistory: Action[]; // For undo/redo
+  historyIndex: number;
+}
+
+interface TablePosition {
+  tableId: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation: number; // 0-360
+  shape: 'rectangle' | 'circle' | 'square' | 'oval';
+  customStyles?: {
+    borderColor?: string;
+    backgroundColor?: string;
+    fontSize?: number;
+  };
+}
+```
+
+**Drag & Drop Architecture**:
+- Use `dnd-kit` library for robust drag-and-drop
+- Implement custom collision detection for grid snapping
+- Real-time position updates during drag
+- Batch save on drag end for performance
+- Support multi-select drag (Shift + click)
+
+**Canvas Rendering Strategy**:
+- Use HTML5 Canvas API for background and grid
+- Use DOM elements for table cards (better accessibility and interaction)
+- Hybrid approach: Canvas for non-interactive elements, DOM for interactive
+- Layer structure: Background Canvas → Grid Canvas → Table DOM elements
+
+### 3. List View
 
 **Purpose**: Tabular data management with advanced filtering and bulk operations
 
@@ -107,7 +185,7 @@ interface TableState {
 - Default page size: 20 items
 - Configurable via user preferences
 
-### 3. Table Forms
+### 4. Table Forms
 
 **Purpose**: Create and edit table configurations with validation
 
@@ -247,20 +325,23 @@ model RestaurantTable {
 }
 ```
 
-### Proposed Enhancements (Phase 2)
+### Proposed Enhancements (For Visual Floor Plan)
 ```prisma
 model RestaurantTable {
   // ... existing fields ...
   
-  // For drag-and-drop positioning
-  positionX   Float?      // X coordinate on canvas
-  positionY   Float?      // Y coordinate on canvas
-  rotation    Int?        @default(0) // Rotation angle (0-360)
+  // For Visual Floor Plan drag-and-drop positioning
+  positionX   Float?      // X coordinate on canvas (pixels)
+  positionY   Float?      // Y coordinate on canvas (pixels)
+  rotation    Int?        @default(0) // Rotation angle (0-360 degrees)
   
   // For visual customization
-  shape       String?     @default("rectangle") // rectangle, circle, square
-  width       Float?      @default(100)
-  height      Float?      @default(100)
+  shape       String?     @default("rectangle") // rectangle, circle, square, oval
+  width       Float?      @default(100)  // Table width in pixels
+  height      Float?      @default(100)  // Table height in pixels
+  
+  // For custom styling (stored as JSON)
+  customStyles Json?      // { borderColor, backgroundColor, fontSize }
   
   // For audit trail
   lastStatusChange DateTime?
@@ -270,7 +351,47 @@ model RestaurantTable {
   @@index([positionX, positionY])
   @@index([lastStatusChange])
 }
+
+// New table for floor plan layouts
+model FloorPlanLayout {
+  layoutId    Int      @id @default(autoincrement())
+  layoutName  String   @db.VarChar(100)
+  floor       Int
+  layoutData  Json     // Stores all table positions, background settings
+  isDefault   Boolean  @default(false)
+  createdBy   Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  creator     User     @relation(fields: [createdBy], references: [userId])
+  
+  @@unique([layoutName, floor])
+  @@index([floor])
+  @@index([createdBy])
+}
+
+// New table for background images
+model FloorPlanBackground {
+  backgroundId Int      @id @default(autoincrement())
+  floor        Int      @unique
+  imageUrl     String   @db.VarChar(500)
+  imageName    String   @db.VarChar(200)
+  opacity      Int      @default(50) // 0-100
+  position     Json     // { x, y }
+  scale        Float    @default(1.0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@index([floor])
+}
 ```
+
+**Migration Strategy**:
+1. Add new columns to `RestaurantTable` as nullable first
+2. Create `FloorPlanLayout` and `FloorPlanBackground` tables
+3. Populate default positions for existing tables (grid layout)
+4. Mark migration as optional for Phase 1 (defer to Phase 2)
 
 ### Query Optimization
 
