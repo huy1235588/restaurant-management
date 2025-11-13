@@ -87,32 +87,36 @@ export function TableListView({
 
     return (
         <div className="border rounded-md">
-            <Table>
+            <Table role="grid" aria-label={t('tables.tablesList', 'List of restaurant tables')}>
                 <TableHeader>
-                    <TableRow>
+                    <TableRow role="row">
                         {onSelectionChange && (
-                            <TableHead className="w-12">
+                            <TableHead className="w-12" role="columnheader" aria-label={t('common.select', 'Select')}>
                                 <Checkbox
                                     checked={allSelected}
                                     onCheckedChange={handleSelectAll}
                                     aria-checked={someSelected ? 'mixed' : undefined}
-                                    aria-label={t('common.selectAll', 'Select all')}
+                                    aria-label={t('common.selectAll', 'Select all tables')}
                                 />
                             </TableHead>
                         )}
                         <TableHead 
                             className="cursor-pointer hover:bg-muted/50"
                             onClick={() => onSort('tableNumber')}
+                            role="columnheader"
+                            aria-sort={sortField === 'tableNumber' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'}
                         >
                             {t('tables.tableNumber', 'Table Number')}
                             <SortIcon field="tableNumber" />
                         </TableHead>
-                        <TableHead>
+                        <TableHead role="columnheader">
                             {t('tables.tableName', 'Name')}
                         </TableHead>
                         <TableHead 
                             className="cursor-pointer hover:bg-muted/50"
                             onClick={() => onSort('capacity')}
+                            role="columnheader"
+                            aria-sort={sortField === 'capacity' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'}
                         >
                             {t('tables.capacity', 'Capacity')}
                             <SortIcon field="capacity" />
@@ -120,24 +124,28 @@ export function TableListView({
                         <TableHead 
                             className="cursor-pointer hover:bg-muted/50"
                             onClick={() => onSort('floor')}
+                            role="columnheader"
+                            aria-sort={sortField === 'floor' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'}
                         >
                             {t('tables.floor', 'Floor')}
                             <SortIcon field="floor" />
                         </TableHead>
-                        <TableHead>
+                        <TableHead role="columnheader">
                             {t('tables.section', 'Section')}
                         </TableHead>
                         <TableHead 
                             className="cursor-pointer hover:bg-muted/50"
                             onClick={() => onSort('status')}
+                            role="columnheader"
+                            aria-sort={sortField === 'status' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'}
                         >
                             {t('tables.status', 'Status')}
                             <SortIcon field="status" />
                         </TableHead>
-                        <TableHead>
+                        <TableHead role="columnheader">
                             {t('tables.qrCode', 'QR Code')}
                         </TableHead>
-                        <TableHead className="text-right">
+                        <TableHead className="text-right" role="columnheader">
                             {t('common.actions', 'Actions')}
                         </TableHead>
                     </TableRow>
@@ -148,6 +156,11 @@ export function TableListView({
                             key={table.tableId}
                             onClick={() => onRowClick?.(table)}
                             className="cursor-pointer hover:bg-muted/50"
+                            role="row"
+                            aria-label={t('tables.tableRow', 'Table {{number}}: {{status}}', { 
+                                number: table.tableNumber,
+                                status: table.status 
+                            })}
                         >
                             {onSelectionChange && (
                                 <TableCell>

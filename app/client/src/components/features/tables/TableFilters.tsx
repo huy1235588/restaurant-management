@@ -32,7 +32,7 @@ export function TableFilters({
     const { t } = useTranslation();
 
     return (
-        <Card className="p-4">
+        <Card className="p-4" role="region" aria-label={t('tables.filters', 'Table filters')}>
             <div className="grid gap-4 md:grid-cols-5">
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -41,11 +41,12 @@ export function TableFilters({
                         value={searchTerm}
                         onChange={(e) => onSearchChange(e.target.value)}
                         className="pl-9"
+                        aria-label={t('tables.searchTables', 'Search tables by number or name')}
                     />
                 </div>
 
                 <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-                    <SelectTrigger>
+                    <SelectTrigger aria-label={t('tables.filterByStatus', 'Filter by table status')}>
                         <SelectValue placeholder={t('tables.statusFilter', 'All Status')} />
                     </SelectTrigger>
                     <SelectContent>
@@ -58,7 +59,7 @@ export function TableFilters({
                 </Select>
 
                 <Select value={floorFilter} onValueChange={onFloorFilterChange}>
-                    <SelectTrigger>
+                    <SelectTrigger aria-label={t('tables.filterByFloor', 'Filter by floor')}>
                         <SelectValue placeholder={t('tables.floorFilter', 'All Floors')} />
                     </SelectTrigger>
                     <SelectContent>
@@ -71,7 +72,7 @@ export function TableFilters({
                 </Select>
 
                 <Select value={sectionFilter} onValueChange={onSectionFilterChange}>
-                    <SelectTrigger>
+                    <SelectTrigger aria-label={t('tables.filterBySection', 'Filter by section')}>
                         <SelectValue placeholder={t('tables.sectionFilter', 'All Sections')} />
                     </SelectTrigger>
                     <SelectContent>
@@ -84,7 +85,7 @@ export function TableFilters({
                 </Select>
 
                 <Select value={activeFilter} onValueChange={onActiveFilterChange}>
-                    <SelectTrigger>
+                    <SelectTrigger aria-label={t('tables.filterByActive', 'Filter by active status')}>
                         <SelectValue placeholder={t('tables.activeFilter', 'All Tables')} />
                     </SelectTrigger>
                     <SelectContent>

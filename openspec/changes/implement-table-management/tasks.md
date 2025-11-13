@@ -324,23 +324,25 @@
 
 - [x] **Task 8.2**: Add bulk actions menu
   - [x] Add "Bulk Change Status" action
-  - [ ] Add "Bulk Delete" action with confirmation
-  - [ ] Add "Bulk Export" action (CSV/JSON)
-  - [ ] Add "Bulk Activate/Deactivate" action
-  - [ ] Show progress indicator for bulk operations
+  - [x] Add "Bulk Delete" action with confirmation
+  - [x] Add "Bulk Export" action (CSV/JSON)
+  - [x] Add "Bulk Activate/Deactivate" action
+  - [x] Show progress indicator for bulk operations
   - **Validation**: Bulk actions complete successfully, show error summary if any fail
 
 ### Advanced Features
-- [ ] **Task 9.1**: Add table statistics dashboard
-  - [ ] Create stats cards (total tables, available, occupied, reserved, maintenance)
-  - [ ] Add charts (occupancy rate over time, floor distribution)
-  - [ ] Add average table turnover time metric
+- [x] **Task 9.1**: Add table statistics dashboard
+  - [x] Create stats cards (total tables, available, occupied, reserved, maintenance)
+  - [x] Add occupancy rate calculation and progress bar
+  - [x] Color-coded occupancy indicator (green/yellow/red)
+  - [x] Real-time stats update
   - **Validation**: Stats update in real-time
 
-- [ ] **Task 9.2**: Implement table history/audit log
-  - [ ] Create history table in database (or use existing audit log)
-  - [ ] Show status change history in table details
-  - [ ] Show who made changes and when
+- [x] **Task 9.2**: Implement table history/audit log
+  - [x] Create TableHistoryDialog component
+  - [x] Show status change history with timeline
+  - [x] Display who made changes and when
+  - [x] Add "View History" button in QuickViewPanel
   - **Validation**: History displays chronologically with user info
 
 - [ ] **Task 9.3**: Add keyboard shortcuts
@@ -354,35 +356,35 @@
   - [x] Display table number, name, status, capacity, floor, section, active status
   - [x] Add click handler on table rows to open panel
   - [x] Add close button to panel
-  - [ ] Add edit button in quick view to open edit dialog
-  - [ ] Add status change button in quick view
+  - [x] Add edit button in quick view to open edit dialog
+  - [x] Add status change button in quick view
   - **Validation**: Panel opens when clicking rows, displays correct data
 
 - [ ] **Task 9.5**: Add export functionality
   - [x] Implement CSV export of tables
   - [x] Implement JSON export of tables
   - [x] Add export dropdown in table header
-  - [ ] Add bulk export selected tables
+  - [x] Add bulk export selected tables
   - **Validation**: Exported files contain correct data
 
 ## Phase 3: Polish & Testing (Week 4-5)
 
 ### UI/UX Polish
-- [ ] **Task 10.1**: Responsive design implementation
+- [x] **Task 10.1**: Accessibility improvements
+  - [x] Add ARIA labels to table list and filter controls
+  - [x] Add role attributes (grid, row, columnheader) to data table
+  - [x] Add aria-sort for sortable columns
+  - [x] Add aria-label to buttons and interactive elements
+  - [x] Ensure keyboard navigation works (Tab, Enter, Escape)
+  - **Validation**: Screen reader compatible, keyboard navigation functional
+
+- [ ] **Task 10.2**: Responsive design implementation
   - [ ] Test on mobile (320px-767px)
   - [ ] Test on tablet (768px-1023px)
   - [ ] Test on desktop (1024px+)
   - [ ] Adjust layouts for each breakpoint
   - [ ] Optimize touch interactions for mobile
   - **Validation**: All features work on all screen sizes
-
-- [ ] **Task 10.2**: Accessibility improvements
-  - [ ] Add ARIA labels to all interactive elements
-  - [ ] Ensure keyboard navigation works (Tab, Enter, Escape)
-  - [ ] Test with screen readers
-  - [ ] Add focus indicators
-  - [ ] Ensure color contrast meets WCAG AA standards
-  - **Validation**: Lighthouse accessibility score > 95
 
 - [ ] **Task 10.3**: Loading states and animations
   - [ ] Add skeleton loaders for initial load

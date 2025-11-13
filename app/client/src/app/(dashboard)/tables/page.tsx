@@ -16,6 +16,10 @@ import { FloorPlanView } from '@/components/features/tables/FloorPlanView';
 import { TablePagination } from '@/components/features/tables/TablePagination';
 import { TableDialogs } from '@/components/features/tables/TableDialogs';
 import { BulkStatusChangeDialog } from '@/components/features/tables/dialogs/BulkStatusChangeDialog';
+import { BulkDeleteDialog } from '@/components/features/tables/dialogs/BulkDeleteDialog';
+import { BulkExportDialog } from '@/components/features/tables/dialogs/BulkExportDialog';
+import { BulkActivateDeactivateDialog } from '@/components/features/tables/dialogs/BulkActivateDeactivateDialog';
+import { TableHistoryDialog } from '@/components/features/tables/dialogs/TableHistoryDialog';
 import { KeyboardShortcutsDialog } from '@/components/features/tables/dialogs/KeyboardShortcutsDialog';
 import { QuickViewPanel } from '@/components/features/tables/QuickViewPanel';
 import { useTableSocket } from '@/hooks/useTableSocket';
@@ -47,7 +51,11 @@ export default function TablesPage() {
     // Selection state
     const [selectedTableIds, setSelectedTableIds] = useState<number[]>([]);
     const [showBulkStatusDialog, setShowBulkStatusDialog] = useState(false);
+    const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
+    const [showBulkExportDialog, setShowBulkExportDialog] = useState(false);
+    const [showBulkActivateDialog, setShowBulkActivateDialog] = useState(false);
     const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
+    const [showHistoryDialog, setShowHistoryDialog] = useState(false);
     const [selectedTable, setSelectedTable] = useState<Table | null>(null);
 
     // Dialog states
@@ -273,6 +281,48 @@ export default function TablesPage() {
         });
     }, [selectedTableIds, t, fetchTables, fetchStats]);
 
+    const handleBulkDelete = useCallback(async () => {
+        if (selectedTableIds.length === 0) {
+            toast.error(t('tables.noTablesSelected', 'Please select at least one table'));
+            return;
+        }
+
+        try {
+            // Delete tables one by one or use bulk delete endpoint if available
+            await Promise.all(
+                selectedTableIds.map(tableId => tableApi.delete(tableId))
+            );
+            setSelectedTableIds([]);
+            fetchTables();
+            fetchStats();
+        } catch (error: any) {
+            console.error('Failed to bulk delete tables:', error);
+            throw error;
+        }
+    }, [selectedTableIds, t, fetchTables, fetchStats]);
+
+    const handleBulkActivateDeactivate = useCallback(async (isActive: boolean) => {
+        if (selectedTableIds.length === 0) {
+            toast.error(t('tables.noTablesSelected', 'Please select at least one table'));
+            return;
+        }
+
+        try {
+            const bulkUpdateData = selectedTableIds.map(tableId => ({
+                tableId,
+                data: { isActive }
+            }));
+
+            await tableApi.bulkUpdate(bulkUpdateData);
+            setSelectedTableIds([]);
+            fetchTables();
+            fetchStats();
+        } catch (error: any) {
+            console.error('Failed to bulk activate/deactivate tables:', error);
+            throw error;
+        }
+    }, [selectedTableIds, t, fetchTables, fetchStats]);
+
     const handleCloseDialogs = useCallback(() => {
         setShowCreateDialog(false);
         setShowEditDialog(false);
@@ -326,6 +376,27 @@ export default function TablesPage() {
                                     onClick={() => setShowBulkStatusDialog(true)}
                                 >
                                     {t('tables.changeBulkStatus', 'Change Status')}
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => setShowBulkActivateDialog(true)}
+                                >
+                                    {t('tables.toggleActive', 'Toggle Active')}
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => setShowBulkExportDialog(true)}
+                                >
+                                    {t('tables.bulkExport', 'Export Selected')}
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={() => setShowBulkDeleteDialog(true)}
+                                >
+                                    {t('tables.bulkDelete', 'Delete Selected')}
                                 </Button>
                                 <Button
                                     size="sm"
@@ -389,6 +460,26 @@ export default function TablesPage() {
                 onConfirm={handleBulkStatusChange}
             />
 
+            <BulkDeleteDialog
+                open={showBulkDeleteDialog}
+                count={selectedTableIds.length}
+                onClose={() => setShowBulkDeleteDialog(false)}
+                onConfirm={handleBulkDelete}
+            />
+
+            <BulkExportDialog
+                open={showBulkExportDialog}
+                tables={tables.filter(t => selectedTableIds.includes(t.tableId))}
+                count={selectedTableIds.length}
+                onClose={() => setShowBulkExportDialog(false)}
+            />
+
+            <BulkActivateDeactivateDialog
+                open={showBulkActivateDialog}
+                count={selectedTableIds.length}
+                onClose={() => setShowBulkActivateDialog(false)}
+                onConfirm={handleBulkActivateDeactivate}
+            />
             <KeyboardShortcutsDialog
                 open={showKeyboardShortcuts}
                 onClose={() => setShowKeyboardShortcuts(false)}
@@ -398,8 +489,17 @@ export default function TablesPage() {
                 <QuickViewPanel
                     table={selectedTable}
                     onClose={() => setSelectedTable(null)}
+                    onEdit={handleEditTable}
+                    onChangeStatus={handleChangeStatus}
+                    onViewHistory={() => setShowHistoryDialog(true)}
                 />
             )}
+
+            <TableHistoryDialog
+                open={showHistoryDialog}
+                table={selectedTable}
+                onClose={() => setShowHistoryDialog(false)}
+            />
         </div>
     );
 }

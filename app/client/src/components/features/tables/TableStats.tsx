@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, CheckCircle, Circle, AlertCircle, Wrench } from 'lucide-react';
+import { Users, CheckCircle, Circle, AlertCircle, Wrench, TrendingUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface TableStatsProps {
@@ -14,6 +14,11 @@ interface TableStatsProps {
 
 export function TableStats({ stats }: TableStatsProps) {
     const { t } = useTranslation();
+
+    // Calculate occupancy rate (occupied + reserved) / total
+    const occupancyRate = stats.total > 0 
+        ? Math.round(((stats.occupied + stats.reserved) / stats.total) * 100)
+        : 0;
 
     const statCards = [
         {
@@ -54,23 +59,61 @@ export function TableStats({ stats }: TableStatsProps) {
     ];
 
     return (
-        <div className="grid gap-4 md:grid-cols-5">
-            {statCards.map((stat, index) => {
-                const Icon = stat.icon;
-                return (
-                    <Card key={index}>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-                            <div className={`p-2 rounded-full ${stat.bgColor}`}>
-                                <Icon className={`w-4 h-4 ${stat.color}`} />
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{stat.value}</div>
-                        </CardContent>
-                    </Card>
-                );
-            })}
+        <div className="space-y-4">
+            {/* Main Stats Grid */}
+            <div className="grid gap-4 md:grid-cols-5">
+                {statCards.map((stat, index) => {
+                    const Icon = stat.icon;
+                    return (
+                        <Card key={index}>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+                                <div className={`p-2 rounded-full ${stat.bgColor}`}>
+                                    <Icon className={`w-4 h-4 ${stat.color}`} />
+                                </div>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{stat.value}</div>
+                            </CardContent>
+                        </Card>
+                    );
+                })}
+            </div>
+
+            {/* Occupancy Rate Card */}
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                        {t('tables.stats.occupancyRate', 'Occupancy Rate')}
+                    </CardTitle>
+                    <div className="p-2 rounded-full bg-purple-100">
+                        <TrendingUp className="w-4 h-4 text-purple-600" />
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-2">
+                        <div className="text-2xl font-bold">{occupancyRate}%</div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div
+                                className={`h-2 rounded-full transition-all ${
+                                    occupancyRate <= 30
+                                        ? 'bg-green-600'
+                                        : occupancyRate <= 70
+                                        ? 'bg-yellow-600'
+                                        : 'bg-red-600'
+                                }`}
+                                style={{ width: `${occupancyRate}%` }}
+                            />
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                            {t('tables.stats.occupancyDesc', '{{occupied}} of {{total}} tables in use', {
+                                occupied: stats.occupied + stats.reserved,
+                                total: stats.total,
+                            })}
+                        </p>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }

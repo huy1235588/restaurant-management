@@ -2,16 +2,19 @@ import { Table } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useTranslation } from 'react-i18next';
-import { X, Users, Home, MapPin } from 'lucide-react';
+import { X, Users, Home, MapPin, Edit, Zap, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TableStatusBadge } from './TableStatusBadge';
 
 interface QuickViewPanelProps {
     table: Table | null;
     onClose: () => void;
+    onEdit?: (table: Table) => void;
+    onChangeStatus?: (table: Table) => void;
+    onViewHistory?: (table: Table) => void;
 }
 
-export function QuickViewPanel({ table, onClose }: QuickViewPanelProps) {
+export function QuickViewPanel({ table, onClose, onEdit, onChangeStatus, onViewHistory }: QuickViewPanelProps) {
     const { t } = useTranslation();
 
     if (!table) return null;
@@ -112,6 +115,53 @@ export function QuickViewPanel({ table, onClose }: QuickViewPanelProps) {
                         {new Date(table.updatedAt).toLocaleDateString()}
                     </p>
                 </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2 pt-4 border-t">
+                    {onEdit && (
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => {
+                                onEdit(table);
+                                onClose();
+                            }}
+                        >
+                            <Edit className="h-4 w-4 mr-2" />
+                            {t('common.edit', 'Edit')}
+                        </Button>
+                    )}
+                    {onChangeStatus && (
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => {
+                                onChangeStatus(table);
+                                onClose();
+                            }}
+                        >
+                            <Zap className="h-4 w-4 mr-2" />
+                            {t('tables.changeStatus', 'Change Status')}
+                        </Button>
+                    )}
+                </div>
+
+                {/* History Button */}
+                {onViewHistory && (
+                    <Button
+                        size="sm"
+                        variant="ghost"
+                        className="w-full mt-2"
+                        onClick={() => {
+                            onViewHistory(table);
+                        }}
+                    >
+                        <Clock className="h-4 w-4 mr-2" />
+                        {t('tables.viewHistory', 'View History')}
+                    </Button>
+                )}
             </CardContent>
         </Card>
     );
