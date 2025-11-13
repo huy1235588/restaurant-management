@@ -87,7 +87,7 @@ src/
 │       └── menu/
 │           └── page.tsx              # Main page (now much cleaner)
 └── components/
-    └── feautures/
+    └── features/
         └── menu/
             ├── index.ts              # Barrel export
             ├── MenuHeader.tsx        # Header component
