@@ -8,12 +8,19 @@ interface TableFilters {
     search?: string;
 }
 
+interface PendingUpdate {
+    tableId: number;
+    previousState: Partial<Table>;
+    timestamp: number;
+}
+
 interface TableState {
     tables: Table[];
     selectedTable: Table | null;
     filters: TableFilters;
     isLoading: boolean;
     error: string | null;
+    pendingUpdates: Map<number, PendingUpdate>;
 
     // Actions
     setTables: (tables: Table[]) => void;
@@ -27,14 +34,20 @@ interface TableState {
     setError: (error: string | null) => void;
     clearTables: () => void;
     bulkUpdateStatus: (tableIds: number[], status: TableStatus) => void;
+    
+    // Optimistic updates
+    optimisticUpdate: (tableId: number, updates: Partial<Table>) => void;
+    confirmUpdate: (tableId: number) => void;
+    rollbackUpdate: (tableId: number) => void;
 }
 
-export const useTableStore = create<TableState>((set) => ({
+export const useTableStore = create<TableState>((set, get) => ({
     tables: [],
     selectedTable: null,
     filters: {},
     isLoading: false,
     error: null,
+    pendingUpdates: new Map(),
 
     setTables: (tables) => set({ tables, error: null }),
 
@@ -103,4 +116,55 @@ export const useTableStore = create<TableState>((set) => ({
             ),
             error: null,
         })),
+
+    // Optimistic update: apply changes immediately and store previous state
+    optimisticUpdate: (tableId, updates) =>
+        set((state) => {
+            const table = state.tables.find((t) => t.tableId === tableId);
+            if (!table) return state;
+
+            const previousState: Partial<Table> = {};
+            Object.keys(updates).forEach((key) => {
+                previousState[key as keyof Table] = table[key as keyof Table] as any;
+            });
+
+            const newPendingUpdates = new Map(state.pendingUpdates);
+            newPendingUpdates.set(tableId, {
+                tableId,
+                previousState,
+                timestamp: Date.now(),
+            });
+
+            return {
+                tables: state.tables.map((t) =>
+                    t.tableId === tableId ? { ...t, ...updates } : t
+                ),
+                pendingUpdates: newPendingUpdates,
+            };
+        }),
+
+    // Confirm update: remove from pending updates
+    confirmUpdate: (tableId) =>
+        set((state) => {
+            const newPendingUpdates = new Map(state.pendingUpdates);
+            newPendingUpdates.delete(tableId);
+            return { pendingUpdates: newPendingUpdates };
+        }),
+
+    // Rollback update: restore previous state
+    rollbackUpdate: (tableId) =>
+        set((state) => {
+            const pending = state.pendingUpdates.get(tableId);
+            if (!pending) return state;
+
+            const newPendingUpdates = new Map(state.pendingUpdates);
+            newPendingUpdates.delete(tableId);
+
+            return {
+                tables: state.tables.map((t) =>
+                    t.tableId === tableId ? { ...t, ...pending.previousState } : t
+                ),
+                pendingUpdates: newPendingUpdates,
+            };
+        }),
 }));

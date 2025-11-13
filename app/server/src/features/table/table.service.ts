@@ -51,9 +51,26 @@ interface UpdateTableData {
     shape?: string;
     width?: number;
     height?: number;
+    // Optimistic locking
+    updatedAt?: Date;
 }
 
 export class TableService {
+    /**
+     * Validate status transition
+     */
+    private validateStatusTransition(from: TableStatus, to: TableStatus): boolean {
+        // Define valid transitions
+        const validTransitions: Record<TableStatus, TableStatus[]> = {
+            available: ['occupied', 'reserved', 'maintenance'],
+            occupied: ['available', 'maintenance'],
+            reserved: ['available', 'occupied', 'maintenance'],
+            maintenance: ['available'],
+        };
+
+        return validTransitions[from]?.includes(to) ?? false;
+    }
+
     /**
      * Get all tables
      */
@@ -112,6 +129,21 @@ export class TableService {
     async updateTable(tableId: number, data: UpdateTableData) {
         const table = await this.getTableById(tableId);
 
+        // Optimistic locking: check if table was modified since client loaded it
+        if (data.updatedAt) {
+            const clientUpdatedAt = new Date(data.updatedAt).getTime();
+            const serverUpdatedAt = new Date(table.updatedAt).getTime();
+            
+            if (clientUpdatedAt < serverUpdatedAt) {
+                throw new BadRequestError(
+                    'Table has been modified by another user. Please refresh and try again.'
+                );
+            }
+            
+            // Remove updatedAt from data to let Prisma handle it
+            delete data.updatedAt;
+        }
+
         // Check if table number is being changed and if it already exists
         if (data.tableNumber && data.tableNumber !== table.tableNumber) {
             const existingTable = await tableRepository.findByNumber(data.tableNumber);
@@ -149,6 +181,13 @@ export class TableService {
     async updateTableStatus(tableId: number, status: TableStatus) {
         const table = await this.getTableById(tableId);
         const previousStatus = table.status;
+
+        // Validate status transition
+        if (!this.validateStatusTransition(previousStatus, status)) {
+            throw new BadRequestError(
+                `Invalid status transition from ${previousStatus} to ${status}`
+            );
+        }
 
         const updatedTable = await tableRepository.update(tableId, { status });
 

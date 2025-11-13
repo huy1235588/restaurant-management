@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { Table as TableType } from '@/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Checkbox } from '@/components/ui/checkbox';
 import { TableStatusBadge } from './TableStatusBadge';
 import { MoreHorizontal, Edit, Trash2, QrCode, ArrowUpDown, CircleDot } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -13,11 +15,13 @@ interface TableListViewProps {
     loading: boolean;
     sortField: string;
     sortOrder: 'asc' | 'desc';
+    selectedTableIds?: number[];
     onSort: (field: any) => void;
     onEdit: (table: TableType) => void;
     onChangeStatus: (table: TableType) => void;
     onDelete: (table: TableType) => void;
     onViewQR: (table: TableType) => void;
+    onSelectionChange?: (selectedIds: number[]) => void;
 }
 
 export function TableListView({
@@ -25,13 +29,33 @@ export function TableListView({
     loading,
     sortField,
     sortOrder,
+    selectedTableIds = [],
     onSort,
     onEdit,
     onChangeStatus,
     onDelete,
     onViewQR,
+    onSelectionChange,
 }: TableListViewProps) {
     const { t } = useTranslation();
+    const [localSelectedIds, setLocalSelectedIds] = useState<number[]>(selectedTableIds);
+
+    const handleSelectAll = (checked: boolean) => {
+        const newSelection = checked ? tables.map(t => t.tableId) : [];
+        setLocalSelectedIds(newSelection);
+        onSelectionChange?.(newSelection);
+    };
+
+    const handleSelectRow = (tableId: number, checked: boolean) => {
+        const newSelection = checked
+            ? [...localSelectedIds, tableId]
+            : localSelectedIds.filter(id => id !== tableId);
+        setLocalSelectedIds(newSelection);
+        onSelectionChange?.(newSelection);
+    };
+
+    const allSelected = tables.length > 0 && localSelectedIds.length === tables.length;
+    const someSelected = localSelectedIds.length > 0 && localSelectedIds.length < tables.length;
 
     if (loading) {
         return (
@@ -64,6 +88,16 @@ export function TableListView({
             <Table>
                 <TableHeader>
                     <TableRow>
+                        {onSelectionChange && (
+                            <TableHead className="w-12">
+                                <Checkbox
+                                    checked={allSelected}
+                                    onCheckedChange={handleSelectAll}
+                                    aria-checked={someSelected ? 'mixed' : undefined}
+                                    aria-label={t('common.selectAll', 'Select all')}
+                                />
+                            </TableHead>
+                        )}
                         <TableHead 
                             className="cursor-pointer hover:bg-muted/50"
                             onClick={() => onSort('tableNumber')}
@@ -109,6 +143,15 @@ export function TableListView({
                 <TableBody>
                     {tables.map((table) => (
                         <TableRow key={table.tableId}>
+                            {onSelectionChange && (
+                                <TableCell>
+                                    <Checkbox
+                                        checked={localSelectedIds.includes(table.tableId)}
+                                        onCheckedChange={(checked) => handleSelectRow(table.tableId, checked as boolean)}
+                                        aria-label={t('common.selectRow', 'Select row')}
+                                    />
+                                </TableCell>
+                            )}
                             <TableCell className="font-medium">{table.tableNumber}</TableCell>
                             <TableCell>{table.tableName || '-'}</TableCell>
                             <TableCell>

@@ -9,10 +9,12 @@ interface TableFiltersProps {
     statusFilter: string;
     floorFilter: string;
     sectionFilter: string;
+    activeFilter?: string;
     onSearchChange: (term: string) => void;
     onStatusFilterChange: (status: string) => void;
     onFloorFilterChange: (floor: string) => void;
     onSectionFilterChange: (section: string) => void;
+    onActiveFilterChange?: (active: string) => void;
 }
 
 export function TableFilters({
@@ -20,16 +22,18 @@ export function TableFilters({
     statusFilter,
     floorFilter,
     sectionFilter,
+    activeFilter = 'all',
     onSearchChange,
     onStatusFilterChange,
     onFloorFilterChange,
     onSectionFilterChange,
+    onActiveFilterChange,
 }: TableFiltersProps) {
     const { t } = useTranslation();
 
     return (
         <Card className="p-4">
-            <div className="grid gap-4 md:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-5">
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
@@ -76,6 +80,17 @@ export function TableFilters({
                         <SelectItem value="patio">{t('tables.sections.patio', 'Patio')}</SelectItem>
                         <SelectItem value="vip">{t('tables.sections.vip', 'VIP')}</SelectItem>
                         <SelectItem value="bar">{t('tables.sections.bar', 'Bar')}</SelectItem>
+                    </SelectContent>
+                </Select>
+
+                <Select value={activeFilter} onValueChange={onActiveFilterChange}>
+                    <SelectTrigger>
+                        <SelectValue placeholder={t('tables.activeFilter', 'All Tables')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">{t('common.all', 'All Tables')}</SelectItem>
+                        <SelectItem value="true">{t('tables.active', 'Active')}</SelectItem>
+                        <SelectItem value="false">{t('tables.inactive', 'Inactive')}</SelectItem>
                     </SelectContent>
                 </Select>
             </div>

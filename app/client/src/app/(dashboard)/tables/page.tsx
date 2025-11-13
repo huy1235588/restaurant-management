@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { tableApi } from '@/services/table.service';
 import { Table, TableStatus } from '@/types';
 import { useTableStore } from '@/stores/tableStore';
+import { Button } from '@/components/ui/button';
 import { TableHeader } from '@/components/features/tables/TableHeader';
 import { TableStats } from '@/components/features/tables/TableStats';
 import { TableFilters } from '@/components/features/tables/TableFilters';
@@ -14,6 +15,7 @@ import { TableListView } from '@/components/features/tables/TableListView';
 import { FloorPlanView } from '@/components/features/tables/FloorPlanView';
 import { TablePagination } from '@/components/features/tables/TablePagination';
 import { TableDialogs } from '@/components/features/tables/TableDialogs';
+import { BulkStatusChangeDialog } from '@/components/features/tables/dialogs/BulkStatusChangeDialog';
 import { useTableSocket } from '@/hooks/useTableSocket';
 
 type ViewMode = 'list' | 'floor';
@@ -40,6 +42,10 @@ export default function TablesPage() {
     // View mode state
     const [viewMode, setViewMode] = useState<ViewMode>('list');
 
+    // Selection state
+    const [selectedTableIds, setSelectedTableIds] = useState<number[]>([]);
+    const [showBulkStatusDialog, setShowBulkStatusDialog] = useState(false);
+
     // Dialog states
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
@@ -57,11 +63,20 @@ export default function TablesPage() {
         statusFilter: searchParams.get('status') || 'all',
         floorFilter: searchParams.get('floor') || 'all',
         sectionFilter: searchParams.get('section') || 'all',
+        activeFilter: searchParams.get('active') || 'all',
         currentPage: parseInt(searchParams.get('page') || '1', 10),
         itemsPerPage: parseInt(searchParams.get('limit') || '20', 10),
         sortField: (searchParams.get('sortBy') || 'tableNumber') as SortField,
         sortOrder: (searchParams.get('sortOrder') || 'asc') as SortOrder,
     }), [searchParams]);
+
+    // Debounce search with 300ms delay
+    const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const [localSearchTerm, setLocalSearchTerm] = useState(filters.searchTerm);
+
+    useEffect(() => {
+        setLocalSearchTerm(filters.searchTerm);
+    }, [filters.searchTerm]);
 
     // Update URL with filters
     const updateURL = useCallback((params: Record<string, string>) => {
@@ -93,6 +108,7 @@ export default function TablesPage() {
                 status: filters.statusFilter !== 'all' ? filters.statusFilter as TableStatus : undefined,
                 floor: filters.floorFilter !== 'all' ? parseInt(filters.floorFilter) : undefined,
                 section: filters.sectionFilter !== 'all' ? filters.sectionFilter : undefined,
+                isActive: filters.activeFilter !== 'all' ? filters.activeFilter === 'true' : undefined,
             });
 
             setTables(response.items);
@@ -125,7 +141,17 @@ export default function TablesPage() {
 
     // Handlers
     const handleSearch = useCallback((term: string) => {
-        updateURL({ search: term, page: '1' });
+        setLocalSearchTerm(term);
+        
+        // Clear previous timeout
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+
+        // Set new timeout for debounced search (300ms)
+        searchTimeoutRef.current = setTimeout(() => {
+            updateURL({ search: term, page: '1' });
+        }, 300);
     }, [updateURL]);
 
     const handleStatusFilter = useCallback((status: string) => {
@@ -138,6 +164,10 @@ export default function TablesPage() {
 
     const handleSectionFilter = useCallback((section: string) => {
         updateURL({ section, page: '1' });
+    }, [updateURL]);
+
+    const handleActiveFilter = useCallback((active: string) => {
+        updateURL({ active, page: '1' });
     }, [updateURL]);
 
     const handleSort = useCallback((field: SortField) => {
@@ -181,6 +211,34 @@ export default function TablesPage() {
         setShowQRDialog(true);
     }, []);
 
+    const handleSelectionChange = useCallback((ids: number[]) => {
+        setSelectedTableIds(ids);
+    }, []);
+
+    const handleBulkStatusChange = useCallback((status: TableStatus) => {
+        if (selectedTableIds.length === 0) {
+            toast.error(t('tables.noTablesSelected', 'Please select at least one table'));
+            return;
+        }
+
+        const bulkUpdateData = selectedTableIds.map(tableId => ({
+            tableId,
+            data: { status }
+        }));
+
+        tableApi.bulkUpdate(bulkUpdateData).then(() => {
+            toast.success(t('tables.bulkStatusUpdateSuccess', '{{count}} tables updated successfully', {
+                count: selectedTableIds.length
+            }));
+            setSelectedTableIds([]);
+            fetchTables();
+            fetchStats();
+        }).catch((error: any) => {
+            console.error('Failed to bulk update status:', error);
+            toast.error(error.response?.data?.message || t('tables.bulkStatusUpdateError', 'Failed to update tables'));
+        });
+    }, [selectedTableIds, t, fetchTables, fetchStats]);
+
     const handleCloseDialogs = useCallback(() => {
         setShowCreateDialog(false);
         setShowEditDialog(false);
@@ -211,24 +269,51 @@ export default function TablesPage() {
                 statusFilter={filters.statusFilter}
                 floorFilter={filters.floorFilter}
                 sectionFilter={filters.sectionFilter}
+                activeFilter={filters.activeFilter}
                 onSearchChange={handleSearch}
                 onStatusFilterChange={handleStatusFilter}
                 onFloorFilterChange={handleFloorFilter}
                 onSectionFilterChange={handleSectionFilter}
+                onActiveFilterChange={handleActiveFilter}
             />
 
             {viewMode === 'list' ? (
                 <>
+                    {selectedTableIds.length > 0 && (
+                        <div className="flex items-center justify-between bg-blue-100 border border-blue-200 rounded-lg p-4">
+                            <span className="text-sm font-medium text-blue-900">
+                                {t('tables.selectedCount', '{{count}} tables selected', { count: selectedTableIds.length })}
+                            </span>
+                            <div className="flex gap-2">
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => setShowBulkStatusDialog(true)}
+                                >
+                                    {t('tables.changeBulkStatus', 'Change Status')}
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => setSelectedTableIds([])}
+                                >
+                                    {t('common.clear', 'Clear')}
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                     <TableListView
                         tables={tables}
                         loading={loading}
                         sortField={filters.sortField}
                         sortOrder={filters.sortOrder}
+                        selectedTableIds={selectedTableIds}
                         onSort={handleSort}
                         onEdit={handleEditTable}
                         onChangeStatus={handleChangeStatus}
                         onDelete={handleDeleteTable}
                         onViewQR={handleViewQR}
+                        onSelectionChange={handleSelectionChange}
                     />
                     <TablePagination
                         currentPage={filters.currentPage}
@@ -259,6 +344,13 @@ export default function TablesPage() {
                 selectedTable={selectedTable}
                 onClose={handleCloseDialogs}
                 onSuccess={handleRefresh}
+            />
+
+            <BulkStatusChangeDialog
+                open={showBulkStatusDialog}
+                count={selectedTableIds.length}
+                onClose={() => setShowBulkStatusDialog(false)}
+                onConfirm={handleBulkStatusChange}
             />
         </div>
     );

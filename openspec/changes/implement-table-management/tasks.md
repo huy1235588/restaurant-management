@@ -9,21 +9,21 @@
   - [x] Create `table:updated` event emitter
   - [x] Create `table:deleted` event emitter
   - [x] Add event listeners in socket handler
-  - [ ] Test event broadcasting to all connected clients
+  - [x] Test event broadcasting to all connected clients
   - **Validation**: WebSocket events emit within 100ms of database changes
 
 - [x] **Task 1.2**: Enhance table API endpoints
   - [x] Add `GET /tables/stats` endpoint for dashboard statistics
-  - [ ] Add validation for table status transitions
-  - [ ] Add optimistic locking for concurrent updates
+  - [x] Add validation for table status transitions
+  - [x] Add optimistic locking for concurrent updates
   - [x] Add bulk update endpoint `PATCH /tables/bulk`
   - **Validation**: All endpoints return correct HTTP status codes and error messages
 
 ### Frontend Setup
 - [x] **Task 2.1**: Create table page structure
   - [x] Create `app/client/src/app/(dashboard)/tables/page.tsx`
-  - [ ] Create `app/client/src/app/(dashboard)/tables/layout.tsx`
-  - [ ] Add route metadata and SEO tags
+  - [x] Create `app/client/src/app/(dashboard)/tables/layout.tsx`
+  - [x] Add route metadata and SEO tags
   - [x] Implement loading and error states
   - **Validation**: Page renders at `/tables` route without errors
 
@@ -45,7 +45,7 @@
 - [x] **Task 3.1**: Build table list/grid view
   - [x] Create data table with sortable columns
   - [x] Implement column headers (Number, Name, Capacity, Floor, Section, Status, QR Code, Actions)
-  - [ ] Add row selection (single/multi)
+  - [x] Add row selection (single/multi)
   - [x] Add pagination controls
   - [x] Add empty state illustration
   - **Validation**: List displays all tables with correct data
@@ -55,8 +55,8 @@
   - [x] Add status filter dropdown (all, available, occupied, reserved, maintenance)
   - [x] Add floor filter
   - [x] Add section filter
-  - [ ] Add active/inactive toggle
-  - [ ] Implement debounced search (300ms)
+  - [x] Add active/inactive toggle
+  - [x] Implement debounced search (300ms)
   - **Validation**: Filters update results correctly, URL params sync with filters
 
 - [x] **Task 3.3**: Add quick actions menu
@@ -81,13 +81,13 @@
   - [x] Pre-populate form with existing table data
   - [x] Allow editing all fields except tableId
   - [x] Add "Save" and "Cancel" buttons
-  - [ ] Implement optimistic UI updates
+  - [x] Implement optimistic UI updates
   - **Validation**: Edits persist correctly, optimistic updates rollback on error
 
 - [x] **Task 4.3**: Implement status change dialog
   - [x] Create status selection dropdown with icons
-  - [ ] Add transition validation (e.g., can't go from maintenance to occupied directly)
-  - [ ] Add confirmation for destructive changes
+  - [x] Add transition validation (e.g., can't go from maintenance to occupied directly)
+  - [x] Add confirmation for destructive changes
   - [ ] Add optional notes field
   - **Validation**: Invalid transitions show warning, valid transitions update immediately
 
@@ -98,14 +98,14 @@
   - [x] Subscribe to table events (`table:status_changed`, etc.)
   - [x] Update Zustand store on event receipt
   - [x] Handle connection/disconnection events
-  - [ ] Implement auto-reconnect logic (exponential backoff)
+  - [x] Implement auto-reconnect logic (exponential backoff)
   - **Validation**: Status changes from other clients reflect within 500ms
 
-- [ ] **Task 5.2**: Add optimistic UI updates
-  - [ ] Update local state immediately on user action
-  - [ ] Show loading indicator on affected table
-  - [ ] Rollback changes if server returns error
-  - [ ] Show conflict resolution dialog if needed
+- [x] **Task 5.2**: Add optimistic UI updates
+  - [x] Update local state immediately on user action
+  - [x] Show loading indicator on affected table
+  - [x] Rollback changes if server returns error
+  - [x] Show conflict resolution dialog if needed
   - **Validation**: UI feels instant, errors handled gracefully
 
 ## Phase 2: Floor Plan & Enhanced Features (Week 3)
@@ -113,8 +113,8 @@
 ### Basic Floor Plan View
 - [x] **Task 6.1**: Create basic floor plan canvas
   - [x] Build canvas component with responsive sizing
-  - [ ] Implement zoom controls (+, -, reset)
-  - [ ] Add pan/drag canvas functionality (mouse + touch)
+  - [x] Implement zoom controls (+, -, reset)
+  - [x] Add pan/drag canvas functionality (mouse + touch)
   - [ ] Add grid overlay (optional toggle)
   - [ ] Add minimap for navigation (optional)
   - **Validation**: Canvas scales and pans smoothly on all devices
@@ -294,11 +294,11 @@
 
 ### QR Code Management
 - [x] **Task 7.1**: Implement QR code generation
-  - [ ] Install `qrcode` library (NOTE: needs to be installed via npm)
+  - [x] Install `qrcode` library (NOTE: needs to be installed via npm)
   - [x] Create QR code generation utility
   - [x] Generate unique codes for each table (format: `TABLE-{tableNumber}`)
   - [x] Add "Generate QR" button in table form
-  - [ ] Auto-generate on table creation (optional)
+  - [x] Auto-generate on table creation (optional)
   - **Validation**: QR codes scan correctly to table URL
 
 - [x] **Task 7.2**: Create QR code display dialog
@@ -315,15 +315,15 @@
   - **Validation**: ZIP file contains correct QR codes for all active tables
 
 ### Bulk Operations
-- [ ] **Task 8.1**: Implement bulk selection
-  - [ ] Add "Select All" checkbox in table header
-  - [ ] Add individual row checkboxes
-  - [ ] Show selection count in toolbar
-  - [ ] Add "Clear Selection" button
+- [x] **Task 8.1**: Implement bulk selection
+  - [x] Add "Select All" checkbox in table header
+  - [x] Add individual row checkboxes
+  - [x] Show selection count in toolbar
+  - [x] Add "Clear Selection" button
   - **Validation**: Selection state syncs correctly across pages
 
-- [ ] **Task 8.2**: Add bulk actions menu
-  - [ ] Add "Bulk Change Status" action
+- [x] **Task 8.2**: Add bulk actions menu
+  - [x] Add "Bulk Change Status" action
   - [ ] Add "Bulk Delete" action with confirmation
   - [ ] Add "Bulk Export" action (CSV/JSON)
   - [ ] Add "Bulk Activate/Deactivate" action
