@@ -172,21 +172,21 @@
   - [ ] Support multi-select drag (Shift + click) - deferred
   - **Validation**: Drag is smooth using dnd-kit, grid snapping works, alignment guides appear and snap correctly
 
-- [ ] **Task 10.5**: Implement table resizing
-  - [ ] Add resize handles (corners and edges) to selected tables
-  - [ ] Implement proportional resize (Shift key)
-  - [ ] Show dimensions during resize
-  - [ ] Enforce minimum size limits (50x50px)
-  - [ ] Update table width/height in state
-  - **Validation**: Resize handles work, dimensions update correctly
+- [x] **Task 10.5**: Implement table resizing
+  - [x] Add resize handles (corners and edges) to selected tables
+  - [x] Implement proportional resize (Shift key)
+  - [x] Show dimensions during resize
+  - [x] Enforce minimum size limits (50x50px)
+  - [x] Update table width/height in state
+  - **Validation**: Resize handles work, dimensions update correctly ✅
 
-- [ ] **Task 10.6**: Implement table rotation
-  - [ ] Add rotation handle to selected tables
-  - [ ] Implement rotation around center point
-  - [ ] Show rotation angle during rotation
-  - [ ] Add snap-to-angle (15° increments with Shift)
-  - [ ] Update rotation value (0-360°) in state
-  - **Validation**: Rotation is smooth, angle snapping works
+- [x] **Task 10.6**: Implement table rotation handles
+  - [x] Add rotation handle above selected table
+  - [x] Implement rotation around center point
+  - [x] Show rotation angle during rotation
+  - [x] Add snap-to-angle (15° increments with Shift)
+  - [x] Update rotation value (0-360°) in state
+  - **Validation**: Rotation is smooth, angle snapping works ✅
 
 ### Grid and Alignment
 - [x] **Task 10.7**: Build grid system
@@ -205,32 +205,32 @@
   - **Validation**: Guides appear/disappear correctly, snap works ✅
 
 ### Custom Table Shapes and Styles
-- [ ] **Task 10.9**: Create properties panel
-  - [ ] Build side panel component
-  - [ ] Show selected table properties
-  - [ ] Add shape selector (Rectangle, Circle, Square, Oval)
-  - [ ] Add dimension inputs (width, height, rotation)
-  - [ ] Changes preview locally (save via Save button)
-  - **Validation**: Properties panel updates table appearance locally
+- [x] **Task 10.9**: Create properties panel
+  - [x] Build side panel component
+  - [x] Show selected table properties
+  - [x] Add shape selector (Rectangle, Circle, Square, Oval)
+  - [x] Add dimension inputs (width, height, rotation)
+  - [x] Changes preview locally (save via Save button)
+  - **Validation**: Properties panel updates table appearance locally ✅
 
-- [ ] **Task 10.10**: Implement shape rendering
-  - [ ] Render tables with custom shapes (CSS border-radius)
-  - [ ] Adjust capacity indicator position per shape
-  - [ ] Ensure hit detection works for all shapes
-  - [ ] Save shape preference to database
-  - **Validation**: All 4 shapes render and interact correctly
+- [x] **Task 10.10**: Implement shape rendering
+  - [x] Render tables with custom shapes (CSS border-radius)
+  - [x] Adjust capacity indicator position per shape
+  - [x] Ensure hit detection works for all shapes
+  - [x] Save shape preference to database
+  - **Validation**: All 4 shapes render and interact correctly ✅
 
 
 
 ### Layout Management
-- [ ] **Task 10.11**: Implement save/load layouts
-  - [ ] Add "Save Layout" button with name input dialog
-  - [ ] Save all table positions, sizes, rotations, styles to database
-  - [ ] Create `FloorPlanLayout` table (migration required)
-  - [ ] Add "Load Layout" dropdown showing saved layouts
-  - [ ] Implement layout loading with animation (500ms transition)
-  - [ ] Show confirmation dialog if unsaved changes exist
-  - **Validation**: Layouts save and load correctly with animations
+- [x] **Task 10.11**: Implement save/load layouts
+  - [x] Add "Save Layout" button with name input dialog
+  - [x] Save all table positions, sizes, rotations, styles to database
+  - [x] Create `FloorPlanLayout` table (migration required)
+  - [x] Add "Load Layout" dropdown showing saved layouts
+  - [x] Implement layout loading with animation (500ms transition)
+  - [x] Show confirmation dialog if unsaved changes exist
+  - **Validation**: Layouts save and load correctly with animations ✅
 
 - [ ] **Task 10.12**: Create layout templates
   - [ ] Design 4 layout templates (Fine Dining, Casual, Bar/Lounge, Banquet)

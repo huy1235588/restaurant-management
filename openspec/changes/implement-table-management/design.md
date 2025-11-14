@@ -370,28 +370,12 @@ model FloorPlanLayout {
   @@index([floor])
   @@index([createdBy])
 }
-
-// New table for background images
-model FloorPlanBackground {
-  backgroundId Int      @id @default(autoincrement())
-  floor        Int      @unique
-  imageUrl     String   @db.VarChar(500)
-  imageName    String   @db.VarChar(200)
-  opacity      Int      @default(50) // 0-100
-  position     Json     // { x, y }
-  scale        Float    @default(1.0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  
-  @@index([floor])
-}
 ```
 
 **Migration Strategy**:
 1. Add new columns to `RestaurantTable` as nullable first
-2. Create `FloorPlanLayout` and `FloorPlanBackground` tables
-3. Populate default positions for existing tables (grid layout)
-4. Mark migration as optional for Phase 1 (defer to Phase 2)
+2. Populate default positions for existing tables (grid layout)
+3. Mark migration as optional for Phase 1 (defer to Phase 2)
 
 ### Query Optimization
 

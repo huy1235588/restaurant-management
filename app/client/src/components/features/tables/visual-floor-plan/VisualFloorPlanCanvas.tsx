@@ -4,6 +4,7 @@ import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { Table, TableStatus } from '@/types';
 import { useTranslation } from 'react-i18next';
 import { VisualTableCard } from './VisualTableCard';
+import { ResizeRotateHandles } from './ResizeRotateHandles';
 import {
     DndContext,
     DragEndEvent,
@@ -29,6 +30,8 @@ interface VisualFloorPlanCanvasProps {
     loading: boolean;
     onTableSelect: (tableId: number | null) => void;
     onTableMove: (tableId: number, x: number, y: number) => void;
+    onTableResize?: (tableId: number, width: number, height: number) => void;
+    onTableRotate?: (tableId: number, rotation: number) => void;
     onPan: (deltaX: number, deltaY: number) => void;
     onEdit: (table: Table) => void;
     onChangeStatus: (table: Table) => void;
@@ -70,6 +73,8 @@ export function VisualFloorPlanCanvas({
     loading,
     onTableSelect,
     onTableMove,
+    onTableResize,
+    onTableRotate,
     onPan,
     onEdit,
     onChangeStatus,
@@ -456,6 +461,9 @@ export function VisualFloorPlanCanvas({
                                 onChangeStatus={onChangeStatus}
                                 onViewQR={onViewQR}
                                 onSelect={() => onTableSelect(table.tableId)}
+                                onResize={onTableResize}
+                                onRotate={onTableRotate}
+                                zoom={zoom}
                             />
                         );
                     })}
@@ -512,6 +520,9 @@ interface DraggableTableCardProps {
     onChangeStatus: (table: Table) => void;
     onViewQR: (table: Table) => void;
     onSelect: () => void;
+    onResize?: (tableId: number, width: number, height: number) => void;
+    onRotate?: (tableId: number, rotation: number) => void;
+    zoom: number;
 }
 
 function DraggableTableCard({
@@ -524,6 +535,9 @@ function DraggableTableCard({
     onChangeStatus,
     onViewQR,
     onSelect,
+    onResize,
+    onRotate,
+    zoom,
 }: DraggableTableCardProps) {
     const { attributes, listeners, setNodeRef, transform } = useDraggable({
         id: table.tableId,
@@ -545,18 +559,32 @@ function DraggableTableCard({
         <div
             ref={setNodeRef}
             style={style}
-            {...listeners}
-            {...attributes}
+            className="table-container"
             onClick={onSelect}
         >
-            <VisualTableCard
-                table={table}
-                isSelected={isSelected}
-                isDragging={isDragging}
-                onEdit={onEdit}
-                onChangeStatus={onChangeStatus}
-                onViewQR={onViewQR}
-            />
+            <div {...listeners} {...attributes} className="h-full w-full">
+                <VisualTableCard
+                    table={table}
+                    isSelected={isSelected}
+                    isDragging={isDragging}
+                    onEdit={onEdit}
+                    onChangeStatus={onChangeStatus}
+                    onViewQR={onViewQR}
+                />
+            </div>
+            {isSelected && !isDragging && onResize && onRotate && (
+                <ResizeRotateHandles
+                    tableId={table.tableId}
+                    x={position.x}
+                    y={position.y}
+                    width={position.width}
+                    height={position.height}
+                    rotation={table.rotation || 0}
+                    zoom={zoom}
+                    onResize={onResize}
+                    onRotate={onRotate}
+                />
+            )}
         </div>
     );
 }

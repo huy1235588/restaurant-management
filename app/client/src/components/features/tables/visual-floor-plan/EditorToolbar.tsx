@@ -13,6 +13,8 @@ import {
     RotateCcw,
     Undo2,
     Redo2,
+    FolderOpen,
+    Layout,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Separator } from '@/components/ui/separator';
@@ -34,6 +36,8 @@ interface EditorToolbarProps {
     canUndo: boolean;
     canRedo: boolean;
     isSaving?: boolean;
+    onSaveLayout?: () => void;
+    onLoadLayout?: () => void;
 }
 
 export function EditorToolbar({
@@ -51,6 +55,8 @@ export function EditorToolbar({
     canUndo,
     canRedo,
     isSaving = false,
+    onSaveLayout,
+    onLoadLayout,
 }: EditorToolbarProps) {
     const { t } = useTranslation();
 
@@ -160,6 +166,34 @@ export function EditorToolbar({
                     >
                         <Redo2 className="w-4 h-4" />
                     </Button>
+
+                    <Separator orientation="vertical" className="mx-1 h-6" />
+
+                    {onSaveLayout && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={onSaveLayout}
+                            title={t('tables.saveLayout', 'Save Layout')}
+                            className="gap-2"
+                        >
+                            <Layout className="w-4 h-4" />
+                            {t('tables.saveLayout', 'Save Layout')}
+                        </Button>
+                    )}
+
+                    {onLoadLayout && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={onLoadLayout}
+                            title={t('tables.loadLayout', 'Load Layout')}
+                            className="gap-2"
+                        >
+                            <FolderOpen className="w-4 h-4" />
+                            {t('tables.loadLayout', 'Load Layout')}
+                        </Button>
+                    )}
 
                     <Separator orientation="vertical" className="mx-1 h-6" />
 

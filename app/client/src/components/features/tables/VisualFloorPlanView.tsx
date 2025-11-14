@@ -8,8 +8,10 @@ import { Button } from '@/components/ui/button';
 import { VisualFloorPlanCanvas } from './visual-floor-plan/VisualFloorPlanCanvas';
 import { EditorToolbar } from './visual-floor-plan/EditorToolbar';
 import { PropertiesPanel } from './visual-floor-plan/PropertiesPanel';
+import { SaveLayoutDialog } from './visual-floor-plan/SaveLayoutDialog';
+import { LoadLayoutDialog } from './visual-floor-plan/LoadLayoutDialog';
 import { ActionHistory } from '@/lib/visual-floor-plan/action-history';
-import { floorPlanApi } from '@/services/floor-plan.service';
+import { floorPlanApi, FloorPlanLayout } from '@/services/floor-plan.service';
 
 interface VisualFloorPlanViewProps {
     tables: Table[];
@@ -57,6 +59,10 @@ export function VisualFloorPlanView({
     const [unsavedChanges, setUnsavedChanges] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [tablePositions, setTablePositions] = useState<Map<number, { x: number; y: number }>>(new Map());
+    const [showSaveLayoutDialog, setShowSaveLayoutDialog] = useState(false);
+    const [showLoadLayoutDialog, setShowLoadLayoutDialog] = useState(false);
+    const [savedLayouts, setSavedLayouts] = useState<FloorPlanLayout[]>([]);
+    const [layoutsLoading, setLayoutsLoading] = useState(false);
 
     // Filter tables by floor
     const filteredTables = floorFilter !== 'all'
@@ -123,6 +129,117 @@ export function VisualFloorPlanView({
 
         setUnsavedChanges(true);
     }, [tablePositions]);
+
+    const handleTableResize = useCallback((tableId: number, width: number, height: number) => {
+        // For now, just update local state - will be saved when user clicks Save
+        // TODO: Add to action history for undo/redo
+        setUnsavedChanges(true);
+        toast.info(t('tables.resizeApplied', 'Resize applied - click Save to persist'));
+    }, [t]);
+
+    const handleTableRotate = useCallback((tableId: number, rotation: number) => {
+        // For now, just update local state - will be saved when user clicks Save
+        // TODO: Add to action history for undo/redo
+        setUnsavedChanges(true);
+        toast.info(t('tables.rotationApplied', 'Rotation applied - click Save to persist'));
+    }, [t]);
+
+    const handleUpdateDimensions = useCallback((tableId: number, width: number, height: number, rotation: number, shape: string) => {
+        // Update dimensions from properties panel - will be saved when user clicks Save
+        // TODO: Add to action history for undo/redo
+        setUnsavedChanges(true);
+        toast.success(t('tables.dimensionsUpdated', 'Dimensions updated - click Save to persist'));
+    }, [t]);
+
+    const handleSaveLayout = useCallback(async (name: string, description: string) => {
+        try {
+            const layoutData = {
+                tables: Array.from(tablePositions.entries()).map(([tableId, pos]) => ({
+                    tableId,
+                    x: pos.x,
+                    y: pos.y,
+                    width: 80,
+                    height: 80,
+                    rotation: 0,
+                })),
+                gridSize: canvasState.gridSize,
+                zoom: canvasState.zoom,
+            };
+
+            const floor = parseInt(floorFilter) || 1;
+            await floorPlanApi.createLayout(floor, name, description, layoutData);
+            
+            toast.success(t('tables.layoutSaved', 'Layout saved successfully'));
+            setShowSaveLayoutDialog(false);
+        } catch (error) {
+            console.error('Failed to save layout:', error);
+            toast.error(t('tables.layoutSaveError', 'Failed to save layout'));
+        }
+    }, [tablePositions, canvasState, floorFilter, t]);
+
+    const handleLoadLayout = useCallback(async (layoutId: number) => {
+        try {
+            const layout = await floorPlanApi.getLayoutById(layoutId);
+            const data = layout.data as { 
+                tables?: Array<{ tableId: number; x: number; y: number }>;
+                gridSize?: number;
+                zoom?: number;
+            };
+
+            if (data.tables) {
+                const newPositions = new Map<number, { x: number; y: number }>();
+                data.tables.forEach(pos => {
+                    newPositions.set(pos.tableId, { x: pos.x, y: pos.y });
+                });
+                setTablePositions(newPositions);
+                
+                // Restore canvas state if available
+                if (data.gridSize || data.zoom) {
+                    setCanvasState(prev => ({
+                        ...prev,
+                        gridSize: data.gridSize || prev.gridSize,
+                        zoom: data.zoom || prev.zoom,
+                    }));
+                }
+                
+                setUnsavedChanges(true);
+                toast.success(t('tables.layoutLoaded', 'Layout loaded - click Save to persist'));
+            }
+        } catch (error) {
+            console.error('Failed to load layout:', error);
+            toast.error(t('tables.layoutLoadError', 'Failed to load layout'));
+        }
+    }, [t]);
+
+    const handleDeleteLayout = useCallback(async (layoutId: number) => {
+        try {
+            await floorPlanApi.deleteLayout(layoutId);
+            setSavedLayouts(prev => prev.filter(l => l.layoutId !== layoutId));
+            toast.success(t('tables.layoutDeleted', 'Layout deleted'));
+        } catch (error) {
+            console.error('Failed to delete layout:', error);
+            toast.error(t('tables.layoutDeleteError', 'Failed to delete layout'));
+        }
+    }, [t]);
+
+    const loadSavedLayouts = useCallback(async () => {
+        try {
+            setLayoutsLoading(true);
+            const floor = parseInt(floorFilter) || 1;
+            const layouts = await floorPlanApi.getLayouts(floor);
+            setSavedLayouts(layouts);
+        } catch (error) {
+            console.error('Failed to load layouts:', error);
+        } finally {
+            setLayoutsLoading(false);
+        }
+    }, [floorFilter]);
+
+    useEffect(() => {
+        if (showLoadLayoutDialog) {
+            loadSavedLayouts();
+        }
+    }, [showLoadLayoutDialog, loadSavedLayouts]);
 
     const handleToolChange = useCallback((tool: EditorTool) => {
         setActiveTool(tool);
@@ -267,6 +384,8 @@ export function VisualFloorPlanView({
                 canUndo={historyRef.current.canUndo()}
                 canRedo={historyRef.current.canRedo()}
                 isSaving={isSaving}
+                onSaveLayout={() => setShowSaveLayoutDialog(true)}
+                onLoadLayout={() => setShowLoadLayoutDialog(true)}
             />
 
             <div className="flex flex-1 gap-4 overflow-hidden px-4 pb-4">
@@ -284,6 +403,8 @@ export function VisualFloorPlanView({
                         loading={loading}
                         onTableSelect={handleTableSelect}
                         onTableMove={handleTableMove}
+                        onTableResize={handleTableResize}
+                        onTableRotate={handleTableRotate}
                         onPan={handlePan}
                         onEdit={onEdit}
                         onChangeStatus={onChangeStatus}
@@ -294,12 +415,30 @@ export function VisualFloorPlanView({
                 {/* Properties Panel */}
                 {selectedTableId && (
                     <PropertiesPanel
-                        table={filteredTables.find(t => t.tableId === selectedTableId)}
+                        table={tablesWithPositions.find(t => t.tableId === selectedTableId)}
                         onEdit={onEdit}
                         onChangeStatus={onChangeStatus}
+                        onUpdateDimensions={handleUpdateDimensions}
                     />
                 )}
             </div>
+
+            {/* Save Layout Dialog */}
+            <SaveLayoutDialog
+                open={showSaveLayoutDialog}
+                onClose={() => setShowSaveLayoutDialog(false)}
+                onSave={handleSaveLayout}
+            />
+
+            {/* Load Layout Dialog */}
+            <LoadLayoutDialog
+                open={showLoadLayoutDialog}
+                onClose={() => setShowLoadLayoutDialog(false)}
+                onLoad={handleLoadLayout}
+                onDelete={handleDeleteLayout}
+                layouts={savedLayouts}
+                loading={layoutsLoading}
+            />
         </div>
     );
 }

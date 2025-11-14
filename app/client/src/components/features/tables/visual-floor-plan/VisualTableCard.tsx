@@ -36,15 +36,35 @@ export function VisualTableCard({
         }
     };
 
+    const getShapeClass = (shape?: string) => {
+        switch (shape) {
+            case 'circle':
+                return 'rounded-full';
+            case 'oval':
+                return 'rounded-[50%]';
+            case 'square':
+                return 'rounded-md';
+            case 'rectangle':
+            default:
+                return 'rounded';
+        }
+    };
+
+    const rotation = table.rotation || 0;
+
     return (
         <div
             className={cn(
-                'h-full w-full flex flex-col items-center justify-center rounded border-2 cursor-move',
+                'h-full w-full flex flex-col items-center justify-center border-2 cursor-move',
                 'transition-all duration-150 select-none',
                 getStatusColor(table.status),
+                getShapeClass(table.shape),
                 isSelected && 'ring-2 ring-blue-500 ring-offset-1 shadow-lg',
                 isDragging && 'opacity-75 shadow-xl',
             )}
+            style={{
+                transform: `rotate(${rotation}deg)`,
+            }}
             onClick={(e) => {
                 e.stopPropagation();
             }}
