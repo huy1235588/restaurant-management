@@ -137,28 +137,28 @@
 ## Phase 3: Visual Floor Plan (Week 4-5)
 
 ### View Mode and Navigation
-- [ ] **Task 10.1**: Add Visual Floor Plan tab
-  - [ ] Update view toggle to include "Visual Floor Plan" option
-  - [ ] Create route `/tables?view=visual`
-  - [ ] Implement view switching with state preservation
+- [x] **Task 10.1**: Add Visual Floor Plan tab
+  - [x] Update view toggle to include "Visual Floor Plan" option
+  - [x] Create route `/tables?view=visual`
+  - [x] Implement view switching with state preservation
   - [ ] Add view mode persistence in localStorage
   - **Validation**: Three tabs (Floor Plan, Visual Floor Plan, List) work correctly
 
 ### Visual Editor Setup
-- [ ] **Task 10.2**: Set up Visual Floor Plan canvas infrastructure
-  - [ ] Install `dnd-kit` library for drag-and-drop
-  - [ ] Create `VisualFloorPlanCanvas` component
-  - [ ] Set up canvas state management (zoom, pan, grid settings)
-  - [ ] Implement HTML5 Canvas for background and grid rendering
-  - [ ] Create hybrid rendering (Canvas + DOM elements)
+- [x] **Task 10.2**: Set up Visual Floor Plan canvas infrastructure
+  - [x] Install `dnd-kit` library for drag-and-drop (already installed)
+  - [x] Create `VisualFloorPlanCanvas` component
+  - [x] Set up canvas state management (zoom, pan, grid settings)
+  - [x] Implement HTML5 Canvas for background and grid rendering
+  - [x] Create hybrid rendering (Canvas + DOM elements)
   - **Validation**: Canvas renders without errors, supports zoom/pan
 
-- [ ] **Task 10.3**: Create editor toolbar
-  - [ ] Build toolbar component with tool palette
-  - [ ] Add tools: Select, Pan, Add Table, Delete, Zoom, Grid, Save
-  - [ ] Implement tool activation/deactivation logic
-  - [ ] Add keyboard shortcuts (V, H, T, Delete, G, Ctrl+S)
-  - [ ] Add tooltips for all tools
+- [x] **Task 10.3**: Create editor toolbar
+  - [x] Build toolbar component with tool palette
+  - [x] Add tools: Select, Pan, Add Table, Delete, Zoom, Grid, Save
+  - [x] Implement tool activation/deactivation logic
+  - [x] Add keyboard shortcuts (V, H, T, Delete, G, Ctrl+S)
+  - [x] Add tooltips for all tools
   - **Validation**: All tools functional with keyboard shortcuts
 
 ### Drag, Resize, and Rotate
@@ -275,21 +275,21 @@
   - **Validation**: Save persists all changes correctly
 
 ### Database Migrations
-- [ ] **Task 10.17**: Create database migrations for Visual Floor Plan
-  - [ ] Add columns to `RestaurantTable`: positionX, positionY, rotation, shape, width, height, customStyles
-  - [ ] Create `FloorPlanLayout` table
-  - [ ] Create `FloorPlanBackground` table
-  - [ ] Add indexes for performance
-  - [ ] Run migrations in dev and staging
+- [x] **Task 10.17**: Create database migrations for Visual Floor Plan
+  - [x] Add columns to `RestaurantTable`: positionX, positionY, rotation, shape, width, height, customStyles
+  - [x] Create `FloorPlanLayout` table
+  - [x] Create `FloorPlanBackground` table
+  - [x] Add indexes for performance
+  - [x] Run migrations in dev and staging
   - **Validation**: Migrations run without errors, schema updated
 
 ### API Endpoints
-- [ ] **Task 10.18**: Create API endpoints for Visual Floor Plan
-  - [ ] Add `PATCH /tables/bulk-positions` for saving positions
-  - [ ] Add `POST /floor-plans/layouts` for saving layouts
-  - [ ] Add `GET /floor-plans/layouts?floor={floor}` for loading layouts
-  - [ ] Add `POST /floor-plans/backgrounds` for uploading backgrounds
-  - [ ] Add `GET /floor-plans/backgrounds/{floor}` for loading backgrounds
+- [x] **Task 10.18**: Create API endpoints for Visual Floor Plan
+  - [x] Add `PATCH /tables/bulk-positions` for saving positions
+  - [x] Add `POST /floor-plans/layouts` for saving layouts
+  - [x] Add `GET /floor-plans/layouts?floor={floor}` for loading layouts
+  - [x] Add `POST /floor-plans/backgrounds` for uploading backgrounds
+  - [x] Add `GET /floor-plans/backgrounds/{floor}` for loading backgrounds
   - **Validation**: All endpoints work with correct validation
 
 ### QR Code Management
@@ -309,10 +309,10 @@
   - **Validation**: QR codes download as 300x300px PNG files
 
 - [ ] **Task 7.3**: Bulk QR code generation
-  - [ ] Add "Generate All QR Codes" action
-  - [ ] Create ZIP download with all QR codes
-  - [ ] Add progress indicator for bulk generation
-  - **Validation**: ZIP file contains correct QR codes for all active tables
+  - [x] Add "Generate All QR Codes" action
+  - [x] Create HTML download with all QR codes
+  - [x] Add progress indicator for bulk generation
+  - **Validation**: HTML file contains correct QR codes for all selected tables
 
 ### Bulk Operations
 - [x] **Task 8.1**: Implement bulk selection

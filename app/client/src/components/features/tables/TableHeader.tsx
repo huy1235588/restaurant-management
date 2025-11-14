@@ -9,8 +9,8 @@ interface TableHeaderProps {
     tables?: Table[];
     onCreateTable: () => void;
     onRefresh: () => void;
-    viewMode: 'list' | 'floor';
-    onViewModeChange: (mode: 'list' | 'floor') => void;
+    viewMode: 'list' | 'floor' | 'visual';
+    onViewModeChange: (mode: 'list' | 'floor' | 'visual') => void;
 }
 
 export function TableHeader({ tables = [], onCreateTable, onRefresh, viewMode, onViewModeChange }: TableHeaderProps) {
@@ -41,6 +41,7 @@ export function TableHeader({ tables = [], onCreateTable, onRefresh, viewMode, o
                         size="sm"
                         onClick={() => onViewModeChange('list')}
                         className="rounded-r-none"
+                        title={t('tables.listViewTitle', 'List View')}
                     >
                         <LayoutList className="w-4 h-4 mr-2" />
                         {t('tables.listView', 'List')}
@@ -49,10 +50,21 @@ export function TableHeader({ tables = [], onCreateTable, onRefresh, viewMode, o
                         variant={viewMode === 'floor' ? 'default' : 'ghost'}
                         size="sm"
                         onClick={() => onViewModeChange('floor')}
-                        className="rounded-l-none"
+                        className="rounded-none"
+                        title={t('tables.floorViewTitle', 'Floor Plan View')}
                     >
                         <LayoutGrid className="w-4 h-4 mr-2" />
                         {t('tables.floorView', 'Floor Plan')}
+                    </Button>
+                    <Button
+                        variant={viewMode === 'visual' ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => onViewModeChange('visual')}
+                        className="rounded-l-none"
+                        title={t('tables.visualEditorTitle', 'Visual Floor Plan Editor')}
+                    >
+                        <LayoutGrid className="w-4 h-4 mr-2" />
+                        {t('tables.visualEditor', 'Visual Editor')}
                     </Button>
                 </div>
                 <Button variant="outline" size="sm" onClick={onRefresh}>

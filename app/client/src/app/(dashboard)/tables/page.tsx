@@ -13,18 +13,20 @@ import { TableStats } from '@/components/features/tables/TableStats';
 import { TableFilters } from '@/components/features/tables/TableFilters';
 import { TableListView } from '@/components/features/tables/TableListView';
 import { FloorPlanView } from '@/components/features/tables/FloorPlanView';
+import { VisualFloorPlanView } from '@/components/features/tables/VisualFloorPlanView';
 import { TablePagination } from '@/components/features/tables/TablePagination';
 import { TableDialogs } from '@/components/features/tables/TableDialogs';
 import { BulkStatusChangeDialog } from '@/components/features/tables/dialogs/BulkStatusChangeDialog';
 import { BulkDeleteDialog } from '@/components/features/tables/dialogs/BulkDeleteDialog';
 import { BulkExportDialog } from '@/components/features/tables/dialogs/BulkExportDialog';
 import { BulkActivateDeactivateDialog } from '@/components/features/tables/dialogs/BulkActivateDeactivateDialog';
+import { BulkQRCodeGenerator } from '@/components/features/tables/dialogs/BulkQRCodeGenerator';
 import { TableHistoryDialog } from '@/components/features/tables/dialogs/TableHistoryDialog';
 import { KeyboardShortcutsDialog } from '@/components/features/tables/dialogs/KeyboardShortcutsDialog';
 import { QuickViewPanel } from '@/components/features/tables/QuickViewPanel';
 import { useTableSocket } from '@/hooks/useTableSocket';
 
-type ViewMode = 'list' | 'floor';
+type ViewMode = 'list' | 'floor' | 'visual';
 type SortField = 'tableNumber' | 'capacity' | 'floor' | 'status';
 type SortOrder = 'asc' | 'desc';
 
@@ -54,6 +56,7 @@ export default function TablesPage() {
     const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
     const [showBulkExportDialog, setShowBulkExportDialog] = useState(false);
     const [showBulkActivateDialog, setShowBulkActivateDialog] = useState(false);
+    const [showBulkQRCodeDialog, setShowBulkQRCodeDialog] = useState(false);
     const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
     const [showHistoryDialog, setShowHistoryDialog] = useState(false);
     const [selectedTable, setSelectedTable] = useState<Table | null>(null);
@@ -393,6 +396,13 @@ export default function TablesPage() {
                                 </Button>
                                 <Button
                                     size="sm"
+                                    variant="outline"
+                                    onClick={() => setShowBulkQRCodeDialog(true)}
+                                >
+                                    {t('tables.bulkQRCode', 'Generate QR Codes')}
+                                </Button>
+                                <Button
+                                    size="sm"
                                     variant="destructive"
                                     onClick={() => setShowBulkDeleteDialog(true)}
                                 >
@@ -431,8 +441,17 @@ export default function TablesPage() {
                         onItemsPerPageChange={handleItemsPerPageChange}
                     />
                 </>
-            ) : (
+            ) : viewMode === 'floor' ? (
                 <FloorPlanView
+                    tables={tables}
+                    loading={loading}
+                    floorFilter={filters.floorFilter}
+                    onEdit={handleEditTable}
+                    onChangeStatus={handleChangeStatus}
+                    onViewQR={handleViewQR}
+                />
+            ) : (
+                <VisualFloorPlanView
                     tables={tables}
                     loading={loading}
                     floorFilter={filters.floorFilter}
@@ -479,6 +498,12 @@ export default function TablesPage() {
                 count={selectedTableIds.length}
                 onClose={() => setShowBulkActivateDialog(false)}
                 onConfirm={handleBulkActivateDeactivate}
+            />
+
+            <BulkQRCodeGenerator
+                open={showBulkQRCodeDialog}
+                tables={tables.filter(t => selectedTableIds.includes(t.tableId))}
+                onClose={() => setShowBulkQRCodeDialog(false)}
             />
             <KeyboardShortcutsDialog
                 open={showKeyboardShortcuts}

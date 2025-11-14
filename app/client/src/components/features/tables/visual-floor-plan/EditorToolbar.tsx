@@ -1,0 +1,182 @@
+'use client';
+
+import { Button } from '@/components/ui/button';
+import { 
+    Pointer, 
+    Hand, 
+    Plus, 
+    Trash2, 
+    ZoomIn, 
+    ZoomOut, 
+    Grid3X3, 
+    Save,
+    RotateCcw,
+    Undo2,
+    Redo2,
+} from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Separator } from '@/components/ui/separator';
+
+type EditorTool = 'select' | 'pan' | 'add' | 'delete' | 'zoom-in' | 'zoom-out' | 'grid';
+
+interface EditorToolbarProps {
+    activeTool: EditorTool;
+    onToolChange: (tool: EditorTool) => void;
+    onZoom: (direction: 'in' | 'out') => void;
+    onResetZoom: () => void;
+    onToggleGrid: () => void;
+    showGrid: boolean;
+    zoom: number;
+    onSave: () => void;
+    onUndo: () => void;
+    onRedo: () => void;
+    hasUnsavedChanges: boolean;
+    canUndo: boolean;
+    canRedo: boolean;
+    isSaving?: boolean;
+}
+
+export function EditorToolbar({
+    activeTool,
+    onToolChange,
+    onZoom,
+    onResetZoom,
+    onToggleGrid,
+    showGrid,
+    zoom,
+    onSave,
+    onUndo,
+    onRedo,
+    hasUnsavedChanges,
+    canUndo,
+    canRedo,
+    isSaving = false,
+}: EditorToolbarProps) {
+    const { t } = useTranslation();
+
+    return (
+        <div className="bg-background border-b shadow-sm px-4 py-3">
+            <div className="flex items-center justify-between gap-4">
+                {/* Left: Tool Palette */}
+                <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+                    <Button
+                        variant={activeTool === 'select' ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => onToolChange('select')}
+                        title={t('tables.visualEditor.selectTool', 'Select Tool (V)')}
+                        className="gap-2"
+                    >
+                        <Pointer className="w-4 h-4" />
+                    </Button>
+                    <Button
+                        variant={activeTool === 'pan' ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => onToolChange('pan')}
+                        title={t('tables.visualEditor.panTool', 'Pan Tool (H)')}
+                        className="gap-2"
+                    >
+                        <Hand className="w-4 h-4" />
+                    </Button>
+                    <Button
+                        variant={activeTool === 'add' ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => onToolChange('add')}
+                        title={t('tables.visualEditor.addTableTool', 'Add Table (T)')}
+                        className="gap-2"
+                    >
+                        <Plus className="w-4 h-4" />
+                    </Button>
+                    <Button
+                        variant={activeTool === 'delete' ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => onToolChange('delete')}
+                        title={t('tables.visualEditor.deleteTool', 'Delete Tool (Del)')}
+                        className="gap-2"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                    </Button>
+
+                    <Separator orientation="vertical" className="mx-1 h-6" />
+
+                    <Button
+                        variant={showGrid ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={onToggleGrid}
+                        title={t('tables.visualEditor.gridToggle', 'Toggle Grid (G)')}
+                        className="gap-2"
+                    >
+                        <Grid3X3 className="w-4 h-4" />
+                    </Button>
+                </div>
+
+                {/* Center: Zoom Controls */}
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onZoom('out')}
+                        title={t('common.zoomOut', 'Zoom Out')}
+                    >
+                        <ZoomOut className="w-4 h-4" />
+                    </Button>
+                    <div className="px-3 py-1 bg-muted rounded text-sm font-medium text-center w-16">
+                        {(zoom * 100).toFixed(0)}%
+                    </div>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onZoom('in')}
+                        title={t('common.zoomIn', 'Zoom In')}
+                    >
+                        <ZoomIn className="w-4 h-4" />
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={onResetZoom}
+                        title={t('common.reset', 'Reset Zoom')}
+                    >
+                        <RotateCcw className="w-4 h-4" />
+                    </Button>
+                </div>
+
+                {/* Right: Action Buttons */}
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={onUndo}
+                        disabled={!canUndo}
+                        title={t('common.undo', 'Undo (Ctrl+Z)')}
+                    >
+                        <Undo2 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={onRedo}
+                        disabled={!canRedo}
+                        title={t('common.redo', 'Redo (Ctrl+Shift+Z)')}
+                    >
+                        <Redo2 className="w-4 h-4" />
+                    </Button>
+
+                    <Separator orientation="vertical" className="mx-1 h-6" />
+
+                    <Button
+                        variant={hasUnsavedChanges ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={onSave}
+                        disabled={isSaving}
+                        title={t('tables.visualEditor.save', 'Save (Ctrl+S)')}
+                        className="gap-2"
+                    >
+                        <Save className="w-4 h-4" />
+                        {isSaving ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
+                        {hasUnsavedChanges && !isSaving && <span className="text-xs ml-1">*</span>}
+                    </Button>
+                </div>
+            </div>
+        </div>
+    );
+}
