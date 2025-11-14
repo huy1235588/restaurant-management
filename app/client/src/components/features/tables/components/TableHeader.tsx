@@ -9,8 +9,8 @@ interface TableHeaderProps {
     tables?: Table[];
     onCreateTable: () => void;
     onRefresh: () => void;
-    viewMode: 'list' | 'floor' | 'visual';
-    onViewModeChange: (mode: 'list' | 'floor' | 'visual') => void;
+    viewMode: 'list' | 'visual';
+    onViewModeChange: (mode: 'list' | 'visual') => void;
 }
 
 export function TableHeader({ tables = [], onCreateTable, onRefresh, viewMode, onViewModeChange }: TableHeaderProps) {
@@ -45,16 +45,6 @@ export function TableHeader({ tables = [], onCreateTable, onRefresh, viewMode, o
                     >
                         <LayoutList className="w-4 h-4 md:mr-2" />
                         <span className="hidden md:inline">{t('tables.listView', 'List')}</span>
-                    </Button>
-                    <Button
-                        variant={viewMode === 'floor' ? 'default' : 'ghost'}
-                        size="sm"
-                        onClick={() => onViewModeChange('floor')}
-                        className="rounded-none"
-                        title={t('tables.floorViewTitle', 'Floor Plan View')}
-                    >
-                        <LayoutGrid className="w-4 h-4 md:mr-2" />
-                        <span className="hidden md:inline">{t('tables.floorView', 'Floor Plan')}</span>
                     </Button>
                     <Button
                         variant={viewMode === 'visual' ? 'default' : 'ghost'}

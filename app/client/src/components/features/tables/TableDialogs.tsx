@@ -1,9 +1,9 @@
 import { Table } from '@/types';
-import { CreateTableDialog } from './dialogs/CreateTableDialog';
-import { EditTableDialog } from './dialogs/EditTableDialog';
-import { StatusChangeDialog } from './dialogs/StatusChangeDialog';
-import { DeleteTableDialog } from './dialogs/DeleteTableDialog';
-import { QRCodeDialog } from './dialogs/QRCodeDialog';
+import { CreateTableDialog } from './dialogs/single/CreateTableDialog';
+import { EditTableDialog } from './dialogs/single/EditTableDialog';
+import { StatusChangeDialog } from './dialogs/single/StatusChangeDialog';
+import { DeleteTableDialog } from './dialogs/single/DeleteTableDialog';
+import { QRCodeDialog } from './dialogs/single/QRCodeDialog';
 
 interface TableDialogsProps {
     showCreateDialog: boolean;

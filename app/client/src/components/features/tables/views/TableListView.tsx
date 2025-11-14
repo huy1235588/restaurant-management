@@ -6,7 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Checkbox } from '@/components/ui/checkbox';
-import { TableStatusBadge } from './TableStatusBadge';
+import { TableStatusBadge } from '../components/TableStatusBadge';
 import { MoreHorizontal, Edit, Trash2, QrCode, ArrowUpDown, CircleDot, ArrowRightLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

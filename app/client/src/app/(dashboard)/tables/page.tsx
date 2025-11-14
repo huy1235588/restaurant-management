@@ -8,25 +8,21 @@ import { tableApi } from '@/services/table.service';
 import { Table, TableStatus } from '@/types';
 import { useTableStore } from '@/stores/tableStore';
 import { Button } from '@/components/ui/button';
-import { TableHeader } from '@/components/features/tables/TableHeader';
-import { TableStats } from '@/components/features/tables/TableStats';
-import { TableFilters } from '@/components/features/tables/TableFilters';
-import { TableListView } from '@/components/features/tables/TableListView';
-import { FloorPlanView } from '@/components/features/tables/FloorPlanView';
-import { VisualFloorPlanView } from '@/components/features/tables/VisualFloorPlanView';
-import { TablePagination } from '@/components/features/tables/TablePagination';
+import { TableHeader, TableStats, TableFilters, TablePagination, QuickViewPanel } from '@/components/features/tables/components';
+import { TableListView } from '@/components/features/tables/views';
 import { TableDialogs } from '@/components/features/tables/TableDialogs';
-import { BulkStatusChangeDialog } from '@/components/features/tables/dialogs/BulkStatusChangeDialog';
-import { BulkDeleteDialog } from '@/components/features/tables/dialogs/BulkDeleteDialog';
-import { BulkExportDialog } from '@/components/features/tables/dialogs/BulkExportDialog';
-import { BulkActivateDeactivateDialog } from '@/components/features/tables/dialogs/BulkActivateDeactivateDialog';
-import { BulkQRCodeGenerator } from '@/components/features/tables/dialogs/BulkQRCodeGenerator';
-import { TableHistoryDialog } from '@/components/features/tables/dialogs/TableHistoryDialog';
-import { KeyboardShortcutsDialog } from '@/components/features/tables/dialogs/KeyboardShortcutsDialog';
-import { QuickViewPanel } from '@/components/features/tables/QuickViewPanel';
+import {
+    BulkStatusChangeDialog,
+    BulkDeleteDialog,
+    BulkExportDialog,
+    BulkActivateDeactivateDialog,
+    BulkQRCodeGenerator,
+    TableHistoryDialog,
+    KeyboardShortcutsDialog,
+} from '@/components/features/tables/dialogs';
 import { useTableSocket } from '@/hooks/useTableSocket';
 
-type ViewMode = 'list' | 'floor' | 'visual';
+type ViewMode = 'list' | 'visual';
 type SortField = 'tableNumber' | 'capacity' | 'floor' | 'status';
 type SortOrder = 'asc' | 'desc';
 
@@ -456,29 +452,19 @@ export default function TablesPage() {
                         onItemsPerPageChange={handleItemsPerPageChange}
                     />
                 </div>
-            ) : viewMode === 'floor' ? (
-                <div className="animate-in fade-in duration-500">
-                <FloorPlanView
-                    tables={tables}
-                    loading={loading}
-                    floorFilter={filters.floorFilter}
-                    onEdit={handleEditTable}
-                    onChangeStatus={handleChangeStatus}
-                    onViewQR={handleViewQR}
-                    onAssignOrder={handleAssignOrder}
-                />
-                </div>
             ) : (
-                <div className="animate-in fade-in duration-500">
-                <VisualFloorPlanView
-                    tables={tables}
-                    loading={loading}
-                    floorFilter={filters.floorFilter}
-                    onEdit={handleEditTable}
-                    onChangeStatus={handleChangeStatus}
-                    onViewQR={handleViewQR}
-                    onAssignOrder={handleAssignOrder}
-                />
+                <div className="animate-in fade-in duration-500 flex items-center justify-center min-h-[400px]">
+                    <div className="text-center space-y-4">
+                        <h3 className="text-lg font-semibold text-muted-foreground">
+                            {t('tables.visualFloorPlan.comingSoon', 'Visual Floor Plan - Coming Soon')}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                            {t('tables.visualFloorPlan.description', 'Advanced visual floor plan editor will be implemented here')}
+                        </p>
+                        <Button onClick={() => setViewMode('list')} variant="outline">
+                            {t('tables.switchToList', 'Switch to List View')}
+                        </Button>
+                    </div>
                 </div>
             )}
 
