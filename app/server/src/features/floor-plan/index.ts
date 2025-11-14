@@ -12,9 +12,7 @@ export * from './validators';
 // Repository
 export {
     FloorPlanLayoutRepository,
-    FloorPlanBackgroundRepository,
     floorPlanLayoutRepository,
-    floorPlanBackgroundRepository,
 } from './floor-plan.repository';
 
 // Service

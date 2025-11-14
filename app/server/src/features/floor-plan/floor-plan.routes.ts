@@ -1,16 +1,13 @@
 import { Router } from 'express';
 import { floorPlanController } from '@/features/floor-plan/floor-plan.controller';
-import { authenticate } from '@/shared/middlewares/auth';
+import { authenticate, authorize } from '@/shared/middlewares/auth';
 import { validate } from '@/shared/middlewares/validation';
+import { Role } from '@prisma/client';
 import {
     createFloorPlanLayoutSchema,
     updateFloorPlanLayoutSchema,
-    createFloorPlanBackgroundSchema,
-    updateFloorPlanBackgroundSchema,
     getFloorPlanLayoutsByFloorSchema,
-    getFloorPlanBackgroundSchema,
     floorPlanLayoutIdSchema,
-    floorPlanBackgroundIdSchema,
 } from '@/features/floor-plan/validators';
 
 const router: Router = Router();
@@ -111,7 +108,7 @@ router.use(authenticate);
  */
 router.get(
     '/layouts/:floor',
-    validate(getFloorPlanLayoutsByFloorSchema),
+    validate(getFloorPlanLayoutsByFloorSchema, 'params'),
     floorPlanController.getLayoutsByFloor.bind(floorPlanController)
 );
 
@@ -177,7 +174,7 @@ router.get(
  */
 router.get(
     '/layouts/:layoutId/detail',
-    validate(floorPlanLayoutIdSchema),
+    validate(floorPlanLayoutIdSchema, 'params'),
     floorPlanController.getLayoutById.bind(floorPlanController)
 );
 
@@ -298,6 +295,7 @@ router.get(
  */
 router.post(
     '/layouts',
+    authorize(Role.admin, Role.manager),
     validate(createFloorPlanLayoutSchema),
     floorPlanController.createLayout.bind(floorPlanController)
 );
@@ -377,6 +375,7 @@ router.post(
  */
 router.put(
     '/layouts/:layoutId',
+    authorize(Role.admin, Role.manager),
     validate(floorPlanLayoutIdSchema),
     validate(updateFloorPlanLayoutSchema),
     floorPlanController.updateLayout.bind(floorPlanController)
@@ -422,361 +421,9 @@ router.put(
  */
 router.delete(
     '/layouts/:layoutId',
-    validate(floorPlanLayoutIdSchema),
+    authorize(Role.admin, Role.manager),
+    validate(floorPlanLayoutIdSchema, 'params'),
     floorPlanController.deleteLayout.bind(floorPlanController)
-);
-
-/**
- * @swagger
- * /floor-plans/backgrounds/{floor}:
- *   get:
- *     summary: Get background for a specific floor
- *     description: Retrieve the background image configuration for a given floor
- *     tags: [Floor Plans - Backgrounds]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: floor
- *         required: true
- *         schema:
- *           type: integer
- *           example: 1
- *         description: Floor number
- *     responses:
- *       200:
- *         description: Floor plan background retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 message:
- *                   type: string
- *                 data:
- *                   type: object
- *                   nullable: true
- *                   properties:
- *                     backgroundId:
- *                       type: integer
- *                     restaurant:
- *                       type: integer
- *                     floor:
- *                       type: integer
- *                     fileUrl:
- *                       type: string
- *                       format: uri
- *                     fileName:
- *                       type: string
- *                     fileSize:
- *                       type: integer
- *                     mimeType:
- *                       type: string
- *                     opacity:
- *                       type: number
- *                       minimum: 0
- *                       maximum: 1
- *                     positionX:
- *                       type: number
- *                     positionY:
- *                       type: number
- *                     scaleX:
- *                       type: number
- *                     scaleY:
- *                       type: number
- *                     createdAt:
- *                       type: string
- *                       format: date-time
- *                     updatedAt:
- *                       type: string
- *                       format: date-time
- *       400:
- *         description: Bad request - Invalid floor number
- *       401:
- *         description: Unauthorized
- *       500:
- *         description: Internal server error
- */
-router.get(
-    '/backgrounds/:floor',
-    validate(getFloorPlanBackgroundSchema),
-    floorPlanController.getBackground.bind(floorPlanController)
-);
-
-/**
- * @swagger
- * /floor-plans/backgrounds/{backgroundId}/detail:
- *   get:
- *     summary: Get background by ID
- *     description: Retrieve a specific floor plan background by its ID
- *     tags: [Floor Plans - Backgrounds]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: backgroundId
- *         required: true
- *         schema:
- *           type: integer
- *           example: 1
- *         description: Background ID
- *     responses:
- *       200:
- *         description: Floor plan background retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 message:
- *                   type: string
- *                 data:
- *                   type: object
- *       400:
- *         description: Bad request - Invalid background ID
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: Background not found
- *       500:
- *         description: Internal server error
- */
-router.get(
-    '/backgrounds/:backgroundId/detail',
-    validate(floorPlanBackgroundIdSchema),
-    floorPlanController.getBackgroundById.bind(floorPlanController)
-);
-
-/**
- * @swagger
- * /floor-plans/backgrounds:
- *   post:
- *     summary: Upload background image for a floor
- *     description: Upload or replace the background image for a specific floor
- *     tags: [Floor Plans - Backgrounds]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - floor
- *               - fileUrl
- *               - fileName
- *               - fileSize
- *               - mimeType
- *             properties:
- *               floor:
- *                 type: integer
- *                 minimum: 1
- *                 example: 1
- *                 description: Floor number
- *               fileUrl:
- *                 type: string
- *                 format: uri
- *                 example: https://cdn.example.com/backgrounds/floor1.png
- *                 description: URL of the background image
- *               fileName:
- *                 type: string
- *                 maxLength: 255
- *                 example: floor1_layout.png
- *                 description: Original file name
- *               fileSize:
- *                 type: integer
- *                 maximum: 52428800
- *                 example: 1024000
- *                 description: File size in bytes (max 50MB)
- *               mimeType:
- *                 type: string
- *                 enum: [image/jpeg, image/png, image/gif, image/webp]
- *                 example: image/png
- *                 description: File MIME type
- *           example:
- *             floor: 1
- *             fileUrl: https://cdn.example.com/backgrounds/floor1.png
- *             fileName: floor1.png
- *             fileSize: 1024000
- *             mimeType: image/png
- *     responses:
- *       201:
- *         description: Background image uploaded successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 message:
- *                   type: string
- *                 data:
- *                   type: object
- *       400:
- *         description: Bad request - Invalid input or file too large
- *       401:
- *         description: Unauthorized
- *       422:
- *         description: Unprocessable entity - Validation error
- *       500:
- *         description: Internal server error
- */
-router.post(
-    '/backgrounds',
-    validate(createFloorPlanBackgroundSchema),
-    floorPlanController.uploadBackground.bind(floorPlanController)
-);
-
-/**
- * @swagger
- * /floor-plans/backgrounds/{backgroundId}:
- *   put:
- *     summary: Update background properties
- *     description: Update positioning and visual properties of a background image
- *     tags: [Floor Plans - Backgrounds]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: backgroundId
- *         required: true
- *         schema:
- *           type: integer
- *           example: 1
- *         description: Background ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               fileUrl:
- *                 type: string
- *                 format: uri
- *                 description: URL of the background image
- *               fileName:
- *                 type: string
- *                 maxLength: 255
- *                 description: Original file name
- *               fileSize:
- *                 type: integer
- *                 maximum: 52428800
- *                 description: File size in bytes
- *               mimeType:
- *                 type: string
- *                 enum: [image/jpeg, image/png, image/gif, image/webp]
- *                 description: File MIME type
- *               opacity:
- *                 type: number
- *                 minimum: 0
- *                 maximum: 1
- *                 example: 0.8
- *                 description: Opacity level (0-1)
- *               positionX:
- *                 type: number
- *                 example: 0
- *                 description: Horizontal position
- *               positionY:
- *                 type: number
- *                 example: 0
- *                 description: Vertical position
- *               scaleX:
- *                 type: number
- *                 minimum: 0.1
- *                 example: 1
- *                 description: Horizontal scale
- *               scaleY:
- *                 type: number
- *                 minimum: 0.1
- *                 example: 1
- *                 description: Vertical scale
- *           example:
- *             opacity: 0.9
- *             positionX: 10
- *             positionY: 10
- *             scaleX: 1.2
- *             scaleY: 1.2
- *     responses:
- *       200:
- *         description: Background properties updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 message:
- *                   type: string
- *                 data:
- *                   type: object
- *       400:
- *         description: Bad request - Invalid input
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: Background not found
- *       422:
- *         description: Unprocessable entity - Validation error
- *       500:
- *         description: Internal server error
- */
-router.put(
-    '/backgrounds/:backgroundId',
-    validate(floorPlanBackgroundIdSchema),
-    validate(updateFloorPlanBackgroundSchema),
-    floorPlanController.updateBackground.bind(floorPlanController)
-);
-
-/**
- * @swagger
- * /floor-plans/backgrounds/{backgroundId}:
- *   delete:
- *     summary: Delete background image
- *     description: Delete a floor plan background image
- *     tags: [Floor Plans - Backgrounds]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: backgroundId
- *         required: true
- *         schema:
- *           type: integer
- *           example: 1
- *         description: Background ID
- *     responses:
- *       200:
- *         description: Background image deleted successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 message:
- *                   type: string
- *       400:
- *         description: Bad request - Invalid background ID
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: Background not found
- *       500:
- *         description: Internal server error
- */
-router.delete(
-    '/backgrounds/:backgroundId',
-    validate(floorPlanBackgroundIdSchema),
-    floorPlanController.deleteBackground.bind(floorPlanController)
 );
 
 /**
@@ -885,6 +532,7 @@ router.delete(
  */
 router.patch(
     '/positions',
+    authorize(Role.admin, Role.manager, Role.waiter),
     floorPlanController.updateTablePositions.bind(floorPlanController)
 );
 
