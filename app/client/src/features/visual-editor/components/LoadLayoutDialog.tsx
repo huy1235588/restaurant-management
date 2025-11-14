@@ -101,7 +101,7 @@ export function LoadLayoutDialog({ open, onOpenChange }: LoadLayoutDialogProps) 
                 
                 <ScrollArea className="h-96 pr-4">
                     {savedLayouts.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                        <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400">
                             <p>No saved layouts found</p>
                             <p className="text-sm">Save your current layout to get started</p>
                         </div>
@@ -114,7 +114,7 @@ export function LoadLayoutDialog({ open, onOpenChange }: LoadLayoutDialogProps) 
                                 return (
                                     <Card
                                         key={layout.layoutId}
-                                        className={`cursor-pointer transition-colors hover:bg-gray-50 ${
+                                        className={`cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 ${
                                             selectedLayout === layout.layoutId
                                                 ? 'ring-2 ring-primary'
                                                 : ''
@@ -137,12 +137,12 @@ export function LoadLayoutDialog({ open, onOpenChange }: LoadLayoutDialogProps) 
                                                     </div>
                                                     
                                                     {layout.description && (
-                                                        <p className="text-sm text-gray-600 mt-1">
+                                                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                                                             {layout.description}
                                                         </p>
                                                     )}
                                                     
-                                                    <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                                                    <div className="flex items-center gap-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
                                                         <span>{tableCount} tables</span>
                                                         <span>•</span>
                                                         <span>{formatDate(layout.updatedAt)}</span>

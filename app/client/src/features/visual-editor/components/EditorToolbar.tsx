@@ -81,7 +81,7 @@ export function EditorToolbar({
     
     return (
         <TooltipProvider>
-            <div className="flex items-center gap-2 p-2 bg-white border-b">
+            <div className="flex items-center gap-2 p-2 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
                 {/* Floor Selector */}
                 <FloorSelector />
                 
@@ -265,7 +265,7 @@ export function EditorToolbar({
                             <Save className="h-4 w-4" />
                             Save Positions
                             {hasUnsavedChanges && (
-                                <span className="ml-1 text-yellow-500">*</span>
+                                <span className="ml-1 text-yellow-500 dark:text-yellow-400">*</span>
                             )}
                         </Button>
                     </TooltipTrigger>

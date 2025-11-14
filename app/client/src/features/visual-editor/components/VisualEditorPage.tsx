@@ -196,7 +196,7 @@ export function VisualEditorPage() {
     }, [handleSave, handleUndo, handleRedo]);
     
     return (
-        <div className="flex flex-col h-[calc(100vh-12rem)] border rounded-lg bg-white">
+        <div className="flex flex-col h-[calc(100vh-12rem)] border rounded-lg bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800">
             <EditorToolbar
                 onSave={handleSave}
                 onUndo={handleUndo}

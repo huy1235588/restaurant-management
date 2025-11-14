@@ -16,13 +16,13 @@ export function PropertiesPanel() {
     
     if (selectedTableIds.length === 0) {
         return (
-            <div className="w-80 border-l bg-white p-4">
+            <div className="w-80 border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-4">
                 <Card>
                     <CardHeader>
                         <CardTitle>Properties</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
                             Select a table to view and edit its properties.
                         </p>
                     </CardContent>
@@ -33,13 +33,13 @@ export function PropertiesPanel() {
     
     if (selectedTableIds.length > 1) {
         return (
-            <div className="w-80 border-l bg-white p-4">
+            <div className="w-80 border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-4">
                 <Card>
                     <CardHeader>
                         <CardTitle>Multiple Selection</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
                             {selectedTableIds.length} tables selected
                         </p>
                     </CardContent>
@@ -55,7 +55,7 @@ export function PropertiesPanel() {
     if (!selectedTable) return null;
     
     return (
-        <div className="w-80 border-l bg-white p-4 overflow-y-auto">
+        <div className="w-80 border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-4 overflow-y-auto">
             <Card>
                 <CardHeader>
                     <CardTitle>Table Properties</CardTitle>

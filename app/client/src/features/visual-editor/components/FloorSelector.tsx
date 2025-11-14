@@ -36,7 +36,7 @@ export function FloorSelector({ maxFloors = 5 }: FloorSelectorProps) {
     
     return (
         <div className="flex items-center gap-2">
-            <Building2 className="h-4 w-4 text-gray-600" />
+            <Building2 className="h-4 w-4 text-gray-600 dark:text-gray-400" />
             <Select value={currentFloor.toString()} onValueChange={handleFloorChange}>
                 <SelectTrigger className="w-32">
                     <SelectValue placeholder="Select floor" />
@@ -50,7 +50,7 @@ export function FloorSelector({ maxFloors = 5 }: FloorSelectorProps) {
                 </SelectContent>
             </Select>
             {unsavedChanges && (
-                <span className="text-xs text-yellow-600">Unsaved changes</span>
+                <span className="text-xs text-yellow-600 dark:text-yellow-400">Unsaved changes</span>
             )}
         </div>
     );

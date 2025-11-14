@@ -26,8 +26,9 @@ export function EditorCanvas({ width, height, children }: EditorCanvasProps) {
         
         if (!grid.enabled) return;
         
-        // Set up grid style
-        ctx.strokeStyle = '#e0e0e0';
+        // Set up grid style - check for dark mode
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        ctx.strokeStyle = isDarkMode ? '#4b5563' : '#e0e0e0'; // gray-600 for dark mode
         ctx.lineWidth = 1;
         
         const gridSize = grid.size * zoom;
@@ -55,8 +56,22 @@ export function EditorCanvas({ width, height, children }: EditorCanvasProps) {
         drawGrid();
     }, [drawGrid]);
     
+    // Redraw grid on theme changes
+    useEffect(() => {
+        const observer = new MutationObserver(() => {
+            drawGrid();
+        });
+        
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class'],
+        });
+        
+        return () => observer.disconnect();
+    }, [drawGrid]);
+    
     return (
-        <div className="relative w-full h-full overflow-hidden bg-gray-50">
+        <div className="relative w-full h-full overflow-hidden bg-gray-50 dark:bg-gray-900">
             {/* Canvas layer for grid */}
             <canvas
                 ref={canvasRef}
