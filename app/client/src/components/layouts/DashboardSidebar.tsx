@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslation } from 'react-i18next';
-import { LucideIcon, ChevronDown, Sparkles } from 'lucide-react';
+import { LucideIcon, ChevronDown, Sparkles, X } from 'lucide-react';
 import {
     Sidebar,
     SidebarContent,
@@ -16,6 +16,7 @@ import {
     SidebarMenuSub,
     SidebarMenuSubItem,
     SidebarMenuSubButton,
+    SidebarTrigger
 } from '@/components/ui/sidebar';
 import {
     Collapsible,
@@ -210,33 +211,24 @@ export function DashboardSidebar({ navItems = [], navGroups, appName }: Dashboar
     };
 
     return (
-        <Sidebar collapsible="icon" className="border-r">
-            {/* Header with Logo */}
-            <SidebarHeader className="h-16 justify-center border-b border-sidebar-border bg-linear-to-b from-sidebar to-sidebar/95">
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton
-                            size="lg"
-                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-sidebar-accent/50 transition-all duration-200"
-                        >
-                            <div className="data-[state=close]:p-8  flex aspect-square size-8 items-center justify-center rounded-lg bg-linear-to-br from-primary to-primary/80 text-primary-foreground shadow-md">
-                                <Image
-                                    src="/images/logo/logo.png"
-                                    height={64}
-                                    width={64}
-                                    alt='logo'
-                                    className="size-8 rounded-lg object-contain"
-                                />
-                            </div>
-                            <div className="flex flex-col gap-0.5 leading-none">
-                                <span className="font-bold text-sm">
-                                    {appName || t('common.appName') || 'Restaurant'}
-                                </span>
-                                <span className="text-xs text-muted-foreground font-medium">Management System</span>
-                            </div>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
+        <Sidebar collapsible="offcanvas" className="border-r">
+            {/* Header with Logo - Pixel-perfect alignment with TopBar logo */}
+            <SidebarHeader className="h-16 flex flex-row items-center justify-between border-b border-sidebar-border bg-linear-to-b from-sidebar to-sidebar/95 px-4">
+                <SidebarTrigger className="-ml-1 hover:bg-accent transition-colors duration-200" />
+
+                {/* Logo positioned to align with TopBar: toggle(28px) + gap(12px) + margin(4px) = 44px from left */}
+                <div className="flex items-center gap-2">
+                    <Image
+                        src="/images/logo/logo.png"
+                        alt="Restaurant Logo"
+                        width={32}
+                        height={32}
+                        className="h-8 w-8"
+                    />
+                    <span className="font-bold text-lg">
+                        {appName || t('common.appName') || 'Restaurant'}
+                    </span>
+                </div>
             </SidebarHeader>
 
             {/* Content */}

@@ -6,6 +6,7 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Globe, Bell } from 'lucide-react';
+import Image from 'next/image';
 
 interface User {
     username: string;
@@ -33,10 +34,26 @@ export function TopBar({ user, onLogout }: TopBarProps) {
 
     return (
         <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 px-4 transition-all duration-200">
-            <div className="flex items-center gap-2">
-                {/* Sidebar trigger - automatically hidden on desktop when sidebar is visible */}
+            <div className="flex items-center gap-3">
+                {/* Sidebar toggle button - positioned at far left */}
                 <SidebarTrigger className="-ml-1 hover:bg-accent transition-colors duration-200" />
-                <Separator orientation="vertical" className="mr-2 h-4" />
+                
+                {/* Application logo - adjacent to toggle button, pixel position: left-11 (44px) */}
+                <div className="flex items-center gap-2" style={{ marginLeft: '4px' }}>
+                    <Image
+                        src="/images/logo/logo.png"
+                        alt="Restaurant Logo"
+                        width={32}
+                        height={32}
+                        className="h-8 w-8"
+                        priority
+                    />
+                    <span className="font-bold text-lg hidden sm:inline-block">
+                        {t('common.appName') || 'Restaurant'}
+                    </span>
+                </div>
+                
+                <Separator orientation="vertical" className="ml-2 h-4" />
             </div>
 
             {/* Right side actions */}
