@@ -393,6 +393,20 @@ export function VisualFloorPlanView({
     // Keyboard shortcuts
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
+            // Tool selection shortcuts
+            if (e.key === 'v' && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                handleToolChange('select');
+            }
+            if (e.key === 'h' && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                handleToolChange('pan');
+            }
+            if (e.key === 't' && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                handleToolChange('add');
+            }
+            // Action shortcuts
             if (e.ctrlKey && e.key === 's') {
                 e.preventDefault();
                 handleSave();
@@ -409,7 +423,7 @@ export function VisualFloorPlanView({
                 e.preventDefault();
                 handleToolChange('delete');
             }
-            if (e.key === 'g') {
+            if (e.key === 'g' && !e.ctrlKey && !e.metaKey) {
                 e.preventDefault();
                 handleToggleGrid();
             }

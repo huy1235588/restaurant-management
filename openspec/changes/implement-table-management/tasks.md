@@ -153,13 +153,13 @@
   - [x] Create hybrid rendering (Canvas + DOM elements)
   - **Validation**: Canvas renders without errors, supports zoom/pan
 
-- [ ] **Task 10.3**: Create editor toolbar
-  - [ ] Build toolbar component with tool palette
-  - [ ] Add tools: Select, Pan, Add Table, Delete, Zoom, Grid, Save
-  - [ ] Implement tool activation/deactivation logic
-  - [ ] Add keyboard shortcuts (V, H, T, Delete, G, Ctrl+S)
-  - [ ] Add tooltips for all tools
-  - **Validation**: All tools functional with keyboard shortcuts
+- [x] **Task 10.3**: Create editor toolbar
+  - [x] Build toolbar component with tool palette
+  - [x] Add tools: Select, Pan, Add Table, Delete, Zoom, Grid, Save
+  - [x] Implement tool activation/deactivation logic
+  - [x] Add keyboard shortcuts (V, H, T, Delete, G, Ctrl+S)
+  - [x] Add tooltips for all tools
+  - **Validation**: All tools functional with keyboard shortcuts ✅
 
 ### Drag, Resize, and Rotate
 - [x] **Task 10.4**: Implement advanced drag-and-drop
@@ -169,8 +169,8 @@
   - [x] Add alignment guides (horizontal magenta, vertical cyan)
   - [x] Snap to alignment within 5px threshold
   - [x] Save positions to local state on drag end
-  - [ ] Support multi-select drag (Shift + click) - deferred
-  - **Validation**: Drag is smooth using dnd-kit, grid snapping works, alignment guides appear and snap correctly
+  - [ ] Support multi-select drag (Shift + click) - **DEFERRED** (Future enhancement)
+  - **Validation**: Drag is smooth using dnd-kit, grid snapping works, alignment guides appear and snap correctly ✅
 
 - [x] **Task 10.5**: Implement table resizing
   - [x] Add resize handles (corners and edges) to selected tables
@@ -375,17 +375,17 @@
   - **Validation**: Animations run at 60fps
 
 ### Documentation
-- [ ] **Task 11.4**: Update user documentation
-  - [ ] Write table management user guide
-  - [ ] Document multi-floor management workflow
-  - [ ] Update FAQ section
-  - **Validation**: Documentation covers all features
+- [x] **Task 11.4**: Update user documentation
+  - [x] Write table management user guide
+  - [x] Document multi-floor management workflow
+  - [x] Update FAQ section
+  - **Validation**: Documentation covers all features ✅
 
-- [ ] **Task 11.5**: Update developer documentation
-  - [ ] Document component API and props
-  - [ ] Document WebSocket event schema (for status updates only)
-  - [ ] Update API documentation
-  - **Validation**: New developers can understand codebase
+- [x] **Task 11.5**: Update developer documentation
+  - [x] Document component API and props
+  - [x] Document WebSocket event schema (for status updates only)
+  - [x] Update API documentation
+  - **Validation**: New developers can understand codebase ✅
 
 ## Validation Checklist
 
@@ -410,11 +410,13 @@
 - [x] Works in Chrome, Firefox, Safari, Edge (latest versions)
 
 ### Business Requirements
-- [ ] Supports 50-200 tables per restaurant
-- [ ] Handles 100+ concurrent users
-- [ ] Zero data loss during status transitions
-- [ ] 95%+ WebSocket uptime
-- [ ] Staff can complete operations in < 30 seconds
+> **Note**: These requirements are performance/scalability targets that require load testing, production monitoring, and real-world usage validation. They cannot be marked complete during development.
+
+- [ ] Supports 50-200 tables per restaurant (requires load testing)
+- [ ] Handles 100+ concurrent users (requires load testing)
+- [ ] Zero data loss during status transitions (requires production monitoring)
+- [ ] 95%+ WebSocket uptime (requires production monitoring)
+- [ ] Staff can complete operations in < 30 seconds (requires user testing)
 
 ## Dependencies Between Tasks
 
