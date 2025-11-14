@@ -10,7 +10,7 @@ import { Table, TableStatus } from '@/types';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { Loader2, AlertTriangle } from 'lucide-react';
-import { TableStatusBadge } from '@/components/features/tables/components/TableStatusBadge';
+import { TableStatusBadge } from '@/features/tables/components/TableStatusBadge';
 
 interface StatusChangeDialogProps {
     open: boolean;
