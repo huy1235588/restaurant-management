@@ -15,6 +15,7 @@ import {
     Redo2,
     FolderOpen,
     Layout,
+    Wand2,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Separator } from '@/components/ui/separator';
@@ -38,6 +39,7 @@ interface EditorToolbarProps {
     isSaving?: boolean;
     onSaveLayout?: () => void;
     onLoadLayout?: () => void;
+    onUseTemplate?: () => void;
 }
 
 export function EditorToolbar({
@@ -57,6 +59,7 @@ export function EditorToolbar({
     isSaving = false,
     onSaveLayout,
     onLoadLayout,
+    onUseTemplate,
 }: EditorToolbarProps) {
     const { t } = useTranslation();
 
@@ -192,6 +195,19 @@ export function EditorToolbar({
                         >
                             <FolderOpen className="w-4 h-4" />
                             {t('tables.loadLayout', 'Load Layout')}
+                        </Button>
+                    )}
+
+                    {onUseTemplate && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={onUseTemplate}
+                            title={t('tables.useTemplate', 'Use Template')}
+                            className="gap-2"
+                        >
+                            <Wand2 className="w-4 h-4" />
+                            {t('tables.useTemplate', 'Use Template')}
                         </Button>
                     )}
 

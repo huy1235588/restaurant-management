@@ -203,6 +203,29 @@ Mô tả chi tiết các luồng tương tác và state machine cho table manage
 
 ---
 
+## 🧩 Layout Templates & Presets
+
+Visual Floor Plan hiện có thư viện template giúp dựng sơ đồ tầng nhanh chóng. Nút **Use Template** nằm trên thanh công cụ của tab Visual Floor Plan và hiển thị 4 preset kèm mô tả.
+
+| Template | Mô tả | Đề xuất sử dụng |
+|----------|-------|-----------------|
+| Fine Dining | Lưới đối xứng, bàn vuông, spacing rộng | Nhà hàng cao cấp, tasting menu |
+| Casual Dining | Bố cục so le, mix bàn tròn/oval/rectangle | Bistro, cafe, brunch |
+| Bar / Lounge | Bàn cao sát tường + pod trung tâm | Quầy bar, lounge, cocktail bar |
+| Banquet | Bàn dài song song | Tiệc cưới, hội nghị, sự kiện |
+
+### Luồng tương tác
+1. Mở Visual Floor Plan → chọn **Use Template**.
+2. Chọn preset và nhấn *Apply Template*.
+3. Canvas cập nhật ngay lập tức (không auto-save) và badge *Unsaved changes* bật lên.
+4. Người dùng tùy chỉnh (drag, resize, rotate) trước khi nhấn **Save Layout**.
+
+### Hành vi & ràng buộc
+- Template áp dụng theo từng tầng; tầng khác giữ nguyên.
+- Nếu tầng chưa có bàn, hệ thống nhắc tạo bàn trước.
+- Undo/Redo track mọi thao tác sau khi áp template.
+- Lưu layout ghi thêm width/height/rotation/shape để khi load lại giữ nguyên tỉ lệ.
+
 ## Nguyên Tắc Thiết Kế (Design Principles)
 
 ### 1. **Clarity First (Rõ Ràng Trước Tiên)**

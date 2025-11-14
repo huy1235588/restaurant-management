@@ -232,12 +232,12 @@
   - [x] Show confirmation dialog if unsaved changes exist
   - **Validation**: Layouts save and load correctly with animations ✅
 
-- [ ] **Task 10.12**: Create layout templates
-  - [ ] Design 4 layout templates (Fine Dining, Casual, Bar/Lounge, Banquet)
-  - [ ] Implement template application algorithm
-  - [ ] Add "Use Template" button and template selector
-  - [ ] Auto-generate table positions based on template
-  - [ ] Allow customization after applying template
+- [x] **Task 10.12**: Create layout templates
+  - [x] Design 4 layout templates (Fine Dining, Casual, Bar/Lounge, Banquet)
+  - [x] Implement template application algorithm
+  - [x] Add "Use Template" button and template selector
+  - [x] Auto-generate table positions based on template
+  - [x] Allow customization after applying template
   - **Validation**: Templates apply correctly and are customizable
 
 ### Undo/Redo and Actions
