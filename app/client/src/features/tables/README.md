@@ -149,11 +149,6 @@ Planned structure for Visual Floor Plan:
 views/
 ├── TableListView.tsx
 └── VisualFloorPlanView.tsx     # Coming soon
-
-visual-floor-plan/              # Future: Visual editor components
-├── canvas/
-├── tools/
-└── panels/
 ```
 
 ## 📚 Related Documentation

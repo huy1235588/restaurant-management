@@ -10,6 +10,7 @@ import { useTableStore } from '@/stores/tableStore';
 import { Button } from '@/components/ui/button';
 import { TableHeader, TableStats, TableFilters, TablePagination, QuickViewPanel } from '@/features/tables/components';
 import { TableListView } from '@/features/tables/views';
+import { VisualFloorPlanView } from '@/features/tables/views';
 import { TableDialogs } from '@/features/tables/TableDialogs';
 import {
     BulkStatusChangeDialog,
@@ -360,112 +361,101 @@ export default function TablesPage() {
                 onViewModeChange={handleViewModeChange}
             />
 
-            <TableStats stats={stats} />
-
-            <TableFilters
-                searchTerm={filters.searchTerm}
-                statusFilter={filters.statusFilter}
-                floorFilter={filters.floorFilter}
-                sectionFilter={filters.sectionFilter}
-                activeFilter={filters.activeFilter}
-                onSearchChange={handleSearch}
-                onStatusFilterChange={handleStatusFilter}
-                onFloorFilterChange={handleFloorFilter}
-                onSectionFilterChange={handleSectionFilter}
-                onActiveFilterChange={handleActiveFilter}
-            />
-
             {viewMode === 'list' ? (
-                <div className="animate-in fade-in duration-500">
-                    {selectedTableIds.length > 0 && (
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-blue-100 border border-blue-200 rounded-lg p-4 animate-in slide-in-from-top-2 duration-300">
-                            <span className="text-sm font-medium text-blue-900">
-                                {t('tables.selectedCount', '{{count}} tables selected', { count: selectedTableIds.length })}
-                            </span>
-                            <div className="flex flex-wrap gap-2">
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => setShowBulkStatusDialog(true)}
-                                >
-                                    {t('tables.changeBulkStatus', 'Change Status')}
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => setShowBulkActivateDialog(true)}
-                                >
-                                    {t('tables.toggleActive', 'Toggle Active')}
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => setShowBulkExportDialog(true)}
-                                >
-                                    {t('tables.bulkExport', 'Export Selected')}
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => setShowBulkQRCodeDialog(true)}
-                                >
-                                    {t('tables.bulkQRCode', 'Generate QR Codes')}
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    variant="destructive"
-                                    onClick={() => setShowBulkDeleteDialog(true)}
-                                >
-                                    {t('tables.bulkDelete', 'Delete Selected')}
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => setSelectedTableIds([])}
-                                >
-                                    {t('common.clear', 'Clear')}
-                                </Button>
+                <>
+                    <TableStats stats={stats} />
+
+                    <TableFilters
+                        searchTerm={filters.searchTerm}
+                        statusFilter={filters.statusFilter}
+                        floorFilter={filters.floorFilter}
+                        sectionFilter={filters.sectionFilter}
+                        activeFilter={filters.activeFilter}
+                        onSearchChange={handleSearch}
+                        onStatusFilterChange={handleStatusFilter}
+                        onFloorFilterChange={handleFloorFilter}
+                        onSectionFilterChange={handleSectionFilter}
+                        onActiveFilterChange={handleActiveFilter}
+                    />
+                    <div className="animate-in fade-in duration-500">
+                        {selectedTableIds.length > 0 && (
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-blue-100 border border-blue-200 rounded-lg p-4 animate-in slide-in-from-top-2 duration-300">
+                                <span className="text-sm font-medium text-blue-900">
+                                    {t('tables.selectedCount', '{{count}} tables selected', { count: selectedTableIds.length })}
+                                </span>
+                                <div className="flex flex-wrap gap-2">
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => setShowBulkStatusDialog(true)}
+                                    >
+                                        {t('tables.changeBulkStatus', 'Change Status')}
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => setShowBulkActivateDialog(true)}
+                                    >
+                                        {t('tables.toggleActive', 'Toggle Active')}
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => setShowBulkExportDialog(true)}
+                                    >
+                                        {t('tables.bulkExport', 'Export Selected')}
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => setShowBulkQRCodeDialog(true)}
+                                    >
+                                        {t('tables.bulkQRCode', 'Generate QR Codes')}
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="destructive"
+                                        onClick={() => setShowBulkDeleteDialog(true)}
+                                    >
+                                        {t('tables.bulkDelete', 'Delete Selected')}
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => setSelectedTableIds([])}
+                                    >
+                                        {t('common.clear', 'Clear')}
+                                    </Button>
+                                </div>
                             </div>
-                        </div>
-                    )}
-                    <TableListView
-                        tables={tables}
-                        loading={loading}
-                        sortField={filters.sortField}
-                        sortOrder={filters.sortOrder}
-                        selectedTableIds={selectedTableIds}
-                        onSort={handleSort}
-                        onEdit={handleEditTable}
-                        onChangeStatus={handleChangeStatus}
-                        onDelete={handleDeleteTable}
-                        onViewQR={handleViewQR}
-                        onAssignOrder={handleAssignOrder}
-                        onSelectionChange={handleSelectionChange}
-                        onRowClick={setSelectedTable}
-                    />
-                    <TablePagination
-                        currentPage={filters.currentPage}
-                        totalPages={totalPages}
-                        totalItems={totalItems}
-                        itemsPerPage={filters.itemsPerPage}
-                        onPageChange={handlePageChange}
-                        onItemsPerPageChange={handleItemsPerPageChange}
-                    />
-                </div>
-            ) : (
-                <div className="animate-in fade-in duration-500 flex items-center justify-center min-h-[400px]">
-                    <div className="text-center space-y-4">
-                        <h3 className="text-lg font-semibold text-muted-foreground">
-                            {t('tables.visualFloorPlan.comingSoon', 'Visual Floor Plan - Coming Soon')}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                            {t('tables.visualFloorPlan.description', 'Advanced visual floor plan editor will be implemented here')}
-                        </p>
-                        <Button onClick={() => setViewMode('list')} variant="outline">
-                            {t('tables.switchToList', 'Switch to List View')}
-                        </Button>
+                        )}
+                        <TableListView
+                            tables={tables}
+                            loading={loading}
+                            sortField={filters.sortField}
+                            sortOrder={filters.sortOrder}
+                            selectedTableIds={selectedTableIds}
+                            onSort={handleSort}
+                            onEdit={handleEditTable}
+                            onChangeStatus={handleChangeStatus}
+                            onDelete={handleDeleteTable}
+                            onViewQR={handleViewQR}
+                            onAssignOrder={handleAssignOrder}
+                            onSelectionChange={handleSelectionChange}
+                            onRowClick={setSelectedTable}
+                        />
+                        <TablePagination
+                            currentPage={filters.currentPage}
+                            totalPages={totalPages}
+                            totalItems={totalItems}
+                            itemsPerPage={filters.itemsPerPage}
+                            onPageChange={handlePageChange}
+                            onItemsPerPageChange={handleItemsPerPageChange}
+                        />
                     </div>
-                </div>
+                </>
+            ) : (
+                <VisualFloorPlanView />
             )}
 
             <TableDialogs

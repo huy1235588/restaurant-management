@@ -3,62 +3,62 @@
 ## Phase 1: Foundation & Core Canvas (Weeks 1-2)
 
 ### Database & Backend Setup
-- [ ] Create database migration for `table_positions` table with all columns
-- [ ] Create database migration for `floor_plan_layouts` table with JSONB support
-- [ ] Add indexes on floor columns for performance
-- [ ] Create Prisma schema models for new tables
-- [ ] Generate Prisma client with new models
-- [ ] Create floor-plans feature module in backend (/src/features/floor-plans)
-- [ ] Implement position controller with GET, PUT batch operations
-- [ ] Implement layouts controller with CRUD operations
-- [ ] Add validation schemas with Zod for position and layout data
+- [x] Create database migration for `table_positions` table with all columns
+- [x] Create database migration for `floor_plan_layouts` table with JSONB support
+- [x] Add indexes on floor columns for performance
+- [x] Create Prisma schema models for new tables
+- [x] Generate Prisma client with new models
+- [x] Create floor-plans feature module in backend (/src/features/floor-plans)
+- [x] Implement position controller with GET, PUT batch operations
+- [x] Implement layouts controller with CRUD operations
+- [x] Add validation schemas with Zod for position and layout data
 - [ ] Write unit tests for controllers and validation
 
 ### API Endpoints
-- [ ] Implement GET /api/floor-plans/positions?floor={floor}
-- [ ] Implement PUT /api/floor-plans/positions/batch
-- [ ] Implement GET /api/floor-plans/layouts?floor={floor}
-- [ ] Implement POST /api/floor-plans/layouts
-- [ ] Implement GET /api/floor-plans/layouts/:layoutId
-- [ ] Implement PUT /api/floor-plans/layouts/:layoutId
-- [ ] Implement DELETE /api/floor-plans/layouts/:layoutId
-- [ ] Implement POST /api/floor-plans/layouts/:layoutId/activate
-- [ ] Add authorization middleware for floor plan operations
-- [ ] Add rate limiting for batch operations
+- [x] Implement GET /api/floor-plans/positions?floor={floor}
+- [x] Implement PUT /api/floor-plans/positions/batch
+- [x] Implement GET /api/floor-plans/layouts?floor={floor}
+- [x] Implement POST /api/floor-plans/layouts
+- [x] Implement GET /api/floor-plans/layouts/:layoutId
+- [x] Implement PUT /api/floor-plans/layouts/:layoutId
+- [x] Implement DELETE /api/floor-plans/layouts/:layoutId
+- [x] Implement POST /api/floor-plans/layouts/:layoutId/activate
+- [x] Add authorization middleware for floor plan operations
+- [x] Add rate limiting for batch operations
 - [ ] Write API integration tests
-- [ ] Document endpoints with Swagger/OpenAPI
+- [x] Document endpoints with Swagger/OpenAPI
 
 ### Frontend Foundation
-- [ ] Create visual-editor feature directory (/src/features/visual-editor)
-- [ ] Create main VisualEditorPage component
-- [ ] Create EditorCanvas component with Canvas element
-- [ ] Create EditorToolbar component layout
-- [ ] Create PropertiesPanel component skeleton
-- [ ] Set up Zustand stores: EditorStore, LayoutStore, HistoryStore
-- [ ] Install and configure @dnd-kit/core library
-- [ ] Create types/interfaces for table positions, layouts, actions
-- [ ] Create API client functions for floor plan endpoints
-- [ ] Set up routing to visual editor page
+- [x] Create visual-editor feature directory (/src/features/visual-editor)
+- [x] Create main VisualEditorPage component
+- [x] Create EditorCanvas component with Canvas element
+- [x] Create EditorToolbar component layout
+- [x] Create PropertiesPanel component skeleton
+- [x] Set up Zustand stores: EditorStore, LayoutStore, HistoryStore
+- [x] Install and configure @dnd-kit/core library
+- [x] Create types/interfaces for table positions, layouts, actions
+- [x] Create API client functions for floor plan endpoints
+- [x] Set up routing to visual editor page
 
 ### Canvas Rendering
-- [ ] Implement Canvas element initialization
-- [ ] Create grid rendering function using Canvas API
-- [ ] Implement grid toggle functionality
-- [ ] Create configurable grid size options (10px, 20px, 50px)
-- [ ] Implement responsive canvas sizing
-- [ ] Add canvas viewport state management
-- [ ] Create table component for DOM layer
-- [ ] Implement hybrid Canvas/DOM layering
+- [x] Implement Canvas element initialization
+- [x] Create grid rendering function using Canvas API
+- [x] Implement grid toggle functionality
+- [x] Create configurable grid size options (10px, 20px, 50px)
+- [x] Implement responsive canvas sizing
+- [x] Add canvas viewport state management
+- [x] Create table component for DOM layer
+- [x] Implement hybrid Canvas/DOM layering
 - [ ] Add performance monitoring for canvas rendering
 
 ### View Controls
-- [ ] Implement zoom in/out functions
-- [ ] Create zoom level state management (25%-200%)
-- [ ] Add zoom controls to toolbar (buttons and display)
+- [x] Implement zoom in/out functions
+- [x] Create zoom level state management (25%-200%)
+- [x] Add zoom controls to toolbar (buttons and display)
 - [ ] Implement Ctrl+Scroll zoom functionality
 - [ ] Add zoom center-point calculation
 - [ ] Create smooth zoom animations
-- [ ] Implement "Reset Zoom" (100%) function
+- [x] Implement "Reset Zoom" (100%) function
 - [ ] Add "0" key shortcut for zoom reset
 - [ ] Implement pan boundaries calculation
 - [ ] Create "Fit to View" function with bounding box calculation
@@ -66,60 +66,60 @@
 ## Phase 2: Editing Tools & Interactions (Weeks 3-4)
 
 ### Tool System
-- [ ] Create Tool base abstraction
-- [ ] Implement Select Tool with click selection
+- [x] Create Tool base abstraction
+- [x] Implement Select Tool with click selection
 - [ ] Implement Pan Tool with drag functionality
 - [ ] Implement Add Table Tool with ghost preview
 - [ ] Implement Delete Tool with confirmation
-- [ ] Add tool state management in EditorStore
-- [ ] Create tool toolbar UI with active states
+- [x] Add tool state management in EditorStore
+- [x] Create tool toolbar UI with active states
 - [ ] Implement tool keyboard shortcuts (V, H, T, Delete)
 - [ ] Add Esc key to cancel active tool
 - [ ] Create visual cursor changes per tool
 
 ### Select Tool Features
-- [ ] Implement single table selection with click
-- [ ] Add selection outline rendering
-- [ ] Create resize handles (8 points: corners + edges)
+- [x] Implement single table selection with click
+- [x] Add selection outline rendering
+- [x] Create resize handles (8 points: corners + edges)
 - [ ] Implement resize handle drag detection
 - [ ] Add resize constraints (min 40x40, max 200x200)
-- [ ] Implement multi-select with Shift+Click
-- [ ] Add deselection on empty area click
-- [ ] Update properties panel on selection change
-- [ ] Add visual feedback for selected state
+- [x] Implement multi-select with Shift+Click
+- [x] Add deselection on empty area click
+- [x] Update properties panel on selection change
+- [x] Add visual feedback for selected state
 
 ### Drag and Drop System
-- [ ] Integrate @dnd-kit/core with table components
-- [ ] Implement draggable table wrapper
-- [ ] Create drag start/end handlers
-- [ ] Add real-time position updates during drag (60fps)
+- [x] Integrate @dnd-kit/core with table components
+- [x] Implement draggable table wrapper
+- [x] Create drag start/end handlers
+- [x] Add real-time position updates during drag (60fps)
 - [ ] Implement drag event debouncing (16ms)
-- [ ] Create elevated shadow effect during drag
-- [ ] Add opacity change during drag
+- [x] Create elevated shadow effect during drag
+- [x] Add opacity change during drag
 - [ ] Implement smooth drop animation
 - [ ] Add Esc key to cancel drag
 - [ ] Create drag performance optimization
 
 ### Collision Detection
-- [ ] Implement AABB collision detection algorithm
-- [ ] Create collision check function for two rectangles
-- [ ] Add real-time collision detection during drag
-- [ ] Implement red outline for colliding tables
-- [ ] Add collision prevention on drop
-- [ ] Create error toast for invalid placement
+- [x] Implement AABB collision detection algorithm
+- [x] Create collision check function for two rectangles
+- [x] Add real-time collision detection during drag
+- [x] Implement red outline for colliding tables
+- [x] Add collision prevention on drop
+- [x] Create error toast for invalid placement
 - [ ] Optimize collision checks (spatial partitioning)
 - [ ] Add collision detection to resize operations
 - [ ] Test performance with 100+ tables
 
 ### Grid Snapping
-- [ ] Implement grid snap algorithm (Math.round)
-- [ ] Add snap-to-grid on drag release
+- [x] Implement grid snap algorithm (Math.round)
+- [x] Add snap-to-grid on drag release
 - [ ] Create Shift+Drag to disable snapping temporarily
 - [ ] Implement snap threshold (10px from grid point)
 - [ ] Add visual preview of snap target
 - [ ] Create smooth snap animation (100ms)
 - [ ] Add grid snapping to resize operations
-- [ ] Implement alignment guides (horizontal/vertical/center)
+- [x] Implement alignment guides (horizontal/vertical/center)
 - [ ] Add snap-to-alignment with 5px threshold
 
 ### Add Table Tool
@@ -137,39 +137,39 @@
 ## Phase 3: Floor & Layout Management (Week 5)
 
 ### Floor Management
-- [ ] Create FloorSelector dropdown component
+- [x] Create FloorSelector dropdown component
 - [ ] Implement floor list with table counts
-- [ ] Add floor switching functionality
-- [ ] Create unsaved changes detection
-- [ ] Implement unsaved changes warning dialog
+- [x] Add floor switching functionality
+- [x] Create unsaved changes detection
+- [x] Implement unsaved changes warning dialog
 - [ ] Add "Save & Switch", "Discard & Switch", "Cancel" options
-- [ ] Create floor data loading function
+- [x] Create floor data loading function
 - [ ] Implement floor data caching (5 min expiry)
 - [ ] Add number key shortcuts (1-9) for floor switching
-- [ ] Create floor-specific state isolation
+- [x] Create floor-specific state isolation
 
 ### Layout Saving
-- [ ] Implement manual save button in toolbar
-- [ ] Create unsaved changes indicator (asterisk/badge)
-- [ ] Add Ctrl+S keyboard shortcut for save
-- [ ] Implement batch position update API call
+- [x] Implement manual save button in toolbar
+- [x] Create unsaved changes indicator (asterisk/badge)
+- [x] Add Ctrl+S keyboard shortcut for save
+- [x] Implement batch position update API call
 - [ ] Create save progress indicator
-- [ ] Add save success notification
-- [ ] Implement save error handling with retry
-- [ ] Clear unsaved indicator on successful save
+- [x] Add save success notification
+- [x] Implement save error handling with retry
+- [x] Clear unsaved indicator on successful save
 - [ ] Add save confirmation before exit
 - [ ] Create exit warning dialog
 
 ### Saved Layouts
-- [ ] Create SaveLayoutDialog component
-- [ ] Implement layout name and description inputs
-- [ ] Add layout data serialization (JSONB format)
-- [ ] Create save layout API call
-- [ ] Implement LoadLayoutDialog component
-- [ ] Create layout list with metadata display
+- [x] Create SaveLayoutDialog component
+- [x] Implement layout name and description inputs
+- [x] Add layout data serialization (JSONB format)
+- [x] Create save layout API call
+- [x] Implement LoadLayoutDialog component
+- [x] Create layout list with metadata display
 - [ ] Add layout preview (future: thumbnail)
-- [ ] Implement load layout functionality
-- [ ] Add delete layout with confirmation
+- [x] Implement load layout functionality
+- [x] Add delete layout with confirmation
 - [ ] Create duplicate layout feature
 - [ ] Implement activate layout functionality
 
@@ -187,36 +187,36 @@
 ## Phase 4: History & Advanced Features (Week 6)
 
 ### Undo/Redo System
-- [ ] Create Action interface and types
-- [ ] Implement HistoryStore with stack management
-- [ ] Add action recording on all edit operations
-- [ ] Create undo function with state reversal
-- [ ] Implement redo function
-- [ ] Add Ctrl+Z keyboard shortcut for undo
-- [ ] Add Ctrl+Shift+Z keyboard shortcut for redo
-- [ ] Create undo/redo buttons in toolbar
-- [ ] Implement button disabled states
-- [ ] Add action limit (50 actions max)
+- [x] Create Action interface and types
+- [x] Implement HistoryStore with stack management
+- [x] Add action recording on all edit operations
+- [x] Create undo function with state reversal
+- [x] Implement redo function
+- [x] Add Ctrl+Z keyboard shortcut for undo
+- [x] Add Ctrl+Shift+Z keyboard shortcut for redo
+- [x] Create undo/redo buttons in toolbar
+- [x] Implement button disabled states
+- [x] Add action limit (50 actions max)
 - [ ] Create floor-specific history isolation
 - [ ] Implement compound action support (multi-table moves)
 - [ ] Add smooth animations for undo/redo
 - [ ] Clear redo stack on new action
 
 ### Properties Panel
-- [ ] Create PropertiesPanel component
-- [ ] Display selected table information (number, status, capacity)
-- [ ] Add position display (X, Y coordinates)
-- [ ] Show table dimensions (Width, Height)
+- [x] Create PropertiesPanel component
+- [x] Display selected table information (number, status, capacity)
+- [x] Add position display (X, Y coordinates)
+- [x] Show table dimensions (Width, Height)
 - [ ] Implement editable properties (number, capacity)
-- [ ] Add position input fields for precise placement
-- [ ] Create quick actions buttons (Edit, Delete, Duplicate)
+- [x] Add position input fields for precise placement
+- [x] Create quick actions buttons (Edit, Delete, Duplicate)
 - [ ] Implement real-time property updates
 - [ ] Add validation for property changes
-- [ ] Show multi-selection info when multiple tables selected
+- [x] Show multi-selection info when multiple tables selected
 
 ### Fullscreen Mode
 - [ ] Implement fullscreen API integration
-- [ ] Create fullscreen toggle button
+- [x] Create fullscreen toggle button
 - [ ] Add "F" key shortcut for fullscreen
 - [ ] Hide non-essential UI in fullscreen
 - [ ] Add Esc key to exit fullscreen
@@ -226,7 +226,7 @@
 ### Keyboard Shortcuts
 - [ ] Create centralized keyboard handler
 - [ ] Implement all tool shortcuts (V, H, T)
-- [ ] Add all action shortcuts (Ctrl+S, Ctrl+Z, etc.)
+- [x] Add all action shortcuts (Ctrl+S, Ctrl+Z, etc.)
 - [ ] Implement grid toggle (G key)
 - [ ] Add fullscreen toggle (F key)
 - [ ] Create arrow key table movement
