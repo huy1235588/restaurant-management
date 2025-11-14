@@ -40,7 +40,7 @@ export function VisualTableCard({
         <div
             className={cn(
                 'h-full w-full flex flex-col items-center justify-center rounded border-2 cursor-move',
-                'transition-all duration-150',
+                'transition-all duration-150 select-none',
                 getStatusColor(table.status),
                 isSelected && 'ring-2 ring-blue-500 ring-offset-1 shadow-lg',
                 isDragging && 'opacity-75 shadow-xl',
