@@ -3,13 +3,14 @@
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import type { TablePosition } from '../types';
+import type { TablePosition, Tool } from '../types';
 import { cn } from '@/lib/utils';
 
 interface TableComponentProps {
     table: TablePosition;
     isSelected: boolean;
     isColliding?: boolean;
+    currentTool?: Tool;
     onClick: (tableId: number, multi: boolean) => void;
     onDoubleClick?: (tableId: number) => void;
 }
@@ -18,12 +19,14 @@ export function TableComponent({
     table,
     isSelected,
     isColliding = false,
+    currentTool = 'select',
     onClick,
     onDoubleClick,
 }: TableComponentProps) {
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: `table-${table.tableId}`,
         data: { table },
+        disabled: currentTool !== 'select',
     });
     
     const style = {
@@ -73,20 +76,27 @@ export function TableComponent({
         }
     };
     
+    const getCursorClass = () => {
+        if (currentTool === 'select') return 'cursor-move';
+        if (currentTool === 'delete') return 'cursor-not-allowed';
+        return 'cursor-pointer';
+    };
+    
     return (
         <div
             ref={setNodeRef}
             style={style}
-            {...listeners}
-            {...attributes}
+            {...(currentTool === 'select' ? listeners : {})}
+            {...(currentTool === 'select' ? attributes : {})}
             onClick={handleClick}
             onDoubleClick={handleDoubleClick}
             className={cn(
                 'flex flex-col items-center justify-center',
-                'border-2 cursor-move transition-all',
+                'border-2 transition-all',
                 'select-none text-gray-900 dark:text-gray-100',
                 getShapeClass(),
                 getStatusColor(),
+                getCursorClass(),
                 isSelected && 'ring-4 ring-blue-500 dark:ring-blue-400 ring-opacity-50',
                 isColliding && 'border-red-500 dark:border-red-600 bg-red-100 dark:bg-red-900/30',
                 isDragging && 'opacity-50 shadow-lg dark:shadow-gray-900/50'

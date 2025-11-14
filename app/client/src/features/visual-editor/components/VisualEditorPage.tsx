@@ -19,6 +19,13 @@ export function VisualEditorPage() {
     const [draggedTable, setDraggedTable] = useState<TablePosition | null>(null);
     const [tempPosition, setTempPosition] = useState<{ x: number; y: number } | null>(null);
     
+    // Pan tool state
+    const [isPanning, setIsPanning] = useState(false);
+    const [panStart, setPanStart] = useState<{ x: number; y: number } | null>(null);
+    
+    // Add table tool state
+    const [ghostPosition, setGhostPosition] = useState<{ x: number; y: number } | null>(null);
+    
     // Load floor plan data
     useFloorPlanData();
     
@@ -29,11 +36,16 @@ export function VisualEditorPage() {
         clearSelection,
         grid,
         zoom,
+        pan,
+        setPan,
+        setTool,
+        setZoom,
     } = useEditorStore();
     
     const {
         tables,
         updateTablePosition,
+        removeTable,
         unsavedChanges,
         setUnsavedChanges,
     } = useLayoutStore();
@@ -120,16 +132,82 @@ export function VisualEditorPage() {
         if (currentTool === 'select') {
             selectTable(tableId, multi);
         } else if (currentTool === 'delete') {
-            // TODO: Implement delete
+            const table = tables.find((t) => t.tableId === tableId);
+            if (table && window.confirm(`Delete table ${table.tableNumber}?`)) {
+                pushHistory({
+                    type: 'delete',
+                    table: table,
+                    timestamp: Date.now(),
+                });
+                removeTable(tableId);
+                toast.success('Table deleted');
+            }
         }
-    }, [currentTool, selectTable]);
+    }, [currentTool, selectTable, tables, removeTable, pushHistory]);
     
-    // Handle canvas click (deselect)
-    const handleCanvasClick = useCallback(() => {
+    // Handle canvas click
+    const handleCanvasClick = useCallback((e: React.MouseEvent) => {
         if (currentTool === 'select') {
             clearSelection();
+        } else if (currentTool === 'add' && ghostPosition) {
+            // TODO: Open dialog to create table at ghost position
+            toast.info('Add table dialog not yet implemented');
         }
-    }, [currentTool, clearSelection]);
+    }, [currentTool, clearSelection, ghostPosition]);
+    
+    // Handle mouse down for pan tool
+    const handleMouseDown = useCallback((e: React.MouseEvent) => {
+        if (currentTool === 'pan') {
+            setIsPanning(true);
+            setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
+            e.preventDefault();
+        }
+    }, [currentTool, pan]);
+    
+    // Handle mouse move for pan and add tools
+    const handleMouseMove = useCallback((e: React.MouseEvent) => {
+        // Pan tool
+        if (isPanning && panStart && currentTool === 'pan') {
+            const newPan = {
+                x: e.clientX - panStart.x,
+                y: e.clientY - panStart.y,
+            };
+            setPan(newPan);
+        }
+        
+        // Add tool ghost preview
+        if (currentTool === 'add' && containerRef.current) {
+            const rect = containerRef.current.getBoundingClientRect();
+            const x = (e.clientX - rect.left - pan.x) / zoom;
+            const y = (e.clientY - rect.top - pan.y) / zoom;
+            
+            // Snap to grid if enabled
+            if (grid.snapEnabled) {
+                const snapped = snapPositionToGrid({ x, y }, grid.size);
+                setGhostPosition(snapped);
+            } else {
+                setGhostPosition({ x, y });
+            }
+        }
+    }, [isPanning, panStart, currentTool, pan, zoom, grid, setPan]);
+    
+    // Handle mouse up for pan tool
+    const handleMouseUp = useCallback(() => {
+        if (currentTool === 'pan') {
+            setIsPanning(false);
+            setPanStart(null);
+        }
+    }, [currentTool]);
+    
+    // Handle wheel for zoom (Ctrl+Scroll)
+    const handleWheel = useCallback((e: React.WheelEvent) => {
+        if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            const delta = -e.deltaY * 0.001;
+            const newZoom = Math.max(0.25, Math.min(2.0, zoom + delta));
+            setZoom(newZoom);
+        }
+    }, [zoom, setZoom]);
     
     // Handle save
     const handleSave = useCallback(async () => {
@@ -172,6 +250,57 @@ export function VisualEditorPage() {
     // Keyboard shortcuts
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
+            // Prevent shortcuts if typing in input
+            if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+                return;
+            }
+            
+            // Tool shortcuts
+            if (e.key === 'v' || e.key === 'V') {
+                e.preventDefault();
+                setTool('select');
+            } else if (e.key === 'h' || e.key === 'H') {
+                e.preventDefault();
+                setTool('pan');
+            } else if (e.key === 't' || e.key === 'T') {
+                e.preventDefault();
+                setTool('add');
+            } else if (e.key === 'Delete' || e.key === 'Backspace') {
+                // Delete selected tables
+                if (selectedTableIds.length > 0 && currentTool === 'select') {
+                    e.preventDefault();
+                    const confirmMsg = selectedTableIds.length === 1 
+                        ? `Delete selected table?`
+                        : `Delete ${selectedTableIds.length} selected tables?`;
+                    
+                    if (window.confirm(confirmMsg)) {
+                        selectedTableIds.forEach((tableId) => {
+                            const table = tables.find((t) => t.tableId === tableId);
+                            if (table) {
+                                pushHistory({
+                                    type: 'delete',
+                                    table: table,
+                                    timestamp: Date.now(),
+                                });
+                                removeTable(tableId);
+                            }
+                        });
+                        clearSelection();
+                        toast.success(`Deleted ${selectedTableIds.length} table(s)`);
+                    }
+                }
+            } else if (e.key === 'Escape') {
+                // Cancel current action
+                e.preventDefault();
+                if (currentTool === 'add') {
+                    setGhostPosition(null);
+                } else if (currentTool === 'pan') {
+                    setIsPanning(false);
+                    setPanStart(null);
+                }
+                clearSelection();
+            }
+            
             // Ctrl/Cmd + S: Save
             if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                 e.preventDefault();
@@ -189,11 +318,43 @@ export function VisualEditorPage() {
                 e.preventDefault();
                 handleRedo();
             }
+            
+            // Ctrl/Cmd + Y: Redo (alternative)
+            if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+                e.preventDefault();
+                handleRedo();
+            }
+            
+            // G: Toggle grid
+            if (e.key === 'g' || e.key === 'G') {
+                e.preventDefault();
+                useEditorStore.getState().setGrid({ enabled: !grid.enabled });
+            }
+            
+            // 0: Reset zoom
+            if (e.key === '0' && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                setZoom(1);
+            }
         };
         
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [handleSave, handleUndo, handleRedo]);
+    }, [handleSave, handleUndo, handleRedo, setTool, currentTool, selectedTableIds, tables, removeTable, pushHistory, clearSelection, grid.enabled, setZoom]);
+    
+    // Get cursor style based on tool
+    const getCursorStyle = () => {
+        switch (currentTool) {
+            case 'pan':
+                return isPanning ? 'grabbing' : 'grab';
+            case 'add':
+                return 'crosshair';
+            case 'delete':
+                return 'not-allowed';
+            default:
+                return 'default';
+        }
+    };
     
     return (
         <div className="flex flex-col h-[calc(100vh+0rem)] border rounded-lg bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800">
@@ -208,7 +369,13 @@ export function VisualEditorPage() {
                 <div
                     ref={containerRef}
                     className="flex-1 relative"
+                    style={{ cursor: getCursorStyle() }}
                     onClick={handleCanvasClick}
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseUp}
+                    onWheel={handleWheel}
                 >
                     <DndContext
                         onDragStart={handleDragStart}
@@ -233,10 +400,29 @@ export function VisualEditorPage() {
                                         table={displayTable}
                                         isSelected={isSelected}
                                         isColliding={isColliding}
+                                        currentTool={currentTool}
                                         onClick={handleTableClick}
                                     />
                                 );
                             })}
+                            
+                            {/* Ghost preview for Add Table tool */}
+                            {currentTool === 'add' && ghostPosition && (
+                                <div
+                                    className="absolute border-2 border-dashed border-blue-500 bg-blue-500/20 rounded pointer-events-none"
+                                    style={{
+                                        left: ghostPosition.x,
+                                        top: ghostPosition.y,
+                                        width: 80,
+                                        height: 80,
+                                        transform: 'translate(-50%, -50%)',
+                                    }}
+                                >
+                                    <div className="flex items-center justify-center h-full text-blue-600 font-medium">
+                                        New Table
+                                    </div>
+                                </div>
+                            )}
                         </EditorCanvas>
                     </DndContext>
                 </div>

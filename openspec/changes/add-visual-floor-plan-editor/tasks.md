@@ -55,11 +55,11 @@
 - [x] Implement zoom in/out functions
 - [x] Create zoom level state management (25%-200%)
 - [x] Add zoom controls to toolbar (buttons and display)
-- [ ] Implement Ctrl+Scroll zoom functionality
+- [x] Implement Ctrl+Scroll zoom functionality
 - [ ] Add zoom center-point calculation
 - [ ] Create smooth zoom animations
 - [x] Implement "Reset Zoom" (100%) function
-- [ ] Add "0" key shortcut for zoom reset
+- [x] Add "0" key shortcut for zoom reset
 - [ ] Implement pan boundaries calculation
 - [ ] Create "Fit to View" function with bounding box calculation
 
@@ -68,14 +68,14 @@
 ### Tool System
 - [x] Create Tool base abstraction
 - [x] Implement Select Tool with click selection
-- [ ] Implement Pan Tool with drag functionality
-- [ ] Implement Add Table Tool with ghost preview
-- [ ] Implement Delete Tool with confirmation
+- [x] Implement Pan Tool with drag functionality
+- [x] Implement Add Table Tool with ghost preview
+- [x] Implement Delete Tool with confirmation
 - [x] Add tool state management in EditorStore
 - [x] Create tool toolbar UI with active states
-- [ ] Implement tool keyboard shortcuts (V, H, T, Delete)
-- [ ] Add Esc key to cancel active tool
-- [ ] Create visual cursor changes per tool
+- [x] Implement tool keyboard shortcuts (V, H, T, Delete)
+- [x] Add Esc key to cancel active tool
+- [x] Create visual cursor changes per tool
 
 ### Select Tool Features
 - [x] Implement single table selection with click
@@ -123,8 +123,8 @@
 - [ ] Add snap-to-alignment with 5px threshold
 
 ### Add Table Tool
-- [ ] Create ghost preview component
-- [ ] Implement ghost preview following cursor
+- [x] Create ghost preview component
+- [x] Implement ghost preview following cursor
 - [ ] Add green/red color based on collision
 - [ ] Create Quick Create Dialog component
 - [ ] Pre-fill coordinates from click position
@@ -224,16 +224,16 @@
 - [ ] Create fullscreen indicator/exit button
 
 ### Keyboard Shortcuts
-- [ ] Create centralized keyboard handler
-- [ ] Implement all tool shortcuts (V, H, T)
+- [x] Create centralized keyboard handler
+- [x] Implement all tool shortcuts (V, H, T)
 - [x] Add all action shortcuts (Ctrl+S, Ctrl+Z, etc.)
-- [ ] Implement grid toggle (G key)
+- [x] Implement grid toggle (G key)
 - [ ] Add fullscreen toggle (F key)
 - [ ] Create arrow key table movement
 - [ ] Implement Shift+Arrow for faster movement
-- [ ] Add Esc key for cancel/deselect
+- [x] Add Esc key for cancel/deselect
 - [ ] Create keyboard shortcuts reference dialog
-- [ ] Test cross-platform shortcuts (Ctrl/Cmd)
+- [x] Test cross-platform shortcuts (Ctrl/Cmd)
 
 ## Phase 5: Accessibility & Polish (Week 7)
 
