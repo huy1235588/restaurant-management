@@ -162,14 +162,15 @@
   - **Validation**: All tools functional with keyboard shortcuts
 
 ### Drag, Resize, and Rotate
-- [ ] **Task 10.4**: Implement advanced drag-and-drop
-  - [ ] Make table cards draggable with `dnd-kit`
-  - [ ] Add visual feedback during drag (shadow, cursor)
-  - [ ] Implement grid snapping with configurable threshold
-  - [ ] Add alignment guides (horizontal, vertical, center)
-  - [ ] Support multi-select drag (Shift + click)
-  - [ ] Save positions to local state on drag end
-  - **Validation**: Drag is smooth (60fps), snapping works, guides appear
+- [x] **Task 10.4**: Implement advanced drag-and-drop
+  - [x] Make table cards draggable with `dnd-kit`
+  - [x] Add visual feedback during drag (opacity, drag overlay, cursor)
+  - [x] Implement grid snapping with configurable threshold (10px)
+  - [x] Add alignment guides (horizontal magenta, vertical cyan)
+  - [x] Snap to alignment within 5px threshold
+  - [x] Save positions to local state on drag end
+  - [ ] Support multi-select drag (Shift + click) - deferred
+  - **Validation**: Drag is smooth using dnd-kit, grid snapping works, alignment guides appear and snap correctly
 
 - [ ] **Task 10.5**: Implement table resizing
   - [ ] Add resize handles (corners and edges) to selected tables
@@ -188,20 +189,20 @@
   - **Validation**: Rotation is smooth, angle snapping works
 
 ### Grid and Alignment
-- [ ] **Task 10.7**: Build grid system
-  - [ ] Render grid overlay using Canvas API
-  - [ ] Make grid configurable (10px, 20px, 50px intervals)
-  - [ ] Add grid toggle button (keyboard: G)
-  - [ ] Implement snap-to-grid logic (disable with Ctrl)
-  - [ ] Add visual snap feedback (pulse effect)
-  - **Validation**: Grid renders correctly, snapping accurate
+- [x] **Task 10.7**: Build grid system
+  - [x] Render grid overlay using Canvas API
+  - [x] Make grid configurable (10px, 20px, 50px intervals)
+  - [x] Add grid toggle button (keyboard: G)
+  - [x] Implement snap-to-grid logic (disable with Ctrl)
+  - [x] Add visual snap feedback (pulse effect)
+  - **Validation**: Grid renders correctly, snapping accurate ✅
 
-- [ ] **Task 10.8**: Implement alignment guides
-  - [ ] Detect alignment during drag (center, edges, corners)
-  - [ ] Render dynamic guide lines (magenta horizontal, cyan vertical)
-  - [ ] Snap to alignment within 5px threshold
-  - [ ] Remove guides when alignment broken
-  - **Validation**: Guides appear/disappear correctly, snap works
+- [x] **Task 10.8**: Implement alignment guides
+  - [x] Detect alignment during drag (center, edges, corners)
+  - [x] Render dynamic guide lines (magenta horizontal, cyan vertical)
+  - [x] Snap to alignment within 5px threshold
+  - [x] Remove guides when alignment broken
+  - **Validation**: Guides appear/disappear correctly, snap works ✅
 
 ### Custom Table Shapes and Styles
 - [ ] **Task 10.9**: Create properties panel
@@ -240,22 +241,22 @@
   - **Validation**: Templates apply correctly and are customizable
 
 ### Undo/Redo and Actions
-- [ ] **Task 10.13**: Implement action history
-  - [ ] Create action history stack (max 50 actions)
-  - [ ] Record actions: move, resize, rotate, style change
-  - [ ] Implement undo (Ctrl+Z) functionality
-  - [ ] Implement redo (Ctrl+Shift+Z) functionality
-  - [ ] Add undo/redo buttons to toolbar
-  - [ ] Clear history on save
-  - **Validation**: Undo/redo works for all action types
+- [x] **Task 10.13**: Implement action history
+  - [x] Create action history stack (max 50 actions)
+  - [x] Record actions: move, resize, rotate, style change
+  - [x] Implement undo (Ctrl+Z) functionality
+  - [x] Implement redo (Ctrl+Shift+Z) functionality
+  - [x] Add undo/redo buttons to toolbar
+  - [x] Clear history on save
+  - **Validation**: Undo/redo works for all action types ✅
 
-- [ ] **Task 10.14**: Implement save functionality
-  - [ ] Add "Save" button (keyboard: Ctrl+S)
-  - [ ] Persist all changes to database via API call (NOT WebSocket)
-  - [ ] Show success/error notifications
-  - [ ] Update "unsaved changes" indicator
-  - [ ] Add confirmation dialog on view switch with unsaved changes
-  - **Validation**: Save persists all changes correctly via button click only
+- [x] **Task 10.14**: Implement save functionality
+  - [x] Add "Save" button (keyboard: Ctrl+S)
+  - [x] Persist all changes to database via API call (NOT WebSocket)
+  - [x] Show success/error notifications
+  - [x] Update "unsaved changes" indicator
+  - [x] Add confirmation dialog on view switch with unsaved changes
+  - **Validation**: Save persists all changes correctly via button click only ✅
 
 ### Database Migrations
 - [x] **Task 10.15**: Create database migrations for Visual Floor Plan

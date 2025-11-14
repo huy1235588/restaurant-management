@@ -109,6 +109,13 @@ export interface Table {
     isActive: boolean;
     qrCode?: string;
     currentOrder?: Order;
+    // Visual Floor Plan properties
+    positionX?: number;
+    positionY?: number;
+    width?: number;
+    height?: number;
+    rotation?: number;
+    shape?: 'rectangle' | 'circle' | 'square' | 'oval';
     createdAt: string;
     updatedAt: string;
 }

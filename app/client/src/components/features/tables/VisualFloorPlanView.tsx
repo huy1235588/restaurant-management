@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Table, TableStatus } from '@/types';
@@ -52,10 +52,11 @@ export function VisualFloorPlanView({
         panX: 0,
         panY: 0,
         gridSize: 20,
-        showGrid: false,
+        showGrid: true, // Default to true for easier layout
     });
     const [unsavedChanges, setUnsavedChanges] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [tablePositions, setTablePositions] = useState<Map<number, { x: number; y: number }>>(new Map());
 
     // Filter tables by floor
     const filteredTables = floorFilter !== 'all'
@@ -100,9 +101,28 @@ export function VisualFloorPlanView({
     }, []);
 
     const handleTableMove = useCallback((tableId: number, x: number, y: number) => {
+        // Get previous position for undo
+        const previousPosition = tablePositions.get(tableId) || { x: 0, y: 0 };
+        
+        // Add to history
+        historyRef.current.addAction({
+            type: 'move',
+            data: {
+                tableId,
+                previousPosition,
+                newPosition: { x, y },
+            },
+        });
+
+        // Update local state
+        setTablePositions(prev => {
+            const newMap = new Map(prev);
+            newMap.set(tableId, { x, y });
+            return newMap;
+        });
+
         setUnsavedChanges(true);
-        // Position will be saved to database when user clicks save
-    }, []);
+    }, [tablePositions]);
 
     const handleToolChange = useCallback((tool: EditorTool) => {
         setActiveTool(tool);
@@ -114,32 +134,74 @@ export function VisualFloorPlanView({
     }, []);
 
     const handleSave = useCallback(async () => {
+        if (!unsavedChanges) {
+            toast.info(t('tables.noChanges', 'No changes to save'));
+            return;
+        }
+
         try {
             setIsSaving(true);
-            // TODO: Implement save logic to database
-            // For now, just update the canvas state
+            
+            // Prepare data for bulk position update
+            const positionsToSave = Array.from(tablePositions.entries()).map(([tableId, pos]) => ({
+                tableId,
+                x: pos.x,
+                y: pos.y,
+                width: 80, // Default width
+                height: 80, // Default height
+                rotation: 0,
+                shape: 'rectangle',
+            }));
+
+            if (positionsToSave.length > 0) {
+                // Save to database via API
+                await floorPlanApi.updateTablePositions(positionsToSave);
+            }
+
             toast.success(t('tables.visualFloorPlanSaved', 'Floor plan saved successfully'));
             setUnsavedChanges(false);
+            
+            // Clear history after successful save
+            historyRef.current.clear();
         } catch (error) {
             console.error('Failed to save floor plan:', error);
             toast.error(t('tables.saveError', 'Failed to save floor plan'));
         } finally {
             setIsSaving(false);
         }
-    }, [t]);
+    }, [t, unsavedChanges, tablePositions]);
 
     const handleUndo = useCallback(() => {
-        const action = historyRef.current.undo();
-        if (action) {
-            // Apply undo action
+        if (!historyRef.current.canUndo()) return;
+
+        const currentAction = historyRef.current.getCurrentAction();
+        historyRef.current.undo();
+
+        if (currentAction && currentAction.type === 'move') {
+            const { tableId, previousPosition } = currentAction.data;
+            setTablePositions(prev => {
+                const newMap = new Map(prev);
+                newMap.set(tableId, previousPosition);
+                return newMap;
+            });
+            setUnsavedChanges(true);
             toast.success(t('common.undone', 'Action undone'));
         }
     }, [t]);
 
     const handleRedo = useCallback(() => {
+        if (!historyRef.current.canRedo()) return;
+
         const action = historyRef.current.redo();
-        if (action) {
-            // Apply redo action
+        
+        if (action && action.type === 'move') {
+            const { tableId, newPosition } = action.data;
+            setTablePositions(prev => {
+                const newMap = new Map(prev);
+                newMap.set(tableId, newPosition);
+                return newMap;
+            });
+            setUnsavedChanges(true);
             toast.success(t('common.redone', 'Action redone'));
         }
     }, [t]);
@@ -173,6 +235,21 @@ export function VisualFloorPlanView({
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [selectedTableId, handleSave, handleUndo, handleRedo, handleToolChange, handleToggleGrid]);
 
+    // Merge local position changes into tables for canvas
+    const tablesWithPositions = useMemo(() => {
+        return filteredTables.map(table => {
+            const position = tablePositions.get(table.tableId);
+            if (position) {
+                return {
+                    ...table,
+                    positionX: position.x,
+                    positionY: position.y,
+                };
+            }
+            return table;
+        });
+    }, [filteredTables, tablePositions]);
+
     return (
         <div className="flex flex-col h-screen gap-4 bg-background">
             <EditorToolbar
@@ -196,7 +273,7 @@ export function VisualFloorPlanView({
                 {/* Main Canvas */}
                 <div className="flex-1 relative bg-mute rounded-lg border overflow-hidden" ref={canvasRef}>
                     <VisualFloorPlanCanvas
-                        tables={filteredTables}
+                        tables={tablesWithPositions}
                         selectedTableId={selectedTableId}
                         activeTool={activeTool}
                         zoom={canvasState.zoom}
