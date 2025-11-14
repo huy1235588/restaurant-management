@@ -5,6 +5,8 @@ import { Table, TableStatus } from '@/types';
 import { useTranslation } from 'react-i18next';
 import { VisualTableCard } from './VisualTableCard';
 import { ResizeRotateHandles } from './ResizeRotateHandles';
+import { GhostTablePreview } from './GhostTablePreview';
+import { ToolIndicator } from './ToolIndicator';
 import {
     DndContext,
     DragEndEvent,
@@ -17,6 +19,8 @@ import {
     useDraggable,
 } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
+import { calculateCanvasBounds, constrainPanOffset } from '@/lib/utils/pan-boundaries';
+import { detectCollision, snapToGrid as snapToGridUtil } from '@/lib/utils/collision-detection';
 
 interface VisualFloorPlanCanvasProps {
     tables: Table[];
@@ -36,6 +40,8 @@ interface VisualFloorPlanCanvasProps {
     onEdit: (table: Table) => void;
     onChangeStatus: (table: Table) => void;
     onViewQR: (table: Table) => void;
+    onAddTableClick?: (position: { x: number; y: number }) => void;
+    ghostTable?: { x: number; y: number; width: number; height: number; isValid: boolean } | null;
 }
 
 interface TablePosition {
@@ -79,6 +85,8 @@ export function VisualFloorPlanCanvas({
     onEdit,
     onChangeStatus,
     onViewQR,
+    onAddTableClick,
+    ghostTable,
 }: VisualFloorPlanCanvasProps) {
     const { t } = useTranslation();
     const canvasRef = useRef<HTMLDivElement>(null);
@@ -91,6 +99,7 @@ export function VisualFloorPlanCanvas({
     const [panStartPos, setPanStartPos] = useState({ x: 0, y: 0 });
     const [alignmentGuides, setAlignmentGuides] = useState<AlignmentGuide[]>([]);
     const [activeId, setActiveId] = useState<number | null>(null);
+    const [canvasBounds, setCanvasBounds] = useState({ minX: 0, maxX: 0, minY: 0, maxY: 0 });
 
     // Configure dnd-kit sensors
     const sensors = useSensors(
@@ -119,6 +128,18 @@ export function VisualFloorPlanCanvas({
         });
         setTablePositions(positions);
     }, [tables]);
+
+    // Calculate and update canvas bounds when tables change
+    useEffect(() => {
+        if (canvasRef.current) {
+            const canvasWidth = canvasRef.current.clientWidth;
+            const canvasHeight = canvasRef.current.clientHeight;
+            
+            const tableArray = Array.from(tablePositions.values());
+            const bounds = calculateCanvasBounds(tableArray, canvasWidth, canvasHeight);
+            setCanvasBounds(bounds);
+        }
+    }, [tablePositions]);
 
     // Snap to grid helper function
     const snapToGrid = useCallback((value: number): number => {
@@ -212,22 +233,57 @@ export function VisualFloorPlanCanvas({
         }
     }, [showGrid, zoom, panX, panY, gridSize]);
 
-    // Handle canvas panning
+    // Handle canvas panning and add tool clicks
     const handleCanvasMouseDown = useCallback((e: React.MouseEvent) => {
         if (activeTool === 'pan') {
             setIsPanning(true);
             setPanStartPos({ x: e.clientX, y: e.clientY });
+        } else if (activeTool === 'add' && onAddTableClick && canvasRef.current) {
+            // Calculate click position in canvas coordinates
+            const rect = canvasRef.current.getBoundingClientRect();
+            const canvasX = (e.clientX - rect.left - panX) / zoom;
+            const canvasY = (e.clientY - rect.top - panY) / zoom;
+            
+            // Apply grid snapping if enabled
+            const finalX = showGrid ? snapToGridUtil(canvasX, gridSize) : canvasX;
+            const finalY = showGrid ? snapToGridUtil(canvasY, gridSize) : canvasY;
+            
+            onAddTableClick({ x: finalX, y: finalY });
         }
-    }, [activeTool]);
+    }, [activeTool, onAddTableClick, panX, panY, zoom, showGrid, gridSize]);
 
     const handleCanvasMouseMove = useCallback((e: React.MouseEvent) => {
-        if (isPanning && activeTool === 'pan') {
+        if (isPanning && activeTool === 'pan' && canvasRef.current) {
             const deltaX = e.clientX - panStartPos.x;
             const deltaY = e.clientY - panStartPos.y;
-            onPan(deltaX, deltaY);
+            
+            // Calculate new pan position
+            const newPanX = panX + deltaX;
+            const newPanY = panY + deltaY;
+            
+            // Constrain within bounds
+            const canvasWidth = canvasRef.current.clientWidth;
+            const canvasHeight = canvasRef.current.clientHeight;
+            const constrained = constrainPanOffset(
+                newPanX,
+                newPanY,
+                canvasBounds,
+                canvasWidth,
+                canvasHeight,
+                zoom
+            );
+            
+            // Only apply the delta that fits within bounds
+            const actualDeltaX = constrained.x - panX;
+            const actualDeltaY = constrained.y - panY;
+            
+            if (actualDeltaX !== 0 || actualDeltaY !== 0) {
+                onPan(actualDeltaX, actualDeltaY);
+            }
+            
             setPanStartPos({ x: e.clientX, y: e.clientY });
         }
-    }, [isPanning, activeTool, panStartPos, onPan]);
+    }, [isPanning, activeTool, panStartPos, onPan, panX, panY, canvasBounds, zoom]);
 
     const handleCanvasMouseUp = useCallback(() => {
         setIsPanning(false);
@@ -370,6 +426,7 @@ export function VisualFloorPlanCanvas({
     const getCursor = () => {
         if (activeTool === 'pan') return 'grab';
         if (isPanning) return 'grabbing';
+        if (activeTool === 'add') return 'crosshair';
         if (activeTool === 'delete') return 'not-allowed';
         if (draggingTableId) return 'grabbing';
         return 'default';
@@ -395,6 +452,9 @@ export function VisualFloorPlanCanvas({
                 onMouseUp={handleCanvasMouseUp}
                 onMouseLeave={handleCanvasMouseUp}
             >
+                {/* Tool Indicator */}
+                <ToolIndicator activeTool={activeTool} />
+
                 {/* Grid Canvas */}
                 {showGrid && (
                     <canvas
@@ -432,6 +492,23 @@ export function VisualFloorPlanCanvas({
                     </div>
                 )}
 
+                {/* Ghost Table Preview for Add Tool */}
+                {ghostTable && activeTool === 'add' && (
+                    <div
+                        className="absolute pointer-events-none z-40"
+                        style={{
+                            transform: `translate(${panX}px, ${panY}px) scale(${zoom})`,
+                            transformOrigin: '0 0',
+                        }}
+                    >
+                        <GhostTablePreview
+                            position={{ x: ghostTable.x, y: ghostTable.y }}
+                            size={{ width: ghostTable.width, height: ghostTable.height }}
+                            isValid={ghostTable.isValid}
+                        />
+                    </div>
+                )}
+
                 {/* Tables Container */}
                 <div
                     className="absolute"
@@ -457,6 +534,7 @@ export function VisualFloorPlanCanvas({
                                 isSelected={selectedTableId === table.tableId}
                                 isDragging={isDragging}
                                 disabled={activeTool !== 'select'}
+                                isDeleteMode={activeTool === 'delete'}
                                 onEdit={onEdit}
                                 onChangeStatus={onChangeStatus}
                                 onViewQR={onViewQR}
@@ -516,6 +594,7 @@ interface DraggableTableCardProps {
     isSelected: boolean;
     isDragging: boolean;
     disabled: boolean;
+    isDeleteMode?: boolean;
     onEdit: (table: Table) => void;
     onChangeStatus: (table: Table) => void;
     onViewQR: (table: Table) => void;
@@ -531,6 +610,7 @@ function DraggableTableCard({
     isSelected,
     isDragging,
     disabled,
+    isDeleteMode = false,
     onEdit,
     onChangeStatus,
     onViewQR,
@@ -555,6 +635,17 @@ function DraggableTableCard({
         cursor: disabled ? 'default' : 'move',
     };
 
+    // Apply red overlay for delete mode on selected table
+    const overlayStyle = isDeleteMode && isSelected ? {
+        position: 'absolute' as const,
+        inset: 0,
+        backgroundColor: 'rgba(239, 68, 68, 0.2)',
+        border: '2px solid rgb(239, 68, 68)',
+        borderRadius: '0.25rem',
+        pointerEvents: 'none' as const,
+        zIndex: 10,
+    } : undefined;
+
     return (
         <div
             ref={setNodeRef}
@@ -562,6 +653,7 @@ function DraggableTableCard({
             className="table-container"
             onClick={onSelect}
         >
+            {overlayStyle && <div style={overlayStyle} />}
             <div {...listeners} {...attributes} className="h-full w-full">
                 <VisualTableCard
                     table={table}

@@ -16,6 +16,8 @@ import {
     FolderOpen,
     Layout,
     Wand2,
+    Maximize2,
+    Home,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Separator } from '@/components/ui/separator';
@@ -40,6 +42,8 @@ interface EditorToolbarProps {
     onSaveLayout?: () => void;
     onLoadLayout?: () => void;
     onUseTemplate?: () => void;
+    onFitToView?: () => void;
+    onResetView?: () => void;
 }
 
 export function EditorToolbar({
@@ -60,6 +64,8 @@ export function EditorToolbar({
     onSaveLayout,
     onLoadLayout,
     onUseTemplate,
+    onFitToView,
+    onResetView,
 }: EditorToolbarProps) {
     const { t } = useTranslation();
 
@@ -147,6 +153,29 @@ export function EditorToolbar({
                     >
                         <RotateCcw className="w-4 h-4" />
                     </Button>
+
+                    <Separator orientation="vertical" className="mx-1 h-6" />
+
+                    {onFitToView && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={onFitToView}
+                            title={t('tables.fitToView', 'Fit to View - Center all tables')}
+                        >
+                            <Maximize2 className="w-4 h-4" />
+                        </Button>
+                    )}
+                    {onResetView && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={onResetView}
+                            title={t('tables.resetView', 'Reset View - Return to origin')}
+                        >
+                            <Home className="w-4 h-4" />
+                        </Button>
+                    )}
                 </div>
 
                 {/* Right: Action Buttons */}

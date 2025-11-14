@@ -14,6 +14,10 @@ import { TemplatesDialog } from './visual-floor-plan/TemplatesDialog';
 import { ActionHistory } from '@/lib/visual-floor-plan/action-history';
 import { floorPlanApi, FloorPlanLayout } from '@/services/floor-plan.service';
 import { LayoutTemplateId, TemplateLayoutState, generateTemplateLayout } from '@/lib/visual-floor-plan/templates';
+import { calculateFitToViewOffset } from '@/lib/utils/pan-boundaries';
+import { detectCollision, generateNextTableNumber } from '@/lib/utils/collision-detection';
+import { QuickCreateTableDialog } from './visual-floor-plan/QuickCreateTableDialog';
+import { DeleteTableConfirmDialog } from './visual-floor-plan/DeleteTableConfirmDialog';
 
 interface VisualFloorPlanViewProps {
     tables: Table[];
@@ -66,6 +70,11 @@ export function VisualFloorPlanView({
     const [savedLayouts, setSavedLayouts] = useState<FloorPlanLayout[]>([]);
     const [layoutsLoading, setLayoutsLoading] = useState(false);
     const [showTemplatesDialog, setShowTemplatesDialog] = useState(false);
+    const [ghostTable, setGhostTable] = useState<{ x: number; y: number; width: number; height: number; isValid: boolean } | null>(null);
+    const [showQuickCreateDialog, setShowQuickCreateDialog] = useState(false);
+    const [clickPosition, setClickPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [tableToDelete, setTableToDelete] = useState<Table | null>(null);
 
     // Filter tables by floor
     const filteredTables = floorFilter !== 'all'
@@ -107,6 +116,48 @@ export function VisualFloorPlanView({
             panY: 0,
         }));
     }, []);
+
+    const handleFitToView = useCallback(() => {
+        if (canvasRef.current) {
+            const canvasWidth = canvasRef.current.clientWidth;
+            const canvasHeight = canvasRef.current.clientHeight;
+            
+            const tablePositionsArray = filteredTables.map(table => {
+                const position = tablePositions.get(table.tableId);
+                return {
+                    x: position?.x ?? table.positionX ?? 0,
+                    y: position?.y ?? table.positionY ?? 0,
+                    width: position?.width ?? table.width ?? 80,
+                    height: position?.height ?? table.height ?? 80,
+                };
+            });
+
+            const { panX, panY, zoom } = calculateFitToViewOffset(
+                tablePositionsArray,
+                canvasWidth,
+                canvasHeight
+            );
+
+            setCanvasState(prev => ({
+                ...prev,
+                zoom,
+                panX,
+                panY,
+            }));
+
+            toast.success(t('tables.fittedToView', 'View fitted to all tables'));
+        }
+    }, [filteredTables, tablePositions, t]);
+
+    const handleResetView = useCallback(() => {
+        setCanvasState(prev => ({
+            ...prev,
+            zoom: 1,
+            panX: 0,
+            panY: 0,
+        }));
+        toast.success(t('tables.viewReset', 'View reset to origin'));
+    }, [t]);
 
     const handleToggleGrid = useCallback(() => {
         setCanvasState(prev => ({
@@ -312,11 +363,133 @@ export function VisualFloorPlanView({
     const handleToolChange = useCallback((tool: EditorTool) => {
         setActiveTool(tool);
         
+        // Handle delete tool activation
+        if (tool === 'delete' && selectedTableId) {
+            const table = filteredTables.find(t => t.tableId === selectedTableId);
+            if (table) {
+                setTableToDelete(table);
+                setShowDeleteDialog(true);
+            } else {
+                toast.error(t('tables.selectTableToDelete', 'Please select a table to delete'));
+            }
+            // Switch back to select tool
+            setActiveTool('select');
+            return;
+        }
+        
         // Clear selection when switching tools
         if (tool !== 'select') {
             setSelectedTableId(null);
         }
-    }, []);
+        
+        // Clear ghost table when switching away from add tool
+        if (tool !== 'add') {
+            setGhostTable(null);
+        }
+    }, [selectedTableId, filteredTables, t]);
+
+    const handleDeleteSuccess = useCallback(() => {
+        if (tableToDelete) {
+            // Record action in history for undo/redo
+            historyRef.current.addAction({
+                type: 'delete',
+                data: {
+                    tableId: tableToDelete.tableId,
+                    tableData: tableToDelete,
+                },
+            });
+        }
+        
+        setShowDeleteDialog(false);
+        setTableToDelete(null);
+        setSelectedTableId(null);
+        setActiveTool('select');
+        setUnsavedChanges(true);
+        // The parent component will refresh the table list
+    }, [tableToDelete]);
+
+    const handleCanvasMouseMove = useCallback((e: React.MouseEvent) => {
+        if (activeTool === 'add' && canvasRef.current) {
+            const rect = canvasRef.current.getBoundingClientRect();
+            const canvasX = (e.clientX - rect.left - canvasState.panX) / canvasState.zoom;
+            const canvasY = (e.clientY - rect.top - canvasState.panY) / canvasState.zoom;
+            
+            const tableWidth = 100;
+            const tableHeight = 100;
+            
+            // Check for collision
+            const existingPositions = filteredTables.map(table => {
+                const position = tablePositions.get(table.tableId);
+                return {
+                    x: position?.x ?? table.positionX ?? 0,
+                    y: position?.y ?? table.positionY ?? 0,
+                    width: position?.width ?? table.width ?? 80,
+                    height: position?.height ?? table.height ?? 80,
+                };
+            });
+            
+            const hasCollision = detectCollision(
+                { x: canvasX, y: canvasY },
+                { width: tableWidth, height: tableHeight },
+                existingPositions
+            );
+            
+            setGhostTable({
+                x: canvasX,
+                y: canvasY,
+                width: tableWidth,
+                height: tableHeight,
+                isValid: !hasCollision,
+            });
+        }
+    }, [activeTool, canvasState.panX, canvasState.panY, canvasState.zoom, filteredTables, tablePositions]);
+
+    const handleAddTableClick = useCallback((position: { x: number; y: number }) => {
+        // Check for collision
+        const tableWidth = 100;
+        const tableHeight = 100;
+        
+        const existingPositions = filteredTables.map(table => {
+            const pos = tablePositions.get(table.tableId);
+            return {
+                x: pos?.x ?? table.positionX ?? 0,
+                y: pos?.y ?? table.positionY ?? 0,
+                width: pos?.width ?? table.width ?? 80,
+                height: pos?.height ?? table.height ?? 80,
+            };
+        });
+        
+        const hasCollision = detectCollision(
+            position,
+            { width: tableWidth, height: tableHeight },
+            existingPositions
+        );
+        
+        if (hasCollision) {
+            toast.error(t('tables.collisionDetected', 'Cannot place table here - collision detected'));
+            return;
+        }
+        
+        // Open quick create dialog
+        setClickPosition(position);
+        setShowQuickCreateDialog(true);
+    }, [filteredTables, tablePositions, t]);
+
+    const handleQuickCreateSuccess = useCallback(() => {
+        setShowQuickCreateDialog(false);
+        setGhostTable(null);
+        
+        // Record action in history for undo/redo
+        historyRef.current.addAction({
+            type: 'add',
+            data: {
+                position: clickPosition,
+            },
+        });
+        
+        setUnsavedChanges(true);
+        toast.success(t('tables.tableCreatedAtPosition', 'Table created at position'));
+    }, [clickPosition, t]);
 
     const handleSave = useCallback(async () => {
         if (!unsavedChanges) {
@@ -361,7 +534,9 @@ export function VisualFloorPlanView({
         const currentAction = historyRef.current.getCurrentAction();
         historyRef.current.undo();
 
-        if (currentAction && currentAction.type === 'move') {
+        if (!currentAction) return;
+
+        if (currentAction.type === 'move') {
             const { tableId, previousPosition } = currentAction.data;
             setTablePositions(prev => {
                 const newMap = new Map(prev);
@@ -370,6 +545,12 @@ export function VisualFloorPlanView({
             });
             setUnsavedChanges(true);
             toast.success(t('common.undone', 'Action undone'));
+        } else if (currentAction.type === 'add') {
+            // Cannot undo table creation here - it's in database
+            toast.info(t('tables.undoAddNotSupported', 'Undo table creation: Please delete the table manually'));
+        } else if (currentAction.type === 'delete') {
+            // Cannot undo table deletion here - it's in database
+            toast.info(t('tables.undoDeleteNotSupported', 'Cannot undo table deletion from database'));
         }
     }, [t]);
 
@@ -378,7 +559,9 @@ export function VisualFloorPlanView({
 
         const action = historyRef.current.redo();
         
-        if (action && action.type === 'move') {
+        if (!action) return;
+
+        if (action.type === 'move') {
             const { tableId, newPosition } = action.data;
             setTablePositions(prev => {
                 const newMap = new Map(prev);
@@ -387,6 +570,8 @@ export function VisualFloorPlanView({
             });
             setUnsavedChanges(true);
             toast.success(t('common.redone', 'Action redone'));
+        } else if (action.type === 'add' || action.type === 'delete') {
+            toast.info(t('tables.redoNotSupported', 'Redo not supported for table add/delete operations'));
         }
     }, [t]);
 
@@ -419,19 +604,32 @@ export function VisualFloorPlanView({
                 e.preventDefault();
                 handleRedo();
             }
-            if (e.key === 'Delete' && selectedTableId) {
+            if (e.key === 'Delete' && selectedTableId && !showQuickCreateDialog && !showDeleteDialog) {
                 e.preventDefault();
-                handleToolChange('delete');
+                const table = filteredTables.find(t => t.tableId === selectedTableId);
+                if (table) {
+                    setTableToDelete(table);
+                    setShowDeleteDialog(true);
+                }
             }
             if (e.key === 'g' && !e.ctrlKey && !e.metaKey) {
                 e.preventDefault();
                 handleToggleGrid();
             }
+            // Escape key to cancel add/delete mode
+            if (e.key === 'Escape') {
+                if (activeTool === 'add' || activeTool === 'delete') {
+                    e.preventDefault();
+                    handleToolChange('select');
+                    setGhostTable(null);
+                    toast.info(t('tables.toolCancelled', 'Tool cancelled'));
+                }
+            }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [selectedTableId, handleSave, handleUndo, handleRedo, handleToolChange, handleToggleGrid]);
+    }, [selectedTableId, handleSave, handleUndo, handleRedo, handleToolChange, handleToggleGrid, showQuickCreateDialog, showDeleteDialog, filteredTables, activeTool, t]);
 
     // Merge local position changes into tables for canvas
     const tablesWithPositions = useMemo(() => {
@@ -472,11 +670,18 @@ export function VisualFloorPlanView({
                 onSaveLayout={() => setShowSaveLayoutDialog(true)}
                 onLoadLayout={() => setShowLoadLayoutDialog(true)}
                 onUseTemplate={() => setShowTemplatesDialog(true)}
+                onFitToView={handleFitToView}
+                onResetView={handleResetView}
             />
 
             <div className="flex flex-1 gap-4 overflow-hidden px-4 pb-4">
                 {/* Main Canvas */}
-                <div className="flex-1 relative bg-mute rounded-lg border overflow-hidden" ref={canvasRef}>
+                <div 
+                    className="flex-1 relative bg-mute rounded-lg border overflow-hidden" 
+                    ref={canvasRef}
+                    onMouseMove={handleCanvasMouseMove}
+                    onMouseLeave={() => setGhostTable(null)}
+                >
                     <VisualFloorPlanCanvas
                         tables={tablesWithPositions}
                         selectedTableId={selectedTableId}
@@ -495,6 +700,8 @@ export function VisualFloorPlanView({
                         onEdit={onEdit}
                         onChangeStatus={onChangeStatus}
                         onViewQR={onViewQR}
+                        onAddTableClick={handleAddTableClick}
+                        ghostTable={ghostTable}
                     />
                 </div>
 
@@ -530,6 +737,32 @@ export function VisualFloorPlanView({
                 open={showTemplatesDialog}
                 onClose={() => setShowTemplatesDialog(false)}
                 onApply={handleApplyTemplate}
+            />
+
+            {/* Quick Create Table Dialog */}
+            <QuickCreateTableDialog
+                open={showQuickCreateDialog}
+                onClose={() => {
+                    setShowQuickCreateDialog(false);
+                    setGhostTable(null);
+                }}
+                onSuccess={handleQuickCreateSuccess}
+                position={clickPosition}
+                floor={parseInt(floorFilter) || 1}
+                suggestedTableNumber={generateNextTableNumber(
+                    filteredTables.map(t => parseInt(t.tableNumber) || 0).filter(n => !isNaN(n))
+                ).toString()}
+            />
+
+            {/* Delete Table Confirmation Dialog */}
+            <DeleteTableConfirmDialog
+                open={showDeleteDialog}
+                onClose={() => {
+                    setShowDeleteDialog(false);
+                    setTableToDelete(null);
+                }}
+                onSuccess={handleDeleteSuccess}
+                table={tableToDelete}
             />
         </div>
     );
