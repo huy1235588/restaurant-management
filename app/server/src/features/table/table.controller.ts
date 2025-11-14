@@ -170,7 +170,7 @@ export class TableController {
     /**
      * Get table statistics
      */
-    async getStats(req: Request, res: Response, next: NextFunction) {
+    async getStats(_: Request, res: Response, next: NextFunction) {
         try {
             const stats = await tableService.getTableStats();
 

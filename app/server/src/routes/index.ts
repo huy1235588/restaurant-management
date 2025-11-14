@@ -13,6 +13,7 @@ import ingredientRoutes from '../features/ingredient/ingredient.routes';
 import purchaseRoutes from '../features/purchase/purchase.routes';
 import stockRoutes from '../features/stock/stock.routes';
 import storageRoutes from '../features/storage/storage.routes';
+import floorPlanRoutes from '../features/floor-plan/floor-plan.routes';
 
 const router: Router = Router();
 
@@ -23,6 +24,7 @@ router.use('/bills', billRoutes);
 router.use('/categories', categoryRoutes);
 router.use('/menu', menuRoutes);
 router.use('/tables', tableRoutes);
+router.use('/floor-plans', floorPlanRoutes);
 router.use('/reservations', reservationRoutes);
 router.use('/kitchen', kitchenRoutes);
 router.use('/staff', staffRoutes);
@@ -43,3 +45,4 @@ router.get('/health', (_req, res) => {
 });
 
 export default router;
+

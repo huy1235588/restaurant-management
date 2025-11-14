@@ -616,3 +616,45 @@ model StockAlert {
     @@index([isResolved])
     @@map("stock_alerts")
 }
+
+// ============================================
+// VISUAL FLOOR PLAN (Phase 3)
+// ============================================
+
+model FloorPlanLayout {
+    layoutId    Int     @id @default(autoincrement())
+    restaurant  Int
+    floor       Int
+    name        String  @db.VarChar(100) // e.g., "Weekday", "Weekend", "Private Event"
+    description String? @db.Text
+    data        Json    // Stores table positions and properties
+    isActive    Boolean @default(false)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    @@unique([restaurant, floor, name])
+    @@index([floor])
+    @@index([isActive])
+    @@map("floor_plan_layouts")
+}
+
+model FloorPlanBackground {
+    backgroundId Int     @id @default(autoincrement())
+    restaurant   Int
+    floor        Int
+    fileUrl      String  @db.Text
+    fileName     String  @db.VarChar(255)
+    fileSize     Int
+    mimeType     String  @db.VarChar(50)
+    opacity      Float   @default(1.0) // 0-1
+    positionX    Float   @default(0)
+    positionY    Float   @default(0)
+    scaleX       Float   @default(1.0)
+    scaleY       Float   @default(1.0)
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+
+    @@unique([restaurant, floor])
+    @@index([floor])
+    @@map("floor_plan_backgrounds")
+}
