@@ -7,6 +7,7 @@ import { VisualTableCard } from './VisualTableCard';
 import { ResizeRotateHandles } from './ResizeRotateHandles';
 import { GhostTablePreview } from './GhostTablePreview';
 import { ToolIndicator } from './ToolIndicator';
+import { BoundaryIndicator } from './BoundaryIndicator';
 import {
     DndContext,
     DragEndEvent,
@@ -42,6 +43,7 @@ interface VisualFloorPlanCanvasProps {
     onViewQR: (table: Table) => void;
     onAddTableClick?: (position: { x: number; y: number }) => void;
     ghostTable?: { x: number; y: number; width: number; height: number; isValid: boolean } | null;
+    deletingTableIds?: Set<number>;
 }
 
 interface TablePosition {
@@ -87,6 +89,7 @@ export function VisualFloorPlanCanvas({
     onViewQR,
     onAddTableClick,
     ghostTable,
+    deletingTableIds = new Set(),
 }: VisualFloorPlanCanvasProps) {
     const { t } = useTranslation();
     const canvasRef = useRef<HTMLDivElement>(null);
@@ -100,6 +103,7 @@ export function VisualFloorPlanCanvas({
     const [alignmentGuides, setAlignmentGuides] = useState<AlignmentGuide[]>([]);
     const [activeId, setActiveId] = useState<number | null>(null);
     const [canvasBounds, setCanvasBounds] = useState({ minX: 0, maxX: 0, minY: 0, maxY: 0 });
+    const [showBoundary, setShowBoundary] = useState(false);
 
     // Configure dnd-kit sensors
     const sensors = useSensors(
@@ -191,6 +195,25 @@ export function VisualFloorPlanCanvas({
 
         return guides;
     }, [tablePositions]);
+
+    // Keyboard shortcut for boundary toggle (B key)
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'b' || e.key === 'B') {
+                // Only toggle if not typing in an input field
+                if (
+                    document.activeElement?.tagName !== 'INPUT' &&
+                    document.activeElement?.tagName !== 'TEXTAREA'
+                ) {
+                    setShowBoundary(prev => !prev);
+                    e.preventDefault();
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     // Draw grid on canvas
     useEffect(() => {
@@ -463,6 +486,15 @@ export function VisualFloorPlanCanvas({
                     />
                 )}
 
+                {/* Boundary Indicator */}
+                <BoundaryIndicator
+                    bounds={canvasBounds}
+                    visible={showBoundary}
+                    zoom={zoom}
+                    panX={panX}
+                    panY={panY}
+                />
+
                 {/* Alignment Guides */}
                 {alignmentGuides.length > 0 && (
                     <div className="absolute inset-0 pointer-events-none z-20">
@@ -523,6 +555,7 @@ export function VisualFloorPlanCanvas({
                         if (!pos) return null;
 
                         const isDragging = table.tableId === draggingTableId;
+                        const isDeleting = deletingTableIds.has(table.tableId);
                         const draggedX = isDragging ? pos.x + dragDelta.x : pos.x;
                         const draggedY = isDragging ? pos.y + dragDelta.y : pos.y;
 
@@ -533,6 +566,7 @@ export function VisualFloorPlanCanvas({
                                 position={{ x: draggedX, y: draggedY, width: pos.width, height: pos.height }}
                                 isSelected={selectedTableId === table.tableId}
                                 isDragging={isDragging}
+                                isDeleting={isDeleting}
                                 disabled={activeTool !== 'select'}
                                 isDeleteMode={activeTool === 'delete'}
                                 onEdit={onEdit}
@@ -593,6 +627,7 @@ interface DraggableTableCardProps {
     position: { x: number; y: number; width: number; height: number };
     isSelected: boolean;
     isDragging: boolean;
+    isDeleting?: boolean;
     disabled: boolean;
     isDeleteMode?: boolean;
     onEdit: (table: Table) => void;
@@ -609,6 +644,7 @@ function DraggableTableCard({
     position,
     isSelected,
     isDragging,
+    isDeleting = false,
     disabled,
     isDeleteMode = false,
     onEdit,
@@ -624,15 +660,20 @@ function DraggableTableCard({
         disabled,
     });
 
+    const transformValue = isDeleting 
+        ? `${CSS.Translate.toString(transform)} scale(0.8)` 
+        : CSS.Translate.toString(transform);
+    
     const style = {
         position: 'absolute' as const,
         left: `${position.x}px`,
         top: `${position.y}px`,
         width: `${position.width}px`,
         height: `${position.height}px`,
-        transform: CSS.Translate.toString(transform),
-        opacity: isDragging ? 0.5 : 1,
+        transform: transformValue,
+        opacity: isDragging ? 0.5 : isDeleting ? 0 : 1,
         cursor: disabled ? 'default' : 'move',
+        transition: isDeleting ? 'opacity 300ms ease-out, transform 300ms ease-out' : 'none',
     };
 
     // Apply red overlay for delete mode on selected table

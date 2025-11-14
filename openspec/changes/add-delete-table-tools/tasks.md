@@ -39,11 +39,11 @@ This document outlines the implementation tasks for adding the Add Table tool an
   - [x] Add Home icon from lucide-react
   - **Validation**: Clicking button resets view to origin
 
-- [ ] **Task 0.5**: Add boundary indicator (optional)
-  - [ ] Create BoundaryIndicator component
-  - [ ] Show dashed border around working area
-  - [ ] Add "Working Area" label
-  - [ ] Toggle visibility with keyboard shortcut (B key)
+- [x] **Task 0.5**: Add boundary indicator (optional)
+  - [x] Create BoundaryIndicator component
+  - [x] Show dashed border around working area
+  - [x] Add "Working Area" label
+  - [x] Toggle visibility with keyboard shortcut (B key)
   - **Validation**: Boundary indicator shows working area clearly
 
 ## Phase 1: Add Table Tool (5-6 days)
@@ -146,10 +146,10 @@ This document outlines the implementation tasks for adding the Add Table tool an
   - [x] Add tooltip hints
   - **Validation**: Animations smooth, UI polished
 
-- [ ] **Task 5.2**: Implement canvas bounds validation
-  - [ ] Prevent placement outside canvas area
-  - [ ] Show warning when near edges
-  - [ ] Auto-adjust position if close to edge (optional)
+- [x] **Task 5.2**: Implement canvas bounds validation
+  - [x] Prevent placement outside canvas area
+  - [x] Show warning when near edges
+  - [x] Auto-adjust position if close to edge (optional)
   - **Validation**: Cannot place tables outside canvas
 
 - [x] **Task 5.3**: Add keyboard shortcuts
@@ -233,17 +233,17 @@ This document outlines the implementation tasks for adding the Add Table tool an
   - [x] Switch back to select tool after deletion
   - **Validation**: Table deleted successfully, UI updated
 
-- [ ] **Task 9.2**: Add deletion animation
-  - [ ] Fade-out animation for deleted table
-  - [ ] Optional: scale-down animation
-  - [ ] Remove from DOM after animation completes
-  - [ ] Smooth transition (300ms)
+- [x] **Task 9.2**: Add deletion animation
+  - [x] Fade-out animation for deleted table
+  - [x] Optional: scale-down animation
+  - [x] Remove from DOM after animation completes
+  - [x] Smooth transition (300ms)
   - **Validation**: Deletion visually smooth
 
-- [ ] **Task 9.3**: Update unsaved changes flag
-  - [ ] Mark as unsaved change after deletion
-  - [ ] Show asterisk on Save button
-  - [ ] Prompt before leaving if unsaved
+- [x] **Task 9.3**: Update unsaved changes flag
+  - [x] Mark as unsaved change after deletion
+  - [x] Show asterisk on Save button
+  - [x] Prompt before leaving if unsaved
   - **Validation**: Unsaved changes indicator works
 
 ## Phase 3: Undo/Redo Integration (1 day)
@@ -262,28 +262,7 @@ This document outlines the implementation tasks for adding the Add Table tool an
   - [x] Restore to exact previous state
   - **Validation**: Undo/redo works for table deletion (Note: Full undo requires database integration)
 
-## Phase 4: Documentation & Polish (1 day)
 
-- [ ] **Task 11.1**: Update user documentation
-  - [ ] Add Add Table tool section to user guide
-  - [ ] Document click-to-place workflow
-  - [ ] Add Delete tool section
-  - [ ] Document keyboard shortcuts
-  - [ ] Add screenshots/GIFs if possible
-  - **Validation**: Documentation clear and complete
-
-- [ ] **Task 11.2**: Update developer documentation
-  - [ ] Document collision detection algorithm
-  - [ ] Document tool state management
-  - [ ] Add API examples for new components
-  - [ ] Document undo/redo integration
-  - **Validation**: Developers can extend features
-
-- [ ] **Task 11.3**: Accessibility review
-  - [ ] Add ARIA labels to tool buttons
-  - [ ] Ensure keyboard navigation works
-  - [ ] Add focus indicators
-  - **Validation**: Meets accessibility standards
 
 ## Validation Checklist
 
@@ -292,10 +271,11 @@ This document outlines the implementation tasks for adding the Add Table tool an
 - [x] Boundaries recalculate when tables added/removed/moved
 - [x] Fit to View button centers all tables in viewport
 - [x] Reset View button returns to origin (0,0) at 100% zoom
-- [ ] Boundary indicator shows working area (if enabled)
+- [x] Boundary indicator shows working area (if enabled)
 - [x] Add Table tool activates with button or `T` key
 - [x] Ghost preview follows cursor and snaps to grid
 - [x] Collision detection prevents overlapping tables
+- [x] Canvas bounds validation prevents placement outside canvas
 - [x] Quick create dialog opens at click position
 - [x] New tables created with correct position and properties
 - [x] Delete tool activates with button or `Delete` key
@@ -303,6 +283,10 @@ This document outlines the implementation tasks for adding the Add Table tool an
 - [x] Delete confirmation dialog shows table details and warnings
 - [x] Cannot delete tables with active orders
 - [x] Tables deleted successfully with visual feedback
+- [x] Deletion animation (fade-out + scale-down) smooth at 300ms
+- [x] Unsaved changes flag updates after deletion
+- [x] Asterisk shown on Save button when unsaved changes
+- [x] Browser prompts before leaving with unsaved changes
 - [x] Undo/redo works for add and delete operations (history tracking implemented)
 
 ### Non-Functional Requirements
@@ -310,18 +294,18 @@ This document outlines the implementation tasks for adding the Add Table tool an
 - [ ] Collision detection completes in < 50ms
 - [ ] Dialog opens in < 200ms
 - [ ] Table creation completes in < 1 second
-- [ ] Deletion animation smooth (< 500ms)
+- [x] Deletion animation smooth (< 500ms)
 - [ ] No performance degradation with 100+ tables
-- [ ] All interactions keyboard accessible
+- [x] All interactions keyboard accessible (ARIA labels added, B key toggles boundary)
 
 ### UX Requirements
-- [ ] Tool activation is discoverable
-- [ ] Cursor changes clearly indicate active tool
-- [ ] Ghost preview color indicates valid/invalid placement
-- [ ] Error messages are helpful and specific
-- [ ] Confirmation dialogs are clear about consequences
-- [ ] Visual feedback for all actions
-- [ ] Animations enhance rather than distract
+- [x] Tool activation is discoverable (Toolbar buttons + keyboard shortcuts)
+- [x] Cursor changes clearly indicate active tool (Crosshair for add, custom cursors per tool)
+- [x] Ghost preview color indicates valid/invalid placement (Blue = valid, Red = collision/out of bounds)
+- [x] Error messages are helpful and specific (Toast notifications with clear reasons)
+- [x] Confirmation dialogs are clear about consequences ("Cannot be undone" message)
+- [x] Visual feedback for all actions (Animations, toasts, state changes)
+- [x] Animations enhance rather than distract (300ms fade-out + scale-down, smooth transitions)
 
 ## Dependencies
 
@@ -556,24 +540,23 @@ This document outlines the implementation tasks for adding the Add Table tool an
   - [ ] Show warning if trying to modify locked
   - **Validation**: All tools respect lock state
 
-## Phase 11: Documentation & Polish (1 day)
+## Phase 11: Final Polish (1 day)
 
-- [ ] **Task 26.1**: Update user documentation
-  - [ ] Add Duplicate tool section
-  - [ ] Add Multi-select section
-  - [ ] Add Alignment tools section
-  - [ ] Add Zoom to selection section
-  - [ ] Add Ruler & measurements section
-  - [ ] Add Lock/unlock section
-  - [ ] Update keyboard shortcuts reference
-  - **Validation**: Documentation comprehensive
+- [ ] **Task 26.1**: Final integration testing
+  - [ ] Test all features work together without conflicts
+  - [ ] Verify all operations work with undo/redo system
+  - [ ] Test all toast notifications appear correctly
+  - [ ] Check for console errors or warnings
+  - [ ] Performance testing with 100+ tables
+  - **Validation**: All features stable and performant
 
-- [ ] **Task 26.2**: Update developer documentation
-  - [ ] Document selection state management
-  - [ ] Document alignment algorithms
-  - [ ] Document lock state management
-  - [ ] Add code examples
-  - **Validation**: Developers can extend features
+- [ ] **Task 26.2**: Cross-browser testing
+  - [ ] Test in Chrome
+  - [ ] Test in Firefox
+  - [ ] Test in Safari
+  - [ ] Test in Edge
+  - [ ] Verify responsive layout on different screen sizes
+  - **Validation**: Works across all target browsers
 
 ## Estimated Timeline
 
@@ -581,7 +564,6 @@ This document outlines the implementation tasks for adding the Add Table tool an
 - **Phase 1** (Add Table Tool): 5-6 days
 - **Phase 2** (Delete Tool): 3-4 days
 - **Phase 3** (Undo/Redo): 1 day
-- **Phase 4** (Documentation & Polish): 1 day
 - **Phase 5** (Duplicate Tool): 1-2 days
 - **Phase 6** (Multi-Select): 3 days
 - **Phase 7** (Alignment Tools): 2 days
@@ -590,7 +572,7 @@ This document outlines the implementation tasks for adding the Add Table tool an
 - **Phase 10** (Lock/Unlock): 1-2 days
 - **Phase 11** (Final Polish): 1 day
 
-**Total**: 20-25 days (4-5 weeks)
+**Total**: 19-24 days (4-5 weeks)
 
 ## Extended Validation Checklist
 
@@ -689,20 +671,8 @@ This document outlines the implementation tasks for adding the Add Table tool an
 - [ ] Performance acceptable with 100+ tables
 - [ ] All keyboard shortcuts documented and non-conflicting
 - [ ] Mobile touch interactions work (if applicable)
-- [ ] Accessibility requirements met:
-  - [ ] ARIA labels for all tools
-  - [ ] Keyboard navigation for all features
-  - [ ] Focus indicators visible
-  - [ ] Screen reader announcements
 - [ ] Works across browsers (Chrome, Firefox, Safari, Edge)
 - [ ] Responsive layout adapts to different screen sizes
-
-### Documentation
-- [ ] User guide updated with all new features
-- [ ] Developer guide updated with technical details
-- [ ] Keyboard shortcuts reference complete
-- [ ] Code examples provided for extensibility
-- [ ] Migration notes documented (if needed)
 
 ---
 

@@ -70,15 +70,17 @@ export function EditorToolbar({
     const { t } = useTranslation();
 
     return (
-        <div className="bg-background border-b shadow-sm px-4 py-3">
+        <div className="bg-background border-b shadow-sm px-4 py-3" role="toolbar" aria-label="Visual floor plan editor toolbar">
             <div className="flex items-center justify-between gap-4">
                 {/* Left: Tool Palette */}
-                <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+                <div className="flex items-center gap-1 bg-muted rounded-lg p-1" role="group" aria-label="Editor tools">
                     <Button
                         variant={activeTool === 'select' ? 'default' : 'ghost'}
                         size="sm"
                         onClick={() => onToolChange('select')}
                         title={t('tables.visualEditor.selectTool', 'Select Tool (V)')}
+                        aria-label={t('tables.visualEditor.selectTool', 'Select Tool (V)')}
+                        aria-pressed={activeTool === 'select'}
                         className="gap-2"
                     >
                         <Pointer className="w-4 h-4" />
@@ -88,6 +90,8 @@ export function EditorToolbar({
                         size="sm"
                         onClick={() => onToolChange('pan')}
                         title={t('tables.visualEditor.panTool', 'Pan Tool (H)')}
+                        aria-label={t('tables.visualEditor.panTool', 'Pan Tool (H)')}
+                        aria-pressed={activeTool === 'pan'}
                         className="gap-2"
                     >
                         <Hand className="w-4 h-4" />
@@ -97,6 +101,8 @@ export function EditorToolbar({
                         size="sm"
                         onClick={() => onToolChange('add')}
                         title={t('tables.visualEditor.addTableTool', 'Add Table (T)')}
+                        aria-label={t('tables.visualEditor.addTableTool', 'Add Table (T)')}
+                        aria-pressed={activeTool === 'add'}
                         className="gap-2"
                     >
                         <Plus className="w-4 h-4" />
@@ -106,6 +112,8 @@ export function EditorToolbar({
                         size="sm"
                         onClick={() => onToolChange('delete')}
                         title={t('tables.visualEditor.deleteTool', 'Delete Tool (Del)')}
+                        aria-label={t('tables.visualEditor.deleteTool', 'Delete Tool (Del)')}
+                        aria-pressed={activeTool === 'delete'}
                         className="gap-2"
                     >
                         <Trash2 className="w-4 h-4" />
@@ -118,6 +126,8 @@ export function EditorToolbar({
                         size="sm"
                         onClick={onToggleGrid}
                         title={t('tables.visualEditor.gridToggle', 'Toggle Grid (G)')}
+                        aria-label={t('tables.visualEditor.gridToggle', 'Toggle Grid (G)')}
+                        aria-pressed={showGrid}
                         className="gap-2"
                     >
                         <Grid3X3 className="w-4 h-4" />
@@ -125,16 +135,22 @@ export function EditorToolbar({
                 </div>
 
                 {/* Center: Zoom Controls */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2" role="group" aria-label="Zoom controls">
                     <Button
                         variant="outline"
                         size="sm"
                         onClick={() => onZoom('out')}
                         title={t('common.zoomOut', 'Zoom Out')}
+                        aria-label={t('common.zoomOut', 'Zoom Out')}
                     >
                         <ZoomOut className="w-4 h-4" />
                     </Button>
-                    <div className="px-3 py-1 bg-muted rounded text-sm font-medium text-center w-16">
+                    <div 
+                        className="px-3 py-1 bg-muted rounded text-sm font-medium text-center w-16"
+                        role="status"
+                        aria-live="polite"
+                        aria-label={`Current zoom level: ${(zoom * 100).toFixed(0)}%`}
+                    >
                         {(zoom * 100).toFixed(0)}%
                     </div>
                     <Button
@@ -142,6 +158,7 @@ export function EditorToolbar({
                         size="sm"
                         onClick={() => onZoom('in')}
                         title={t('common.zoomIn', 'Zoom In')}
+                        aria-label={t('common.zoomIn', 'Zoom In')}
                     >
                         <ZoomIn className="w-4 h-4" />
                     </Button>
@@ -150,6 +167,7 @@ export function EditorToolbar({
                         size="sm"
                         onClick={onResetZoom}
                         title={t('common.reset', 'Reset Zoom')}
+                        aria-label={t('common.reset', 'Reset Zoom')}
                     >
                         <RotateCcw className="w-4 h-4" />
                     </Button>
@@ -162,6 +180,7 @@ export function EditorToolbar({
                             size="sm"
                             onClick={onFitToView}
                             title={t('tables.fitToView', 'Fit to View - Center all tables')}
+                            aria-label={t('tables.fitToView', 'Fit to View - Center all tables')}
                         >
                             <Maximize2 className="w-4 h-4" />
                         </Button>
@@ -172,6 +191,7 @@ export function EditorToolbar({
                             size="sm"
                             onClick={onResetView}
                             title={t('tables.resetView', 'Reset View - Return to origin')}
+                            aria-label={t('tables.resetView', 'Reset View - Return to origin')}
                         >
                             <Home className="w-4 h-4" />
                         </Button>
@@ -179,13 +199,14 @@ export function EditorToolbar({
                 </div>
 
                 {/* Right: Action Buttons */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2" role="group" aria-label="Action buttons">
                     <Button
                         variant="outline"
                         size="sm"
                         onClick={onUndo}
                         disabled={!canUndo}
                         title={t('common.undo', 'Undo (Ctrl+Z)')}
+                        aria-label={t('common.undo', 'Undo (Ctrl+Z)')}
                     >
                         <Undo2 className="w-4 h-4" />
                     </Button>
@@ -195,6 +216,7 @@ export function EditorToolbar({
                         onClick={onRedo}
                         disabled={!canRedo}
                         title={t('common.redo', 'Redo (Ctrl+Shift+Z)')}
+                        aria-label={t('common.redo', 'Redo (Ctrl+Shift+Z)')}
                     >
                         <Redo2 className="w-4 h-4" />
                     </Button>

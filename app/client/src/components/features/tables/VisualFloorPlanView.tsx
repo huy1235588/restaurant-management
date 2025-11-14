@@ -15,7 +15,7 @@ import { ActionHistory } from '@/lib/visual-floor-plan/action-history';
 import { floorPlanApi, FloorPlanLayout } from '@/services/floor-plan.service';
 import { LayoutTemplateId, TemplateLayoutState, generateTemplateLayout } from '@/lib/visual-floor-plan/templates';
 import { calculateFitToViewOffset } from '@/lib/utils/pan-boundaries';
-import { detectCollision, generateNextTableNumber } from '@/lib/utils/collision-detection';
+import { detectCollision, generateNextTableNumber, isWithinCanvasBounds } from '@/lib/utils/collision-detection';
 import { QuickCreateTableDialog } from './visual-floor-plan/QuickCreateTableDialog';
 import { DeleteTableConfirmDialog } from './visual-floor-plan/DeleteTableConfirmDialog';
 
@@ -75,6 +75,7 @@ export function VisualFloorPlanView({
     const [clickPosition, setClickPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [tableToDelete, setTableToDelete] = useState<Table | null>(null);
+    const [deletingTableIds, setDeletingTableIds] = useState<Set<number>>(new Set());
 
     // Filter tables by floor
     const filteredTables = floorFilter !== 'all'
@@ -98,6 +99,19 @@ export function VisualFloorPlanView({
             shape: table?.shape ?? 'rectangle',
         };
     }, [tableLookup]);
+
+    // Warn user before leaving with unsaved changes
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (unsavedChanges) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [unsavedChanges]);
 
     const handleZoom = useCallback((direction: 'in' | 'out') => {
         setCanvasState(prev => ({
@@ -390,6 +404,9 @@ export function VisualFloorPlanView({
 
     const handleDeleteSuccess = useCallback(() => {
         if (tableToDelete) {
+            // Add table to deleting set for animation
+            setDeletingTableIds(prev => new Set(prev).add(tableToDelete.tableId));
+            
             // Record action in history for undo/redo
             historyRef.current.addAction({
                 type: 'delete',
@@ -398,6 +415,15 @@ export function VisualFloorPlanView({
                     tableData: tableToDelete,
                 },
             });
+            
+            // Remove from deleting set after animation completes (300ms)
+            setTimeout(() => {
+                setDeletingTableIds(prev => {
+                    const newSet = new Set(prev);
+                    newSet.delete(tableToDelete.tableId);
+                    return newSet;
+                });
+            }, 300);
         }
         
         setShowDeleteDialog(false);
@@ -434,12 +460,22 @@ export function VisualFloorPlanView({
                 existingPositions
             );
             
+            // Check canvas bounds
+            const canvasWidth = rect.width / canvasState.zoom;
+            const canvasHeight = rect.height / canvasState.zoom;
+            const withinBounds = isWithinCanvasBounds(
+                { x: canvasX, y: canvasY },
+                { width: tableWidth, height: tableHeight },
+                canvasWidth,
+                canvasHeight
+            );
+            
             setGhostTable({
                 x: canvasX,
                 y: canvasY,
                 width: tableWidth,
                 height: tableHeight,
-                isValid: !hasCollision,
+                isValid: !hasCollision && withinBounds,
             });
         }
     }, [activeTool, canvasState.panX, canvasState.panY, canvasState.zoom, filteredTables, tablePositions]);
@@ -470,10 +506,28 @@ export function VisualFloorPlanView({
             return;
         }
         
+        // Check canvas bounds
+        if (canvasRef.current) {
+            const rect = canvasRef.current.getBoundingClientRect();
+            const canvasWidth = rect.width / canvasState.zoom;
+            const canvasHeight = rect.height / canvasState.zoom;
+            const withinBounds = isWithinCanvasBounds(
+                position,
+                { width: tableWidth, height: tableHeight },
+                canvasWidth,
+                canvasHeight
+            );
+            
+            if (!withinBounds) {
+                toast.error(t('tables.outsideCanvasBounds', 'Cannot place table outside canvas area'));
+                return;
+            }
+        }
+        
         // Open quick create dialog
         setClickPosition(position);
         setShowQuickCreateDialog(true);
-    }, [filteredTables, tablePositions, t]);
+    }, [filteredTables, tablePositions, canvasState.zoom, t]);
 
     const handleQuickCreateSuccess = useCallback(() => {
         setShowQuickCreateDialog(false);
@@ -702,6 +756,7 @@ export function VisualFloorPlanView({
                         onViewQR={onViewQR}
                         onAddTableClick={handleAddTableClick}
                         ghostTable={ghostTable}
+                        deletingTableIds={deletingTableIds}
                     />
                 </div>
 

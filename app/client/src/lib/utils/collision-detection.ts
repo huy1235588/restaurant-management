@@ -83,3 +83,30 @@ export function generateNextTableNumber(existingNumbers: number[]): number {
   // No gaps, return next number
   return maxNumber + 1;
 }
+
+/**
+ * Check if a table position is within canvas bounds
+ * @param position The position to check (top-left corner)
+ * @param size The size of the table
+ * @param canvasWidth The width of the canvas
+ * @param canvasHeight The height of the canvas
+ * @param margin Optional margin from edges (default: 20px)
+ * @returns true if within bounds, false otherwise
+ */
+export function isWithinCanvasBounds(
+  position: { x: number; y: number },
+  size: { width: number; height: number },
+  canvasWidth: number,
+  canvasHeight: number,
+  margin: number = 20
+): boolean {
+  const tableRight = position.x + size.width;
+  const tableBottom = position.y + size.height;
+  
+  return (
+    position.x >= margin &&
+    position.y >= margin &&
+    tableRight <= canvasWidth - margin &&
+    tableBottom <= canvasHeight - margin
+  );
+}
