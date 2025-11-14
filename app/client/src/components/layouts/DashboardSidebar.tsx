@@ -213,7 +213,7 @@ export function DashboardSidebar({ navItems = [], navGroups, appName }: Dashboar
     return (
         <Sidebar collapsible="offcanvas" className="border-r">
             {/* Header with Logo - Pixel-perfect alignment with TopBar logo */}
-            <SidebarHeader className="h-16 flex flex-row items-center justify-between border-b border-sidebar-border bg-linear-to-b from-sidebar to-sidebar/95 px-4">
+            <SidebarHeader className="h-16 flex flex-row items-center gap-3 border-b border-sidebar-border bg-linear-to-b from-sidebar to-sidebar/95 px-4">
                 <SidebarTrigger className="-ml-1 hover:bg-accent transition-colors duration-200" />
 
                 {/* Logo positioned to align with TopBar: toggle(28px) + gap(12px) + margin(4px) = 44px from left */}
@@ -226,7 +226,7 @@ export function DashboardSidebar({ navItems = [], navGroups, appName }: Dashboar
                         className="h-8 w-8"
                     />
                     <span className="font-bold text-lg">
-                        {appName || t('common.appName') || 'Restaurant'}
+                        {/* {asppName || t('common.appName') || 'Restaurant'} */}
                     </span>
                 </div>
             </SidebarHeader>

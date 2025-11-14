@@ -39,7 +39,7 @@ export function TopBar({ user, onLogout }: TopBarProps) {
                 <SidebarTrigger className="-ml-1 hover:bg-accent transition-colors duration-200" />
                 
                 {/* Application logo - adjacent to toggle button, pixel position: left-11 (44px) */}
-                <div className="flex items-center gap-2" style={{ marginLeft: '4px' }}>
+                <div className="flex items-center gap-2">
                     <Image
                         src="/images/logo/logo.png"
                         alt="Restaurant Logo"
@@ -49,7 +49,7 @@ export function TopBar({ user, onLogout }: TopBarProps) {
                         priority
                     />
                     <span className="font-bold text-lg hidden sm:inline-block">
-                        {t('common.appName') || 'Restaurant'}
+                        {/* {t('common.appName') || 'Restaurant'} */}
                     </span>
                 </div>
                 
