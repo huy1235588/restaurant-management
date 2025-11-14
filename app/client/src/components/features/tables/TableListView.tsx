@@ -63,10 +63,37 @@ export function TableListView({
 
     if (loading) {
         return (
-            <div className="space-y-3">
-                {[...Array(5)].map((_, index) => (
-                    <Skeleton key={index} className="h-16 w-full" />
-                ))}
+            <div className="border rounded-md">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            {onSelectionChange && <TableHead className="w-12"><Skeleton className="h-4 w-4" /></TableHead>}
+                            <TableHead><Skeleton className="h-4 w-20" /></TableHead>
+                            <TableHead><Skeleton className="h-4 w-24" /></TableHead>
+                            <TableHead><Skeleton className="h-4 w-16" /></TableHead>
+                            <TableHead><Skeleton className="h-4 w-16" /></TableHead>
+                            <TableHead><Skeleton className="h-4 w-20" /></TableHead>
+                            <TableHead><Skeleton className="h-4 w-16" /></TableHead>
+                            <TableHead><Skeleton className="h-4 w-16" /></TableHead>
+                            <TableHead className="text-right"><Skeleton className="h-4 w-16 ml-auto" /></TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {[...Array(5)].map((_, index) => (
+                            <TableRow key={index} className="animate-pulse">
+                                {onSelectionChange && <TableCell><Skeleton className="h-4 w-4" /></TableCell>}
+                                <TableCell><Skeleton className="h-4 w-12" /></TableCell>
+                                <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                                <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                                <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                                <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                                <TableCell><Skeleton className="h-6 w-20" /></TableCell>
+                                <TableCell><Skeleton className="h-8 w-8 rounded" /></TableCell>
+                                <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto rounded" /></TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
             </div>
         );
     }
@@ -88,8 +115,8 @@ export function TableListView({
     );
 
     return (
-        <div className="border rounded-md">
-            <Table role="grid" aria-label={t('tables.tablesList', 'List of restaurant tables')}>
+        <div className="border rounded-md overflow-x-auto">
+            <Table role="grid" aria-label={t('tables.tablesList', 'List of restaurant tables')} className="min-w-[800px]">
                 <TableHeader>
                     <TableRow role="row">
                         {onSelectionChange && (
@@ -157,7 +184,7 @@ export function TableListView({
                         <TableRow 
                             key={table.tableId}
                             onClick={() => onRowClick?.(table)}
-                            className="cursor-pointer hover:bg-muted/50"
+                            className="cursor-pointer hover:bg-muted/50 transition-colors duration-200"
                             role="row"
                             aria-label={t('tables.tableRow', 'Table {{number}}: {{status}}', { 
                                 number: table.tableNumber,

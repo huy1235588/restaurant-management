@@ -39,8 +39,11 @@ export function TableStatusBadge({ status, className }: TableStatusBadgeProps) {
     const Icon = config.icon;
 
     return (
-        <Badge variant={config.variant} className={`${config.className} ${className || ''}`}>
-            <Icon className="w-3 h-3 mr-1" />
+        <Badge 
+            variant={config.variant} 
+            className={`${config.className} ${className || ''} transition-all duration-300 ease-in-out`}
+        >
+            <Icon className="w-3 h-3 mr-1 transition-transform duration-200 group-hover:scale-110" />
             {config.label}
         </Badge>
     );

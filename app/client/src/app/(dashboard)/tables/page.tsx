@@ -355,7 +355,7 @@ export default function TablesPage() {
     }, [fetchTables, fetchStats]);
 
     return (
-        <div className="container mx-auto p-6 space-y-6">
+        <div className="container mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
             <TableHeader
                 tables={tables}
                 onCreateTable={handleCreateTable}
@@ -380,13 +380,13 @@ export default function TablesPage() {
             />
 
             {viewMode === 'list' ? (
-                <>
+                <div className="animate-in fade-in duration-500">
                     {selectedTableIds.length > 0 && (
-                        <div className="flex items-center justify-between bg-blue-100 border border-blue-200 rounded-lg p-4">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-blue-100 border border-blue-200 rounded-lg p-4 animate-in slide-in-from-top-2 duration-300">
                             <span className="text-sm font-medium text-blue-900">
                                 {t('tables.selectedCount', '{{count}} tables selected', { count: selectedTableIds.length })}
                             </span>
-                            <div className="flex gap-2">
+                            <div className="flex flex-wrap gap-2">
                                 <Button
                                     size="sm"
                                     variant="outline"
@@ -455,8 +455,9 @@ export default function TablesPage() {
                         onPageChange={handlePageChange}
                         onItemsPerPageChange={handleItemsPerPageChange}
                     />
-                </>
+                </div>
             ) : viewMode === 'floor' ? (
+                <div className="animate-in fade-in duration-500">
                 <FloorPlanView
                     tables={tables}
                     loading={loading}
@@ -466,7 +467,9 @@ export default function TablesPage() {
                     onViewQR={handleViewQR}
                     onAssignOrder={handleAssignOrder}
                 />
+                </div>
             ) : (
+                <div className="animate-in fade-in duration-500">
                 <VisualFloorPlanView
                     tables={tables}
                     loading={loading}
@@ -476,6 +479,7 @@ export default function TablesPage() {
                     onViewQR={handleViewQR}
                     onAssignOrder={handleAssignOrder}
                 />
+                </div>
             )}
 
             <TableDialogs

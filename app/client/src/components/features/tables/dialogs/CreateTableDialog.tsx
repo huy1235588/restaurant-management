@@ -65,7 +65,7 @@ export function CreateTableDialog({ open, onClose, onSuccess }: CreateTableDialo
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>{t('tables.createTable', 'Create New Table')}</DialogTitle>
                     <DialogDescription>
@@ -75,7 +75,7 @@ export function CreateTableDialog({ open, onClose, onSuccess }: CreateTableDialo
 
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <FormField
                                 control={form.control}
                                 name="tableNumber"

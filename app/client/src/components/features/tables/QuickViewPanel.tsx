@@ -122,7 +122,7 @@ export const QuickViewPanel = memo(function QuickViewPanel({
     }), [table.createdAt, table.updatedAt]);
 
     return (
-        <Card className="fixed right-0 top-16 bottom-0 w-80 rounded-none shadow-lg border-l z-40 flex flex-col overflow-hidden">
+        <Card className="fixed right-0 top-16 bottom-0 w-full sm:w-80 rounded-none shadow-lg border-l z-40 flex flex-col overflow-hidden">
             <TableHeader table={table} onClose={onClose} t={t} />
 
             <CardContent className="flex-1 overflow-y-auto space-y-4 py-4 px-4">

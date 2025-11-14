@@ -114,11 +114,11 @@ export function FloorPlanView({
     return (
         <div className="space-y-4">
             {/* Zoom Controls */}
-            <div className="flex items-center gap-2 justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 justify-between">
                 <div className="text-sm text-muted-foreground">
                     {t('tables.showingCount', 'Showing {{count}} tables', { count: visibleTableCount })}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                 <Button
                     variant="outline"
                     size="icon"
@@ -206,16 +206,16 @@ export function FloorPlanView({
                         <h3 className="text-lg font-semibold mb-4">
                             {t('tables.floor', 'Floor')} {floor}
                         </h3>
-                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                             {floorTables.map((table) => (
                                 <Card
                                     key={table.tableId}
-                                    className="cursor-pointer hover:shadow-lg transition-shadow"
+                                    className="cursor-pointer hover:shadow-lg hover:scale-105 transition-all duration-300 ease-in-out hover:-translate-y-1 group"
                                     onClick={() => onEdit(table)}
                                 >
                                     <CardContent className="p-4 space-y-2">
                                         <div className="flex items-center justify-between">
-                                            <span className="text-2xl font-bold">
+                                            <span className="text-2xl font-bold transition-colors duration-200 group-hover:text-primary">
                                                 {table.tableNumber}
                                             </span>
                                             <TableStatusBadge status={table.status} />
