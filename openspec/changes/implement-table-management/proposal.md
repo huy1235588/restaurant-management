@@ -51,18 +51,17 @@ Build a complete table management feature with four main interfaces:
 - Table cards with status indicators (🟢 available, 🔴 occupied, 🟡 reserved, 🔵 maintenance)
 - Drag-and-drop repositioning (future enhancement)
 - Floor/section filtering
-- Real-time status updates via WebSocket
+- Manual save changes via Save button
 - Quick actions (change status, view details, assign order)
 
 ### 2. Visual Floor Plan (Enhanced Interactive View)
 - Advanced 3D-like visualization or enhanced 2D canvas
 - Interactive table arrangement with visual editor
 - Custom table shapes and sizes (rectangle, circle, square)
-- Background floor plan image upload support
 - Grid snapping and alignment tools
 - Visual indicators for table relationships (combined tables, sections)
 - Enhanced drag-and-drop with rotation and resizing
-- Save and load multiple floor plan layouts
+- Save and load multiple floor plan layouts (via Save button)
 - Print-friendly floor plan export
 
 ### 3. List View (Data Management)
@@ -84,9 +83,10 @@ Build a complete table management feature with four main interfaces:
 
 1. **Enable table visualization**: Provide clear overview of restaurant layout and table status
 2. **Streamline table operations**: Quick CRUD operations with validation
-3. **Real-time updates**: Instant status synchronization across all connected clients
+3. **Manual save workflow**: Explicit save actions for better control and data consistency
 4. **Improve efficiency**: Reduce time staff spend managing table configurations
 5. **Support scalability**: Handle restaurants with 50-200+ tables across multiple floors
+6. **Multi-floor management**: Allow restaurants to manage separate floor plans for different floors (e.g., Floor 1, Floor 2, Rooftop)
 
 ## Non-Goals
 
@@ -98,31 +98,30 @@ Build a complete table management feature with four main interfaces:
 
 ## Success Metrics
 
-- Table status changes reflect instantly (< 500ms latency)
 - Staff can create/edit tables in < 30 seconds
-- Support 100+ concurrent users viewing table status
-- 95%+ uptime for WebSocket connections
-- Zero data loss during status transitions
+- Layout changes save successfully within 2 seconds
+- Support managing 50-200+ tables across multiple floors
+- Zero data loss during save operations
+- Intuitive floor switching with clear visual indicators
 
 ## Risks & Mitigations
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| WebSocket connection drops | High | Implement automatic reconnection with exponential backoff |
-| Race conditions on status updates | High | Use optimistic UI updates + server validation |
+| Unsaved changes lost on navigation | Medium | Show warning dialog before leaving with unsaved changes |
 | Performance with 200+ tables | Medium | Implement virtual scrolling and pagination |
 | QR code generation load | Low | Generate codes asynchronously, cache results |
-| Drag-and-drop complexity | Medium | Defer to Phase 2, implement basic positioning first |
+| Drag-and-drop complexity | Medium | Use proven libraries (dnd-kit) and implement incrementally |
+| Multi-floor data synchronization | Medium | Use floor-scoped queries and clear floor indicators |
 
 ## Dependencies
 
 - Existing backend API (`/tables` endpoints)
-- Socket.io client library (already installed)
 - Radix UI components (Dialog, Dropdown, etc.)
 - Zustand for state management
 - React Hook Form + Zod for validation
 - **dnd-kit** library for Visual Floor Plan drag-and-drop
-- HTML5 Canvas API for background and grid rendering
+- HTML5 Canvas API for grid rendering
 
 ## Timeline Estimate
 
@@ -130,7 +129,7 @@ Build a complete table management feature with four main interfaces:
   - List view with CRUD operations
   - Basic floor plan view
   - Status management
-  - Real-time updates
+  - Multi-floor support
   
 - **Phase 2** (Enhanced Features): 1-2 weeks
   - Basic drag-and-drop positioning
@@ -138,16 +137,15 @@ Build a complete table management feature with four main interfaces:
   - Bulk operations
   - Advanced filtering
 
-- **Phase 3** (Visual Floor Plan): 2-3 weeks
+- **Phase 3** (Visual Floor Plan): 1-2 weeks
   - Advanced visual editor with drag, resize, rotate
-  - Custom table shapes and styles
-  - Background images and layers
-  - Layout templates and save/load
+  - Custom table shapes (no color customization)
+  - Layout templates and save/load (button-based)
   - Grid system and alignment guides
   - Undo/redo functionality
   - Database migrations and API endpoints
 
-**Total**: 5-8 weeks
+**Total**: 4-7 weeks
 
 ## Alternatives Considered
 
@@ -175,10 +173,10 @@ Build a complete table management feature with four main interfaces:
    - **Proposed**: Implement locking mechanism with timeout
 
 5. Should Visual Floor Plan support real-time collaborative editing?
-   - **Proposed**: Defer to future enhancement; Phase 3 focuses on single-user editing
+   - **Decision**: No, changes are saved manually via Save button for better control
 
-6. What should be the maximum file size for background images?
-   - **Proposed**: 10MB limit, support PNG, JPG, SVG formats
+6. How should multi-floor management work?
+   - **Decision**: Each floor has independent floor plan layout. Floor selector allows switching between floors with clear visual indicators
 
 ## What's New in This Update
 
@@ -191,29 +189,34 @@ This proposal has been updated to include a **third view mode: Visual Floor Plan
    - Advanced drag-and-drop with resize and rotate capabilities
    - Custom table shapes (Rectangle, Circle, Square, Oval)
    - Grid system with snapping and alignment guides
+   - Manual save via Save button (no WebSocket auto-sync)
 
 2. **New Requirements** (TV-008 through TV-014):
    - **TV-008**: Visual Floor Plan Editor with drag, resize, rotate
-   - **TV-009**: Custom table shapes and styles
-   - **TV-010**: Background images and layer management
-   - **TV-011**: Layout templates and save/load functionality
+   - **TV-009**: Custom table shapes (simplified, no color customization)
+   - **TV-011**: Layout templates and save/load functionality (button-based)
    - **TV-012**: Grid system with snapping
    - **TV-013**: Undo/redo and action history
    - **TV-014**: Comprehensive editor toolbar
 
 3. **Database Schema Enhancements**:
-   - Added fields to `RestaurantTable`: positionX, positionY, rotation, shape, width, height, customStyles
+   - Added fields to `RestaurantTable`: positionX, positionY, rotation, shape, width, height
    - New table: `FloorPlanLayout` for saving multiple layouts
-   - New table: `FloorPlanBackground` for background images per floor
 
 4. **New Dependencies**:
    - `dnd-kit` library for advanced drag-and-drop
-   - HTML5 Canvas API for background and grid rendering
+   - HTML5 Canvas API for grid rendering
 
-5. **Implementation Tasks** (Phase 3):
-   - 18 new tasks covering Visual Floor Plan implementation
-   - Estimated 2-3 weeks development time
-   - Total project timeline extended to 5-8 weeks
+5. **Multi-Floor Support**:
+   - Restaurants can manage multiple floors (e.g., Tầng 1, Tầng 2, Sân thượng)
+   - Each floor has independent floor plan layouts
+   - Clear floor selector with visual indicators
+
+6. **Implementation Tasks** (Phase 3):
+   - Streamlined tasks covering Visual Floor Plan implementation
+   - Estimated 1-2 weeks development time
+   - Testing requirements integrated into development, not separate phase
+   - Total project timeline: 4-7 weeks
 
 ## Approval
 

@@ -153,12 +153,12 @@
   - [x] Create hybrid rendering (Canvas + DOM elements)
   - **Validation**: Canvas renders without errors, supports zoom/pan
 
-- [x] **Task 10.3**: Create editor toolbar
-  - [x] Build toolbar component with tool palette
-  - [x] Add tools: Select, Pan, Add Table, Delete, Zoom, Grid, Save
-  - [x] Implement tool activation/deactivation logic
-  - [x] Add keyboard shortcuts (V, H, T, Delete, G, Ctrl+S)
-  - [x] Add tooltips for all tools
+- [ ] **Task 10.3**: Create editor toolbar
+  - [ ] Build toolbar component with tool palette
+  - [ ] Add tools: Select, Pan, Add Table, Delete, Zoom, Grid, Save
+  - [ ] Implement tool activation/deactivation logic
+  - [ ] Add keyboard shortcuts (V, H, T, Delete, G, Ctrl+S)
+  - [ ] Add tooltips for all tools
   - **Validation**: All tools functional with keyboard shortcuts
 
 ### Drag, Resize, and Rotate
@@ -208,10 +208,9 @@
   - [ ] Build side panel component
   - [ ] Show selected table properties
   - [ ] Add shape selector (Rectangle, Circle, Square, Oval)
-  - [ ] Add style customization (border color, background, font size)
   - [ ] Add dimension inputs (width, height, rotation)
-  - [ ] Real-time preview of changes
-  - **Validation**: Properties panel updates table appearance
+  - [ ] Changes preview locally (save via Save button)
+  - **Validation**: Properties panel updates table appearance locally
 
 - [ ] **Task 10.10**: Implement shape rendering
   - [ ] Render tables with custom shapes (CSS border-radius)
@@ -220,26 +219,10 @@
   - [ ] Save shape preference to database
   - **Validation**: All 4 shapes render and interact correctly
 
-### Background and Layers
-- [ ] **Task 10.11**: Implement background image upload
-  - [ ] Create background upload dialog
-  - [ ] Add file input (PNG, JPG, SVG, max 10MB)
-  - [ ] Upload image to server (use existing file storage API)
-  - [ ] Render background image on canvas
-  - [ ] Add opacity slider (0-100%)
-  - [ ] Allow repositioning and scaling background
-  - [ ] Save background config per floor
-  - **Validation**: Images upload, render, and persist correctly
 
-- [ ] **Task 10.12**: Build layer manager
-  - [ ] Create layers panel showing all layers
-  - [ ] Add visibility toggles for each layer
-  - [ ] Add lock/unlock functionality
-  - [ ] Implement layer order (background → grid → tables → annotations)
-  - **Validation**: Layer visibility and locking work correctly
 
 ### Layout Management
-- [ ] **Task 10.13**: Implement save/load layouts
+- [ ] **Task 10.11**: Implement save/load layouts
   - [ ] Add "Save Layout" button with name input dialog
   - [ ] Save all table positions, sizes, rotations, styles to database
   - [ ] Create `FloorPlanLayout` table (migration required)
@@ -248,7 +231,7 @@
   - [ ] Show confirmation dialog if unsaved changes exist
   - **Validation**: Layouts save and load correctly with animations
 
-- [ ] **Task 10.14**: Create layout templates
+- [ ] **Task 10.12**: Create layout templates
   - [ ] Design 4 layout templates (Fine Dining, Casual, Bar/Lounge, Banquet)
   - [ ] Implement template application algorithm
   - [ ] Add "Use Template" button and template selector
@@ -257,7 +240,7 @@
   - **Validation**: Templates apply correctly and are customizable
 
 ### Undo/Redo and Actions
-- [ ] **Task 10.15**: Implement action history
+- [ ] **Task 10.13**: Implement action history
   - [ ] Create action history stack (max 50 actions)
   - [ ] Record actions: move, resize, rotate, style change
   - [ ] Implement undo (Ctrl+Z) functionality
@@ -266,30 +249,27 @@
   - [ ] Clear history on save
   - **Validation**: Undo/redo works for all action types
 
-- [ ] **Task 10.16**: Implement save functionality
+- [ ] **Task 10.14**: Implement save functionality
   - [ ] Add "Save" button (keyboard: Ctrl+S)
-  - [ ] Persist all changes to database via API
+  - [ ] Persist all changes to database via API call (NOT WebSocket)
   - [ ] Show success/error notifications
   - [ ] Update "unsaved changes" indicator
   - [ ] Add confirmation dialog on view switch with unsaved changes
-  - **Validation**: Save persists all changes correctly
+  - **Validation**: Save persists all changes correctly via button click only
 
 ### Database Migrations
-- [x] **Task 10.17**: Create database migrations for Visual Floor Plan
-  - [x] Add columns to `RestaurantTable`: positionX, positionY, rotation, shape, width, height, customStyles
+- [x] **Task 10.15**: Create database migrations for Visual Floor Plan
+  - [x] Add columns to `RestaurantTable`: positionX, positionY, rotation, shape, width, height
   - [x] Create `FloorPlanLayout` table
-  - [x] Create `FloorPlanBackground` table
   - [x] Add indexes for performance
   - [x] Run migrations in dev and staging
   - **Validation**: Migrations run without errors, schema updated
 
 ### API Endpoints
-- [x] **Task 10.18**: Create API endpoints for Visual Floor Plan
-  - [x] Add `PATCH /tables/bulk-positions` for saving positions
+- [x] **Task 10.16**: Create API endpoints for Visual Floor Plan
+  - [x] Add `PATCH /tables/bulk-positions` for saving positions (called on Save button)
   - [x] Add `POST /floor-plans/layouts` for saving layouts
   - [x] Add `GET /floor-plans/layouts?floor={floor}` for loading layouts
-  - [x] Add `POST /floor-plans/backgrounds` for uploading backgrounds
-  - [x] Add `GET /floor-plans/backgrounds/{floor}` for loading backgrounds
   - **Validation**: All endpoints work with correct validation
 
 ### QR Code Management
@@ -367,10 +347,10 @@
   - [x] Add bulk export selected tables
   - **Validation**: Exported files contain correct data
 
-## Phase 3: Polish & Testing (Week 4-5)
+## Phase 3: Polish (Week 4)
 
 ### UI/UX Polish
-- [x] **Task 10.1**: Accessibility improvements
+- [x] **Task 11.1**: Accessibility improvements
   - [x] Add ARIA labels to table list and filter controls
   - [x] Add role attributes (grid, row, columnheader) to data table
   - [x] Add aria-sort for sortable columns
@@ -378,7 +358,7 @@
   - [x] Ensure keyboard navigation works (Tab, Enter, Escape)
   - **Validation**: Screen reader compatible, keyboard navigation functional
 
-- [x] **Task 10.2**: Responsive design implementation
+- [x] **Task 11.2**: Responsive design implementation
   - [x] Test on mobile (320px-767px)
   - [x] Test on tablet (768px-1023px)
   - [x] Test on desktop (1024px+)
@@ -386,45 +366,23 @@
   - [x] Optimize touch interactions for mobile
   - **Validation**: All features work on all screen sizes
 
-- [x] **Task 10.3**: Loading states and animations
+- [x] **Task 11.3**: Loading states and animations
   - [x] Add skeleton loaders for initial load
   - [x] Add smooth transitions for status changes
   - [x] Add micro-animations for user actions
   - [x] Optimize animation performance (use CSS transforms)
   - **Validation**: Animations run at 60fps
 
-### Testing
-- [ ] **Task 11.1**: Unit tests
-  - [ ] Test table components (render, props, events)
-  - [ ] Test Zustand store actions and selectors
-  - [ ] Test form validation logic
-  - [ ] Test utility functions (QR generation, etc.)
-  - **Validation**: 80%+ code coverage
-
-- [ ] **Task 11.2**: Integration tests
-  - [ ] Test table CRUD flow end-to-end
-  - [ ] Test WebSocket event handling
-  - [ ] Test status change workflows
-  - [ ] Test bulk operations
-  - **Validation**: All critical paths covered
-
-- [ ] **Task 11.3**: Performance testing
-  - [ ] Load test with 200+ tables
-  - [ ] Test WebSocket with 50+ concurrent connections
-  - [ ] Measure initial page load time (< 2s)
-  - [ ] Optimize bundle size
-  - **Validation**: No performance degradation with max expected load
-
 ### Documentation
-- [ ] **Task 12.1**: Update user documentation
+- [ ] **Task 11.4**: Update user documentation
   - [ ] Write table management user guide
-  - [ ] Create video tutorial (optional)
+  - [ ] Document multi-floor management workflow
   - [ ] Update FAQ section
   - **Validation**: Documentation covers all features
 
-- [ ] **Task 12.2**: Update developer documentation
+- [ ] **Task 11.5**: Update developer documentation
   - [ ] Document component API and props
-  - [ ] Document WebSocket event schema
+  - [ ] Document WebSocket event schema (for status updates only)
   - [ ] Update API documentation
   - **Validation**: New developers can understand codebase
 

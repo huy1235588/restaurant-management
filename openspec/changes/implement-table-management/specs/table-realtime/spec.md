@@ -1,5 +1,15 @@
 # Specification Delta: Table Real-time Updates
 
+## Overview
+
+**IMPORTANT**: WebSocket is used ONLY for real-time synchronization of table status changes across multiple users viewing the same floor plan. It is NOT used for saving floor plan layouts or table positions.
+
+**Scope**:
+- ✅ **IN SCOPE**: Real-time status updates (available, occupied, reserved, maintenance) when other users make changes
+- ✅ **IN SCOPE**: Broadcasting table creation/deletion/updates to all connected clients
+- ❌ **OUT OF SCOPE**: Auto-saving floor plan layouts (layouts are saved via explicit Save button only)
+- ❌ **OUT OF SCOPE**: Real-time collaborative editing of floor plans
+
 ## ADDED Requirements
 
 ### Requirement: TR-001 - WebSocket Connection Management
@@ -165,55 +175,6 @@ interface TableDeletedEvent {
 - ✅ Deleted tables remove from all views instantly
 - ✅ Animations provide smooth visual feedback
 - ✅ Event payloads are minimal (only changed data)
-
----
-
-### Requirement: TR-004 - Optimistic UI Updates
-**Priority**: P0 (Critical)  
-**Category**: User Experience  
-**Owner**: Frontend Team
-
-The system SHALL implement optimistic UI updates with rollback capability.
-
-#### Scenario: Successful optimistic update
-**Given** the user changes table T-05 status from "available" to "occupied"  
-**When** the user confirms the action  
-**Then** the frontend SHALL immediately update the local state  
-**And** the table card SHALL instantly show "occupied" status  
-**And** a subtle loading indicator SHALL appear on the table card  
-**And** the system SHALL send the update request to the backend  
-**And** when the backend confirms success  
-**Then** the loading indicator SHALL disappear  
-**And** the WebSocket event SHALL be received (confirming update)  
-**And** no further UI change is needed (already optimistically updated)
-
-#### Scenario: Failed optimistic update with rollback
-**Given** the user changes table T-05 status from "available" to "occupied"  
-**And** the optimistic update shows "occupied" immediately  
-**When** the backend returns error "Table already occupied by another order"  
-**Then** the frontend SHALL:
-  - Rollback the status to "available"
-  - Animate the reversion (brief shake or flash)
-  - Show error toast "Failed to update: Table already occupied"
-  - Keep the table selected with error indicator
-
-#### Scenario: Conflict detection during optimistic update
-**Given** User A starts editing table T-10 (version 5)  
-**And** User B edits and saves table T-10 (now version 6)  
-**When** User A tries to save their changes  
-**Then** the backend SHALL detect version conflict  
-**And** return 409 Conflict with current table state  
-**And** the frontend SHALL show conflict dialog:
-  - "Table was modified by [User B] while you were editing"
-  - Show User A's changes vs. Current state side-by-side
-  - Options: [Discard My Changes] [Overwrite] [Merge Manually]
-
-**Acceptance Criteria**:
-- ✅ UI updates instantly (< 50ms) on user action
-- ✅ Loading indicators show during backend processing
-- ✅ Rollback is smooth and obvious when errors occur
-- ✅ Conflict resolution flow is user-friendly
-- ✅ No data loss occurs during rollback
 
 ---
 
@@ -416,37 +377,6 @@ socket.on('reconnect_failed', () => {});
 ```
 
 ---
-
-## Testing Requirements
-
-### Unit Tests
-- [ ] WebSocket connection establishes correctly
-- [ ] Reconnection logic uses exponential backoff
-- [ ] Event handlers update Zustand store correctly
-- [ ] Optimistic updates rollback on error
-
-### Integration Tests
-- [ ] Status change event broadcasts to all clients
-- [ ] Created table appears on all connected floor plans
-- [ ] Deleted table removes from all views
-- [ ] Room filtering works (floor-specific events)
-
-### E2E Tests
-- [ ] Multiple users see real-time updates simultaneously
-- [ ] Connection drop and reconnect works seamlessly
-- [ ] Missed events sync after reconnection
-- [ ] Conflict resolution dialog appears on concurrent edits
-
-### Performance Tests
-- [ ] 100 concurrent connections maintain stable latency (< 500ms)
-- [ ] 1000 events/minute broadcast without degradation
-- [ ] Memory usage stable with long-lived connections (24h+)
-- [ ] CPU usage < 20% during high event load
-
-### Load Tests
-- [ ] System handles 500+ concurrent WebSocket connections
-- [ ] 10,000 events/minute broadcast successfully
-- [ ] Graceful degradation under overload (queue events, don't drop)
 
 ---
 

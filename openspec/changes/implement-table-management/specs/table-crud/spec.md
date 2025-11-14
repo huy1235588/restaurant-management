@@ -540,33 +540,6 @@ GET /tables?status=available&floor=2&page=1&limit=20&sortBy=tableNumber&sortOrde
 
 ---
 
-## Testing Requirements
-
-### Unit Tests
-- [ ] Form validation schema catches all invalid inputs
-- [ ] Table list renders correctly with mock data
-- [ ] Search debouncing works (300ms delay)
-- [ ] Filter logic combines correctly (AND logic)
-
-### Integration Tests
-- [ ] Create table flow from button click to success toast
-- [ ] Edit table updates database and UI
-- [ ] Delete table removes from list/floor plan
-- [ ] Bulk operations handle partial failures correctly
-
-### E2E Tests
-- [ ] User can create, edit, and delete tables
-- [ ] User can search and filter tables
-- [ ] User can change table status
-- [ ] Multiple users see real-time updates
-
-### Performance Tests
-- [ ] List view renders 100 tables in < 1s
-- [ ] Search filters 100 tables in < 100ms
-- [ ] Bulk update of 50 tables completes in < 3s
-
----
-
 ## Implementation Notes
 
 - Use React Hook Form for all table forms

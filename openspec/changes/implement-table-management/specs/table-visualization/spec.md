@@ -33,20 +33,29 @@ The system SHALL provide a visual floor plan view that displays restaurant table
 
 ---
 
-### Requirement: TV-002 - Floor and Section Filtering
+### Requirement: TV-002 - Multi-Floor Management and Filtering
 **Priority**: P0 (Critical)  
 **Category**: User Interface  
 **Owner**: Frontend Team
 
-The system SHALL allow users to filter the floor plan view by floor and section.
+The system SHALL support multiple floors for restaurants and allow users to manage separate floor plans for each floor independently.
+
+#### Scenario: Restaurant has multiple floors
+**Given** a restaurant has multiple floors (e.g., Tầng 1, Tầng 2, Sân thượng)  
+**When** the user navigates to table management  
+**Then** the system SHALL display a floor selector dropdown  
+**And** each floor SHALL have its own independent floor plan layout  
+**And** tables SHALL be associated with specific floors  
+**And** floor plans SHALL be managed separately for each floor
 
 #### Scenario: User filters tables by floor
 **Given** the user is on the floor plan view  
-**And** tables exist on multiple floors (e.g., Floor 1, Floor 2, Floor 3)  
-**When** the user selects "Floor 2" from the floor dropdown  
-**Then** the canvas SHALL display only tables on Floor 2  
+**And** tables exist on multiple floors (e.g., Tầng 1, Tầng 2, Tầng 3)  
+**When** the user selects "Tầng 2" from the floor dropdown  
+**Then** the canvas SHALL display only tables on Tầng 2  
 **And** the table count SHALL update to reflect filtered results  
 **And** the URL SHALL update to `/tables?floor=2` for bookmarkability  
+**And** the floor selector SHALL show clear visual indicator of current floor  
 
 #### Scenario: User filters by section
 **Given** the user is on the floor plan view  
@@ -59,11 +68,14 @@ The system SHALL allow users to filter the floor plan view by floor and section.
 
 **Acceptance Criteria**:
 - ✅ Floor selector dropdown shows all floors with table counts
+- ✅ Each floor has independent floor plan layout storage
+- ✅ Floor switching updates canvas to show only that floor's tables
 - ✅ Section filters appear as toggle chips
 - ✅ Filters apply instantly (< 100ms)
 - ✅ URL parameters sync with filter state
 - ✅ Filters persist on page refresh
 - ✅ "Clear All Filters" button resets to default view
+- ✅ Multi-floor support scales to 5+ floors per restaurant
 
 ---
 
@@ -329,62 +341,11 @@ The system SHALL support custom table shapes, styles, and visual properties in t
 **And** the capacity indicator SHALL adjust to fit the new shape  
 **And** the shape preference SHALL be saved to the database
 
-#### Scenario: User customizes table appearance
-**Given** the user is in Visual Floor Plan view  
-**And** the user has selected a table  
-**When** the user opens the appearance settings  
-**Then** the user SHALL be able to customize:
-- Border color and thickness
-- Background color (status colors by default)
-- Label font size and color
-- Icon display (show/hide capacity, status icons)
-**And** customizations SHALL be previewed in real-time  
-**And** a "Reset to Default" option SHALL be available
-
 **Acceptance Criteria**:
 - ✅ 4 basic shapes supported: Rectangle, Circle, Square, Oval
 - ✅ Shape changes preserve table dimensions where possible
-- ✅ Custom styles persist in database
-- ✅ Style changes sync across all connected clients
-- ✅ Accessibility: custom colors must meet WCAG AA contrast ratio
-
----
-
-### Requirement: TV-010 - Floor Plan Background and Layers
-**Priority**: P2 (Medium)  
-**Category**: User Interface  
-**Owner**: Frontend Team
-
-The system SHALL support background images and multiple layers in the Visual Floor Plan view.
-
-#### Scenario: User uploads floor plan background image
-**Given** the user is in Visual Floor Plan view  
-**And** the user has manager permissions  
-**When** the user clicks "Upload Background" button  
-**And** the user selects an image file (PNG, JPG, SVG)  
-**Then** the system SHALL upload the image to the server  
-**And** the image SHALL be displayed as the canvas background  
-**And** the image SHALL be resizable and repositionable  
-**And** the opacity SHALL be adjustable (0-100%)  
-**And** the system SHALL save the background configuration per floor
-
-#### Scenario: User manages canvas layers
-**Given** the user is in Visual Floor Plan view  
-**When** the user opens the layers panel  
-**Then** the system SHALL display all layers:
-- Background Image layer (bottom)
-- Grid/Guide layer (optional)
-- Table layer (top)
-- Annotation layer (optional)  
-**And** the user SHALL be able to toggle layer visibility  
-**And** the user SHALL be able to lock/unlock layers
-
-**Acceptance Criteria**:
-- ✅ Supports PNG, JPG, SVG image formats (max 10MB)
-- ✅ Background images are stored per floor
-- ✅ Image aspect ratio is preserved
-- ✅ Opacity range: 0% (invisible) to 100% (opaque)
-- ✅ Layer order is fixed but visibility is toggleable
+- ✅ Shape preference persists in database
+- ✅ Table appearance uses default status colors (not customizable)
 
 ---
 
@@ -393,16 +354,17 @@ The system SHALL support background images and multiple layers in the Visual Flo
 **Category**: User Interface  
 **Owner**: Frontend Team
 
-The system SHALL provide layout templates and the ability to save/load multiple floor plan configurations.
+The system SHALL provide layout templates and the ability to save/load multiple floor plan configurations via explicit Save button actions.
 
 #### Scenario: User saves current floor plan layout
 **Given** the user is in Visual Floor Plan view  
-**And** the user has customized table positions and styles  
+**And** the user has customized table positions and shapes  
 **When** the user clicks "Save Layout" button  
 **And** the user enters a layout name (e.g., "Weekend Setup", "Private Event")  
-**Then** the system SHALL save all table positions, sizes, rotations, and styles  
+**Then** the system SHALL save all table positions, sizes, rotations, and shapes to the database  
 **And** the layout SHALL appear in the "Saved Layouts" dropdown  
 **And** a success notification SHALL be shown
+**And** changes are persisted only when Save button is clicked (no auto-save via WebSocket)
 
 #### Scenario: User loads saved layout
 **Given** the user is in Visual Floor Plan view  
@@ -428,10 +390,12 @@ The system SHALL provide layout templates and the ability to save/load multiple 
 
 **Acceptance Criteria**:
 - ✅ Users can save unlimited layouts per floor
-- ✅ Layouts include positions, sizes, rotations, styles, and background
+- ✅ Layouts include positions, sizes, rotations, and shapes
 - ✅ Loading layouts shows smooth animation
 - ✅ Template system provides 4+ starter templates
 - ✅ Layouts can be exported as JSON for backup
+- ✅ Save happens only on button click (no WebSocket auto-sync)
+- ✅ Unsaved changes indicator shows when changes exist
 
 ---
 
@@ -501,9 +465,10 @@ The system SHALL provide action history with undo/redo capabilities and a compre
 #### Scenario: User saves floor plan layout
 **Given** the user is in Visual Floor Plan view  
 **And** the user has made unsaved changes  
-**When** the user clicks the "Save" button  
-**Then** the system SHALL persist all table positions, sizes, rotations, and styles  
-**And** the system SHALL clear the undo/redo history  
+**When** the user clicks the "Save" button or presses Ctrl+S  
+**Then** the system SHALL persist all table positions, sizes, rotations, and shapes to the database via API call  
+**And** the system SHALL NOT use WebSocket for automatic saving  
+**And** the system SHALL clear the undo/redo history after successful save  
 **And** a success toast SHALL appear ("Layout saved successfully")  
 **And** the "Unsaved Changes" indicator SHALL disappear
 
@@ -587,39 +552,6 @@ None. This is a new capability.
 
 ---
 
-## Testing Requirements
-
-### Unit Tests
-- [ ] TableCard component renders correctly with all status types
-- [ ] FloorSelector displays correct floor list
-- [ ] Canvas zoom calculations are accurate
-- [ ] Legend status counts calculate correctly
-
-### Integration Tests
-- [ ] Floor filter updates canvas and URL
-- [ ] Status filter via legend dims other tables
-- [ ] Zoom and pan controls work together
-- [ ] View toggle preserves filters
-
-### E2E Tests
-- [ ] User can navigate full floor plan workflow
-- [ ] User can switch between floors and see correct tables
-- [ ] User can interact with table cards and see details
-- [ ] Real-time updates appear on canvas
-
-### Performance Tests
-- [ ] Floor plan with 200 tables renders in < 2s
-- [ ] Zoom/pan operations run at 60fps
-- [ ] Status updates render in < 100ms
-
-### Accessibility Tests
-- [ ] Keyboard navigation works for all controls
-- [ ] Screen readers announce table statuses correctly
-- [ ] Color contrast meets WCAG AA standards
-- [ ] Focus indicators are visible
-
----
-
 ## Implementation Notes
 
 ### Technical Decisions
@@ -636,11 +568,20 @@ None. This is a new capability.
    - **Event**: `table:status_changed` → Update table card color
    - **Event**: `table:created` → Add new table card to canvas
    - **Event**: `table:deleted` → Remove table card from canvas
+   - **Note**: WebSocket is for viewing status updates only, NOT for saving layouts
+
+4. **Save Workflow**: Use explicit Save button for persisting layout changes
+   - **Reason**: Better control, prevents accidental changes, clear user intent
+   - **Implementation**: Unsaved changes indicator + confirmation dialog on navigation
+
+5. **Multi-Floor Support**: Each floor has independent layout storage
+   - **Reason**: Different floors may have different layouts (e.g., Tầng 1, Tầng 2, Sân thượng)
+   - **Implementation**: Floor selector with clear visual indicators
 
 ### Open Questions
 
 1. **Q**: Should the floor plan support custom backgrounds (floor plan images)?
-   **A**: Not in Phase 1. Defer to Phase 2 as enhancement.
+   **A**: No, background images are not supported to keep implementation simple.
 
 2. **Q**: Should we support printing the floor plan?
    **A**: Yes, add "Print Floor Plan" button that generates a printer-friendly view.

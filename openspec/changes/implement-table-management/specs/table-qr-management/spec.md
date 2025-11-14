@@ -505,39 +505,6 @@ export const validateQRCode = async (token: string) => {
 
 ---
 
-## Testing Requirements
-
-### Unit Tests
-- [ ] QR code generation creates valid QR codes
-- [ ] QR codes encode correct data
-- [ ] Token generation is unique
-- [ ] Customization applies correctly
-
-### Integration Tests
-- [ ] QR code auto-generates on table creation
-- [ ] QR code can be regenerated
-- [ ] Bulk generation completes successfully
-- [ ] Download and print actions work
-
-### E2E Tests
-- [ ] Customer scans QR code and reaches ordering page
-- [ ] Invalid QR code shows error page
-- [ ] QR analytics track scans correctly
-- [ ] Bulk download ZIP contains all QR codes
-
-### Manual Testing
-- [ ] QR codes scan successfully on iOS devices (iPhone, iPad)
-- [ ] QR codes scan successfully on Android devices
-- [ ] Printed QR codes (on paper/plastic) scan correctly
-- [ ] Laminated QR codes remain scannable
-
-### Performance Tests
-- [ ] Single QR generation completes in < 1 second
-- [ ] Bulk generation of 100 QR codes completes in < 30 seconds
-- [ ] QR code image size is optimized (< 50KB per PNG)
-
----
-
 ## Security Considerations
 
 1. **Token Security**: Use UUID v4 for unpredictable tokens
