@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { tableApi } from '@/services/table.service';
 import { Table, TableStatus } from '@/types';
@@ -41,6 +42,7 @@ export function StatusChangeDialog({ open, table, onClose, onSuccess }: StatusCh
     const { t } = useTranslation();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [newStatus, setNewStatus] = useState<TableStatus>(table.status);
+    const [notes, setNotes] = useState('');
 
     const handleSubmit = async () => {
         if (newStatus === table.status) {
@@ -123,6 +125,20 @@ export function StatusChangeDialog({ open, table, onClose, onSuccess }: StatusCh
                                 </AlertDescription>
                             </Alert>
                         )}
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="status-notes">
+                            {t('tables.statusNotes', 'Notes')} {t('common.optional', '(Optional)')}
+                        </Label>
+                        <Textarea
+                            id="status-notes"
+                            placeholder={t('tables.statusNotesPlaceholder', 'Add any notes about this status change...')}
+                            value={notes}
+                            onChange={(e) => setNotes(e.target.value)}
+                            rows={3}
+                            className="resize-none"
+                        />
                     </div>
                 </div>
 

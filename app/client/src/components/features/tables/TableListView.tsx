@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TableStatusBadge } from './TableStatusBadge';
-import { MoreHorizontal, Edit, Trash2, QrCode, ArrowUpDown, CircleDot } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, QrCode, ArrowUpDown, CircleDot, ArrowRightLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface TableListViewProps {
@@ -21,6 +21,7 @@ interface TableListViewProps {
     onChangeStatus: (table: TableType) => void;
     onDelete: (table: TableType) => void;
     onViewQR: (table: TableType) => void;
+    onAssignOrder?: (table: TableType) => void;
     onSelectionChange?: (selectedIds: number[]) => void;
     onRowClick?: (table: TableType) => void;
 }
@@ -36,6 +37,7 @@ export function TableListView({
     onChangeStatus,
     onDelete,
     onViewQR,
+    onAssignOrder,
     onSelectionChange,
     onRowClick,
 }: TableListViewProps) {
@@ -220,6 +222,12 @@ export function TableListView({
                                             <CircleDot className="mr-2 h-4 w-4" />
                                             {t('tables.changeStatus', 'Change Status')}
                                         </DropdownMenuItem>
+                                        {onAssignOrder && (
+                                            <DropdownMenuItem onClick={() => onAssignOrder(table)}>
+                                                <ArrowRightLeft className="mr-2 h-4 w-4" />
+                                                {t('tables.assignOrder', 'Assign to Order')}
+                                            </DropdownMenuItem>
+                                        )}
                                         <DropdownMenuItem onClick={() => onViewQR(table)}>
                                             <QrCode className="mr-2 h-4 w-4" />
                                             {t('tables.viewQR', 'View QR Code')}

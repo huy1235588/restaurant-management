@@ -64,7 +64,7 @@
   - [x] Add "Change Status" dropdown
   - [x] Add "View QR Code" action
   - [x] Add "Delete" action with confirmation
-  - [ ] Add "Assign to Order" action
+  - [x] Add "Assign to Order" action
   - **Validation**: All actions trigger correct API calls and UI updates
 
 ### Table Forms
@@ -88,7 +88,7 @@
   - [x] Create status selection dropdown with icons
   - [x] Add transition validation (e.g., can't go from maintenance to occupied directly)
   - [x] Add confirmation for destructive changes
-  - [ ] Add optional notes field
+  - [x] Add optional notes field
   - **Validation**: Invalid transitions show warning, valid transitions update immediately
 
 ### Real-time Updates
@@ -115,8 +115,8 @@
   - [x] Build canvas component with responsive sizing
   - [x] Implement zoom controls (+, -, reset)
   - [x] Add pan/drag canvas functionality (mouse + touch)
-  - [ ] Add grid overlay (optional toggle)
-  - [ ] Add minimap for navigation (optional)
+  - [x] Add grid overlay (optional toggle)
+  - [x] Add minimap for navigation (optional)
   - **Validation**: Canvas scales and pans smoothly on all devices
 
 - [x] **Task 6.2**: Render table cards on canvas
@@ -131,7 +131,7 @@
   - [x] Add floor selector dropdown in toolbar
   - [x] Add section filter chips
   - [x] Filter tables displayed on canvas
-  - [ ] Update table count indicator
+  - [x] Update table count indicator
   - **Validation**: Filters update canvas instantly
 
 ## Phase 3: Visual Floor Plan (Week 4-5)
@@ -141,7 +141,7 @@
   - [x] Update view toggle to include "Visual Floor Plan" option
   - [x] Create route `/tables?view=visual`
   - [x] Implement view switching with state preservation
-  - [ ] Add view mode persistence in localStorage
+  - [x] Add view mode persistence in localStorage
   - **Validation**: Three tabs (Floor Plan, Visual Floor Plan, List) work correctly
 
 ### Visual Editor Setup
@@ -308,7 +308,7 @@
   - [x] Show table details alongside QR code
   - **Validation**: QR codes download as 300x300px PNG files
 
-- [ ] **Task 7.3**: Bulk QR code generation
+- [x] **Task 7.3**: Bulk QR code generation
   - [x] Add "Generate All QR Codes" action
   - [x] Create HTML download with all QR codes
   - [x] Add progress indicator for bulk generation
@@ -345,13 +345,13 @@
   - [x] Add "View History" button in QuickViewPanel
   - **Validation**: History displays chronologically with user info
 
-- [ ] **Task 9.3**: Add keyboard shortcuts
-  - [x] Implement shortcuts: `Ctrl+N` (new table), `/` (focus search), `Esc` (close dialogs), `?` (help)
+- [x] **Task 9.3**: Add keyboard shortcuts
+  - [x] Implement shortcuts: `Shift+N` (new table), `/` (focus search), `Esc` (close dialogs), `?` (help)
   - [x] Show shortcut hints in tooltips
   - [x] Add keyboard shortcut help modal (`?` key)
   - **Validation**: All shortcuts work correctly
 
-- [ ] **Task 9.4**: Add Quick View panel
+- [x] **Task 9.4**: Add Quick View panel
   - [x] Create QuickViewPanel component showing table details
   - [x] Display table number, name, status, capacity, floor, section, active status
   - [x] Add click handler on table rows to open panel
@@ -360,7 +360,7 @@
   - [x] Add status change button in quick view
   - **Validation**: Panel opens when clicking rows, displays correct data
 
-- [ ] **Task 9.5**: Add export functionality
+- [x] **Task 9.5**: Add export functionality
   - [x] Implement CSV export of tables
   - [x] Implement JSON export of tables
   - [x] Add export dropdown in table header

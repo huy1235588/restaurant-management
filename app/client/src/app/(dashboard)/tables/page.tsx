@@ -47,8 +47,14 @@ export default function TablesPage() {
         maintenance: 0,
     });
 
-    // View mode state
-    const [viewMode, setViewMode] = useState<ViewMode>('list');
+    // View mode state with localStorage persistence
+    const [viewMode, setViewMode] = useState<ViewMode>(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('tables-view-mode');
+            return (saved as ViewMode) || 'list';
+        }
+        return 'list';
+    });
 
     // Selection state
     const [selectedTableIds, setSelectedTableIds] = useState<number[]>([]);
@@ -230,6 +236,9 @@ export default function TablesPage() {
 
     const handleViewModeChange = useCallback((mode: ViewMode) => {
         setViewMode(mode);
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('tables-view-mode', mode);
+        }
     }, []);
 
     const handleCreateTable = useCallback(() => {
@@ -255,6 +264,11 @@ export default function TablesPage() {
         setSelectedTable(table);
         setShowQRDialog(true);
     }, []);
+
+    const handleAssignOrder = useCallback((table: Table) => {
+        // Navigate to orders page with table pre-selected
+        router.push(`/orders/create?tableId=${table.tableId}`);
+    }, [router]);
 
     const handleSelectionChange = useCallback((ids: number[]) => {
         setSelectedTableIds(ids);
@@ -429,6 +443,7 @@ export default function TablesPage() {
                         onChangeStatus={handleChangeStatus}
                         onDelete={handleDeleteTable}
                         onViewQR={handleViewQR}
+                        onAssignOrder={handleAssignOrder}
                         onSelectionChange={handleSelectionChange}
                         onRowClick={setSelectedTable}
                     />
@@ -449,6 +464,7 @@ export default function TablesPage() {
                     onEdit={handleEditTable}
                     onChangeStatus={handleChangeStatus}
                     onViewQR={handleViewQR}
+                    onAssignOrder={handleAssignOrder}
                 />
             ) : (
                 <VisualFloorPlanView
@@ -458,6 +474,7 @@ export default function TablesPage() {
                     onEdit={handleEditTable}
                     onChangeStatus={handleChangeStatus}
                     onViewQR={handleViewQR}
+                    onAssignOrder={handleAssignOrder}
                 />
             )}
 

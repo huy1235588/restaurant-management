@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TableStatusBadge } from './TableStatusBadge';
-import { Users, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import { Users, ZoomIn, ZoomOut, Maximize2, Grid3x3, Map } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface FloorPlanViewProps {
@@ -14,6 +14,7 @@ interface FloorPlanViewProps {
     onEdit: (table: TableType) => void;
     onChangeStatus: (table: TableType) => void;
     onViewQR: (table: TableType) => void;
+    onAssignOrder?: (table: TableType) => void;
 }
 
 export function FloorPlanView({
@@ -23,6 +24,7 @@ export function FloorPlanView({
     onEdit,
     onChangeStatus,
     onViewQR,
+    onAssignOrder,
 }: FloorPlanViewProps) {
     const { t } = useTranslation();
     const containerRef = useRef<HTMLDivElement>(null);
@@ -30,6 +32,8 @@ export function FloorPlanView({
     const [pan, setPan] = useState({ x: 0, y: 0 });
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+    const [showGrid, setShowGrid] = useState(false);
+    const [showMinimap, setShowMinimap] = useState(true);
 
     const handleZoomIn = () => setZoom((prev) => Math.min(prev + 0.1, 2));
     const handleZoomOut = () => setZoom((prev) => Math.max(prev - 0.1, 0.5));
@@ -104,10 +108,17 @@ export function FloorPlanView({
         ? Object.keys(groupedTables).sort()
         : [floorFilter];
 
+    // Count visible tables
+    const visibleTableCount = tables.length;
+
     return (
         <div className="space-y-4">
             {/* Zoom Controls */}
-            <div className="flex items-center gap-2 justify-end">
+            <div className="flex items-center gap-2 justify-between">
+                <div className="text-sm text-muted-foreground">
+                    {t('tables.showingCount', 'Showing {{count}} tables', { count: visibleTableCount })}
+                </div>
+                <div className="flex items-center gap-2">
                 <Button
                     variant="outline"
                     size="icon"
@@ -135,6 +146,23 @@ export function FloorPlanView({
                 >
                     <Maximize2 className="h-4 w-4" />
                 </Button>
+                <Button
+                    variant={showGrid ? 'default' : 'outline'}
+                    size="icon"
+                    onClick={() => setShowGrid(!showGrid)}
+                    title={t('tables.toggleGrid', 'Toggle grid')}
+                >
+                    <Grid3x3 className="h-4 w-4" />
+                </Button>
+                <Button
+                    variant={showMinimap ? 'default' : 'outline'}
+                    size="icon"
+                    onClick={() => setShowMinimap(!showMinimap)}
+                    title={t('tables.toggleMinimap', 'Toggle minimap')}
+                >
+                    <Map className="h-4 w-4" />
+                </Button>
+                </div>
             </div>
 
             {/* Floor Plan Canvas */}
@@ -147,6 +175,21 @@ export function FloorPlanView({
                 onWheel={handleWheel}
                 style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
             >
+                {/* Grid Overlay */}
+                {showGrid && (
+                    <div
+                        className="absolute inset-0 pointer-events-none"
+                        style={{
+                            backgroundImage: `
+                                linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+                                linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px)
+                            `,
+                            backgroundSize: `${50 * zoom}px ${50 * zoom}px`,
+                            backgroundPosition: `${pan.x}px ${pan.y}px`,
+                        }}
+                    />
+                )}
+
                 <div
                     className="space-y-8 p-8 transition-transform"
                     style={{
@@ -203,6 +246,32 @@ export function FloorPlanView({
                 );
             })}
                 </div>
+
+                {/* Minimap */}
+                {showMinimap && (
+                    <div className="absolute bottom-4 right-4 w-48 h-32 border-2 border-primary/30 rounded-lg bg-background/90 backdrop-blur-sm shadow-lg overflow-hidden">
+                        <div className="relative w-full h-full">
+                            {/* Minimap content - simplified view */}
+                            <div className="absolute inset-0 p-2">
+                                <div className="w-full h-full border border-muted-foreground/20 rounded">
+                                    {/* Viewport indicator */}
+                                    <div
+                                        className="absolute border-2 border-primary bg-primary/10 rounded"
+                                        style={{
+                                            left: `${Math.max(0, Math.min(75, 50 - (pan.x / 10)))}%`,
+                                            top: `${Math.max(0, Math.min(75, 50 - (pan.y / 10)))}%`,
+                                            width: `${Math.min(100, 25 / zoom)}%`,
+                                            height: `${Math.min(100, 25 / zoom)}%`,
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                            <div className="absolute bottom-1 right-1 text-xs text-muted-foreground bg-background/80 px-1 rounded">
+                                {t('tables.minimap', 'Minimap')}
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

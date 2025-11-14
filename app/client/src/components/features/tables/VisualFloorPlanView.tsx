@@ -18,6 +18,7 @@ interface VisualFloorPlanViewProps {
     onEdit: (table: Table) => void;
     onChangeStatus: (table: Table) => void;
     onViewQR: (table: Table) => void;
+    onAssignOrder?: (table: Table) => void;
 }
 
 type EditorTool = 'select' | 'pan' | 'add' | 'delete' | 'zoom-in' | 'zoom-out' | 'grid';
@@ -37,6 +38,7 @@ export function VisualFloorPlanView({
     onEdit,
     onChangeStatus,
     onViewQR,
+    onAssignOrder,
 }: VisualFloorPlanViewProps) {
     const { t } = useTranslation();
     const canvasRef = useRef<HTMLDivElement>(null);
