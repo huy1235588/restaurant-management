@@ -126,8 +126,10 @@ export default function MenuItemDetailPage({
                         <div className="flex items-center gap-2">
                             <h1 className="text-3xl font-bold">{menuItem.itemName}</h1>
                             {menuItem.isVegetarian && <span className="text-2xl">🌱</span>}
-                            {menuItem.spicyLevel && menuItem.spicyLevel > 0 && (
-                                <span className="text-xl">{getSpicyLevelEmoji(menuItem.spicyLevel)}</span>
+                            {menuItem.spicyLevel != undefined && menuItem.spicyLevel > 0 && (
+                                <span className="text-xl">
+                                    {getSpicyLevelEmoji(menuItem.spicyLevel)}
+                                </span>
                             )}
                         </div>
                         <p className="text-muted-foreground mt-1 font-mono">{menuItem.itemCode}</p>
@@ -232,7 +234,7 @@ export default function MenuItemDetailPage({
                                     <Separator />
                                     <div className="flex items-center justify-between">
                                         <span className="text-sm text-muted-foreground">Profit Margin</span>
-                                        <span className="font-bold text-green-600">
+                                        <span className="font-bold text-green-600 dark:text-green-400">
                                             {formatMargin(menuItem.price, menuItem.cost)}
                                         </span>
                                     </div>

@@ -140,11 +140,11 @@ export default function CategoriesPage() {
                 </div>
                 <div className="p-4 border rounded-lg">
                     <div className="text-sm text-muted-foreground">Active</div>
-                    <div className="text-2xl font-bold mt-1 text-green-600">{stats.active}</div>
+                    <div className="text-2xl font-bold mt-1 text-green-600 dark:text-green-400">{stats.active}</div>
                 </div>
                 <div className="p-4 border rounded-lg">
                     <div className="text-sm text-muted-foreground">Inactive</div>
-                    <div className="text-2xl font-bold mt-1 text-gray-600">{stats.inactive}</div>
+                    <div className="text-2xl font-bold mt-1 text-gray-600 dark:text-gray-400">{stats.inactive}</div>
                 </div>
             </div>
 

@@ -189,7 +189,7 @@ export function MenuItemList({
                                 <div className="flex items-center gap-2">
                                     <span className="font-medium">{item.itemName}</span>
                                     {item.isVegetarian && <span className="text-xs">🌱</span>}
-                                    {item.spicyLevel && item.spicyLevel > 0 && (
+                                    {item.spicyLevel != undefined && item.spicyLevel > 0 && (
                                         <span className="text-xs">{getSpicyLevelEmoji(item.spicyLevel)}</span>
                                     )}
                                 </div>

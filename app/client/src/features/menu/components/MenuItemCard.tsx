@@ -65,12 +65,12 @@ export function MenuItemCard({
                         </Badge>
                     )}
                     {item.isVegetarian && (
-                        <Badge variant="outline" className="text-xs bg-green-50">
+                        <Badge variant="outline" className="text-xs bg-green-50 dark:bg-green-950 text-green-900 dark:text-green-300">
                             🌱 Vegan
                         </Badge>
                     )}
-                    {item.spicyLevel && item.spicyLevel > 0 && (
-                        <Badge variant="outline" className="text-xs bg-red-50">
+                    {item.spicyLevel != undefined && item.spicyLevel > 0 && (
+                        <Badge variant="outline" className="text-xs bg-red-50 dark:bg-red-950 text-red-900 dark:text-red-300">
                             {getSpicyLevelEmoji(item.spicyLevel)}
                         </Badge>
                     )}
