@@ -18,14 +18,6 @@ import {
 } from '../constants/upload.constants';
 import { AppError } from '@/shared/utils/errors';
 
-// Ensure all upload directories exist on startup
-Object.values(UPLOAD_DIRS).forEach(dir => {
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-    }
-});
-
-
 /**
  * Generate unique filename with better format
  */
