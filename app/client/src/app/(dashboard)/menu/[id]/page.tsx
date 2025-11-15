@@ -25,9 +25,9 @@ import {
     useMenuItem,
     useUpdateMenuItem,
     useDeleteMenuItem,
-    useCategories,
     MenuItemForm,
 } from '@/features/menu';
+import { useCategories } from '@/features/categories';
 import {
     formatPrice,
     formatMargin,

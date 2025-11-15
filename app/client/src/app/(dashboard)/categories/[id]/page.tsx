@@ -25,8 +25,8 @@ import {
     useUpdateCategory,
     useDeleteCategory,
     CategoryForm,
-} from '@/features/menu';
-import { formatDate } from '@/features/menu/utils';
+    formatDate,
+} from '@/features/categories';
 import { MenuItem } from '@/types';
 import { MenuItemCard } from '@/features/menu/components/MenuItemCard';
 
@@ -68,7 +68,7 @@ export default function CategoryDetailPage({
         try {
             await deleteCategory(categoryId);
             toast.success('Category deleted successfully');
-            router.push('/menu/categories');
+            router.push('/categories');
         } catch (error: any) {
             toast.error(error.message || 'Failed to delete category');
         }
@@ -119,7 +119,7 @@ export default function CategoryDetailPage({
                     <div className="text-center">
                         <h2 className="text-2xl font-bold mb-2">Category Not Found</h2>
                         <p className="text-muted-foreground mb-4">{error || 'Category does not exist'}</p>
-                        <Button onClick={() => router.push('/menu/categories')}>
+                        <Button onClick={() => router.push('/categories')}>
                             <ArrowLeft className="w-4 h-4 mr-2" />
                             Back to Categories
                         </Button>
@@ -136,7 +136,7 @@ export default function CategoryDetailPage({
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                    <Button variant="outline" size="icon" onClick={() => router.push('/menu/categories')}>
+                    <Button variant="outline" size="icon" onClick={() => router.push('/categories')}>
                         <ArrowLeft className="w-4 h-4" />
                     </Button>
                     <div>

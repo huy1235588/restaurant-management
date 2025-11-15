@@ -19,7 +19,7 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import { ImageUploadField } from './ImageUploadField';
+import { ImageUploadField } from '@/features/menu/components/ImageUploadField';
 import { Loader2 } from 'lucide-react';
 
 interface CategoryFormProps {

@@ -25,7 +25,7 @@ import {
     useCreateCategory,
     useUpdateCategory,
     useDeleteCategory,
-} from '@/features/menu';
+} from '@/features/categories';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -113,7 +113,7 @@ export default function CategoriesPage() {
     };
 
     const handleViewDetails = (category: Category) => {
-        router.push(`/menu/categories/${category.categoryId}`);
+        router.push(`/categories/${category.categoryId}`);
     };
 
     return (

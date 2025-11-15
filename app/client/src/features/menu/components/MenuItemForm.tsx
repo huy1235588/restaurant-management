@@ -46,18 +46,18 @@ export function MenuItemForm({
         defaultValues: {
             itemCode: menuItem?.itemCode || '',
             itemName: menuItem?.itemName || '',
-            categoryId: menuItem?.categoryId || 0,
-            price: menuItem?.price || 0,
-            cost: menuItem?.cost || undefined,
+            categoryId: Number(menuItem?.categoryId) || 0,
+            price: Number(menuItem?.price) || 0,
+            cost: menuItem?.cost ? Number(menuItem.cost) : undefined,
             description: menuItem?.description || '',
             imageUrl: menuItem?.imageUrl || '',
             isAvailable: menuItem?.isAvailable ?? true,
             isActive: menuItem?.isActive ?? true,
-            preparationTime: menuItem?.preparationTime || undefined,
-            spicyLevel: menuItem?.spicyLevel || 0,
+            preparationTime: menuItem?.preparationTime ? Number(menuItem.preparationTime) : undefined,
+            spicyLevel: Number(menuItem?.spicyLevel) || 0,
             isVegetarian: menuItem?.isVegetarian ?? false,
-            calories: menuItem?.calories || undefined,
-            displayOrder: menuItem?.displayOrder || 0,
+            calories: menuItem?.calories ? Number(menuItem.calories) : undefined,
+            displayOrder: Number(menuItem?.displayOrder) || 0,
         },
         mode: 'onChange',
     });
@@ -255,13 +255,12 @@ export function MenuItemForm({
                                         <div className="flex items-center justify-between">
                                             <span className="text-sm font-medium">Profit Margin:</span>
                                             <span
-                                                className={`text-lg font-bold ${
-                                                    margin > 50
-                                                        ? 'text-green-600'
-                                                        : margin > 30
+                                                className={`text-lg font-bold ${margin > 50
+                                                    ? 'text-green-600'
+                                                    : margin > 30
                                                         ? 'text-yellow-600'
                                                         : 'text-red-600'
-                                                }`}
+                                                    }`}
                                             >
                                                 {formatMargin(watchPrice, watchCost ?? undefined)}
                                             </span>

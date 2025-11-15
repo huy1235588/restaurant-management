@@ -31,14 +31,6 @@ export interface MenuItemFormData {
     displayOrder?: number | null;
 }
 
-export interface CategoryFormData {
-    categoryName: string;
-    description?: string | null;
-    displayOrder?: number | null;
-    isActive: boolean;
-    imageUrl?: string | null;
-}
-
 // View mode type
 export type ViewMode = 'grid' | 'list' | 'table';
 
@@ -48,12 +40,6 @@ export interface MenuStatisticsData {
     available: number;
     outOfStock: number;
     newThisMonth: number;
-}
-
-export interface CategoryStatistics {
-    total: number;
-    active: number;
-    inactive: number;
 }
 
 // Sort options

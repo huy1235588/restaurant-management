@@ -13,6 +13,7 @@ import {
     Settings,
     ChefHat,
     Table,
+    Tag,
 } from 'lucide-react';
 
 import { useAuthStore } from '@/stores/authStore';
@@ -76,6 +77,12 @@ export default function DashboardLayout({
                     href: '/menu',
                     icon: UtensilsCrossed,
                     permission: 'menu.read',
+                },
+                {
+                    title: t('sidebar.category'),
+                    href: '/categories',
+                    icon: Tag,
+                    permission: 'category.read',
                 },
                 {
                     title: t('sidebar.reservations'),

@@ -29,12 +29,12 @@ import {
     ViewModeSwitcher,
     useMenuItems,
     useMenuItemCount,
-    useCategories,
     useCreateMenuItem,
     useUpdateMenuItem,
     useDeleteMenuItem,
     useUpdateAvailability,
 } from '@/features/menu';
+import { useCategories } from '@/features/categories';
 import {
     Pagination,
     PaginationContent,
@@ -257,9 +257,6 @@ export default function MenuPage() {
                     <p className="text-muted-foreground mt-1">Manage your restaurant menu items</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => router.push('/menu/categories')}>
-                        Manage Categories
-                    </Button>
                     <Button onClick={() => setCreateDialogOpen(true)}>
                         <Plus className="w-4 h-4 mr-2" />
                         Add Menu Item

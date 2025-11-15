@@ -11,16 +11,13 @@ export const menuItemFormSchema = z.object({
         .string()
         .min(1, 'Item name is required')
         .max(100, 'Item name must be at most 100 characters'),
-    categoryId: z
-        .number({ message: 'Category must be selected' })
+    categoryId: z.number({ message: 'Category must be selected' })
         .int()
         .positive('Category is required'),
-    price: z
-        .number({ message: 'Price must be a number' })
+    price: z.number({ message: 'Price must be a number' })
         .positive('Price must be greater than 0')
         .max(100000000, 'Price is too high'),
-    cost: z
-        .number()
+    cost: z.number()
         .positive('Cost must be greater than 0')
         .max(100000000, 'Cost is too high')
         .optional()
@@ -33,55 +30,29 @@ export const menuItemFormSchema = z.object({
     imageUrl: z.string().url('Invalid image URL').optional().nullable().or(z.literal('')),
     isAvailable: z.boolean(),
     isActive: z.boolean(),
-    preparationTime: z
-        .number()
+    preparationTime: z.number()
         .int('Preparation time must be an integer')
         .positive('Preparation time must be greater than 0')
         .max(300, 'Preparation time is too long')
         .optional()
         .nullable(),
-    spicyLevel: z
-        .number()
+    spicyLevel: z.number()
         .int('Spicy level must be an integer')
         .min(0, 'Spicy level must be between 0 and 5')
         .max(5, 'Spicy level must be between 0 and 5')
         .optional()
         .nullable(),
     isVegetarian: z.boolean(),
-    calories: z
-        .number()
+    calories: z.number()
         .int('Calories must be an integer')
         .positive('Calories must be greater than 0')
         .max(10000, 'Calories value is too high')
-        .optional()
-        .nullable(),
-    displayOrder: z
-        .number()
+        .optional().nullable(),
+    displayOrder: z.number()
         .int('Display order must be an integer')
         .min(0, 'Display order must be 0 or greater')
         .optional()
         .nullable(),
-});
-
-// Category form validation schema
-export const categoryFormSchema = z.object({
-    categoryName: z
-        .string()
-        .min(1, 'Category name is required')
-        .max(100, 'Category name must be at most 100 characters'),
-    description: z
-        .string()
-        .max(500, 'Description must be at most 500 characters')
-        .optional()
-        .nullable(),
-    displayOrder: z
-        .number()
-        .int('Display order must be an integer')
-        .min(0, 'Display order must be 0 or greater')
-        .optional()
-        .nullable(),
-    isActive: z.boolean(),
-    imageUrl: z.string().url('Invalid image URL').optional().nullable().or(z.literal('')),
 });
 
 // Menu filter validation schema
