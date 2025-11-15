@@ -6,3 +6,5 @@ export { VisualEditorPage } from './VisualEditorPage';
 export { FloorSelector } from './FloorSelector';
 export { SaveLayoutDialog } from './SaveLayoutDialog';
 export { LoadLayoutDialog } from './LoadLayoutDialog';
+export { UnsavedChangesDialog } from './UnsavedChangesDialog';
+export { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';

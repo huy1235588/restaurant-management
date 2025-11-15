@@ -9,6 +9,7 @@ import { EditorCanvas } from './EditorCanvas';
 import { EditorToolbar } from './EditorToolbar';
 import { TableComponent } from './TableComponent';
 import { PropertiesPanel } from './PropertiesPanel';
+import { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
 import { checkTableCollision, snapPositionToGrid } from '../utils/geometry';
 import { floorPlanApi } from '@/services/floor-plan.service';
 import type { TablePosition } from '../types';
@@ -18,6 +19,8 @@ export function VisualEditorPage() {
     const [dimensions, setDimensions] = useState({ width: 1200, height: 1000 });
     const [draggedTable, setDraggedTable] = useState<TablePosition | null>(null);
     const [tempPosition, setTempPosition] = useState<{ x: number; y: number } | null>(null);
+    const [isDraggingWithShift, setIsDraggingWithShift] = useState(false);
+    const dragMoveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     
     // Pan tool state
     const [isPanning, setIsPanning] = useState(false);
@@ -40,6 +43,8 @@ export function VisualEditorPage() {
         setPan,
         setTool,
         setZoom,
+        showKeyboardShortcuts,
+        toggleKeyboardShortcuts,
     } = useEditorStore();
     
     const {
@@ -74,27 +79,39 @@ export function VisualEditorPage() {
         }
     }, []);
     
-    // Handle drag move (real-time collision detection)
+    // Handle drag move (real-time collision detection with debouncing)
     const handleDragMove = useCallback((event: DragMoveEvent) => {
         if (!draggedTable) return;
         
-        const delta = event.delta;
-        const newX = draggedTable.x + delta.x / zoom;
-        const newY = draggedTable.y + delta.y / zoom;
+        // Debounce position updates to 16ms (60fps)
+        if (dragMoveTimeoutRef.current) {
+            clearTimeout(dragMoveTimeoutRef.current);
+        }
         
-        setTempPosition({ x: newX, y: newY });
+        dragMoveTimeoutRef.current = setTimeout(() => {
+            const delta = event.delta;
+            const newX = draggedTable.x + delta.x / zoom;
+            const newY = draggedTable.y + delta.y / zoom;
+            
+            setTempPosition({ x: newX, y: newY });
+        }, 16);
     }, [draggedTable, zoom]);
     
     // Handle drag end
     const handleDragEnd = useCallback((event: DragEndEvent) => {
         if (!draggedTable) return;
         
+        // Clear debounce timeout
+        if (dragMoveTimeoutRef.current) {
+            clearTimeout(dragMoveTimeoutRef.current);
+        }
+        
         const delta = event.delta;
         let newX = draggedTable.x + delta.x / zoom;
         let newY = draggedTable.y + delta.y / zoom;
         
-        // Apply grid snapping if enabled
-        if (grid.snapEnabled) {
+        // Apply grid snapping if enabled and Shift is not held
+        if (grid.snapEnabled && !isDraggingWithShift) {
             const snapped = snapPositionToGrid({ x: newX, y: newY }, grid.size);
             newX = snapped.x;
             newY = snapped.y;
@@ -108,6 +125,7 @@ export function VisualEditorPage() {
             toast.error('Table overlaps with another table');
             setDraggedTable(null);
             setTempPosition(null);
+            setIsDraggingWithShift(false);
             return;
         }
         
@@ -120,12 +138,13 @@ export function VisualEditorPage() {
             timestamp: Date.now(),
         });
         
-        // Update position
+        // Update position with smooth animation (handled by CSS transition)
         updateTablePosition(draggedTable.tableId, { x: newX, y: newY });
         
         setDraggedTable(null);
         setTempPosition(null);
-    }, [draggedTable, tables, grid, zoom, updateTablePosition, pushHistory, toast]);
+        setIsDraggingWithShift(false);
+    }, [draggedTable, tables, grid, zoom, isDraggingWithShift, updateTablePosition, pushHistory]);
     
     // Handle table click
     const handleTableClick = useCallback((tableId: number, multi: boolean) => {
@@ -144,6 +163,12 @@ export function VisualEditorPage() {
             }
         }
     }, [currentTool, selectTable, tables, removeTable, pushHistory]);
+    
+    // Handle table resize
+    const handleTableResize = useCallback((tableId: number, width: number, height: number) => {
+        const { updateTableSize } = useLayoutStore.getState();
+        updateTableSize(tableId, { width, height });
+    }, []);
     
     // Handle canvas click
     const handleCanvasClick = useCallback((e: React.MouseEvent) => {
@@ -255,6 +280,11 @@ export function VisualEditorPage() {
                 return;
             }
             
+            // Track Shift key for disabling snap during drag
+            if (e.key === 'Shift' && draggedTable) {
+                setIsDraggingWithShift(true);
+            }
+            
             // Tool shortcuts
             if (e.key === 'v' || e.key === 'V') {
                 e.preventDefault();
@@ -292,7 +322,15 @@ export function VisualEditorPage() {
             } else if (e.key === 'Escape') {
                 // Cancel current action
                 e.preventDefault();
-                if (currentTool === 'add') {
+                if (draggedTable) {
+                    // Cancel drag operation
+                    setDraggedTable(null);
+                    setTempPosition(null);
+                    setIsDraggingWithShift(false);
+                    if (dragMoveTimeoutRef.current) {
+                        clearTimeout(dragMoveTimeoutRef.current);
+                    }
+                } else if (currentTool === 'add') {
                     setGhostPosition(null);
                 } else if (currentTool === 'pan') {
                     setIsPanning(false);
@@ -331,16 +369,45 @@ export function VisualEditorPage() {
                 useEditorStore.getState().setGrid({ enabled: !grid.enabled });
             }
             
+            // F: Toggle fullscreen
+            if (e.key === 'f' || e.key === 'F') {
+                e.preventDefault();
+                useEditorStore.getState().toggleFullscreen();
+            }
+            
+            // ?: Show keyboard shortcuts
+            if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+                e.preventDefault();
+                useEditorStore.getState().toggleKeyboardShortcuts();
+            }
+            
             // 0: Reset zoom
             if (e.key === '0' && !e.ctrlKey && !e.metaKey) {
                 e.preventDefault();
                 setZoom(1);
             }
+            
+            // 1-9: Switch floors (number keys)
+            const floorNum = parseInt(e.key);
+            if (!isNaN(floorNum) && floorNum >= 1 && floorNum <= 9 && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                useEditorStore.getState().setCurrentFloor(floorNum);
+            }
+        };
+        
+        const handleKeyUp = (e: KeyboardEvent) => {
+            if (e.key === 'Shift') {
+                setIsDraggingWithShift(false);
+            }
         };
         
         window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [handleSave, handleUndo, handleRedo, setTool, currentTool, selectedTableIds, tables, removeTable, pushHistory, clearSelection, grid.enabled, setZoom]);
+        window.addEventListener('keyup', handleKeyUp);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+    }, [handleSave, handleUndo, handleRedo, setTool, currentTool, selectedTableIds, tables, removeTable, pushHistory, clearSelection, grid.enabled, setZoom, draggedTable]);
     
     // Get cursor style based on tool
     const getCursorStyle = () => {
@@ -402,6 +469,7 @@ export function VisualEditorPage() {
                                         isColliding={isColliding}
                                         currentTool={currentTool}
                                         onClick={handleTableClick}
+                                        onResize={handleTableResize}
                                     />
                                 );
                             })}
@@ -429,6 +497,12 @@ export function VisualEditorPage() {
                 
                 <PropertiesPanel />
             </div>
+            
+            {/* Keyboard Shortcuts Dialog */}
+            <KeyboardShortcutsDialog
+                open={showKeyboardShortcuts}
+                onOpenChange={toggleKeyboardShortcuts}
+            />
         </div>
     );
 }

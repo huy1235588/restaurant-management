@@ -16,6 +16,7 @@ import {
     RotateCcw,
     FolderOpen,
     Download,
+    Keyboard,
 } from 'lucide-react';
 import { useEditorStore } from '../stores';
 import { useHistoryStore } from '../stores';
@@ -30,6 +31,7 @@ import {
 import { FloorSelector } from './FloorSelector';
 import { SaveLayoutDialog } from './SaveLayoutDialog';
 import { LoadLayoutDialog } from './LoadLayoutDialog';
+import { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
 
 interface EditorToolbarProps {
     onSave: () => void;
@@ -46,6 +48,7 @@ export function EditorToolbar({
 }: EditorToolbarProps) {
     const [showSaveDialog, setShowSaveDialog] = useState(false);
     const [showLoadDialog, setShowLoadDialog] = useState(false);
+    const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
     
     const {
         currentTool,
@@ -258,6 +261,24 @@ export function EditorToolbar({
                 
                 <Separator orientation="vertical" className="h-8" />
                 
+                {/* Keyboard Shortcuts */}
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setShowKeyboardShortcuts(true)}
+                        >
+                            <Keyboard className="h-4 w-4" />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Keyboard Shortcuts (?)</p>
+                    </TooltipContent>
+                </Tooltip>
+                
+                <Separator orientation="vertical" className="h-8" />
+                
                 {/* Save Button */}
                 <Tooltip>
                     <TooltipTrigger asChild>
@@ -278,6 +299,10 @@ export function EditorToolbar({
             {/* Dialogs */}
             <SaveLayoutDialog open={showSaveDialog} onOpenChange={setShowSaveDialog} />
             <LoadLayoutDialog open={showLoadDialog} onOpenChange={setShowLoadDialog} />
+            <KeyboardShortcutsDialog 
+                open={showKeyboardShortcuts} 
+                onOpenChange={setShowKeyboardShortcuts} 
+            />
         </TooltipProvider>
     );
 }

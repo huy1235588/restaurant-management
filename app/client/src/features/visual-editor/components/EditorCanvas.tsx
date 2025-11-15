@@ -12,6 +12,24 @@ interface EditorCanvasProps {
 export function EditorCanvas({ width, height, children }: EditorCanvasProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const { zoom, pan, grid } = useEditorStore();
+    const performanceRef = useRef({ frameCount: 0, lastTime: Date.now() });
+    
+    // Performance monitoring for canvas rendering
+    const monitorPerformance = useCallback(() => {
+        const now = Date.now();
+        const perf = performanceRef.current;
+        perf.frameCount++;
+        
+        // Log FPS every second
+        if (now - perf.lastTime >= 1000) {
+            const fps = perf.frameCount;
+            if (process.env.NODE_ENV === 'development') {
+                console.debug(`Canvas render FPS: ${fps}`);
+            }
+            perf.frameCount = 0;
+            perf.lastTime = now;
+        }
+    }, []);
     
     // Draw grid on canvas
     const drawGrid = useCallback(() => {
@@ -20,6 +38,8 @@ export function EditorCanvas({ width, height, children }: EditorCanvasProps) {
         
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
+        
+        monitorPerformance();
         
         // Clear canvas
         ctx.clearRect(0, 0, width, height);
@@ -50,7 +70,7 @@ export function EditorCanvas({ width, height, children }: EditorCanvasProps) {
             ctx.lineTo(width, y);
             ctx.stroke();
         }
-    }, [width, height, zoom, pan, grid]);
+    }, [width, height, zoom, pan, grid, monitorPerformance]);
     
     useEffect(() => {
         drawGrid();

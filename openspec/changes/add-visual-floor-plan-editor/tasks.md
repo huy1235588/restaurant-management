@@ -47,19 +47,19 @@
 - [x] Add canvas viewport state management
 - [x] Create table component for DOM layer
 - [x] Implement hybrid Canvas/DOM layering
-- [ ] Add performance monitoring for canvas rendering
+- [x] Add performance monitoring for canvas rendering
 
 ### View Controls
 - [x] Implement zoom in/out functions
 - [x] Create zoom level state management (25%-200%)
 - [x] Add zoom controls to toolbar (buttons and display)
 - [x] Implement Ctrl+Scroll zoom functionality
-- [ ] Add zoom center-point calculation
+- [x] Add zoom center-point calculation
 - [ ] Create smooth zoom animations
 - [x] Implement "Reset Zoom" (100%) function
 - [x] Add "0" key shortcut for zoom reset
-- [ ] Implement pan boundaries calculation
-- [ ] Create "Fit to View" function with bounding box calculation
+- [x] Implement pan boundaries calculation
+- [x] Create "Fit to View" function with bounding box calculation
 
 ## Phase 2: Editing Tools & Interactions (Weeks 3-4)
 
@@ -79,8 +79,8 @@
 - [x] Implement single table selection with click
 - [x] Add selection outline rendering
 - [x] Create resize handles (8 points: corners + edges)
-- [ ] Implement resize handle drag detection
-- [ ] Add resize constraints (min 40x40, max 200x200)
+- [x] Implement resize handle drag detection
+- [x] Add resize constraints (min 40x40, max 200x200)
 - [x] Implement multi-select with Shift+Click
 - [x] Add deselection on empty area click
 - [x] Update properties panel on selection change
@@ -91,11 +91,11 @@
 - [x] Implement draggable table wrapper
 - [x] Create drag start/end handlers
 - [x] Add real-time position updates during drag (60fps)
-- [ ] Implement drag event debouncing (16ms)
+- [x] Implement drag event debouncing (16ms)
 - [x] Create elevated shadow effect during drag
 - [x] Add opacity change during drag
-- [ ] Implement smooth drop animation
-- [ ] Add Esc key to cancel drag
+- [x] Implement smooth drop animation
+- [x] Add Esc key to cancel drag
 - [ ] Create drag performance optimization
 
 ### Collision Detection
@@ -106,13 +106,13 @@
 - [x] Add collision prevention on drop
 - [x] Create error toast for invalid placement
 - [ ] Optimize collision checks (spatial partitioning)
-- [ ] Add collision detection to resize operations
+- [x] Add collision detection to resize operations
 - [ ] Test performance with 100+ tables
 
 ### Grid Snapping
 - [x] Implement grid snap algorithm (Math.round)
 - [x] Add snap-to-grid on drag release
-- [ ] Create Shift+Drag to disable snapping temporarily
+- [x] Create Shift+Drag to disable snapping temporarily
 - [ ] Implement snap threshold (10px from grid point)
 - [ ] Add visual preview of snap target
 - [ ] Create smooth snap animation (100ms)
@@ -136,14 +136,14 @@
 
 ### Floor Management
 - [x] Create FloorSelector dropdown component
-- [ ] Implement floor list with table counts
+- [x] Implement floor list with table counts
 - [x] Add floor switching functionality
 - [x] Create unsaved changes detection
 - [x] Implement unsaved changes warning dialog
-- [ ] Add "Save & Switch", "Discard & Switch", "Cancel" options
+- [x] Add "Save & Switch", "Discard & Switch", "Cancel" options
 - [x] Create floor data loading function
 - [ ] Implement floor data caching (5 min expiry)
-- [ ] Add number key shortcuts (1-9) for floor switching
+- [x] Add number key shortcuts (1-9) for floor switching
 - [x] Create floor-specific state isolation
 
 ### Layout Saving
@@ -215,7 +215,7 @@
 ### Fullscreen Mode
 - [ ] Implement fullscreen API integration
 - [x] Create fullscreen toggle button
-- [ ] Add "F" key shortcut for fullscreen
+- [x] Add "F" key shortcut for fullscreen
 - [ ] Hide non-essential UI in fullscreen
 - [ ] Add Esc key to exit fullscreen
 - [ ] Maintain editor state during fullscreen toggle
@@ -230,13 +230,13 @@
 - [ ] Create arrow key table movement
 - [ ] Implement Shift+Arrow for faster movement
 - [x] Add Esc key for cancel/deselect
-- [ ] Create keyboard shortcuts reference dialog
+- [x] Create keyboard shortcuts reference dialog
 - [x] Test cross-platform shortcuts (Ctrl/Cmd)
 
 ## Phase 5: Performance Optimization & Polish (Week 7)
 
 ### Performance Optimization
-- [ ] Implement React.memo for table components
+- [x] Implement React.memo for table components
 - [ ] Add virtual scrolling for 100+ tables
 - [ ] Optimize collision detection with spatial indexing
 - [ ] Use requestAnimationFrame for animations

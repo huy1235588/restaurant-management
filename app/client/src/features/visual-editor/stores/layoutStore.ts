@@ -23,6 +23,7 @@ interface LayoutState {
     addTable: (table: TablePosition) => void;
     removeTable: (tableId: number) => void;
     getTableById: (tableId: number) => TablePosition | undefined;
+    loadFloorData: (floor: number) => Promise<void>;
     
     // Layout management
     setSavedLayouts: (layouts: FloorPlanLayout[]) => void;
@@ -97,6 +98,12 @@ export const useLayoutStore = create<LayoutState>()(
             
             getTableById: (tableId: number) => {
                 return get().tables.find((table) => table.tableId === tableId);
+            },
+            
+            loadFloorData: async (floor: number) => {
+                // This is a placeholder implementation
+                // In a real implementation, you would fetch data from the API
+                set({ tables: [], unsavedChanges: false });
             },
             
             setSavedLayouts: (layouts: FloorPlanLayout[]) => set({ savedLayouts: layouts }),
