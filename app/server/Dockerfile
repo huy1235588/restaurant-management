@@ -11,7 +11,7 @@ COPY prisma ./prisma/
 
 # Install dependencies with cache mount and generate Prisma client
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
-    pnpm install --frozen-lockfile && \
+    pnpm install --no-frozen-lockfile && \
     pnpm prisma:generate
 
 # Stage 2: Builder
