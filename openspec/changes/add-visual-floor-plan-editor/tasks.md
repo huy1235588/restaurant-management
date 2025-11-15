@@ -12,7 +12,6 @@
 - [x] Implement position controller with GET, PUT batch operations
 - [x] Implement layouts controller with CRUD operations
 - [x] Add validation schemas with Zod for position and layout data
-- [ ] Write unit tests for controllers and validation
 
 ### API Endpoints
 - [x] Implement GET /api/floor-plans/positions?floor={floor}
@@ -25,7 +24,6 @@
 - [x] Implement POST /api/floor-plans/layouts/:layoutId/activate
 - [x] Add authorization middleware for floor plan operations
 - [x] Add rate limiting for batch operations
-- [ ] Write API integration tests
 - [x] Document endpoints with Swagger/OpenAPI
 
 ### Frontend Foundation
@@ -235,38 +233,7 @@
 - [ ] Create keyboard shortcuts reference dialog
 - [x] Test cross-platform shortcuts (Ctrl/Cmd)
 
-## Phase 5: Accessibility & Polish (Week 7)
-
-### Accessibility
-- [ ] Add ARIA labels to all interactive elements
-- [ ] Implement role attributes (button, region, dialog)
-- [ ] Create focus indicators for all focusable elements
-- [ ] Add keyboard navigation (Tab order)
-- [ ] Implement aria-live regions for announcements
-- [ ] Add aria-describedby for context
-- [ ] Create skip navigation links
-- [ ] Implement focus trap for dialogs
-- [ ] Add aria-pressed for toggle buttons
-- [ ] Test with screen reader (NVDA/JAWS)
-
-### Color Contrast & Visuals
-- [ ] Audit all colors for WCAG AA compliance
-- [ ] Ensure text has 4.5:1 contrast ratio
-- [ ] Verify interactive elements have 3:1 ratio
-- [ ] Add non-color indicators (icons, patterns) for status
-- [ ] Implement colorblind-friendly palette
-- [ ] Create high contrast mode support
-- [ ] Add focus outline with adequate contrast
-- [ ] Test with color blindness simulators
-
-### Form Accessibility
-- [ ] Add labels to all form inputs
-- [ ] Implement aria-required for required fields
-- [ ] Add aria-invalid and error associations
-- [ ] Create accessible error messages
-- [ ] Test form navigation with keyboard
-- [ ] Add input validation with clear feedback
-- [ ] Implement accessible dialogs (focus management)
+## Phase 5: Performance Optimization & Polish (Week 7)
 
 ### Performance Optimization
 - [ ] Implement React.memo for table components
@@ -280,92 +247,6 @@
 - [ ] Profile and optimize re-renders
 - [ ] Test with 100+ tables, ensure 60fps
 
-## Phase 6: Testing & Documentation (Week 8)
-
-### Unit Tests
-- [ ] Write tests for collision detection algorithm
-- [ ] Test grid snapping calculations
-- [ ] Test history stack operations (push, undo, redo)
-- [ ] Test Zustand store actions
-- [ ] Test API client functions
-- [ ] Test validation schemas
-- [ ] Test utility functions (bounding box, alignment)
-- [ ] Achieve 80%+ code coverage for core logic
-
-### Integration Tests
-- [ ] Test floor switching with unsaved changes
-- [ ] Test save and load layout workflows
-- [ ] Test template application
-- [ ] Test drag and drop with collision
-- [ ] Test undo/redo sequences
-- [ ] Test keyboard navigation flows
-- [ ] Test multi-select operations
-- [ ] Test API endpoint integration
-
-### End-to-End Tests
-- [ ] Create E2E test for complete editing workflow
-- [ ] Test adding, moving, resizing, deleting tables
-- [ ] Test saving and loading layouts
-- [ ] Test floor switching
-- [ ] Test undo/redo in complex scenarios
-- [ ] Test keyboard-only navigation
-- [ ] Test error handling and recovery
-- [ ] Use Playwright for E2E tests
-
-### Accessibility Testing
-- [ ] Run axe-core accessibility audit
-- [ ] Test with keyboard only (no mouse)
-- [ ] Test with screen reader (NVDA on Windows)
-- [ ] Test with screen reader (VoiceOver on Mac)
-- [ ] Verify WCAG AA compliance
-- [ ] Test focus management in dialogs
-- [ ] Test skip navigation links
-- [ ] Fix all critical and serious accessibility issues
-
-### Performance Testing
-- [ ] Benchmark canvas rendering with 100 tables
-- [ ] Measure drag operation performance (fps)
-- [ ] Test zoom and pan smoothness
-- [ ] Benchmark API response times
-- [ ] Test memory usage during long editing sessions
-- [ ] Profile for performance bottlenecks
-- [ ] Optimize identified slow operations
-- [ ] Ensure all operations meet performance targets
-
-### Documentation
-- [ ] Write user guide for visual editor
-- [ ] Create video tutorial for basic workflow
-- [ ] Document keyboard shortcuts reference
-- [ ] Write API documentation for floor plan endpoints
-- [ ] Create developer documentation for components
-- [ ] Document state management architecture
-- [ ] Write troubleshooting guide
-- [ ] Create inline help text and tooltips
-
-### Final Polish
-- [ ] Review and refine all animations
-- [ ] Ensure consistent styling across components
-- [ ] Add loading states for all async operations
-- [ ] Polish error messages for clarity
-- [ ] Review and improve tooltips
-- [ ] Test on different screen sizes
-- [ ] Test on different browsers (Chrome, Firefox, Safari, Edge)
-- [ ] Conduct user acceptance testing
-- [ ] Fix all high-priority bugs
-- [ ] Prepare feature flag for rollout
-
-## Deployment Checklist
-- [ ] Create database migration scripts
-- [ ] Test migrations on staging environment
-- [ ] Deploy backend API changes
-- [ ] Deploy frontend changes
-- [ ] Enable feature flag for beta users
-- [ ] Monitor error rates and performance
-- [ ] Gather user feedback
-- [ ] Iterate based on feedback
-- [ ] Gradual rollout to all users
-- [ ] Post-launch monitoring and support
-
 ---
 
 ## Dependencies Between Tasks
@@ -376,12 +257,10 @@
 - Drag and drop needed before collision detection
 - Floor management needed before layout saving
 - History store needed before undo/redo
-- Core features needed before accessibility polish
-- All features needed before comprehensive testing
+- Keyboard shortcuts depend on core tool functionality
 
 ## Parallel Work Opportunities
 - Backend API and frontend components can develop in parallel after schema agreement
 - Different tools (Select, Pan, Add) can be implemented in parallel
-- Accessibility work can happen alongside feature development
-- Documentation can be written as features complete
-- Unit tests can be written alongside implementation
+- Keyboard shortcuts can be implemented alongside feature development
+- Performance optimization can happen as features are completed
