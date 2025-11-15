@@ -55,7 +55,7 @@
 - [x] Add zoom controls to toolbar (buttons and display)
 - [x] Implement Ctrl+Scroll zoom functionality
 - [x] Add zoom center-point calculation
-- [ ] Create smooth zoom animations
+- [x] Create smooth zoom animations
 - [x] Implement "Reset Zoom" (100%) function
 - [x] Add "0" key shortcut for zoom reset
 - [x] Implement pan boundaries calculation
@@ -105,7 +105,7 @@
 - [x] Implement red outline for colliding tables
 - [x] Add collision prevention on drop
 - [x] Create error toast for invalid placement
-- [ ] Optimize collision checks (spatial partitioning)
+- [x] Optimize collision checks (spatial partitioning)
 - [x] Add collision detection to resize operations
 - [ ] Test performance with 100+ tables
 
@@ -113,24 +113,24 @@
 - [x] Implement grid snap algorithm (Math.round)
 - [x] Add snap-to-grid on drag release
 - [x] Create Shift+Drag to disable snapping temporarily
-- [ ] Implement snap threshold (10px from grid point)
+- [x] Implement snap threshold (10px from grid point)
 - [ ] Add visual preview of snap target
-- [ ] Create smooth snap animation (100ms)
-- [ ] Add grid snapping to resize operations
+- [x] Create smooth snap animation (100ms)
+- [x] Add grid snapping to resize operations
 - [x] Implement alignment guides (horizontal/vertical/center)
 - [ ] Add snap-to-alignment with 5px threshold
 
 ### Add Table Tool
 - [x] Create ghost preview component
 - [x] Implement ghost preview following cursor
-- [ ] Add green/red color based on collision
-- [ ] Create Quick Create Dialog component
-- [ ] Pre-fill coordinates from click position
-- [ ] Add auto-increment table number logic
-- [ ] Implement table creation API call
-- [ ] Add fade-in animation for new table
-- [ ] Handle creation errors gracefully
-- [ ] Keep tool active after creation for adding more
+- [x] Add green/red color based on collision
+- [x] Create Quick Create Dialog component
+- [x] Pre-fill coordinates from click position
+- [x] Add auto-increment table number logic
+- [x] Implement table creation API call
+- [x] Add fade-in animation for new table
+- [x] Handle creation errors gracefully
+- [x] Keep tool active after creation for adding more
 
 ## Phase 3: Floor & Layout Management (Week 5)
 
@@ -213,13 +213,13 @@
 - [x] Show multi-selection info when multiple tables selected
 
 ### Fullscreen Mode
-- [ ] Implement fullscreen API integration
+- [x] Implement fullscreen API integration
 - [x] Create fullscreen toggle button
 - [x] Add "F" key shortcut for fullscreen
-- [ ] Hide non-essential UI in fullscreen
-- [ ] Add Esc key to exit fullscreen
-- [ ] Maintain editor state during fullscreen toggle
-- [ ] Create fullscreen indicator/exit button
+- [x] Hide non-essential UI in fullscreen
+- [x] Add Esc key to exit fullscreen
+- [x] Maintain editor state during fullscreen toggle
+- [x] Create fullscreen indicator/exit button
 
 ### Keyboard Shortcuts
 - [x] Create centralized keyboard handler
@@ -227,8 +227,8 @@
 - [x] Add all action shortcuts (Ctrl+S, Ctrl+Z, etc.)
 - [x] Implement grid toggle (G key)
 - [ ] Add fullscreen toggle (F key)
-- [ ] Create arrow key table movement
-- [ ] Implement Shift+Arrow for faster movement
+- [x] Create arrow key table movement
+- [x] Implement Shift+Arrow for faster movement
 - [x] Add Esc key for cancel/deselect
 - [x] Create keyboard shortcuts reference dialog
 - [x] Test cross-platform shortcuts (Ctrl/Cmd)
@@ -239,9 +239,9 @@
 - [x] Implement React.memo for table components
 - [ ] Add virtual scrolling for 100+ tables
 - [ ] Optimize collision detection with spatial indexing
-- [ ] Use requestAnimationFrame for animations
-- [ ] Debounce drag events to 16ms
-- [ ] Cache canvas rendering where possible
+- [x] Use requestAnimationFrame for animations
+- [x] Debounce drag events to 16ms
+- [x] Cache canvas rendering where possible
 - [ ] Lazy load floor data
 - [ ] Implement optimistic UI updates
 - [ ] Profile and optimize re-renders

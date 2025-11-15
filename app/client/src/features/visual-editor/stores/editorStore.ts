@@ -36,6 +36,7 @@ interface EditorState {
     setGrid: (grid: Partial<GridSettings>) => void;
     setCurrentFloor: (floor: number) => void;
     toggleFullscreen: () => void;
+    setFullscreen: (isFullscreen: boolean) => void;
     toggleKeyboardShortcuts: () => void;
     togglePropertiesPanel: () => void;
     resetView: () => void;
@@ -126,6 +127,8 @@ export const useEditorStore = create<EditorState>()(
             setCurrentFloor: (floor: number) => set({ currentFloor: floor }),
             
             toggleFullscreen: () => set((state) => ({ isFullscreen: !state.isFullscreen })),
+            
+            setFullscreen: (isFullscreen: boolean) => set({ isFullscreen }),
             
             toggleKeyboardShortcuts: () =>
                 set((state) => ({ showKeyboardShortcuts: !state.showKeyboardShortcuts })),

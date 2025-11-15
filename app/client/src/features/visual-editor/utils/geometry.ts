@@ -13,7 +13,78 @@ export function checkCollision(rect1: Rect, rect2: Rect): boolean {
 }
 
 /**
- * Check if a table collides with any other tables
+ * Spatial grid for optimized collision detection
+ */
+class SpatialGrid {
+    private cellSize: number;
+    private grid: Map<string, TablePosition[]>;
+    
+    constructor(cellSize: number = 200) {
+        this.cellSize = cellSize;
+        this.grid = new Map();
+    }
+    
+    private getCellKey(x: number, y: number): string {
+        const cellX = Math.floor(x / this.cellSize);
+        const cellY = Math.floor(y / this.cellSize);
+        return `${cellX},${cellY}`;
+    }
+    
+    private getCellsForRect(rect: Rect): string[] {
+        const cells: string[] = [];
+        const minCellX = Math.floor(rect.x / this.cellSize);
+        const minCellY = Math.floor(rect.y / this.cellSize);
+        const maxCellX = Math.floor((rect.x + rect.width) / this.cellSize);
+        const maxCellY = Math.floor((rect.y + rect.height) / this.cellSize);
+        
+        for (let cx = minCellX; cx <= maxCellX; cx++) {
+            for (let cy = minCellY; cy <= maxCellY; cy++) {
+                cells.push(`${cx},${cy}`);
+            }
+        }
+        return cells;
+    }
+    
+    clear() {
+        this.grid.clear();
+    }
+    
+    insert(table: TablePosition) {
+        const rect: Rect = {
+            x: table.x,
+            y: table.y,
+            width: table.width,
+            height: table.height,
+        };
+        
+        const cells = this.getCellsForRect(rect);
+        cells.forEach(cell => {
+            if (!this.grid.has(cell)) {
+                this.grid.set(cell, []);
+            }
+            this.grid.get(cell)!.push(table);
+        });
+    }
+    
+    query(rect: Rect): TablePosition[] {
+        const cells = this.getCellsForRect(rect);
+        const tables = new Set<TablePosition>();
+        
+        cells.forEach(cell => {
+            const cellTables = this.grid.get(cell);
+            if (cellTables) {
+                cellTables.forEach(table => tables.add(table));
+            }
+        });
+        
+        return Array.from(tables);
+    }
+}
+
+let spatialGrid: SpatialGrid | null = null;
+
+/**
+ * Check if a table collides with any other tables (optimized with spatial partitioning)
  */
 export function checkTableCollision(
     table: TablePosition,
@@ -27,6 +98,34 @@ export function checkTableCollision(
         height: table.height,
     };
     
+    // Use spatial partitioning for large table counts
+    if (allTables.length > 20) {
+        // Rebuild spatial grid if needed
+        if (!spatialGrid) {
+            spatialGrid = new SpatialGrid();
+        }
+        spatialGrid.clear();
+        
+        allTables.forEach(t => {
+            if (t.tableId !== table.tableId && !excludeIds.includes(t.tableId)) {
+                spatialGrid!.insert(t);
+            }
+        });
+        
+        const nearbyTables = spatialGrid.query(tableRect);
+        
+        return nearbyTables.some((otherTable) => {
+            const otherRect: Rect = {
+                x: otherTable.x,
+                y: otherTable.y,
+                width: otherTable.width,
+                height: otherTable.height,
+            };
+            return checkCollision(tableRect, otherRect);
+        });
+    }
+    
+    // Simple iteration for small table counts
     return allTables.some((otherTable) => {
         if (otherTable.tableId === table.tableId || excludeIds.includes(otherTable.tableId)) {
             return false;
@@ -51,12 +150,33 @@ export function snapToGrid(value: number, gridSize: number): number {
 }
 
 /**
+ * Snap value to grid with threshold
+ */
+export function snapToGridWithThreshold(value: number, gridSize: number, threshold: number = 10): number {
+    const snappedValue = snapToGrid(value, gridSize);
+    const distance = Math.abs(value - snappedValue);
+    
+    // Only snap if within threshold
+    return distance <= threshold ? snappedValue : value;
+}
+
+/**
  * Snap position to grid
  */
 export function snapPositionToGrid(position: Position, gridSize: number): Position {
     return {
         x: snapToGrid(position.x, gridSize),
         y: snapToGrid(position.y, gridSize),
+    };
+}
+
+/**
+ * Snap size to grid
+ */
+export function snapSizeToGrid(size: Size, gridSize: number): Size {
+    return {
+        width: snapToGrid(size.width, gridSize),
+        height: snapToGrid(size.height, gridSize),
     };
 }
 

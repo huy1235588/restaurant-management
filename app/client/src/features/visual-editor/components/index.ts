@@ -8,3 +8,4 @@ export { SaveLayoutDialog } from './SaveLayoutDialog';
 export { LoadLayoutDialog } from './LoadLayoutDialog';
 export { UnsavedChangesDialog } from './UnsavedChangesDialog';
 export { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
+export { QuickCreateTableDialog } from './QuickCreateTableDialog';

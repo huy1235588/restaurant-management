@@ -5,6 +5,8 @@ import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import type { TablePosition, Tool } from '../types';
 import { cn } from '@/lib/utils';
+import { snapSizeToGrid } from '../utils/geometry';
+import { useEditorStore } from '../stores';
 
 interface TableComponentProps {
     table: TablePosition;
@@ -119,8 +121,27 @@ const TableComponentRaw = ({
     }, [resizing, resizeStart, table.tableId, onResize]);
     
     const handleResizeEnd = useCallback(() => {
+        if (!resizing || !onResize) {
+            setResizing(null);
+            return;
+        }
+        
+        // Get current size
+        const currentWidth = table.width;
+        const currentHeight = table.height;
+        
+        // Apply grid snapping on resize end
+        const { grid } = useEditorStore.getState();
+        if (grid.snapEnabled) {
+            const snappedSize = snapSizeToGrid(
+                { width: currentWidth, height: currentHeight },
+                grid.size
+            );
+            onResize(table.tableId, snappedSize.width, snappedSize.height);
+        }
+        
         setResizing(null);
-    }, []);
+    }, [resizing, onResize, table.tableId, table.width, table.height]);
     
     React.useEffect(() => {
         if (resizing) {

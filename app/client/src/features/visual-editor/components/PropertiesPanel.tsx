@@ -1,16 +1,23 @@
 'use client';
 
-import React from 'react';
-import { useEditorStore, useLayoutStore } from '../stores';
+import React, { useCallback } from 'react';
+import { useEditorStore, useLayoutStore, useHistoryStore } from '../stores';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Trash2, Copy } from 'lucide-react';
+import { toast } from 'sonner';
+import type { TablePosition } from '../types';
 
-export function PropertiesPanel() {
-    const { selectedTableIds, showPropertiesPanel } = useEditorStore();
-    const { tables, updateTablePosition } = useLayoutStore();
+interface PropertiesPanelProps {
+    onDelete?: (tableId: number) => void;
+}
+
+export function PropertiesPanel({ onDelete }: PropertiesPanelProps) {
+    const { selectedTableIds, showPropertiesPanel, clearSelection, selectTable } = useEditorStore();
+    const { tables, updateTablePosition, addTable, removeTable } = useLayoutStore();
+    const { push: pushHistory } = useHistoryStore();
     
     if (!showPropertiesPanel) return null;
     
@@ -53,6 +60,37 @@ export function PropertiesPanel() {
     );
     
     if (!selectedTable) return null;
+    
+    const handleDuplicate = useCallback(() => {
+        // Create a copy with offset position
+        const duplicatedTable: TablePosition = {
+            ...selectedTable,
+            tableId: Date.now(), // Temporary ID
+            tableNumber: `${selectedTable.tableNumber}-Copy`,
+            x: selectedTable.x + 20,
+            y: selectedTable.y + 20,
+        };
+        
+        addTable(duplicatedTable);
+        
+        pushHistory({
+            type: 'create',
+            table: duplicatedTable,
+            timestamp: Date.now(),
+        });
+        
+        // Select the new table
+        clearSelection();
+        selectTable(duplicatedTable.tableId, false);
+        
+        toast.success('Table duplicated');
+    }, [selectedTable, addTable, pushHistory, clearSelection, selectTable]);
+    
+    const handleDelete = useCallback(() => {
+        if (onDelete) {
+            onDelete(selectedTable.tableId);
+        }
+    }, [selectedTable.tableId, onDelete]);
     
     return (
         <div className="w-80 border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-4 overflow-y-auto">
@@ -149,11 +187,19 @@ export function PropertiesPanel() {
                     
                     {/* Actions */}
                     <div className="space-y-2 pt-4 border-t">
-                        <Button variant="outline" className="w-full gap-2">
+                        <Button 
+                            variant="outline" 
+                            className="w-full gap-2"
+                            onClick={handleDuplicate}
+                        >
                             <Copy className="h-4 w-4" />
                             Duplicate
                         </Button>
-                        <Button variant="destructive" className="w-full gap-2">
+                        <Button 
+                            variant="destructive" 
+                            className="w-full gap-2"
+                            onClick={handleDelete}
+                        >
                             <Trash2 className="h-4 w-4" />
                             Delete
                         </Button>

@@ -10,9 +10,12 @@ import { EditorToolbar } from './EditorToolbar';
 import { TableComponent } from './TableComponent';
 import { PropertiesPanel } from './PropertiesPanel';
 import { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
+import { QuickCreateTableDialog } from './QuickCreateTableDialog';
+import { DeleteTableDialog } from './DeleteTableDialog';
 import { checkTableCollision, snapPositionToGrid } from '../utils/geometry';
 import { floorPlanApi } from '@/services/floor-plan.service';
 import type { TablePosition } from '../types';
+import { Button } from '@/components/ui/button';
 
 export function VisualEditorPage() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -28,6 +31,12 @@ export function VisualEditorPage() {
     
     // Add table tool state
     const [ghostPosition, setGhostPosition] = useState<{ x: number; y: number } | null>(null);
+    const [showCreateDialog, setShowCreateDialog] = useState(false);
+    const [createPosition, setCreatePosition] = useState({ x: 0, y: 0 });
+    
+    // Delete dialog state
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [tablesToDelete, setTablesToDelete] = useState<number[]>([]);
     
     // Load floor plan data
     useFloorPlanData();
@@ -45,6 +54,7 @@ export function VisualEditorPage() {
         setZoom,
         showKeyboardShortcuts,
         toggleKeyboardShortcuts,
+        isFullscreen,
     } = useEditorStore();
     
     const {
@@ -69,6 +79,21 @@ export function VisualEditorPage() {
         updateDimensions();
         window.addEventListener('resize', updateDimensions);
         return () => window.removeEventListener('resize', updateDimensions);
+    }, []);
+    
+    // Handle fullscreen changes
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            const { setFullscreen } = useEditorStore.getState();
+            if (document.fullscreenElement) {
+                setFullscreen(true);
+            } else {
+                setFullscreen(false);
+            }
+        };
+        
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
     }, []);
     
     // Handle drag start
@@ -151,18 +176,34 @@ export function VisualEditorPage() {
         if (currentTool === 'select') {
             selectTable(tableId, multi);
         } else if (currentTool === 'delete') {
+            setTablesToDelete([tableId]);
+            setShowDeleteDialog(true);
+        }
+    }, [currentTool, selectTable]);
+    
+    // Handle delete confirm
+    const handleDeleteConfirm = useCallback(() => {
+        tablesToDelete.forEach((tableId) => {
             const table = tables.find((t) => t.tableId === tableId);
-            if (table && window.confirm(`Delete table ${table.tableNumber}?`)) {
+            if (table) {
                 pushHistory({
                     type: 'delete',
                     table: table,
                     timestamp: Date.now(),
                 });
                 removeTable(tableId);
-                toast.success('Table deleted');
             }
-        }
-    }, [currentTool, selectTable, tables, removeTable, pushHistory]);
+        });
+        clearSelection();
+        toast.success(`Deleted ${tablesToDelete.length} table(s)`);
+        setTablesToDelete([]);
+    }, [tablesToDelete, tables, removeTable, pushHistory, clearSelection]);
+    
+    // Handle delete from properties panel
+    const handleDeleteFromPanel = useCallback((tableId: number) => {
+        setTablesToDelete([tableId]);
+        setShowDeleteDialog(true);
+    }, []);
     
     // Handle table resize
     const handleTableResize = useCallback((tableId: number, width: number, height: number) => {
@@ -170,13 +211,66 @@ export function VisualEditorPage() {
         updateTableSize(tableId, { width, height });
     }, []);
     
+    // Handle create table
+    const handleCreateTable = useCallback(async (data: {
+        tableNumber: string;
+        capacity: number;
+        shape: 'circle' | 'square' | 'rectangle' | 'oval';
+        x: number;
+        y: number;
+    }) => {
+        try {
+            // Tính kích thước bàn
+            const tableWidth = data.shape === 'rectangle' ? 120 : 80;
+            const tableHeight = 80;
+            
+            // Create new table object - đặt ở chính giữa vị trí ghost preview
+            const newTable: TablePosition = {
+                tableId: Date.now(), // Temporary ID, should be from API
+                tableNumber: data.tableNumber,
+                capacity: data.capacity,
+                shape: data.shape,
+                x: data.x - tableWidth / 2,
+                y: data.y - tableHeight / 2,
+                width: tableWidth,
+                height: tableHeight,
+                rotation: 0,
+                status: 'available',
+            };
+            
+            // Check for collision
+            const hasCollision = checkTableCollision(newTable, tables);
+            if (hasCollision) {
+                toast.error('Cannot place table here - overlaps with another table');
+                return;
+            }
+            
+            // Add to store
+            const { addTable } = useLayoutStore.getState();
+            addTable(newTable);
+            
+            // Record history
+            pushHistory({
+                type: 'create',
+                table: newTable,
+                timestamp: Date.now(),
+            });
+            
+            toast.success(`Table ${data.tableNumber} created`);
+            
+            // Keep tool active for adding more tables
+        } catch (error) {
+            toast.error('Failed to create table');
+        }
+    }, [tables, pushHistory]);
+    
     // Handle canvas click
     const handleCanvasClick = useCallback((e: React.MouseEvent) => {
         if (currentTool === 'select') {
             clearSelection();
         } else if (currentTool === 'add' && ghostPosition) {
-            // TODO: Open dialog to create table at ghost position
-            toast.info('Add table dialog not yet implemented');
+            setCreatePosition(ghostPosition);
+            setShowCreateDialog(true);
         }
     }, [currentTool, clearSelection, ghostPosition]);
     
@@ -200,11 +294,12 @@ export function VisualEditorPage() {
             setPan(newPan);
         }
         
-        // Add tool ghost preview
+        // Add tool ghost preview - cập nhật ngay lập tức không debounce
         if (currentTool === 'add' && containerRef.current) {
             const rect = containerRef.current.getBoundingClientRect();
-            const x = (e.clientX - rect.left - pan.x) / zoom;
-            const y = (e.clientY - rect.top - pan.y) / zoom;
+            // Tính toán vị trí chính xác với zoom và pan
+            const x = (e.clientX - rect.left) / zoom - pan.x / zoom;
+            const y = (e.clientY - rect.top) / zoom - pan.y / zoom;
             
             // Snap to grid if enabled
             if (grid.snapEnabled) {
@@ -224,13 +319,23 @@ export function VisualEditorPage() {
         }
     }, [currentTool]);
     
-    // Handle wheel for zoom (Ctrl+Scroll)
+    // Handle wheel for zoom (Ctrl+Scroll) with center-point
     const handleWheel = useCallback((e: React.WheelEvent) => {
         if (e.ctrlKey || e.metaKey) {
             e.preventDefault();
-            const delta = -e.deltaY * 0.001;
-            const newZoom = Math.max(0.25, Math.min(2.0, zoom + delta));
-            setZoom(newZoom);
+            
+            // Get cursor position relative to container
+            if (containerRef.current) {
+                const rect = containerRef.current.getBoundingClientRect();
+                const centerPoint = {
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top,
+                };
+                
+                const delta = -e.deltaY * 0.001;
+                const newZoom = Math.max(0.25, Math.min(2.0, zoom + delta));
+                setZoom(newZoom, centerPoint);
+            }
         }
     }, [zoom, setZoom]);
     
@@ -299,30 +404,17 @@ export function VisualEditorPage() {
                 // Delete selected tables
                 if (selectedTableIds.length > 0 && currentTool === 'select') {
                     e.preventDefault();
-                    const confirmMsg = selectedTableIds.length === 1 
-                        ? `Delete selected table?`
-                        : `Delete ${selectedTableIds.length} selected tables?`;
-                    
-                    if (window.confirm(confirmMsg)) {
-                        selectedTableIds.forEach((tableId) => {
-                            const table = tables.find((t) => t.tableId === tableId);
-                            if (table) {
-                                pushHistory({
-                                    type: 'delete',
-                                    table: table,
-                                    timestamp: Date.now(),
-                                });
-                                removeTable(tableId);
-                            }
-                        });
-                        clearSelection();
-                        toast.success(`Deleted ${selectedTableIds.length} table(s)`);
-                    }
+                    setTablesToDelete(selectedTableIds);
+                    setShowDeleteDialog(true);
                 }
             } else if (e.key === 'Escape') {
                 // Cancel current action
                 e.preventDefault();
-                if (draggedTable) {
+                
+                // Exit fullscreen if active
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else if (draggedTable) {
                     // Cancel drag operation
                     setDraggedTable(null);
                     setTempPosition(null);
@@ -335,8 +427,9 @@ export function VisualEditorPage() {
                 } else if (currentTool === 'pan') {
                     setIsPanning(false);
                     setPanStart(null);
+                } else {
+                    clearSelection();
                 }
-                clearSelection();
             }
             
             // Ctrl/Cmd + S: Save
@@ -372,7 +465,49 @@ export function VisualEditorPage() {
             // F: Toggle fullscreen
             if (e.key === 'f' || e.key === 'F') {
                 e.preventDefault();
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else {
+                    containerRef.current?.parentElement?.requestFullscreen();
+                }
                 useEditorStore.getState().toggleFullscreen();
+            }
+            
+            // Arrow keys: Move selected table
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                if (selectedTableIds.length === 1 && currentTool === 'select') {
+                    e.preventDefault();
+                    const tableId = selectedTableIds[0];
+                    const table = tables.find((t) => t.tableId === tableId);
+                    if (table) {
+                        const step = e.shiftKey ? 10 : 1; // Shift for faster movement
+                        let newX = table.x;
+                        let newY = table.y;
+                        
+                        switch (e.key) {
+                            case 'ArrowUp':
+                                newY -= step;
+                                break;
+                            case 'ArrowDown':
+                                newY += step;
+                                break;
+                            case 'ArrowLeft':
+                                newX -= step;
+                                break;
+                            case 'ArrowRight':
+                                newX += step;
+                                break;
+                        }
+                        
+                        // Check for collision
+                        const movedTable = { ...table, x: newX, y: newY };
+                        const hasCollision = checkTableCollision(movedTable, tables, [tableId]);
+                        
+                        if (!hasCollision) {
+                            updateTablePosition(tableId, { x: newX, y: newY });
+                        }
+                    }
+                }
             }
             
             // ?: Show keyboard shortcuts
@@ -425,6 +560,19 @@ export function VisualEditorPage() {
     
     return (
         <div className="flex flex-col h-[calc(100vh+0rem)] border rounded-lg bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800">
+            {/* Fullscreen Exit Button */}
+            {isFullscreen && (
+                <div className="absolute top-4 right-4 z-50">
+                    <Button
+                        onClick={() => document.exitFullscreen()}
+                        className="bg-black/50 hover:bg-black/70 text-white"
+                        size="sm"
+                    >
+                        Exit Fullscreen (ESC)
+                    </Button>
+                </div>
+            )}
+            
             <EditorToolbar
                 onSave={handleSave}
                 onUndo={handleUndo}
@@ -475,33 +623,74 @@ export function VisualEditorPage() {
                             })}
                             
                             {/* Ghost preview for Add Table tool */}
-                            {currentTool === 'add' && ghostPosition && (
-                                <div
-                                    className="absolute border-2 border-dashed border-blue-500 bg-blue-500/20 rounded pointer-events-none"
-                                    style={{
-                                        left: ghostPosition.x,
-                                        top: ghostPosition.y,
-                                        width: 80,
-                                        height: 80,
-                                        transform: 'translate(-50%, -50%)',
-                                    }}
-                                >
-                                    <div className="flex items-center justify-center h-full text-blue-600 font-medium">
-                                        New Table
+                            {currentTool === 'add' && ghostPosition && (() => {
+                                const ghostWidth = 80;
+                                const ghostHeight = 80;
+                                const ghostTable: TablePosition = {
+                                    tableId: -1,
+                                    tableNumber: 'New',
+                                    capacity: 4,
+                                    shape: 'circle',
+                                    x: ghostPosition.x - ghostWidth / 2,
+                                    y: ghostPosition.y - ghostHeight / 2,
+                                    width: ghostWidth,
+                                    height: ghostHeight,
+                                    rotation: 0,
+                                    status: 'available',
+                                };
+                                const hasCollision = checkTableCollision(ghostTable, tables);
+                                const colorClass = hasCollision 
+                                    ? 'border-red-500 bg-red-500/20' 
+                                    : 'border-green-500 bg-green-500/20';
+                                const textClass = hasCollision ? 'text-red-600' : 'text-green-600';
+                                
+                                return (
+                                    <div
+                                        className={`absolute border-2 border-dashed ${colorClass} rounded-full pointer-events-none`}
+                                        style={{
+                                            left: ghostTable.x,
+                                            top: ghostTable.y,
+                                            width: ghostWidth,
+                                            height: ghostHeight,
+                                        }}
+                                    >
+                                        <div className={`flex items-center justify-center h-full ${textClass} font-medium text-2xl`}>
+                                            {hasCollision ? '✕' : '✓'}
+                                        </div>
                                     </div>
-                                </div>
-                            )}
+                                );
+                            })()}
                         </EditorCanvas>
                     </DndContext>
                 </div>
                 
-                <PropertiesPanel />
+                <PropertiesPanel onDelete={handleDeleteFromPanel} />
             </div>
             
             {/* Keyboard Shortcuts Dialog */}
             <KeyboardShortcutsDialog
                 open={showKeyboardShortcuts}
                 onOpenChange={toggleKeyboardShortcuts}
+            />
+            
+            {/* Quick Create Table Dialog */}
+            <QuickCreateTableDialog
+                open={showCreateDialog}
+                onOpenChange={setShowCreateDialog}
+                position={createPosition}
+                onCreateTable={handleCreateTable}
+                existingTableNumbers={tables.map(t => t.tableNumber)}
+            />
+            
+            {/* Delete Table Dialog */}
+            <DeleteTableDialog
+                open={showDeleteDialog}
+                onOpenChange={setShowDeleteDialog}
+                onConfirm={handleDeleteConfirm}
+                tableNumbers={tablesToDelete.map(id => {
+                    const table = tables.find(t => t.tableId === id);
+                    return table?.tableNumber || 'Unknown';
+                })}
             />
         </div>
     );
