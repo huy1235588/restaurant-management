@@ -15,6 +15,7 @@
     -   [3.5 Order Management](#35-order-management)
     -   [3.6 Kitchen Management](#36-kitchen-management)
     -   [3.7 Billing & Payment](#37-billing--payment)
+    -   [3.8 Visual Floor Plan](#38-visual-floor-plan)
 -   [4. Mối quan hệ giữa các bảng](#4-mối-quan-hệ-giữa-các-bảng)
 -   [5. Chiến lược đánh chỉ mục](#5-chiến-lược-đánh-chỉ-mục)
 -   [6. Các truy vấn thường dùng](#6-các-truy-vấn-thường-dùng)
@@ -48,7 +49,7 @@
 
 ### 1.3. Cấu trúc tổng thể
 
-Cơ sở dữ liệu được chia thành 7 module chính với **15 bảng**:
+Cơ sở dữ liệu được chia thành 8 module chính với **16 bảng**:
 
 | STT | Module               | Bảng chính                      | Mô tả                          |
 | --- | -------------------- | ------------------------------- | ------------------------------ |
@@ -60,6 +61,7 @@ Cơ sở dữ liệu được chia thành 7 module chính với **15 bảng**:
 | 6   | **Order Management** | orders, order_items             | Quản lý đơn hàng               |
 | 7   | **Kitchen**          | kitchen_orders                  | Quản lý bếp (KDS)              |
 | 8   | **Billing**          | bills, bill_items, payments     | Thanh toán và hóa đơn          |
+| 9   | **Visual Floor Plan**| floor_plan_layouts              | Sơ đồ mặt bằng trực quan       |
 
 ---
 
@@ -566,8 +568,21 @@ Quản lý bàn ăn trong nhà hàng.
 | status      | ENUM(TableStatus) | DEFAULT available | Trạng thái                  |
 | qrCode      | VARCHAR(255)      | UNIQUE, NULL      | Mã QR                       |
 | isActive    | BOOLEAN           | DEFAULT true      | Đang sử dụng                |
+| positionX   | FLOAT             | DEFAULT 0         | Tọa độ X trên sơ đồ         |
+| positionY   | FLOAT             | DEFAULT 0         | Tọa độ Y trên sơ đồ         |
+| rotation    | FLOAT             | DEFAULT 0         | Góc xoay (0-360°)           |
+| shape       | VARCHAR(20)       | DEFAULT rectangle | Hình dạng bàn               |
+| width       | FLOAT             | DEFAULT 100       | Chiều rộng (px)             |
+| height      | FLOAT             | DEFAULT 80        | Chiều cao (px)              |
 | createdAt   | TIMESTAMP         | DEFAULT now()     | Ngày tạo                    |
 | updatedAt   | TIMESTAMP         | AUTO UPDATE       | Ngày cập nhật               |
+
+**Floor Plan Positioning (Định vị sơ đồ mặt bằng):**
+
+-   **positionX, positionY**: Tọa độ của bàn trên canvas/sơ đồ (đơn vị: pixels)
+-   **rotation**: Góc xoay của bàn (0-360 độ) để tạo bố cục linh hoạt
+-   **shape**: Hình dạng bàn (rectangle, circle, square, oval)
+-   **width, height**: Kích thước bàn trên sơ đồ (pixels)
 
 **Indexes:**
 
@@ -580,6 +595,27 @@ Quản lý bàn ăn trong nhà hàng.
 -   1:N với `reservations`
 -   1:N với `orders`
 -   1:N với `bills`
+
+**Ví dụ dữ liệu:**
+
+```json
+{
+    "tableId": 1,
+    "tableNumber": "T01",
+    "tableName": "VIP Table 1",
+    "capacity": 6,
+    "minCapacity": 2,
+    "floor": 1,
+    "section": "VIP",
+    "status": "available",
+    "positionX": 150.5,
+    "positionY": 200.0,
+    "rotation": 45,
+    "shape": "rectangle",
+    "width": 120,
+    "height": 80
+}
+```
 
 ---
 
@@ -826,6 +862,92 @@ Các khoản thanh toán cho hóa đơn.
 **Quan hệ:**
 
 -   N:1 với `bills` (CASCADE DELETE)
+
+---
+
+### 3.8. Visual Floor Plan
+
+#### 3.8.1. floor_plan_layouts (Bố cục sơ đồ mặt bằng)
+
+Lưu trữ các bố cục sơ đồ mặt bằng khác nhau cho mỗi tầng.
+
+| Trường      | Kiểu         | Ràng buộc            | Mô tả                          |
+| ----------- | ------------ | -------------------- | ------------------------------ |
+| layoutId    | INTEGER      | PK, Auto             | ID bố cục                      |
+| floor       | INTEGER      | NOT NULL             | Số tầng                        |
+| name        | VARCHAR(100) | NOT NULL             | Tên bố cục                     |
+| description | TEXT         | NULL                 | Mô tả                          |
+| data        | JSON         | NOT NULL             | Dữ liệu vị trí và thuộc tính   |
+| isActive    | BOOLEAN      | DEFAULT false        | Đang sử dụng                   |
+| createdAt   | TIMESTAMP    | DEFAULT now()        | Ngày tạo                       |
+| updatedAt   | TIMESTAMP    | AUTO UPDATE          | Ngày cập nhật                  |
+
+**Ràng buộc:**
+
+-   `UNIQUE(floor, name)` - Mỗi tầng không được có 2 bố cục trùng tên
+
+**Indexes:**
+
+-   `idx_floor_plan_layouts_floor` trên `floor`
+-   `idx_floor_plan_layouts_isActive` trên `isActive`
+
+**Ví dụ dữ liệu JSON:**
+
+```json
+{
+    "tables": [
+        {
+            "tableId": 1,
+            "positionX": 100,
+            "positionY": 150,
+            "rotation": 0,
+            "shape": "rectangle",
+            "width": 100,
+            "height": 80
+        },
+        {
+            "tableId": 2,
+            "positionX": 250,
+            "positionY": 150,
+            "rotation": 45,
+            "shape": "circle",
+            "width": 90,
+            "height": 90
+        }
+    ],
+    "walls": [
+        {
+            "x1": 0,
+            "y1": 0,
+            "x2": 500,
+            "y2": 0
+        }
+    ],
+    "doors": [
+        {
+            "x": 250,
+            "y": 0,
+            "width": 80
+        }
+    ]
+}
+```
+
+**Mô tả chi tiết:**
+
+-   **layoutId**: ID duy nhất cho mỗi bố cục
+-   **floor**: Số tầng (1, 2, 3...)
+-   **name**: Tên bố cục (ví dụ: "Weekday", "Weekend", "Private Event")
+-   **description**: Mô tả chi tiết về bố cục
+-   **data**: Dữ liệu JSON lưu trữ vị trí bàn, tường, cửa, và các phần tử khác
+-   **isActive**: Chỉ có 1 bố cục active cho mỗi tầng tại một thời điểm
+
+**Use Cases:**
+
+1. **Multiple Layouts**: Nhà hàng có thể có nhiều bố cục khác nhau cho cùng một tầng
+2. **Event Planning**: Chuyển đổi giữa các bố cục cho sự kiện đặc biệt
+3. **Seasonal Changes**: Thay đổi bố cục theo mùa (hè/đông, trong/ngoài trời)
+4. **A/B Testing**: Thử nghiệm các bố cục khác nhau để tối ưu hóa không gian
 
 **Indexes:**
 
@@ -1974,10 +2096,10 @@ Tài liệu này cung cấp cái nhìn toàn diện về cơ sở dữ liệu h�
 
 | Thông số         | Giá trị |
 | ---------------- | ------- |
-| **Tổng số bảng** | 15      |
+| **Tổng số bảng** | 16      |
 | **Enums**        | 6       |
 | **Foreign Keys** | 18      |
-| **Indexes**      | 30+     |
+| **Indexes**      | 32+     |
 
 ### 8.3. Tổng quan các Module
 
@@ -1991,6 +2113,7 @@ Tài liệu này cung cấp cái nhìn toàn diện về cơ sở dữ liệu h�
 | 6   | Order Management  | 2       | ✅ Hoàn thành | 100%              |
 | 7   | Kitchen           | 1       | ✅ Hoàn thành | 100%              |
 | 8   | Billing & Payment | 3       | ✅ Hoàn thành | 100%              |
+| 9   | Visual Floor Plan | 1       | ✅ Hoàn thành | 100%              |
 
 ### 8.4. Nguyên tắc thiết kế Database
 
@@ -2289,6 +2412,10 @@ Xem sơ đồ ERD đầy đủ tại:
 |           |            | - Tập trung 8 module cốt lõi (15 bảng)          |
 |           |            | - Cải thiện tài liệu cho sinh viên              |
 |           |            | - Thêm phần hướng dẫn chi tiết hơn              |
+| 2.1       | 2025-11-15 | Thêm Visual Floor Plan Management              |
+|           |            | - Thêm bảng floor_plan_layouts                |
+|           |            | - Hỗ trợ nhiều bố cục cho mỗi tầng             |
+|           |            | - Lưu trữ vị trí bàn bằng JSON                  |
 
 ---
 
