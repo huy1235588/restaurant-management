@@ -291,8 +291,8 @@ echo "Save these secrets securely!"
 cd /opt/restaurant
 
 # Build Docker images locally (first time)
-docker build -t restaurant-server:prod -f apps/server/Dockerfile apps/server
-docker build -t restaurant-client:prod -f apps/client/Dockerfile apps/client \
+docker build -t restaurant-server:prod -f app/server/Dockerfile app/server
+docker build -t restaurant-client:prod -f app/client/Dockerfile app/client \
   --build-arg NEXT_PUBLIC_API_URL=http://YOUR_DROPLET_IP:5000
 
 # Tag images for docker-compose

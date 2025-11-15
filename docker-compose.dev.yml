@@ -33,7 +33,7 @@ services:
     # Backend Server (Development with hot reload)
     server:
         build:
-            context: ./apps/server
+            context: ./app/server
             dockerfile: Dockerfile.dev
             target: development
         container_name: restaurant_server_dev
@@ -59,14 +59,14 @@ services:
         networks:
             - restaurant_network_dev
         volumes:
-            - ./apps/server/src:/app/src
-            - ./apps/server/prisma:/app/prisma
-            - ./apps/server/logs:/app/logs
+            - ./app/server/src:/app/src
+            - ./app/server/prisma:/app/prisma
+            - ./app/server/logs:/app/logs
 
     # Frontend Client (Development with hot reload)
     client:
         build:
-            context: ./apps/client
+            context: ./app/client
             dockerfile: Dockerfile.dev
             target: development
         container_name: restaurant_client_dev
@@ -82,9 +82,9 @@ services:
         networks:
             - restaurant_network_dev
         volumes:
-            - ./apps/client/src:/app/src
-            - ./apps/client/public:/app/public
-            - ./apps/client/locales:/app/locales
+            - ./app/client/src:/app/src
+            - ./app/client/public:/app/public
+            - ./app/client/locales:/app/locales
             - /app/node_modules
             - /app/.next
 

@@ -223,11 +223,11 @@ The tasks below are **manual deployment steps** that must be executed on Digital
 ### 2.4 Build Production Docker Images
 - [ ] Build backend image:
   ```bash
-  docker build -t restaurant-server:prod -f apps/server/Dockerfile apps/server
+  docker build -t restaurant-server:prod -f app/server/Dockerfile app/server
   ```
 - [ ] Build frontend image:
   ```bash
-  docker build -t restaurant-client:prod -f apps/client/Dockerfile apps/client \
+  docker build -t restaurant-client:prod -f app/client/Dockerfile app/client \
     --build-arg NEXT_PUBLIC_API_URL=http://<DROPLET_IP>:5000
   ```
 - [ ] Verify images built successfully: `docker images`
@@ -423,14 +423,14 @@ The tasks below are **manual deployment steps** that must be executed on Digital
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v5
         with:
-          context: ./apps/server
+          context: ./app/server
           push: true
           tags: |
             ghcr.io/${{ github.repository }}/server:latest
             ghcr.io/${{ github.repository }}/server:${{ github.sha }}
       - uses: docker/build-push-action@v5
         with:
-          context: ./apps/client
+          context: ./app/client
           push: true
           tags: |
             ghcr.io/${{ github.repository }}/client:latest

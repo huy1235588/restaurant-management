@@ -1,0 +1,64 @@
+name: Rollback Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      backup_file:
+        description: 'Database backup file to restore (optional, e.g., /mnt/volume/backups/postgres/backup_20250101_120000.sql.gz)'
+        required: false
+        type: string
+
+jobs:
+  rollback:
+    name: Rollback to Previous Version
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    steps:
+      - name: Confirm Rollback
+        run: |
+          echo "⚠️  ROLLBACK INITIATED"
+          echo "This will revert to the previous deployment"
+          if [ -n "${{ github.event.inputs.backup_file }}" ]; then
+            echo "Database will be restored from: ${{ github.event.inputs.backup_file }}"
+          fi
+
+      - name: Execute Rollback
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DROPLET_IP }}
+          username: ${{ secrets.DROPLET_USER }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          port: 22
+          script: |
+            set -e
+            
+            cd /opt/restaurant
+            
+            echo "=========================================="
+            echo "Starting rollback procedure"
+            echo "=========================================="
+            
+            # Make script executable
+            chmod +x ./scripts/rollback.sh
+            
+            # Execute rollback with optional backup file
+            if [ -n "${{ github.event.inputs.backup_file }}" ]; then
+              ./scripts/rollback.sh "${{ github.event.inputs.backup_file }}"
+            else
+              ./scripts/rollback.sh
+            fi
+            
+            echo "=========================================="
+            echo "Rollback completed"
+            echo "=========================================="
+
+      - name: Rollback Status
+        if: always()
+        run: |
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "✅ Rollback successful"
+          else
+            echo "❌ Rollback failed"
+            exit 1
+          fi

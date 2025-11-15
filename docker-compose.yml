@@ -44,7 +44,7 @@ services:
     # Backend Server
     server:
         build:
-            context: ./apps/server
+            context: ./app/server
             dockerfile: Dockerfile
             cache_from:
                 - restaurant_server:latest
@@ -71,12 +71,12 @@ services:
         networks:
             - restaurant_network
         volumes:
-            - ./apps/server/logs:/app/logs
+            - ./app/server/logs:/app/logs
 
     # Frontend Client
     client:
         build:
-            context: ./apps/client
+            context: ./app/client
             dockerfile: Dockerfile
             cache_from:
                 - restaurant_client:latest
