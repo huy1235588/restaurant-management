@@ -39,7 +39,8 @@ RUN apk add --no-cache openssl netcat-openbsd && \
     npm install -g pnpm && \
     addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nodeuser && \
-    mkdir -p logs
+    mkdir -p logs uploads/images uploads/documents && \
+    chown -R nodeuser:nodejs logs uploads
 
 # Copy built files with correct ownership
 COPY --from=builder --chown=nodeuser:nodejs /app/dist ./dist

@@ -315,11 +315,13 @@ docker compose -f docker-compose.prod.yml logs -f
 # Wait for PostgreSQL to be ready
 sleep 20
 
-# Run migrations
+# Run migrations (automatically done by entrypoint, but can be done manually)
 docker compose -f docker-compose.prod.yml exec server npx prisma migrate deploy
 
-# Seed database (optional)
-docker compose -f docker-compose.prod.yml exec server npm run prisma:seed
+# Seed database (OPTIONAL - only if you need sample data)
+# Note: Seeding is skipped in production by default for security
+# Run manually if needed:
+docker compose -f docker-compose.prod.yml exec server pnpm prisma:seed
 
 # Create initial backup
 sudo mkdir -p /mnt/volume/backups/postgres

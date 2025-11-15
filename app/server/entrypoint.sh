@@ -29,10 +29,17 @@ else
 fi
 echo "✅ Migrations completed"
 
-# Seed the database (optional, skip if fails)
-echo "Seeding database..."
-if ! pnpm prisma:seed; then
-    echo "⚠️ Database seeding failed or skipped"
+# Ensure uploads directory exists with proper permissions
+mkdir -p uploads/images uploads/documents
+
+# Seed the database only in development (skip in production)
+if [ "$NODE_ENV" = "development" ]; then
+    echo "Seeding database (development mode)..."
+    if ! pnpm prisma:seed; then
+        echo "⚠️ Database seeding failed or skipped"
+    fi
+else
+    echo "ℹ️  Skipping database seeding in production (run manually if needed)"
 fi
 
 # Start the application
