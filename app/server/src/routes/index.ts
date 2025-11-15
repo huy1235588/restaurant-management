@@ -11,6 +11,7 @@ import staffRoutes from '../features/staff/staff.routes';
 import paymentRoutes from '../features/payment/payment.routes';
 import storageRoutes from '../features/storage/storage.routes';
 import floorPlanRoutes from '../features/floor-plan/floor-plan.routes';
+import DatabaseClient from '@/config/database';
 
 const router: Router = Router();
 
@@ -28,13 +29,37 @@ router.use('/staff', staffRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/storage', storageRoutes);
 
-// Health check
-router.get('/health', (_req, res) => {
-    res.status(200).json({
-        success: true,
-        message: 'Server is running',
+// Enhanced health check endpoint for production monitoring
+router.get('/health', async (_req, res) => {
+    const health: {
+        status: 'healthy' | 'unhealthy';
+        uptime: number;
+        timestamp: string;
+        environment: string;
+        services: {
+            database: string;
+        };
+    } = {
+        status: 'healthy',
+        uptime: process.uptime(),
         timestamp: new Date().toISOString(),
-    });
+        environment: process.env['NODE_ENV'] || 'development',
+        services: {
+            database: 'unknown',
+        },
+    };
+
+    try {
+        // Check database connection
+        await DatabaseClient.getInstance().$queryRaw`SELECT 1`;
+        health.services.database = 'healthy';
+    } catch (error) {
+        health.services.database = 'unhealthy';
+        health.status = 'unhealthy';
+    }
+
+    const statusCode = health.status === 'healthy' ? 200 : 503;
+    res.status(statusCode).json(health);
 });
 
 export default router;
