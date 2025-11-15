@@ -78,6 +78,7 @@ export interface MenuItem {
     spicyLevel?: number;
     isVegetarian?: boolean;
     calories?: number;
+    displayOrder?: number;
     createdAt: string;
     updatedAt: string;
 }
