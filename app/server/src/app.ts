@@ -12,6 +12,7 @@ import { swaggerSpec } from './config/swagger';
 import routes from './routes';
 import { errorHandler, notFoundHandler } from './shared/middlewares';
 import logger from './config/logger';
+import DatabaseClient from './config/database';
 
 export function createApp(): Application {
     const app = express();
@@ -69,6 +70,38 @@ export function createApp(): Application {
             res.set('Cross-Origin-Resource-Policy', 'cross-origin');
         },
     }));
+
+    // Health check endpoint (before API routes, no auth required)
+    app.get('/api/health', async (_req, res) => {
+        const health: {
+            status: 'healthy' | 'unhealthy';
+            uptime: number;
+            timestamp: string;
+            environment: string;
+            services: {
+                database: string;
+            };
+        } = {
+            status: 'healthy',
+            uptime: process.uptime(),
+            timestamp: new Date().toISOString(),
+            environment: process.env['NODE_ENV'] || 'development',
+            services: {
+                database: 'unknown',
+            },
+        };
+
+        try {
+            await DatabaseClient.getInstance().$queryRaw`SELECT 1`;
+            health.services.database = 'healthy';
+        } catch (error) {
+            health.services.database = 'unhealthy';
+            health.status = 'unhealthy';
+        }
+
+        const statusCode = health.status === 'healthy' ? 200 : 503;
+        res.status(statusCode).json(health);
+    });
 
     // API Routes
     app.use(`/api/${config.apiVersion}`, routes);
