@@ -21,6 +21,81 @@ export function PropertiesPanel({ onDelete }: PropertiesPanelProps) {
     const [editingTableNumber, setEditingTableNumber] = React.useState<string>('');
     const [editingCapacity, setEditingCapacity] = React.useState<string>('');
     
+    // Find selected table
+    const selectedTable = selectedTableIds.length === 1 
+        ? tables.find((table) => table.tableId === selectedTableIds[0])
+        : null;
+
+    // Initialize editing states when table changes
+    React.useEffect(() => {
+        if (selectedTable) {
+            setEditingTableNumber(selectedTable.tableNumber);
+            setEditingCapacity(String(selectedTable.capacity));
+        }
+    }, [selectedTable?.tableId]);
+
+    const handleTableNumberChange = useCallback((value: string) => {
+        setEditingTableNumber(value);
+    }, []);
+
+    const handleTableNumberBlur = useCallback(() => {
+        if (!selectedTable) return;
+        const trimmed = editingTableNumber.trim();
+        if (trimmed && trimmed !== selectedTable.tableNumber) {
+            updateTableProperties(selectedTable.tableId, { tableNumber: trimmed });
+            toast.success('Table number updated');
+        } else {
+            setEditingTableNumber(selectedTable.tableNumber);
+        }
+    }, [editingTableNumber, selectedTable, updateTableProperties]);
+
+    const handleCapacityChange = useCallback((value: string) => {
+        setEditingCapacity(value);
+    }, []);
+
+    const handleCapacityBlur = useCallback(() => {
+        if (!selectedTable) return;
+        const capacity = parseInt(editingCapacity);
+        if (!isNaN(capacity) && capacity > 0 && capacity !== selectedTable.capacity) {
+            updateTableProperties(selectedTable.tableId, { capacity });
+            toast.success('Capacity updated');
+        } else {
+            setEditingCapacity(String(selectedTable.capacity));
+        }
+    }, [editingCapacity, selectedTable, updateTableProperties]);
+    
+    const handleDuplicate = useCallback(() => {
+        if (!selectedTable) return;
+        // Create a copy with offset position
+        const duplicatedTable: TablePosition = {
+            ...selectedTable,
+            tableId: Date.now(), // Temporary ID
+            tableNumber: `${selectedTable.tableNumber}-Copy`,
+            x: selectedTable.x + 20,
+            y: selectedTable.y + 20,
+        };
+        
+        addTable(duplicatedTable);
+        
+        pushHistory({
+            type: 'create',
+            table: duplicatedTable,
+            timestamp: Date.now(),
+        });
+        
+        // Select the new table
+        clearSelection();
+        selectTable(duplicatedTable.tableId, false);
+        
+        toast.success('Table duplicated');
+    }, [selectedTable, addTable, pushHistory, clearSelection, selectTable]);
+    
+    const handleDelete = useCallback(() => {
+        if (!selectedTable || !onDelete) return;
+        onDelete(selectedTable.tableId);
+    }, [selectedTable, onDelete]);
+    
+    // Early returns after all hooks
     if (!showPropertiesPanel) return null;
     
     if (selectedTableIds.length === 0) {
@@ -57,76 +132,7 @@ export function PropertiesPanel({ onDelete }: PropertiesPanelProps) {
         );
     }
     
-    const selectedTable = tables.find(
-        (table) => table.tableId === selectedTableIds[0]
-    );
-    
     if (!selectedTable) return null;
-
-    // Initialize editing states when table changes
-    React.useEffect(() => {
-        setEditingTableNumber(selectedTable.tableNumber);
-        setEditingCapacity(String(selectedTable.capacity));
-    }, [selectedTable.tableId]);
-
-    const handleTableNumberChange = useCallback((value: string) => {
-        setEditingTableNumber(value);
-    }, []);
-
-    const handleTableNumberBlur = useCallback(() => {
-        const trimmed = editingTableNumber.trim();
-        if (trimmed && trimmed !== selectedTable.tableNumber) {
-            updateTableProperties(selectedTable.tableId, { tableNumber: trimmed });
-            toast.success('Table number updated');
-        } else {
-            setEditingTableNumber(selectedTable.tableNumber);
-        }
-    }, [editingTableNumber, selectedTable.tableId, selectedTable.tableNumber, updateTableProperties]);
-
-    const handleCapacityChange = useCallback((value: string) => {
-        setEditingCapacity(value);
-    }, []);
-
-    const handleCapacityBlur = useCallback(() => {
-        const capacity = parseInt(editingCapacity);
-        if (!isNaN(capacity) && capacity > 0 && capacity !== selectedTable.capacity) {
-            updateTableProperties(selectedTable.tableId, { capacity });
-            toast.success('Capacity updated');
-        } else {
-            setEditingCapacity(String(selectedTable.capacity));
-        }
-    }, [editingCapacity, selectedTable.tableId, selectedTable.capacity, updateTableProperties]);
-    
-    const handleDuplicate = useCallback(() => {
-        // Create a copy with offset position
-        const duplicatedTable: TablePosition = {
-            ...selectedTable,
-            tableId: Date.now(), // Temporary ID
-            tableNumber: `${selectedTable.tableNumber}-Copy`,
-            x: selectedTable.x + 20,
-            y: selectedTable.y + 20,
-        };
-        
-        addTable(duplicatedTable);
-        
-        pushHistory({
-            type: 'create',
-            table: duplicatedTable,
-            timestamp: Date.now(),
-        });
-        
-        // Select the new table
-        clearSelection();
-        selectTable(duplicatedTable.tableId, false);
-        
-        toast.success('Table duplicated');
-    }, [selectedTable, addTable, pushHistory, clearSelection, selectTable]);
-    
-    const handleDelete = useCallback(() => {
-        if (onDelete) {
-            onDelete(selectedTable.tableId);
-        }
-    }, [selectedTable.tableId, onDelete]);
     
     return (
         <div className="w-80 border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-4 overflow-y-auto">

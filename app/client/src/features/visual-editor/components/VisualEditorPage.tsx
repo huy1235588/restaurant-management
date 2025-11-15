@@ -121,8 +121,10 @@ export function VisualEditorPage() {
         const table = event.active.data.current?.table;
         if (table) {
             setDraggedTable(table);
+            // Select table when dragging to show properties
+            selectTable(table.tableId, false);
         }
-    }, []);
+    }, [selectTable]);
     
     // Handle drag move (real-time collision detection with debouncing)
     const handleDragMove = useCallback((event: DragMoveEvent) => {
