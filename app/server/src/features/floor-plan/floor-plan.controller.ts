@@ -106,6 +106,37 @@ export class FloorPlanController {
             next(error);
         }
     }
+
+    /**
+     * Activate a layout
+     */
+    async activateLayout(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { layoutId } = req.params;
+
+            const layout = await floorPlanService.activateLayout(parseInt(layoutId!));
+
+            res.json(ApiResponse.success(layout, 'Layout activated successfully'));
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
+     * Duplicate a layout
+     */
+    async duplicateLayout(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { layoutId } = req.params;
+            const { name } = req.body as { name: string };
+
+            const layout = await floorPlanService.duplicateLayout(parseInt(layoutId!), name);
+
+            res.status(201).json(ApiResponse.success(layout, 'Layout duplicated successfully'));
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 export const floorPlanController = new FloorPlanController();

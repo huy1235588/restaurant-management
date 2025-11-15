@@ -536,4 +536,111 @@ router.patch(
     floorPlanController.updateTablePositions.bind(floorPlanController)
 );
 
+/**
+ * @swagger
+ * /floor-plans/layouts/{layoutId}/activate:
+ *   post:
+ *     summary: Activate a layout
+ *     description: Set a layout as the active layout for its floor (deactivates all other layouts)
+ *     tags: [Floor Plans - Layouts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: layoutId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: Layout ID
+ *     responses:
+ *       200:
+ *         description: Layout activated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *       400:
+ *         description: Bad request - Invalid layout ID
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Layout not found
+ *       500:
+ *         description: Internal server error
+ */
+router.post(
+    '/layouts/:layoutId/activate',
+    authorize(Role.admin, Role.manager),
+    validate(floorPlanLayoutIdSchema, 'params'),
+    floorPlanController.activateLayout.bind(floorPlanController)
+);
+
+/**
+ * @swagger
+ * /floor-plans/layouts/{layoutId}/duplicate:
+ *   post:
+ *     summary: Duplicate a layout
+ *     description: Create a copy of an existing layout with a new name
+ *     tags: [Floor Plans - Layouts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: layoutId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: Layout ID to duplicate
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Main Hall Layout - Copy
+ *                 description: Name for the duplicated layout
+ *     responses:
+ *       201:
+ *         description: Layout duplicated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *       400:
+ *         description: Bad request - Invalid layout ID or name already exists
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Layout not found
+ *       500:
+ *         description: Internal server error
+ */
+router.post(
+    '/layouts/:layoutId/duplicate',
+    authorize(Role.admin, Role.manager),
+    validate(floorPlanLayoutIdSchema, 'params'),
+    floorPlanController.duplicateLayout.bind(floorPlanController)
+);
+
 export default router;

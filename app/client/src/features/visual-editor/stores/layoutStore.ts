@@ -20,6 +20,7 @@ interface LayoutState {
     updateTablePosition: (tableId: number, position: { x: number; y: number }) => void;
     updateTableSize: (tableId: number, size: { width: number; height: number }) => void;
     updateTableRotation: (tableId: number, rotation: number) => void;
+    updateTableProperties: (tableId: number, properties: Partial<Pick<TablePosition, 'tableNumber' | 'capacity'>>) => void;
     addTable: (table: TablePosition) => void;
     removeTable: (tableId: number) => void;
     getTableById: (tableId: number) => TablePosition | undefined;
@@ -77,6 +78,20 @@ export const useLayoutStore = create<LayoutState>()(
                 set((state) => ({
                     tables: state.tables.map((table) =>
                         table.tableId === tableId ? { ...table, rotation } : table
+                    ),
+                    unsavedChanges: true,
+                }));
+            },
+
+            updateTableProperties: (
+                tableId: number,
+                properties: Partial<Pick<TablePosition, 'tableNumber' | 'capacity'>>
+            ) => {
+                set((state) => ({
+                    tables: state.tables.map((table) =>
+                        table.tableId === tableId
+                            ? { ...table, ...properties }
+                            : table
                     ),
                     unsavedChanges: true,
                 }));

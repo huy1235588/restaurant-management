@@ -103,4 +103,25 @@ export const floorPlanApi = {
         });
         return response.data.data;
     },
+
+    /**
+     * Activate a layout
+     */
+    async activateLayout(layoutId: number): Promise<FloorPlanLayout> {
+        const response = await axiosInstance.post<ApiResponse<FloorPlanLayout>>(
+            `${BASE_URL}/layouts/${layoutId}/activate`
+        );
+        return response.data.data;
+    },
+
+    /**
+     * Duplicate a layout
+     */
+    async duplicateLayout(layoutId: number, newName: string): Promise<FloorPlanLayout> {
+        const response = await axiosInstance.post<ApiResponse<FloorPlanLayout>>(
+            `${BASE_URL}/layouts/${layoutId}/duplicate`,
+            { name: newName }
+        );
+        return response.data.data;
+    },
 };

@@ -38,6 +38,7 @@ interface EditorToolbarProps {
     onUndo: () => void;
     onRedo: () => void;
     hasUnsavedChanges?: boolean;
+    isSaving?: boolean;
 }
 
 export function EditorToolbar({
@@ -45,6 +46,7 @@ export function EditorToolbar({
     onUndo,
     onRedo,
     hasUnsavedChanges = false,
+    isSaving = false,
 }: EditorToolbarProps) {
     const [showSaveDialog, setShowSaveDialog] = useState(false);
     const [showLoadDialog, setShowLoadDialog] = useState(false);
@@ -282,10 +284,10 @@ export function EditorToolbar({
                 {/* Save Button */}
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <Button onClick={onSave} className="gap-2">
-                            <Save className="h-4 w-4" />
-                            Save Positions
-                            {hasUnsavedChanges && (
+                        <Button onClick={onSave} className="gap-2" disabled={isSaving}>
+                            <Save className={`h-4 w-4 ${isSaving ? 'animate-spin' : ''}`} />
+                            {isSaving ? 'Saving...' : 'Save Positions'}
+                            {hasUnsavedChanges && !isSaving && (
                                 <span className="ml-1 text-yellow-500 dark:text-yellow-400">*</span>
                             )}
                         </Button>

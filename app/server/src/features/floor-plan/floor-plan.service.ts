@@ -76,6 +76,39 @@ export class FloorPlanService {
 
         return Promise.all(updates);
     }
+
+    /**
+     * Activate a layout
+     */
+    async activateLayout(layoutId: number) {
+        const layout = await floorPlanLayoutRepository.findById(layoutId);
+        
+        if (!layout) {
+            throw new BadRequestError('Layout not found');
+        }
+
+        return floorPlanLayoutRepository.activate(layoutId, layout.floor);
+    }
+
+    /**
+     * Duplicate a layout
+     */
+    async duplicateLayout(layoutId: number, newName: string) {
+        // Check if layout with new name already exists
+        const layout = await floorPlanLayoutRepository.findById(layoutId);
+        
+        if (!layout) {
+            throw new BadRequestError('Layout not found');
+        }
+
+        const existing = await floorPlanLayoutRepository.findByName(layout.floor, newName);
+
+        if (existing) {
+            throw new BadRequestError(`Layout "${newName}" already exists for this floor`);
+        }
+
+        return floorPlanLayoutRepository.duplicate(layoutId, newName);
+    }
 }
 
 export const floorPlanService = new FloorPlanService();

@@ -99,6 +99,42 @@ export class FloorPlanLayoutRepository extends BaseRepository<FloorPlanLayout, F
             },
         });
     }
+
+    async activate(layoutId: number, floor: number): Promise<FloorPlanLayout> {
+        // Deactivate all other layouts for this floor
+        await prisma.floorPlanLayout.updateMany({
+            where: { floor, isActive: true },
+            data: { isActive: false },
+        });
+
+        // Activate the selected layout
+        const layout = await this.findById(layoutId);
+        if (!layout) {
+            throw new NotFoundError('Floor plan layout not found');
+        }
+
+        return prisma.floorPlanLayout.update({
+            where: { layoutId },
+            data: { isActive: true },
+        });
+    }
+
+    async duplicate(layoutId: number, newName: string): Promise<FloorPlanLayout> {
+        const layout = await this.findById(layoutId);
+        if (!layout) {
+            throw new NotFoundError('Floor plan layout not found');
+        }
+
+        return prisma.floorPlanLayout.create({
+            data: {
+                name: newName,
+                floor: layout.floor,
+                description: layout.description,
+                data: layout.data as any,
+                isActive: false,
+            },
+        });
+    }
 }
 
 export const floorPlanLayoutRepository = new FloorPlanLayoutRepository();

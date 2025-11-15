@@ -13,10 +13,11 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { floorPlanApi } from '@/services/floor-plan.service';
 import { useLayoutStore, useEditorStore } from '../stores';
-import { Check, Trash2 } from 'lucide-react';
+import { Check, Trash2, Copy, CheckCircle2 } from 'lucide-react';
 import type { FloorPlanLayout } from '../types';
 
 interface LoadLayoutDialogProps {
@@ -28,6 +29,8 @@ export function LoadLayoutDialog({ open, onOpenChange }: LoadLayoutDialogProps) 
     const { savedLayouts, setSavedLayouts, setTables, setUnsavedChanges } = useLayoutStore();
     const { setZoom, setGrid, currentFloor } = useEditorStore();
     const [selectedLayout, setSelectedLayout] = useState<number | null>(null);
+    const [duplicatingId, setDuplicatingId] = useState<number | null>(null);
+    const [duplicateName, setDuplicateName] = useState('');
     
     const handleLoad = async (layout: FloorPlanLayout) => {
         try {
@@ -75,6 +78,55 @@ export function LoadLayoutDialog({ open, onOpenChange }: LoadLayoutDialogProps) 
             toast.success('Layout deleted successfully');
         } catch (error) {
             toast.error('Failed to delete layout');
+            console.error(error);
+        }
+    };
+
+    const handleActivate = async (layoutId: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        
+        try {
+            await floorPlanApi.activateLayout(layoutId);
+            
+            // Refresh layouts list
+            const layouts = await floorPlanApi.getLayouts(currentFloor);
+            setSavedLayouts(layouts);
+            
+            toast.success('Layout activated successfully');
+        } catch (error) {
+            toast.error('Failed to activate layout');
+            console.error(error);
+        }
+    };
+
+    const handleDuplicate = async (layoutId: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        
+        const layout = savedLayouts.find((l) => l.layoutId === layoutId);
+        if (!layout) return;
+        
+        setDuplicatingId(layoutId);
+        setDuplicateName(`${layout.name} - Copy`);
+    };
+
+    const handleDuplicateConfirm = async () => {
+        if (!duplicatingId || !duplicateName.trim()) {
+            toast.error('Please provide a name for the duplicate layout');
+            return;
+        }
+        
+        try {
+            await floorPlanApi.duplicateLayout(duplicatingId, duplicateName.trim());
+            
+            // Refresh layouts list
+            const layouts = await floorPlanApi.getLayouts(currentFloor);
+            setSavedLayouts(layouts);
+            
+            setDuplicatingId(null);
+            setDuplicateName('');
+            toast.success('Layout duplicated successfully');
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || 'Failed to duplicate layout');
             console.error(error);
         }
     };
@@ -149,14 +201,32 @@ export function LoadLayoutDialog({ open, onOpenChange }: LoadLayoutDialogProps) 
                                                     </div>
                                                 </div>
                                                 
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={(e) => handleDelete(layout.layoutId, e)}
-                                                    className="ml-2"
-                                                >
-                                                    <Trash2 className="h-4 w-4 text-red-500" />
-                                                </Button>
+                                                <div className="flex items-center gap-1">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={(e) => handleActivate(layout.layoutId, e)}
+                                                        title="Set as active"
+                                                    >
+                                                        <CheckCircle2 className={`h-4 w-4 ${layout.isActive ? 'text-green-500' : 'text-gray-400'}`} />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={(e) => handleDuplicate(layout.layoutId, e)}
+                                                        title="Duplicate"
+                                                    >
+                                                        <Copy className="h-4 w-4 text-blue-500" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={(e) => handleDelete(layout.layoutId, e)}
+                                                        title="Delete"
+                                                    >
+                                                        <Trash2 className="h-4 w-4 text-red-500" />
+                                                    </Button>
+                                                </div>
                                             </div>
                                         </CardContent>
                                     </Card>
@@ -165,6 +235,39 @@ export function LoadLayoutDialog({ open, onOpenChange }: LoadLayoutDialogProps) 
                         </div>
                     )}
                 </ScrollArea>
+                
+                {duplicatingId && (
+                    <div className="border-t pt-4 space-y-2">
+                        <label className="text-sm font-medium">
+                            Duplicate Layout Name
+                        </label>
+                        <Input
+                            value={duplicateName}
+                            onChange={(e) => setDuplicateName(e.target.value)}
+                            placeholder="Enter name for duplicate"
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleDuplicateConfirm();
+                                }
+                            }}
+                        />
+                        <div className="flex gap-2">
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    setDuplicatingId(null);
+                                    setDuplicateName('');
+                                }}
+                                size="sm"
+                            >
+                                Cancel
+                            </Button>
+                            <Button onClick={handleDuplicateConfirm} size="sm">
+                                Confirm Duplicate
+                            </Button>
+                        </div>
+                    </div>
+                )}
                 
                 <DialogFooter>
                     <Button variant="outline" onClick={() => onOpenChange(false)}>

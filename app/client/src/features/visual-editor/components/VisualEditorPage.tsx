@@ -34,9 +34,15 @@ export function VisualEditorPage() {
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const [createPosition, setCreatePosition] = useState({ x: 0, y: 0 });
     
+    // Snap preview state
+    const [snapPreview, setSnapPreview] = useState<{ x: number; y: number } | null>(null);
+    
     // Delete dialog state
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [tablesToDelete, setTablesToDelete] = useState<number[]>([]);
+    
+    // Save state
+    const [isSaving, setIsSaving] = useState(false);
     
     // Load floor plan data
     useFloorPlanData();
@@ -95,6 +101,20 @@ export function VisualEditorPage() {
         document.addEventListener('fullscreenchange', handleFullscreenChange);
         return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
     }, []);
+
+    // Warn on exit if there are unsaved changes
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (unsavedChanges) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [unsavedChanges]);
     
     // Handle drag start
     const handleDragStart = useCallback((event: any) => {
@@ -119,8 +139,16 @@ export function VisualEditorPage() {
             const newY = draggedTable.y + delta.y / zoom;
             
             setTempPosition({ x: newX, y: newY });
+            
+            // Show snap preview if grid snapping is enabled
+            if (grid.snapEnabled && !isDraggingWithShift) {
+                const snapped = snapPositionToGrid({ x: newX, y: newY }, grid.size);
+                setSnapPreview(snapped);
+            } else {
+                setSnapPreview(null);
+            }
         }, 16);
-    }, [draggedTable, zoom]);
+    }, [draggedTable, zoom, grid.snapEnabled, grid.size, isDraggingWithShift]);
     
     // Handle drag end
     const handleDragEnd = useCallback((event: DragEndEvent) => {
@@ -169,6 +197,7 @@ export function VisualEditorPage() {
         setDraggedTable(null);
         setTempPosition(null);
         setIsDraggingWithShift(false);
+        setSnapPreview(null);
     }, [draggedTable, tables, grid, zoom, isDraggingWithShift, updateTablePosition, pushHistory]);
     
     // Handle table click
@@ -341,7 +370,11 @@ export function VisualEditorPage() {
     
     // Handle save
     const handleSave = useCallback(async () => {
+        if (isSaving) return;
+        
         try {
+            setIsSaving(true);
+            
             const positions = tables.map((table) => ({
                 tableId: table.tableId,
                 x: table.x,
@@ -358,8 +391,10 @@ export function VisualEditorPage() {
             toast.success('Layout saved successfully');
         } catch (error) {
             toast.error('Failed to save layout');
+        } finally {
+            setIsSaving(false);
         }
-    }, [tables, setUnsavedChanges]);
+    }, [tables, setUnsavedChanges, isSaving]);
     
     // Handle undo
     const handleUndo = useCallback(() => {
@@ -578,6 +613,7 @@ export function VisualEditorPage() {
                 onUndo={handleUndo}
                 onRedo={handleRedo}
                 hasUnsavedChanges={unsavedChanges}
+                isSaving={isSaving}
             />
             
             <div className="flex flex-1 overflow-hidden">
@@ -621,6 +657,24 @@ export function VisualEditorPage() {
                                     />
                                 );
                             })}
+                            
+                            {/* Snap preview indicator */}
+                            {snapPreview && draggedTable && (
+                                <div
+                                    className="absolute pointer-events-none z-10"
+                                    style={{
+                                        left: snapPreview.x,
+                                        top: snapPreview.y,
+                                        width: draggedTable.width,
+                                        height: draggedTable.height,
+                                    }}
+                                >
+                                    <div className="w-full h-full border-2 border-dashed border-blue-400 bg-blue-400/10 rounded" />
+                                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                                        Snap: ({Math.round(snapPreview.x)}, {Math.round(snapPreview.y)})
+                                    </div>
+                                </div>
+                            )}
                             
                             {/* Ghost preview for Add Table tool */}
                             {currentTool === 'add' && ghostPosition && (() => {

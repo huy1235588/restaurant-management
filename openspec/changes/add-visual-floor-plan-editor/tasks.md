@@ -96,7 +96,7 @@
 - [x] Add opacity change during drag
 - [x] Implement smooth drop animation
 - [x] Add Esc key to cancel drag
-- [ ] Create drag performance optimization
+- [x] Create drag performance optimization
 
 ### Collision Detection
 - [x] Implement AABB collision detection algorithm
@@ -114,11 +114,11 @@
 - [x] Add snap-to-grid on drag release
 - [x] Create Shift+Drag to disable snapping temporarily
 - [x] Implement snap threshold (10px from grid point)
-- [ ] Add visual preview of snap target
+- [x] Add visual preview of snap target
 - [x] Create smooth snap animation (100ms)
 - [x] Add grid snapping to resize operations
 - [x] Implement alignment guides (horizontal/vertical/center)
-- [ ] Add snap-to-alignment with 5px threshold
+- [x] Add snap-to-alignment with 5px threshold
 
 ### Add Table Tool
 - [x] Create ghost preview component
@@ -151,12 +151,12 @@
 - [x] Create unsaved changes indicator (asterisk/badge)
 - [x] Add Ctrl+S keyboard shortcut for save
 - [x] Implement batch position update API call
-- [ ] Create save progress indicator
+- [x] Create save progress indicator
 - [x] Add save success notification
 - [x] Implement save error handling with retry
 - [x] Clear unsaved indicator on successful save
-- [ ] Add save confirmation before exit
-- [ ] Create exit warning dialog
+- [x] Add save confirmation before exit
+- [x] Create exit warning dialog
 
 ### Saved Layouts
 - [x] Create SaveLayoutDialog component
@@ -168,8 +168,8 @@
 - [ ] Add layout preview (future: thumbnail)
 - [x] Implement load layout functionality
 - [x] Add delete layout with confirmation
-- [ ] Create duplicate layout feature
-- [ ] Implement activate layout functionality
+- [x] Create duplicate layout feature
+- [x] Implement activate layout functionality
 
 ### Layout Templates
 - [ ] Define 5 predefined templates (Restaurant, Cafe, Fine Dining, Bar, Banquet)
@@ -198,18 +198,18 @@
 - [ ] Create floor-specific history isolation
 - [ ] Implement compound action support (multi-table moves)
 - [ ] Add smooth animations for undo/redo
-- [ ] Clear redo stack on new action
+- [x] Clear redo stack on new action
 
 ### Properties Panel
 - [x] Create PropertiesPanel component
 - [x] Display selected table information (number, status, capacity)
 - [x] Add position display (X, Y coordinates)
 - [x] Show table dimensions (Width, Height)
-- [ ] Implement editable properties (number, capacity)
+- [x] Implement editable properties (number, capacity)
 - [x] Add position input fields for precise placement
 - [x] Create quick actions buttons (Edit, Delete, Duplicate)
-- [ ] Implement real-time property updates
-- [ ] Add validation for property changes
+- [x] Implement real-time property updates
+- [x] Add validation for property changes
 - [x] Show multi-selection info when multiple tables selected
 
 ### Fullscreen Mode
@@ -226,7 +226,7 @@
 - [x] Implement all tool shortcuts (V, H, T)
 - [x] Add all action shortcuts (Ctrl+S, Ctrl+Z, etc.)
 - [x] Implement grid toggle (G key)
-- [ ] Add fullscreen toggle (F key)
+- [x] Add fullscreen toggle (F key)
 - [x] Create arrow key table movement
 - [x] Implement Shift+Arrow for faster movement
 - [x] Add Esc key for cancel/deselect

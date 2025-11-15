@@ -16,8 +16,10 @@ interface PropertiesPanelProps {
 
 export function PropertiesPanel({ onDelete }: PropertiesPanelProps) {
     const { selectedTableIds, showPropertiesPanel, clearSelection, selectTable } = useEditorStore();
-    const { tables, updateTablePosition, addTable, removeTable } = useLayoutStore();
+    const { tables, updateTablePosition, addTable, removeTable, updateTableProperties } = useLayoutStore();
     const { push: pushHistory } = useHistoryStore();
+    const [editingTableNumber, setEditingTableNumber] = React.useState<string>('');
+    const [editingCapacity, setEditingCapacity] = React.useState<string>('');
     
     if (!showPropertiesPanel) return null;
     
@@ -60,6 +62,40 @@ export function PropertiesPanel({ onDelete }: PropertiesPanelProps) {
     );
     
     if (!selectedTable) return null;
+
+    // Initialize editing states when table changes
+    React.useEffect(() => {
+        setEditingTableNumber(selectedTable.tableNumber);
+        setEditingCapacity(String(selectedTable.capacity));
+    }, [selectedTable.tableId]);
+
+    const handleTableNumberChange = useCallback((value: string) => {
+        setEditingTableNumber(value);
+    }, []);
+
+    const handleTableNumberBlur = useCallback(() => {
+        const trimmed = editingTableNumber.trim();
+        if (trimmed && trimmed !== selectedTable.tableNumber) {
+            updateTableProperties(selectedTable.tableId, { tableNumber: trimmed });
+            toast.success('Table number updated');
+        } else {
+            setEditingTableNumber(selectedTable.tableNumber);
+        }
+    }, [editingTableNumber, selectedTable.tableId, selectedTable.tableNumber, updateTableProperties]);
+
+    const handleCapacityChange = useCallback((value: string) => {
+        setEditingCapacity(value);
+    }, []);
+
+    const handleCapacityBlur = useCallback(() => {
+        const capacity = parseInt(editingCapacity);
+        if (!isNaN(capacity) && capacity > 0 && capacity !== selectedTable.capacity) {
+            updateTableProperties(selectedTable.tableId, { capacity });
+            toast.success('Capacity updated');
+        } else {
+            setEditingCapacity(String(selectedTable.capacity));
+        }
+    }, [editingCapacity, selectedTable.tableId, selectedTable.capacity, updateTableProperties]);
     
     const handleDuplicate = useCallback(() => {
         // Create a copy with offset position
@@ -102,7 +138,17 @@ export function PropertiesPanel({ onDelete }: PropertiesPanelProps) {
                     {/* Table Number */}
                     <div className="space-y-2">
                         <Label>Table Number</Label>
-                        <Input value={selectedTable.tableNumber} readOnly />
+                        <Input 
+                            value={editingTableNumber} 
+                            onChange={(e) => handleTableNumberChange(e.target.value)}
+                            onBlur={handleTableNumberBlur}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.currentTarget.blur();
+                                }
+                            }}
+                            placeholder="Enter table number"
+                        />
                     </div>
                     
                     {/* Status */}
@@ -113,8 +159,20 @@ export function PropertiesPanel({ onDelete }: PropertiesPanelProps) {
                     
                     {/* Capacity */}
                     <div className="space-y-2">
-                        <Label>Capacity</Label>
-                        <Input value={selectedTable.capacity} readOnly />
+                        <Label>Capacity (people)</Label>
+                        <Input 
+                            type="number"
+                            min="1"
+                            value={editingCapacity} 
+                            onChange={(e) => handleCapacityChange(e.target.value)}
+                            onBlur={handleCapacityBlur}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.currentTarget.blur();
+                                }
+                            }}
+                            placeholder="Enter capacity"
+                        />
                     </div>
                     
                     {/* Position */}
