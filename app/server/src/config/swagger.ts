@@ -65,21 +65,6 @@ const swaggerOptions: Options = {
                     enum: ['pending', 'confirmed', 'seated', 'completed', 'cancelled', 'no_show'],
                     description: 'Status of a reservation',
                 },
-                TransactionType: {
-                    type: 'string',
-                    enum: ['in', 'out', 'adjustment', 'waste'],
-                    description: 'Type of stock transaction',
-                },
-                PurchaseOrderStatus: {
-                    type: 'string',
-                    enum: ['pending', 'ordered', 'received', 'cancelled'],
-                    description: 'Status of a purchase order',
-                },
-                StockAlertType: {
-                    type: 'string',
-                    enum: ['low_stock', 'expiring_soon', 'expired'],
-                    description: 'Type of stock alert',
-                },
                 // API Response Types
                 ApiResponse: {
                     type: 'object',

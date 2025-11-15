@@ -61,26 +61,6 @@ enum ReservationStatus {
     no_show
 }
 
-enum TransactionType {
-    in
-    out
-    adjustment
-    waste
-}
-
-enum PurchaseOrderStatus {
-    pending
-    ordered
-    received
-    cancelled
-}
-
-enum StockAlertType {
-    low_stock
-    expiring_soon
-    expired
-}
-
 // ============================================
 // AUTHENTICATION & USER MANAGEMENT
 // ============================================
@@ -140,9 +120,6 @@ model Staff {
     orders            Order[]
     bills             Bill[]
     kitchenOrders     KitchenOrder[]
-    purchaseOrders    PurchaseOrder[]
-    stockTransactions StockTransaction[]
-    resolvedAlerts    StockAlert[]
 
     @@index([role])
     @@index([isActive])
@@ -191,7 +168,6 @@ model MenuItem {
     category   Category    @relation(fields: [categoryId], references: [categoryId], onDelete: Restrict)
     orderItems OrderItem[]
     billItems  BillItem[]
-    recipes    Recipe[]
 
     @@index([categoryId])
     @@index([isAvailable])
@@ -426,200 +402,7 @@ model Payment {
 }
 
 // ============================================
-// INVENTORY MANAGEMENT
-// ============================================
-
-model IngredientCategory {
-    categoryId   Int      @id @default(autoincrement())
-    categoryName String   @unique @db.VarChar(100)
-    description  String?  @db.Text
-    isActive     Boolean  @default(true)
-    createdAt    DateTime @default(now())
-    updatedAt    DateTime @updatedAt
-
-    ingredients Ingredient[]
-
-    @@index([isActive])
-    @@map("ingredient_categories")
-}
-
-model Ingredient {
-    ingredientId   Int      @id @default(autoincrement())
-    ingredientCode String   @unique @db.VarChar(20)
-    ingredientName String   @db.VarChar(100)
-    unit           String   @db.VarChar(20) // kg, g, lít, ml, etc.
-    categoryId     Int?
-    minimumStock   Decimal  @default(0) @db.Decimal(10, 2)
-    currentStock   Decimal  @default(0) @db.Decimal(10, 2)
-    unitCost       Decimal? @db.Decimal(10, 2)
-    isActive       Boolean  @default(true)
-    createdAt      DateTime @default(now())
-    updatedAt      DateTime @updatedAt
-
-    category           IngredientCategory? @relation(fields: [categoryId], references: [categoryId], onDelete: SetNull)
-    recipes            Recipe[]
-    stockTransactions  StockTransaction[]
-    batches            IngredientBatch[]
-    stockAlerts        StockAlert[]
-    purchaseOrderItems PurchaseOrderItem[]
-
-    @@index([categoryId])
-    @@index([isActive])
-    @@map("ingredients")
-}
-
-model Recipe {
-    recipeId     Int      @id @default(autoincrement())
-    itemId       Int
-    ingredientId Int
-    quantity     Decimal  @db.Decimal(10, 3) // Số lượng nguyên liệu cần
-    unit         String   @db.VarChar(20)
-    notes        String?  @db.Text
-    createdAt    DateTime @default(now())
-    updatedAt    DateTime @updatedAt
-
-    menuItem   MenuItem   @relation(fields: [itemId], references: [itemId], onDelete: Cascade)
-    ingredient Ingredient @relation(fields: [ingredientId], references: [ingredientId], onDelete: Restrict)
-
-    @@unique([itemId, ingredientId])
-    @@index([itemId])
-    @@index([ingredientId])
-    @@map("recipes")
-}
-
-model Supplier {
-    supplierId    Int      @id @default(autoincrement())
-    supplierCode  String   @unique @db.VarChar(20)
-    supplierName  String   @db.VarChar(255)
-    contactPerson String?  @db.VarChar(255)
-    phoneNumber   String?  @db.VarChar(20)
-    email         String?  @db.VarChar(255)
-    address       String?  @db.Text
-    taxCode       String?  @db.VarChar(50)
-    paymentTerms  String?  @db.VarChar(100)
-    isActive      Boolean  @default(true)
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
-
-    purchaseOrders PurchaseOrder[]
-
-    @@index([isActive])
-    @@map("suppliers")
-}
-
-model PurchaseOrder {
-    purchaseOrderId Int                 @id @default(autoincrement())
-    orderNumber     String              @unique @default(uuid()) @db.VarChar(50)
-    supplierId      Int
-    staffId         Int?
-    orderDate       DateTime            @default(now())
-    expectedDate    DateTime?           @db.Date
-    receivedDate    DateTime?
-    status          PurchaseOrderStatus @default(pending)
-    subtotal        Decimal             @db.Decimal(12, 2)
-    taxAmount       Decimal             @default(0) @db.Decimal(12, 2)
-    totalAmount     Decimal             @db.Decimal(12, 2)
-    notes           String?             @db.Text
-    createdAt       DateTime            @default(now())
-    updatedAt       DateTime            @updatedAt
-
-    supplier Supplier            @relation(fields: [supplierId], references: [supplierId], onDelete: Restrict)
-    staff    Staff?              @relation(fields: [staffId], references: [staffId], onDelete: SetNull)
-    items    PurchaseOrderItem[]
-    batches  IngredientBatch[]
-
-    @@index([orderNumber])
-    @@index([supplierId])
-    @@index([status])
-    @@index([orderDate])
-    @@map("purchase_orders")
-}
-
-model PurchaseOrderItem {
-    itemId           Int      @id @default(autoincrement())
-    purchaseOrderId  Int
-    ingredientId     Int
-    quantity         Decimal  @db.Decimal(10, 2)
-    unit             String   @db.VarChar(20)
-    unitPrice        Decimal  @db.Decimal(10, 2)
-    subtotal         Decimal  @db.Decimal(10, 2)
-    receivedQuantity Decimal  @default(0) @db.Decimal(10, 2)
-    createdAt        DateTime @default(now())
-
-    purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [purchaseOrderId], onDelete: Cascade)
-    ingredient    Ingredient    @relation(fields: [ingredientId], references: [ingredientId], onDelete: Restrict)
-
-    @@index([purchaseOrderId])
-    @@index([ingredientId])
-    @@map("purchase_order_items")
-}
-
-model StockTransaction {
-    transactionId   Int             @id @default(autoincrement())
-    ingredientId    Int
-    transactionType TransactionType
-    quantity        Decimal         @db.Decimal(10, 2)
-    unit            String          @db.VarChar(20)
-    referenceType   String?         @db.VarChar(50) // purchase_order, order, adjustment
-    referenceId     Int?
-    staffId         Int?
-    notes           String?         @db.Text
-    transactionDate DateTime        @default(now())
-    createdAt       DateTime        @default(now())
-
-    ingredient Ingredient @relation(fields: [ingredientId], references: [ingredientId], onDelete: Restrict)
-    staff      Staff?     @relation(fields: [staffId], references: [staffId], onDelete: SetNull)
-
-    @@index([ingredientId])
-    @@index([transactionType])
-    @@index([transactionDate])
-    @@map("stock_transactions")
-}
-
-model IngredientBatch {
-    batchId           Int       @id @default(autoincrement())
-    ingredientId      Int
-    purchaseOrderId   Int?
-    batchNumber       String    @db.VarChar(50)
-    quantity          Decimal   @db.Decimal(10, 2)
-    remainingQuantity Decimal   @db.Decimal(10, 2)
-    unit              String    @db.VarChar(20)
-    unitCost          Decimal?  @db.Decimal(10, 2)
-    expiryDate        DateTime? @db.Date
-    receivedDate      DateTime  @db.Date
-    createdAt         DateTime  @default(now())
-    updatedAt         DateTime  @updatedAt
-
-    ingredient    Ingredient     @relation(fields: [ingredientId], references: [ingredientId], onDelete: Restrict)
-    purchaseOrder PurchaseOrder? @relation(fields: [purchaseOrderId], references: [purchaseOrderId], onDelete: SetNull)
-
-    @@index([ingredientId])
-    @@index([purchaseOrderId])
-    @@index([expiryDate])
-    @@map("ingredient_batches")
-}
-
-model StockAlert {
-    alertId      Int            @id @default(autoincrement())
-    ingredientId Int
-    alertType    StockAlertType
-    message      String         @db.Text
-    isResolved   Boolean        @default(false)
-    resolvedAt   DateTime?
-    resolvedBy   Int?
-    createdAt    DateTime       @default(now())
-
-    ingredient Ingredient @relation(fields: [ingredientId], references: [ingredientId], onDelete: Cascade)
-    resolver   Staff?     @relation(fields: [resolvedBy], references: [staffId], onDelete: SetNull)
-
-    @@index([ingredientId])
-    @@index([alertType])
-    @@index([isResolved])
-    @@map("stock_alerts")
-}
-
-// ============================================
-// VISUAL FLOOR PLAN (Phase 3)
+// VISUAL FLOOR PLAN
 // ============================================
 
 model FloorPlanLayout {
