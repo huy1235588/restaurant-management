@@ -67,9 +67,11 @@ export function PropertiesPanel({ onDelete }: PropertiesPanelProps) {
     const handleDuplicate = useCallback(() => {
         if (!selectedTable) return;
         // Create a copy with offset position
+        // Use negative ID for temporary tables (not yet saved to DB)
+        const tempId = -(Date.now() % 1000000); // Negative ID in safe range
         const duplicatedTable: TablePosition = {
             ...selectedTable,
-            tableId: Date.now(), // Temporary ID
+            tableId: tempId, // Temporary negative ID
             tableNumber: `${selectedTable.tableNumber}-Copy`,
             x: selectedTable.x + 20,
             y: selectedTable.y + 20,

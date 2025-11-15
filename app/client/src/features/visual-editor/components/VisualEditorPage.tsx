@@ -256,8 +256,10 @@ export function VisualEditorPage() {
             const tableHeight = 80;
             
             // Create new table object - đặt ở chính giữa vị trí ghost preview
+            // Use negative ID for temporary tables (not yet saved to DB)
+            const tempId = -(Date.now() % 1000000); // Negative ID in safe range
             const newTable: TablePosition = {
-                tableId: Date.now(), // Temporary ID, should be from API
+                tableId: tempId, // Temporary negative ID
                 tableNumber: data.tableNumber,
                 capacity: data.capacity,
                 shape: data.shape,
@@ -377,7 +379,17 @@ export function VisualEditorPage() {
         try {
             setIsSaving(true);
             
-            const positions = tables.map((table) => ({
+            // Only save tables with positive IDs (existing in DB)
+            // Tables with negative IDs are temporary and need to be created first
+            const existingTables = tables.filter(table => table.tableId > 0);
+            
+            if (existingTables.length === 0) {
+                toast.warning('No existing tables to save. New tables need to be created through the API.');
+                setIsSaving(false);
+                return;
+            }
+            
+            const positions = existingTables.map((table) => ({
                 tableId: table.tableId,
                 x: table.x,
                 y: table.y,
@@ -390,7 +402,12 @@ export function VisualEditorPage() {
             await floorPlanApi.updateTablePositions(positions);
             setUnsavedChanges(false);
             
-            toast.success('Layout saved successfully');
+            const tempTablesCount = tables.length - existingTables.length;
+            if (tempTablesCount > 0) {
+                toast.success(`Layout saved successfully. ${tempTablesCount} new table(s) not saved (temporary).`);
+            } else {
+                toast.success('Layout saved successfully');
+            }
         } catch (error) {
             toast.error('Failed to save layout');
         } finally {

@@ -58,21 +58,41 @@ export class FloorPlanService {
 
     /**
      * Update table positions in bulk
+     * Only updates existing tables (positive IDs)
      */
     async updateTablePositions(positions: TablePositionDto[]) {
-        const updates = positions.map(pos =>
-            prisma.restaurantTable.update({
-                where: { tableId: pos.tableId },
-                data: {
-                    positionX: pos.x,
-                    positionY: pos.y,
-                    width: pos.width,
-                    height: pos.height,
-                    ...(pos.rotation !== undefined && { rotation: pos.rotation }),
-                    ...(pos.shape && { shape: pos.shape }),
-                },
-            })
-        );
+        // Filter out invalid IDs (negative or non-existent)
+        const validPositions = positions.filter(pos => pos.tableId > 0);
+        
+        if (validPositions.length === 0) {
+            return [];
+        }
+
+        // Get existing table IDs to verify they exist
+        const tableIds = validPositions.map(pos => pos.tableId);
+        const existingTables = await prisma.restaurantTable.findMany({
+            where: { tableId: { in: tableIds } },
+            select: { tableId: true },
+        });
+        
+        const existingTableIds = new Set(existingTables.map(t => t.tableId));
+        
+        // Only update tables that exist in the database
+        const updates = validPositions
+            .filter(pos => existingTableIds.has(pos.tableId))
+            .map(pos =>
+                prisma.restaurantTable.update({
+                    where: { tableId: pos.tableId },
+                    data: {
+                        positionX: pos.x,
+                        positionY: pos.y,
+                        width: pos.width,
+                        height: pos.height,
+                        ...(pos.rotation !== undefined && { rotation: pos.rotation }),
+                        ...(pos.shape && { shape: pos.shape }),
+                    },
+                })
+            );
 
         return Promise.all(updates);
     }
