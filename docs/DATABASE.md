@@ -1,5 +1,8 @@
 # 📊 Tài liệu Cơ sở Dữ liệu - Hệ thống Quản lý Nhà hàng
 
+> **Dự án tốt nghiệp** - Hệ thống quản lý nhà hàng toàn diện  
+> **Công nghệ**: PostgreSQL 16 + Prisma ORM + TypeScript
+
 ## Mục lục
 
 -   [1. Tổng quan](#1-tổng-quan)
@@ -12,15 +15,12 @@
     -   [3.5 Order Management](#35-order-management)
     -   [3.6 Kitchen Management](#36-kitchen-management)
     -   [3.7 Billing & Payment](#37-billing--payment)
-    -   [3.8 Inventory Management](#38-inventory-management)
 -   [4. Mối quan hệ giữa các bảng](#4-mối-quan-hệ-giữa-các-bảng)
 -   [5. Chiến lược đánh chỉ mục](#5-chiến-lược-đánh-chỉ-mục)
 -   [6. Các truy vấn thường dùng](#6-các-truy-vấn-thường-dùng)
 -   [7. Hệ thống đặt bàn](#7-hệ-thống-đặt-bàn)
--   [8. Quản lý tồn kho](#8-quản-lý-tồn-kho)
--   [9. Kết luận](#9-kết-luận)
--   [10. Phụ lục](#10-phụ-lục)
--   [11. Lịch sử Thay đổi](#11-lịch-sử-thay-đổi)
+-   [8. Kết luận](#8-kết-luận)
+-   [9. Phụ lục](#9-phụ-lục)
 
 ---
 
@@ -28,86 +28,97 @@
 
 ### 1.1. Giới thiệu
 
-Cơ sở dữ liệu hệ thống quản lý nhà hàng được thiết kế để hỗ trợ toàn bộ hoạt động của nhà hàng, bao gồm:
+Đây là tài liệu cơ sở dữ liệu cho **dự án tốt nghiệp** về hệ thống quản lý nhà hàng. Hệ thống được thiết kế để hỗ trợ các nghiệp vụ cốt lõi của nhà hàng:
 
--   Quản lý nhân viên và phân quyền
--   Quản lý thực đơn và danh mục
--   Quản lý bàn và đặt bàn
--   Quản lý đơn hàng và bếp
--   Quản lý thanh toán và hóa đơn
+✅ **Các chức năng chính:**
+-   Quản lý tài khoản và phân quyền nhân viên
+-   Quản lý thực đơn và danh mục món ăn
+-   Quản lý bàn ăn và sơ đồ mặt bằng
 -   Hệ thống đặt bàn trực tuyến
--   **Quản lý tồn kho và nguyên liệu** 🆕
+-   Quản lý đơn hàng và bếp (Kitchen Display System)
+-   Quản lý thanh toán và hóa đơn
 
-### 1.2. Công nghệ
+### 1.2. Công nghệ sử dụng
 
--   **Database**: PostgreSQL 16
--   **ORM**: Prisma
+-   **Database**: PostgreSQL 16 (Hệ quản trị CSDL quan hệ)
+-   **ORM**: Prisma (Object-Relational Mapping)
 -   **Language**: TypeScript
+-   **Backend**: Node.js + Express
+-   **Frontend**: Next.js 16 + React 19
 
 ### 1.3. Cấu trúc tổng thể
 
-Cơ sở dữ liệu được chia thành các module chính:
+Cơ sở dữ liệu được chia thành 7 module chính với **15 bảng**:
 
-| Module               | Bảng chính                                                                   | Mô tả               |
-| -------------------- | ---------------------------------------------------------------------------- | ------------------- |
-| **Authentication**   | accounts, refresh_tokens                                                     | Xác thực và bảo mật |
-| **Staff Management** | staff                                                                        | Quản lý nhân viên   |
-| **Menu Management**  | categories, menu_items, recipes                                              | Quản lý thực đơn    |
-| **Table Management** | restaurant_tables                                                            | Quản lý bàn ăn      |
-| **Reservation**      | reservations                                                                 | Đặt bàn trực tuyến  |
-| **Order Management** | orders, order_items                                                          | Quản lý đơn hàng    |
-| **Kitchen**          | kitchen_orders                                                               | Quản lý bếp         |
-| **Billing**          | bills, bill_items, payments                                                  | Thanh toán          |
-| **Inventory** 🆕     | ingredients, suppliers, purchase_orders, stock_transactions, batches, alerts | Quản lý tồn kho     |
+| STT | Module               | Bảng chính                      | Mô tả                          |
+| --- | -------------------- | ------------------------------- | ------------------------------ |
+| 1   | **Authentication**   | accounts, refresh_tokens        | Xác thực và bảo mật            |
+| 2   | **Staff Management** | staff                           | Quản lý nhân viên              |
+| 3   | **Menu Management**  | categories, menu_items          | Quản lý thực đơn               |
+| 4   | **Table Management** | restaurant_tables               | Quản lý bàn ăn                 |
+| 5   | **Reservation**      | reservations                    | Đặt bàn trực tuyến             |
+| 6   | **Order Management** | orders, order_items             | Quản lý đơn hàng               |
+| 7   | **Kitchen**          | kitchen_orders                  | Quản lý bếp (KDS)              |
+| 8   | **Billing**          | bills, bill_items, payments     | Thanh toán và hóa đơn          |
 
 ---
 
 ## 2. Sơ đồ ERD
 
-### 2.1. Sơ đồ tổng thể (Mermaid)
+### 2.1. Sơ đồ quan hệ giữa các bảng (ERD)
 
 ```mermaid
 erDiagram
-    %% Authentication & User Management
+    %% ============================================
+    %% AUTHENTICATION & USER MANAGEMENT
+    %% ============================================
     Account ||--o{ RefreshToken : "has"
-    Account ||--o| Staff : "has"
+    Account ||--o| Staff : "has profile"
 
-    %% Menu Management
+    %% ============================================
+    %% MENU MANAGEMENT
+    %% ============================================
     Category ||--o{ MenuItem : "contains"
 
-    %% Table & Reservation
-    RestaurantTable ||--o{ Reservation : "has"
-    RestaurantTable ||--o{ Order : "serves"
-    RestaurantTable ||--o{ Bill : "generates"
-
-    %% Reservation
+    %% ============================================
+    %% TABLE & RESERVATION FLOW
+    %% ============================================
+    RestaurantTable ||--o{ Reservation : "booked for"
+    RestaurantTable ||--o{ Order : "serves at"
+    RestaurantTable ||--o{ Bill : "generates from"
+    
     Reservation ||--o{ Order : "creates"
 
-    %% Order Management
+    %% ============================================
+    %% ORDER MANAGEMENT FLOW
+    %% ============================================
     Order ||--o{ OrderItem : "contains"
-    Order ||--o{ KitchenOrder : "sends_to"
-    Order ||--o| Bill : "generates"
-    Staff ||--o{ Order : "takes"
+    Order ||--o{ KitchenOrder : "sends to kitchen"
+    Order ||--o| Bill : "generates bill"
+    
+    MenuItem ||--o{ OrderItem : "ordered as"
+    Staff ||--o{ Order : "serves by"
+    Staff ||--o{ KitchenOrder : "prepared by"
 
-    %% Order Items
-    MenuItem ||--o{ OrderItem : "ordered_as"
+    %% ============================================
+    %% BILLING & PAYMENT FLOW
+    %% ============================================
+    Bill ||--o{ BillItem : "itemizes"
+    Bill ||--o{ Payment : "paid by"
+    
+    MenuItem ||--o{ BillItem : "charged as"
+    Staff ||--o{ Bill : "processed by"
 
-    %% Kitchen
-    Staff ||--o{ KitchenOrder : "prepares"
-
-    %% Billing
-    Bill ||--o{ BillItem : "contains"
-    Bill ||--o{ Payment : "receives"
-    MenuItem ||--o{ BillItem : "billed_as"
-    Staff ||--o{ Bill : "processes"
-
-    %% Core Tables
+    %% ============================================
+    %% TABLE DEFINITIONS
+    %% ============================================
+    
     Account {
         int accountId PK
         string username UK
         string email UK
         string phoneNumber UK
-        string password
+        string password "hashed"
         boolean isActive
         datetime lastLogin
         datetime createdAt
@@ -123,18 +134,17 @@ erDiagram
         string ipAddress
         boolean isRevoked
         datetime createdAt
-        datetime revokedAt
     }
 
     Staff {
         int staffId PK
-        int accountId FK
+        int accountId FK UK
         string fullName
         string address
         date dateOfBirth
         date hireDate
         decimal salary
-        enum role
+        enum role "admin|manager|waiter|chef|cashier"
         boolean isActive
         datetime createdAt
         datetime updatedAt
@@ -162,8 +172,8 @@ erDiagram
         string imageUrl
         boolean isAvailable
         boolean isActive
-        int preparationTime
-        int spicyLevel
+        int preparationTime "minutes"
+        int spicyLevel "0-5"
         boolean isVegetarian
         int calories
         int displayOrder
@@ -178,8 +188,8 @@ erDiagram
         int capacity
         int minCapacity
         int floor
-        string section
-        enum status
+        string section "VIP|Garden|Indoor"
+        enum status "available|occupied|reserved|maintenance"
         string qrCode UK
         boolean isActive
         datetime createdAt
@@ -195,11 +205,11 @@ erDiagram
         int tableId FK
         date reservationDate
         time reservationTime
-        int duration
+        int duration "minutes"
         int headCount
         string specialRequest
         decimal depositAmount
-        enum status
+        enum status "pending|confirmed|seated|completed|cancelled|no_show"
         string notes
         datetime createdAt
         datetime updatedAt
@@ -214,7 +224,7 @@ erDiagram
         string customerName
         string customerPhone
         int headCount
-        enum status
+        enum status "pending|confirmed|preparing|ready|served|cancelled"
         string notes
         datetime orderTime
         datetime confirmedAt
@@ -239,12 +249,12 @@ erDiagram
     KitchenOrder {
         int kitchenOrderId PK
         int orderId FK
-        int staffId FK
+        int staffId FK "chef"
         int priority
         enum status
         datetime startedAt
         datetime completedAt
-        int estimatedTime
+        int estimatedTime "minutes"
         string notes
         datetime createdAt
         datetime updatedAt
@@ -253,19 +263,19 @@ erDiagram
     Bill {
         int billId PK
         string billNumber UK
-        int orderId FK
+        int orderId FK UK
         int tableId FK
-        int staffId FK
+        int staffId FK "cashier"
         decimal subtotal
         decimal taxAmount
-        decimal taxRate
+        decimal taxRate "percentage"
         decimal discountAmount
         decimal serviceCharge
         decimal totalAmount
         decimal paidAmount
         decimal changeAmount
-        enum paymentStatus
-        enum paymentMethod
+        enum paymentStatus "pending|paid|refunded|cancelled"
+        enum paymentMethod "cash|card|momo|bank_transfer"
         string notes
         datetime createdAt
         datetime paidAt
@@ -276,7 +286,7 @@ erDiagram
         int billItemId PK
         int billId FK
         int itemId FK
-        string itemName
+        string itemName "snapshot"
         int quantity
         decimal unitPrice
         decimal subtotal
@@ -291,7 +301,7 @@ erDiagram
         enum paymentMethod
         decimal amount
         string transactionId
-        string cardNumber
+        string cardNumber "last 4 digits"
         string cardHolderName
         enum status
         string notes
@@ -300,78 +310,68 @@ erDiagram
     }
 ```
 
-### 2.2. Các Enum Types
+### 2.2. Các kiểu dữ liệu Enum
 
-#### Role (Vai trò nhân viên)
+Database sử dụng các **Enum** để đảm bảo tính nhất quán và an toàn dữ liệu:
 
-```typescript
-enum Role {
-  admin      // Quản trị viên
-  manager    // Quản lý
-  waiter     // Phục vụ
-  chef       // Đầu bếp
-  cashier    // Thu ngân
-}
-```
+#### 📌 Role - Vai trò nhân viên
 
-#### TableStatus (Trạng thái bàn)
+| Giá trị   | Mô tả          | Quyền hạn chính                  |
+| --------- | -------------- | -------------------------------- |
+| `admin`   | Quản trị viên  | Toàn quyền hệ thống              |
+| `manager` | Quản lý        | Quản lý nhân viên, báo cáo       |
+| `waiter`  | Nhân viên phục vụ | Nhận đơn, phục vụ khách      |
+| `chef`    | Đầu bếp        | Xử lý đơn bếp, cập nhật món      |
+| `cashier` | Thu ngân       | Xử lý thanh toán, in hóa đơn     |
 
-```typescript
-enum TableStatus {
-  available    // Có sẵn
-  occupied     // Đang sử dụng
-  reserved     // Đã đặt
-  maintenance  // Bảo trì
-}
-```
+#### 📌 TableStatus - Trạng thái bàn
 
-#### OrderStatus (Trạng thái đơn hàng)
+| Giá trị       | Mô tả         | Màu hiển thị | Mô tả chi tiết              |
+| ------------- | ------------- | ------------ | --------------------------- |
+| `available`   | Có sẵn        | 🟢 Xanh     | Bàn trống, sẵn sàng phục vụ |
+| `occupied`    | Đang sử dụng  | 🔴 Đỏ       | Có khách đang ngồi          |
+| `reserved`    | Đã đặt        | 🟡 Vàng     | Đã được đặt trước           |
+| `maintenance` | Đang bảo trì  | ⚫ Xám      | Đang sửa chữa, không dùng   |
 
-```typescript
-enum OrderStatus {
-  pending     // Chờ xác nhận
-  confirmed   // Đã xác nhận
-  preparing   // Đang chuẩn bị
-  ready       // Sẵn sàng
-  served      // Đã phục vụ
-  cancelled   // Đã hủy
-}
-```
+#### 📌 OrderStatus - Trạng thái đơn hàng
 
-#### PaymentStatus (Trạng thái thanh toán)
+| Giá trị      | Mô tả           | Giai đoạn           |
+| ------------ | --------------- | ------------------- |
+| `pending`    | Chờ xác nhận    | Mới tạo             |
+| `confirmed`  | Đã xác nhận     | Đã tiếp nhận        |
+| `preparing`  | Đang chuẩn bị   | Bếp đang nấu        |
+| `ready`      | Sẵn sàng        | Món đã xong         |
+| `served`     | Đã phục vụ      | Đã mang ra bàn      |
+| `cancelled`  | Đã hủy          | Hủy đơn             |
 
-```typescript
-enum PaymentStatus {
-  pending     // Chờ thanh toán
-  paid        // Đã thanh toán
-  refunded    // Đã hoàn tiền
-  cancelled   // Đã hủy
-}
-```
+#### 📌 PaymentStatus - Trạng thái thanh toán
 
-#### PaymentMethod (Phương thức thanh toán)
+| Giá trị     | Mô tả             |
+| ----------- | ----------------- |
+| `pending`   | Chờ thanh toán    |
+| `paid`      | Đã thanh toán     |
+| `refunded`  | Đã hoàn tiền      |
+| `cancelled` | Đã hủy            |
 
-```typescript
-enum PaymentMethod {
-  cash           // Tiền mặt
-  card           // Thẻ ngân hàng
-  momo           // Ví MoMo
-  bank_transfer  // Chuyển khoản
-}
-```
+#### 📌 PaymentMethod - Phương thức thanh toán
 
-#### ReservationStatus (Trạng thái đặt bàn)
+| Giá trị         | Mô tả              | Icon |
+| --------------- | ------------------ | ---- |
+| `cash`          | Tiền mặt           | 💵   |
+| `card`          | Thẻ ngân hàng      | 💳   |
+| `momo`          | Ví MoMo            | 📱   |
+| `bank_transfer` | Chuyển khoản       | 🏦   |
 
-```typescript
-enum ReservationStatus {
-  pending     // Chờ xác nhận
-  confirmed   // Đã xác nhận
-  seated      // Đã đến ngồi
-  completed   // Hoàn thành
-  cancelled   // Đã hủy
-  no_show     // Không đến
-}
-```
+#### 📌 ReservationStatus - Trạng thái đặt bàn
+
+| Giá trị     | Mô tả            | Mô tả chi tiết                  |
+| ----------- | ---------------- | ------------------------------- |
+| `pending`   | Chờ xác nhận     | Vừa mới đặt, chưa xác nhận      |
+| `confirmed` | Đã xác nhận      | Nhân viên đã xác nhận đặt bàn   |
+| `seated`    | Đã đến ngồi      | Khách đã tới và ngồi vào bàn    |
+| `completed` | Hoàn thành       | Đã dùng xong và rời đi          |
+| `cancelled` | Đã hủy           | Khách hoặc nhà hàng hủy         |
+| `no_show`   | Không đến        | Khách đặt nhưng không tới       |
 
 ---
 
@@ -896,294 +896,6 @@ Thông tin chi tiết về nhân viên.
 -   1:N với `orders` (waiter)
 -   1:N với `bills` (cashier)
 -   1:N với `kitchen_orders` (chef)
--   1:N với `purchase_orders` (staff)
--   1:N với `stock_transactions` (staff)
--   1:N với `stock_alerts` (resolver)
-
----
-
-### 3.8. Inventory Management
-
-#### 3.8.1. ingredient_categories (Danh mục nguyên liệu)
-
-Phân loại các nguyên liệu đầu bếp.
-
-| Trường       | Kiểu         | Ràng buộc        | Mô tả          |
-| ------------ | ------------ | ---------------- | -------------- |
-| categoryId   | INTEGER      | PK, Auto         | ID danh mục    |
-| categoryName | VARCHAR(100) | UNIQUE, NOT NULL | Tên danh mục   |
-| description  | TEXT         | NULL             | Mô tả          |
-| isActive     | BOOLEAN      | DEFAULT true     | Đang hoạt động |
-| createdAt    | TIMESTAMP    | DEFAULT now()    | Ngày tạo       |
-| updatedAt    | TIMESTAMP    | AUTO UPDATE      | Ngày cập nhật  |
-
-**Indexes:**
-
--   `idx_ingredient_categories_isActive` trên `isActive`
-
-**Quan hệ:**
-
--   1:N với `ingredients`
-
----
-
-#### 3.8.2. ingredients (Nguyên liệu)
-
-Quản lý nguyên liệu sử dụng trong nhà bếp.
-
-| Trường         | Kiểu          | Ràng buộc        | Mô tả                      |
-| -------------- | ------------- | ---------------- | -------------------------- |
-| ingredientId   | INTEGER       | PK, Auto         | ID nguyên liệu             |
-| ingredientCode | VARCHAR(20)   | UNIQUE, NOT NULL | Mã nguyên liệu             |
-| ingredientName | VARCHAR(100)  | NOT NULL         | Tên nguyên liệu            |
-| unit           | VARCHAR(20)   | NOT NULL         | Đơn vị (kg, g, lít, ml...) |
-| categoryId     | INTEGER       | FK, NULL         | ID danh mục                |
-| minimumStock   | DECIMAL(10,2) | DEFAULT 0        | Mức tồn kho tối thiểu      |
-| currentStock   | DECIMAL(10,2) | DEFAULT 0        | Tồn kho hiện tại           |
-| unitCost       | DECIMAL(10,2) | NULL             | Giá vốn/đơn vị             |
-| isActive       | BOOLEAN       | DEFAULT true     | Đang sử dụng               |
-| createdAt      | TIMESTAMP     | DEFAULT now()    | Ngày tạo                   |
-| updatedAt      | TIMESTAMP     | AUTO UPDATE      | Ngày cập nhật              |
-
-**Indexes:**
-
--   `idx_ingredients_categoryId` trên `categoryId`
--   `idx_ingredients_isActive` trên `isActive`
--   `idx_ingredients_currentStock` trên `currentStock`
-
-**Quan hệ:**
-
--   N:1 với `ingredient_categories` (SET NULL)
--   1:N với `recipes`
--   1:N với `stock_transactions`
--   1:N với `ingredient_batches`
--   1:N với `stock_alerts` (CASCADE DELETE)
--   1:N với `purchase_order_items`
-
----
-
-#### 3.8.3. recipes (Công thức món ăn)
-
-Mối quan hệ giữa món ăn và nguyên liệu cần thiết.
-
-| Trường       | Kiểu          | Ràng buộc     | Mô tả                    |
-| ------------ | ------------- | ------------- | ------------------------ |
-| recipeId     | INTEGER       | PK, Auto      | ID công thức             |
-| itemId       | INTEGER       | FK, NOT NULL  | ID món ăn                |
-| ingredientId | INTEGER       | FK, NOT NULL  | ID nguyên liệu           |
-| quantity     | DECIMAL(10,3) | NOT NULL      | Số lượng nguyên liệu cần |
-| unit         | VARCHAR(20)   | NOT NULL      | Đơn vị                   |
-| notes        | TEXT          | NULL          | Ghi chú                  |
-| createdAt    | TIMESTAMP     | DEFAULT now() | Ngày tạo                 |
-| updatedAt    | TIMESTAMP     | AUTO UPDATE   | Ngày cập nhật            |
-
-**Unique Constraint:**
-
--   `UNIQUE(itemId, ingredientId)`
-
-**Indexes:**
-
--   `idx_recipes_itemId` trên `itemId`
--   `idx_recipes_ingredientId` trên `ingredientId`
-
-**Quan hệ:**
-
--   N:1 với `menu_items` (CASCADE DELETE)
--   N:1 với `ingredients` (RESTRICT DELETE)
-
----
-
-#### 3.8.4. suppliers (Nhà cung cấp)
-
-Thông tin nhà cung cấp nguyên liệu.
-
-| Trường        | Kiểu         | Ràng buộc        | Mô tả            |
-| ------------- | ------------ | ---------------- | ---------------- |
-| supplierId    | INTEGER      | PK, Auto         | ID nhà cung cấp  |
-| supplierCode  | VARCHAR(20)  | UNIQUE, NOT NULL | Mã nhà cung cấp  |
-| supplierName  | VARCHAR(255) | NOT NULL         | Tên nhà cung cấp |
-| contactPerson | VARCHAR(255) | NULL             | Người liên hệ    |
-| phoneNumber   | VARCHAR(20)  | NULL             | Số điện thoại    |
-| email         | VARCHAR(255) | NULL             | Email            |
-| address       | TEXT         | NULL             | Địa chỉ          |
-| taxCode       | VARCHAR(50)  | NULL             | Mã số thuế       |
-| paymentTerms  | VARCHAR(100) | NULL             | Điều khoản TT    |
-| isActive      | BOOLEAN      | DEFAULT true     | Đang hoạt động   |
-| createdAt     | TIMESTAMP    | DEFAULT now()    | Ngày tạo         |
-| updatedAt     | TIMESTAMP    | AUTO UPDATE      | Ngày cập nhật    |
-
-**Indexes:**
-
--   `idx_suppliers_isActive` trên `isActive`
-
-**Quan hệ:**
-
--   1:N với `purchase_orders`
-
----
-
-#### 3.8.5. purchase_orders (Đơn đặt hàng)
-
-Quản lý đơn đặt hàng từ nhà cung cấp.
-
-| Trường          | Kiểu                      | Ràng buộc       | Mô tả                    |
-| --------------- | ------------------------- | --------------- | ------------------------ |
-| purchaseOrderId | INTEGER                   | PK, Auto        | ID đơn đặt hàng          |
-| orderNumber     | VARCHAR(50)               | UNIQUE, UUID    | Mã đơn đặt hàng          |
-| supplierId      | INTEGER                   | FK, NOT NULL    | ID nhà cung cấp          |
-| staffId         | INTEGER                   | FK, NULL        | ID nhân viên (người tạo) |
-| orderDate       | TIMESTAMP                 | DEFAULT now()   | Ngày đặt                 |
-| expectedDate    | DATE                      | NULL            | Ngày dự kiến nhận        |
-| receivedDate    | TIMESTAMP                 | NULL            | Ngày nhận thực tế        |
-| status          | ENUM(PurchaseOrderStatus) | DEFAULT pending | Trạng thái               |
-| subtotal        | DECIMAL(12,2)             | NOT NULL        | Tổng tiền hàng           |
-| taxAmount       | DECIMAL(12,2)             | DEFAULT 0       | Tiền thuế                |
-| totalAmount     | DECIMAL(12,2)             | NOT NULL        | Tổng cộng                |
-| notes           | TEXT                      | NULL            | Ghi chú                  |
-| createdAt       | TIMESTAMP                 | DEFAULT now()   | Ngày tạo                 |
-| updatedAt       | TIMESTAMP                 | AUTO UPDATE     | Ngày cập nhật            |
-
-**Enum Status:**
-
--   `pending`: Chờ đặt
--   `ordered`: Đã đặt
--   `received`: Đã nhận
--   `cancelled`: Đã hủy
-
-**Indexes:**
-
--   `idx_purchase_orders_orderNumber` trên `orderNumber`
--   `idx_purchase_orders_supplierId` trên `supplierId`
--   `idx_purchase_orders_status` trên `status`
--   `idx_purchase_orders_orderDate` trên `orderDate`
-
-**Quan hệ:**
-
--   N:1 với `suppliers` (RESTRICT DELETE)
--   N:1 với `staff` (SET NULL)
--   1:N với `purchase_order_items`
--   1:N với `ingredient_batches`
-
----
-
-#### 3.8.6. purchase_order_items (Chi tiết đơn đặt hàng)
-
-Chi tiết các mặt hàng trong đơn đặt hàng.
-
-| Trường           | Kiểu          | Ràng buộc     | Mô tả            |
-| ---------------- | ------------- | ------------- | ---------------- |
-| itemId           | INTEGER       | PK, Auto      | ID chi tiết      |
-| purchaseOrderId  | INTEGER       | FK, NOT NULL  | ID đơn đặt hàng  |
-| ingredientId     | INTEGER       | FK, NOT NULL  | ID nguyên liệu   |
-| quantity         | DECIMAL(10,2) | NOT NULL      | Số lượng đặt     |
-| unit             | VARCHAR(20)   | NOT NULL      | Đơn vị           |
-| unitPrice        | DECIMAL(10,2) | NOT NULL      | Đơn giá          |
-| subtotal         | DECIMAL(10,2) | NOT NULL      | Thành tiền       |
-| receivedQuantity | DECIMAL(10,2) | DEFAULT 0     | Số lượng đã nhận |
-| createdAt        | TIMESTAMP     | DEFAULT now() | Ngày tạo         |
-
-**Indexes:**
-
--   `idx_purchase_order_items_purchaseOrderId` trên `purchaseOrderId`
--   `idx_purchase_order_items_ingredientId` trên `ingredientId`
-
-**Quan hệ:**
-
--   N:1 với `purchase_orders` (CASCADE DELETE)
--   N:1 với `ingredients` (RESTRICT DELETE)
-
----
-
-#### 3.8.7. stock_transactions (Giao dịch tồn kho)
-
-Ghi nhận tất cả các thay đổi về tồn kho.
-
-| Trường          | Kiểu                  | Ràng buộc     | Mô tả                                               |
-| --------------- | --------------------- | ------------- | --------------------------------------------------- |
-| transactionId   | INTEGER               | PK, Auto      | ID giao dịch                                        |
-| ingredientId    | INTEGER               | FK, NOT NULL  | ID nguyên liệu                                      |
-| transactionType | ENUM(TransactionType) | NOT NULL      | Loại: in, out, adjustment, waste                    |
-| quantity        | DECIMAL(10,2)         | NOT NULL      | Số lượng                                            |
-| unit            | VARCHAR(20)           | NOT NULL      | Đơn vị                                              |
-| referenceType   | VARCHAR(50)           | NULL          | Loại tham chiếu (purchase_order, order, adjustment) |
-| referenceId     | INTEGER               | NULL          | ID tham chiếu                                       |
-| staffId         | INTEGER               | FK, NULL      | ID nhân viên (người thực hiện)                      |
-| notes           | TEXT                  | NULL          | Ghi chú                                             |
-| transactionDate | TIMESTAMP             | DEFAULT now() | Ngày/giờ giao dịch                                  |
-| createdAt       | TIMESTAMP             | DEFAULT now() | Ngày tạo                                            |
-
-**Indexes:**
-
--   `idx_stock_transactions_ingredientId` trên `ingredientId`
--   `idx_stock_transactions_transactionType` trên `transactionType`
--   `idx_stock_transactions_transactionDate` trên `transactionDate`
--   `idx_stock_transactions_reference` trên `(referenceType, referenceId)`
-
-**Quan hệ:**
-
--   N:1 với `ingredients` (RESTRICT DELETE)
--   N:1 với `staff` (SET NULL)
-
----
-
-#### 3.8.8. ingredient_batches (Lô hàng)
-
-Theo dõi từng lô hàng, hạn sử dụng và số lượng còn lại.
-
-| Trường            | Kiểu          | Ràng buộc     | Mô tả              |
-| ----------------- | ------------- | ------------- | ------------------ |
-| batchId           | INTEGER       | PK, Auto      | ID lô hàng         |
-| ingredientId      | INTEGER       | FK, NOT NULL  | ID nguyên liệu     |
-| purchaseOrderId   | INTEGER       | FK, NULL      | ID đơn đặt hàng    |
-| batchNumber       | VARCHAR(50)   | NOT NULL      | Mã lô (batch code) |
-| quantity          | DECIMAL(10,2) | NOT NULL      | Số lượng ban đầu   |
-| remainingQuantity | DECIMAL(10,2) | NOT NULL      | Số lượng còn lại   |
-| unit              | VARCHAR(20)   | NOT NULL      | Đơn vị             |
-| unitCost          | DECIMAL(10,2) | NULL          | Giá vốn/đơn vị     |
-| expiryDate        | DATE          | NULL          | Ngày hết hạn       |
-| receivedDate      | DATE          | NOT NULL      | Ngày nhận          |
-| createdAt         | TIMESTAMP     | DEFAULT now() | Ngày tạo           |
-| updatedAt         | TIMESTAMP     | AUTO UPDATE   | Ngày cập nhật      |
-
-**Indexes:**
-
--   `idx_ingredient_batches_ingredientId` trên `ingredientId`
--   `idx_ingredient_batches_purchaseOrderId` trên `purchaseOrderId`
--   `idx_ingredient_batches_expiryDate` trên `expiryDate`
--   `idx_ingredient_batches_remaining` trên `remainingQuantity` (WHERE remainingQuantity > 0)
-
-**Quan hệ:**
-
--   N:1 với `ingredients` (RESTRICT DELETE)
--   N:1 với `purchase_orders` (SET NULL)
-
----
-
-#### 3.8.9. stock_alerts (Cảnh báo tồn kho)
-
-Theo dõi các cảnh báo về tồn kho thấp, hạn sử dụng sắp hết, v.v.
-
-| Trường       | Kiểu                 | Ràng buộc     | Mô tả                                   |
-| ------------ | -------------------- | ------------- | --------------------------------------- |
-| alertId      | INTEGER              | PK, Auto      | ID cảnh báo                             |
-| ingredientId | INTEGER              | FK, NOT NULL  | ID nguyên liệu                          |
-| alertType    | ENUM(StockAlertType) | NOT NULL      | Loại: low_stock, expiring_soon, expired |
-| message      | TEXT                 | NOT NULL      | Nội dung cảnh báo                       |
-| isResolved   | BOOLEAN              | DEFAULT false | Đã xử lý                                |
-| resolvedAt   | TIMESTAMP            | NULL          | Ngày xử lý                              |
-| resolvedBy   | INTEGER              | FK, NULL      | ID nhân viên xử lý                      |
-| createdAt    | TIMESTAMP            | DEFAULT now() | Ngày tạo                                |
-
-**Indexes:**
-
--   `idx_stock_alerts_ingredientId` trên `ingredientId`
--   `idx_stock_alerts_alertType` trên `alertType`
--   `idx_stock_alerts_isResolved` trên `isResolved`
-
-**Quan hệ:**
-
--   N:1 với `ingredients` (CASCADE DELETE)
--   N:1 với `staff` (SET NULL)
 
 ---
 
@@ -1235,45 +947,34 @@ Reservation (1) ─── (N) Order
               └── Payment (N)
 ```
 
-### 4.2. Ràng buộc tham chiếu (Foreign Keys) - CẬP NHẬT
+### 4.2. Ràng buộc tham chiếu (Foreign Keys)
 
-| Bảng con                 | Khóa ngoại          | Bảng cha                  | Hành động xóa |
-| ------------------------ | ------------------- | ------------------------- | ------------- |
-| refresh_tokens           | accountId           | accounts                  | CASCADE       |
-| staff                    | accountId           | accounts                  | CASCADE       |
-| menu_items               | categoryId          | categories                | RESTRICT      |
-| recipes                  | itemId              | menu_items                | CASCADE       |
-| recipes                  | ingredientId        | ingredients               | RESTRICT      |
-| reservations             | tableId             | restaurant_tables         | RESTRICT      |
-| orders                   | tableId             | restaurant_tables         | RESTRICT      |
-| orders                   | staffId             | staff                     | SET NULL      |
-| orders                   | reservationId       | reservations              | SET NULL      |
-| order_items              | orderId             | orders                    | CASCADE       |
-| order_items              | itemId              | menu_items                | RESTRICT      |
-| kitchen_orders           | orderId             | orders                    | CASCADE       |
-| kitchen_orders           | staffId             | staff                     | SET NULL      |
-| bills                    | orderId             | orders                    | RESTRICT      |
-| bills                    | tableId             | restaurant_tables         | RESTRICT      |
-| bills                    | staffId             | staff                     | SET NULL      |
-| bill_items               | billId              | bills                     | CASCADE       |
-| bill_items               | itemId              | menu_items                | RESTRICT      |
-| payments                 | billId              | bills                     | CASCADE       |
-| **ingredients**          | **categoryId**      | **ingredient_categories** | **SET NULL**  |
-| **purchase_orders**      | **supplierId**      | **suppliers**             | **RESTRICT**  |
-| **purchase_orders**      | **staffId**         | **staff**                 | **SET NULL**  |
-| **purchase_order_items** | **purchaseOrderId** | **purchase_orders**       | **CASCADE**   |
-| **purchase_order_items** | **ingredientId**    | **ingredients**           | **RESTRICT**  |
-| **stock_transactions**   | **ingredientId**    | **ingredients**           | **RESTRICT**  |
-| **stock_transactions**   | **staffId**         | **staff**                 | **SET NULL**  |
-| **ingredient_batches**   | **ingredientId**    | **ingredients**           | **RESTRICT**  |
-| **ingredient_batches**   | **purchaseOrderId** | **purchase_orders**       | **SET NULL**  |
-| **stock_alerts**         | **ingredientId**    | **ingredients**           | **CASCADE**   |
-| **stock_alerts**         | **resolvedBy**      | **staff**                 | **SET NULL**  |
+Danh sách các ràng buộc khóa ngoại trong database:
 
-**Giải thích:**
+| Bảng con       | Khóa ngoại    | Bảng cha          | Hành động xóa | Mô tả                                     |
+| -------------- | ------------- | ----------------- | ------------- | ----------------------------------------- |
+| refresh_tokens | accountId     | accounts          | CASCADE       | Xóa token khi xóa tài khoản               |
+| staff          | accountId     | accounts          | CASCADE       | Xóa nhân viên khi xóa tài khoản           |
+| menu_items     | categoryId    | categories        | RESTRICT      | Không cho xóa danh mục nếu còn món        |
+| reservations   | tableId       | restaurant_tables | RESTRICT      | Không cho xóa bàn nếu có đặt chỗ          |
+| orders         | tableId       | restaurant_tables | RESTRICT      | Không cho xóa bàn nếu còn đơn hàng        |
+| orders         | staffId       | staff             | SET NULL      | Set NULL khi xóa nhân viên                |
+| orders         | reservationId | reservations      | SET NULL      | Set NULL khi xóa đặt bàn                  |
+| order_items    | orderId       | orders            | CASCADE       | Xóa chi tiết khi xóa đơn hàng             |
+| order_items    | itemId        | menu_items        | RESTRICT      | Không cho xóa món nếu đã trong đơn        |
+| kitchen_orders | orderId       | orders            | CASCADE       | Xóa đơn bếp khi xóa đơn hàng              |
+| kitchen_orders | staffId       | staff             | SET NULL      | Set NULL khi xóa đầu bếp                  |
+| bills          | orderId       | orders            | RESTRICT      | Không cho xóa đơn nếu đã có hóa đơn       |
+| bills          | tableId       | restaurant_tables | RESTRICT      | Không cho xóa bàn nếu có hóa đơn          |
+| bills          | staffId       | staff             | SET NULL      | Set NULL khi xóa thu ngân                 |
+| bill_items     | billId        | bills             | CASCADE       | Xóa chi tiết khi xóa hóa đơn              |
+| bill_items     | itemId        | menu_items        | RESTRICT      | Không cho xóa món nếu đã trong hóa đơn    |
+| payments       | billId        | bills             | CASCADE       | Xóa thanh toán khi xóa hóa đơn            |
 
--   **CASCADE**: Xóa bản ghi con khi xóa bản ghi cha
--   **RESTRICT**: Không cho phép xóa bản ghi cha nếu còn bản ghi con
+**Giải thích các hành động xóa:**
+
+-   **CASCADE**: Tự động xóa các bản ghi con khi xóa bản ghi cha
+-   **RESTRICT**: Ngăn không cho xóa bản ghi cha nếu còn bản ghi con tham chiếu
 -   **SET NULL**: Đặt giá trị NULL cho khóa ngoại khi xóa bản ghi cha
 
 ---
@@ -1292,21 +993,16 @@ Tất cả các bảng đều có primary key tự động tăng (AUTO_INCREMENT
 
 Các trường có ràng buộc UNIQUE:
 
-| Bảng                  | Trường                       | Mục đích                     |
-| --------------------- | ---------------------------- | ---------------------------- |
-| accounts              | username, email, phoneNumber | Đăng nhập và liên hệ         |
-| refresh_tokens        | token                        | Bảo mật token                |
-| categories            | categoryName                 | Không trùng tên danh mục     |
-| ingredient_categories | categoryName                 | Không trùng tên danh mục     |
-| menu_items            | itemCode                     | Mã món duy nhất              |
-| restaurant_tables     | tableNumber, qrCode          | Số bàn và QR                 |
-| reservations          | reservationCode              | Mã đặt bàn                   |
-| orders                | orderNumber                  | Mã đơn hàng                  |
-| bills                 | billNumber, orderId          | Mã hóa đơn                   |
-| **ingredients**       | **ingredientCode**           | **Mã nguyên liệu duy nhất**  |
-| **suppliers**         | **supplierCode**             | **Mã nhà cung cấp duy nhất** |
-| **purchase_orders**   | **orderNumber**              | **Mã đơn đặt hàng duy nhất** |
-| **recipes**           | **(itemId, ingredientId)**   | **Không trùng công thức**    |
+| Bảng             | Trường                       | Mục đích                 |
+| ---------------- | ---------------------------- | ------------------------ |
+| accounts         | username, email, phoneNumber | Đăng nhập và liên hệ     |
+| refresh_tokens   | token                        | Bảo mật token            |
+| categories       | categoryName                 | Không trùng tên danh mục |
+| menu_items       | itemCode                     | Mã món duy nhất          |
+| restaurant_tables| tableNumber, qrCode          | Số bàn và QR             |
+| reservations     | reservationCode              | Mã đặt bàn               |
+| orders           | orderNumber                  | Mã đơn hàng              |
+| bills            | billNumber, orderId          | Mã hóa đơn               |
 
 ### 5.3. Regular Indexes
 
@@ -1322,8 +1018,6 @@ CREATE INDEX idx_refresh_tokens_token ON refresh_tokens(token);
 
 -- Menu
 CREATE INDEX idx_menu_items_categoryId ON menu_items(categoryId);
-CREATE INDEX idx_recipes_itemId ON recipes(itemId);
-CREATE INDEX idx_recipes_ingredientId ON recipes(ingredientId);
 
 -- Orders
 CREATE INDEX idx_orders_orderNumber ON orders(orderNumber);
@@ -1356,16 +1050,6 @@ CREATE INDEX idx_bills_paymentStatus ON bills(paymentStatus);
 
 -- Role filter
 CREATE INDEX idx_staff_role ON staff(role);
-
--- Inventory filters
-CREATE INDEX idx_ingredients_isActive ON ingredients(isActive);
-CREATE INDEX idx_ingredients_currentStock ON ingredients(currentStock);
-CREATE INDEX idx_ingredient_categories_isActive ON ingredient_categories(isActive);
-CREATE INDEX idx_purchase_orders_status ON purchase_orders(status);
-CREATE INDEX idx_purchase_orders_supplierId ON purchase_orders(supplierId);
-CREATE INDEX idx_stock_transactions_transactionType ON stock_transactions(transactionType);
-CREATE INDEX idx_stock_alerts_isResolved ON stock_alerts(isResolved);
-CREATE INDEX idx_stock_alerts_alertType ON stock_alerts(alertType);
 ```
 
 #### Time-based Indexes (Truy vấn theo thời gian)
@@ -1375,11 +1059,6 @@ CREATE INDEX idx_refresh_tokens_expiresAt ON refresh_tokens(expiresAt);
 CREATE INDEX idx_reservations_reservationDate ON reservations(reservationDate);
 CREATE INDEX idx_orders_orderTime ON orders(orderTime);
 CREATE INDEX idx_bills_createdAt ON bills(createdAt);
-
--- Inventory time-based
-CREATE INDEX idx_stock_transactions_transactionDate ON stock_transactions(transactionDate);
-CREATE INDEX idx_purchase_orders_orderDate ON purchase_orders(orderDate);
-CREATE INDEX idx_ingredient_batches_expiryDate ON ingredient_batches(expiryDate);
 ```
 
 #### Location Indexes (Truy vấn theo vị trí)
@@ -1415,15 +1094,6 @@ ON bills(DATE(createdAt), paymentStatus);
 -- Kitchen orders by priority and status
 CREATE INDEX idx_kitchen_orders_priority_status
 ON kitchen_orders(priority DESC, status);
-
--- Inventory batch tracking
-CREATE INDEX idx_ingredient_batches_remaining
-ON ingredient_batches(remainingQuantity)
-WHERE remainingQuantity > 0;
-
--- Stock transaction references
-CREATE INDEX idx_stock_transactions_reference
-ON stock_transactions(referenceType, referenceId);
 ```
 
 ### 5.5. Index Performance Tips
@@ -2283,609 +1953,231 @@ FOR VALUES FROM ('2024-01-01') TO ('2024-02-01');
 
 ---
 
-## 8. Quản lý tồn kho
+## 8. Kết luận
 
-### 8.1. Tổng quan
+### 8.1. Tóm tắt
 
-⚠️ **LƯU Ý**: Hệ thống quản lý tồn kho chưa được triển khai trong schema hiện tại.
+Tài liệu này cung cấp cái nhìn toàn diện về cơ sở dữ liệu hệ thống quản lý nhà hàng cho **dự án tốt nghiệp**, bao gồm:
 
-Section này mô tả thiết kế đề xuất cho tính năng quản lý tồn kho trong tương lai.
+✅ **Các chức năng đã triển khai:**
 
-### 8.2. Thiết kế đề xuất
+1. **Hệ thống xác thực** - Đăng nhập, phân quyền, JWT tokens
+2. **Quản lý nhân viên** - Thông tin nhân viên, vai trò, lương
+3. **Quản lý thực đơn** - Danh mục món ăn, giá cả, hình ảnh
+4. **Quản lý bàn ăn** - Sơ đồ mặt bằng, trạng thái bàn, QR code
+5. **Hệ thống đặt bàn** - Đặt bàn trực tuyến, xác nhận tự động
+6. **Quản lý đơn hàng** - Tạo đơn, theo dõi trạng thái
+7. **Kitchen Display System (KDS)** - Màn hình bếp thời gian thực
+8. **Thanh toán & Hóa đơn** - Nhiều phương thức thanh toán
 
-#### 8.2.1. Các bảng cần thêm
+### 8.2. Thống kê Cơ sở dữ liệu
 
-**ingredients (Nguyên liệu)**
+| Thông số         | Giá trị |
+| ---------------- | ------- |
+| **Tổng số bảng** | 15      |
+| **Enums**        | 6       |
+| **Foreign Keys** | 18      |
+| **Indexes**      | 30+     |
 
-```sql
-CREATE TABLE ingredients (
-    ingredientId SERIAL PRIMARY KEY,
-    ingredientCode VARCHAR(20) UNIQUE NOT NULL,
-    ingredientName VARCHAR(100) NOT NULL,
-    unit VARCHAR(20) NOT NULL, -- kg, g, lít, ml, etc.
-    categoryId INT REFERENCES ingredient_categories(categoryId),
-    minimumStock DECIMAL(10, 2) DEFAULT 0,
-    currentStock DECIMAL(10, 2) DEFAULT 0,
-    unitCost DECIMAL(10, 2),
-    isActive BOOLEAN DEFAULT true,
-    createdAt TIMESTAMP DEFAULT NOW(),
-    updatedAt TIMESTAMP DEFAULT NOW()
-);
-```
+### 8.3. Tổng quan các Module
 
-**ingredient_categories (Danh mục nguyên liệu)**
+| STT | Module            | Số bảng | Trạng thái    | Mức độ hoàn thiện |
+| --- | ----------------- | ------- | ------------- | ----------------- |
+| 1   | Authentication    | 2       | ✅ Hoàn thành | 100%              |
+| 2   | Staff Management  | 1       | ✅ Hoàn thành | 100%              |
+| 3   | Menu Management   | 2       | ✅ Hoàn thành | 100%              |
+| 4   | Table Management  | 1       | ✅ Hoàn thành | 100%              |
+| 5   | Reservation       | 1       | ✅ Hoàn thành | 100%              |
+| 6   | Order Management  | 2       | ✅ Hoàn thành | 100%              |
+| 7   | Kitchen           | 1       | ✅ Hoàn thành | 100%              |
+| 8   | Billing & Payment | 3       | ✅ Hoàn thành | 100%              |
 
-```sql
-CREATE TABLE ingredient_categories (
-    categoryId SERIAL PRIMARY KEY,
-    categoryName VARCHAR(100) UNIQUE NOT NULL,
-    description TEXT,
-    isActive BOOLEAN DEFAULT true,
-    createdAt TIMESTAMP DEFAULT NOW(),
-    updatedAt TIMESTAMP DEFAULT NOW()
-);
-```
+### 8.4. Nguyên tắc thiết kế Database
 
-**recipes (Công thức món ăn)**
+#### ✅ Database Design Principles
 
-```sql
-CREATE TABLE recipes (
-    recipeId SERIAL PRIMARY KEY,
-    itemId INT NOT NULL REFERENCES menu_items(itemId),
-    ingredientId INT NOT NULL REFERENCES ingredients(ingredientId),
-    quantity DECIMAL(10, 3) NOT NULL, -- Số lượng nguyên liệu cần
-    unit VARCHAR(20) NOT NULL,
-    notes TEXT,
-    createdAt TIMESTAMP DEFAULT NOW(),
-    updatedAt TIMESTAMP DEFAULT NOW(),
-    UNIQUE(itemId, ingredientId)
-);
-```
+-   **Chuẩn hóa**: Tuân thủ chuẩn Third Normal Form (3NF)
+-   **Foreign Keys**: Sử dụng đúng cascade rules (CASCADE, RESTRICT, SET NULL)
+-   **Indexes**: Đặt index trên các cột thường xuyên query
+-   **ENUMs**: Sử dụng cho các giá trị cố định, dễ quản lý
+-   **UUID**: Dùng cho mã đơn hàng, hóa đơn để tránh conflict
+-   **Timestamps**: Luôn có `createdAt` và `updatedAt`
+-   **Soft Delete**: Dùng `isActive` thay vì xóa hẳn dữ liệu quan trọng
 
-**suppliers (Nhà cung cấp)**
+#### 🔒 Bảo mật (Security)
 
-```sql
-CREATE TABLE suppliers (
-    supplierId SERIAL PRIMARY KEY,
-    supplierCode VARCHAR(20) UNIQUE NOT NULL,
-    supplierName VARCHAR(255) NOT NULL,
-    contactPerson VARCHAR(255),
-    phoneNumber VARCHAR(20),
-    email VARCHAR(255),
-    address TEXT,
-    taxCode VARCHAR(50),
-    paymentTerms VARCHAR(100),
-    isActive BOOLEAN DEFAULT true,
-    createdAt TIMESTAMP DEFAULT NOW(),
-    updatedAt TIMESTAMP DEFAULT NOW()
-);
-```
+-   **Password**: Hash bằng bcrypt (bcryptjs), không lưu plaintext
+-   **Payment Info**: Chỉ lưu 4 số cuối của thẻ tín dụng
+-   **JWT Tokens**: Sử dụng access token (15 phút) + refresh token (7 ngày)
+-   **API Security**: Rate limiting, CORS, Helmet middleware
+-   **SQL Injection**: Prisma ORM tự động prevent SQL injection
 
-**purchase_orders (Đơn đặt hàng)**
+#### ⚡ Hiệu suất (Performance)
 
-```sql
-CREATE TABLE purchase_orders (
-    purchaseOrderId SERIAL PRIMARY KEY,
-    orderNumber VARCHAR(50) UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
-    supplierId INT NOT NULL REFERENCES suppliers(supplierId),
-    staffId INT REFERENCES staff(staffId),
-    orderDate TIMESTAMP DEFAULT NOW(),
-    expectedDate DATE,
-    receivedDate TIMESTAMP,
-    status VARCHAR(20) DEFAULT 'pending', -- pending, ordered, received, cancelled
-    subtotal DECIMAL(12, 2) NOT NULL,
-    taxAmount DECIMAL(12, 2) DEFAULT 0,
-    totalAmount DECIMAL(12, 2) NOT NULL,
-    notes TEXT,
-    createdAt TIMESTAMP DEFAULT NOW(),
-    updatedAt TIMESTAMP DEFAULT NOW()
-);
-```
+-   **Index Optimization**: Index trên foreign keys và search fields
+-   **Connection Pooling**: Sử dụng Prisma connection pool
+-   **Query Optimization**: Tránh N+1 queries, dùng `include` và `select` hợp lý
+-   **Caching**: Cache menu, categories ít thay đổi
+-   **Pagination**: Phân trang cho danh sách lớn (orders, bills)
 
-**purchase_order_items (Chi tiết đơn đặt hàng)**
+### 8.5. Hướng dẫn Maintenance
 
-```sql
-CREATE TABLE purchase_order_items (
-    itemId SERIAL PRIMARY KEY,
-    purchaseOrderId INT NOT NULL REFERENCES purchase_orders(purchaseOrderId) ON DELETE CASCADE,
-    ingredientId INT NOT NULL REFERENCES ingredients(ingredientId),
-    quantity DECIMAL(10, 2) NOT NULL,
-    unit VARCHAR(20) NOT NULL,
-    unitPrice DECIMAL(10, 2) NOT NULL,
-    subtotal DECIMAL(10, 2) NOT NULL,
-    receivedQuantity DECIMAL(10, 2) DEFAULT 0,
-    createdAt TIMESTAMP DEFAULT NOW()
-);
-```
+#### 📅 Tác vụ định kỳ
 
-**stock_transactions (Giao dịch tồn kho)**
+| Tần suất      | Công việc                          |
+| ------------- | ---------------------------------- |
+| **Hàng ngày** | Backup database                    |
+| **Hàng tuần** | Analyze slow queries               |
+| **Hàng tháng** | Review indexes, Archive old data  |
+| **Hàng quý**  | Performance tuning, vacuum DB      |
 
-```sql
-CREATE TABLE stock_transactions (
-    transactionId SERIAL PRIMARY KEY,
-    ingredientId INT NOT NULL REFERENCES ingredients(ingredientId),
-    transactionType VARCHAR(20) NOT NULL, -- in, out, adjustment, waste
-    quantity DECIMAL(10, 2) NOT NULL,
-    unit VARCHAR(20) NOT NULL,
-    referenceType VARCHAR(50), -- purchase_order, order, adjustment
-    referenceId INT,
-    staffId INT REFERENCES staff(staffId),
-    notes TEXT,
-    transactionDate TIMESTAMP DEFAULT NOW(),
-    createdAt TIMESTAMP DEFAULT NOW()
-);
-```
+#### 📊 Giám sát (Monitoring)
 
-**ingredient_batches (Lô hàng và hạn sử dụng)**
+-   Database size và tốc độ tăng trưởng
+-   Slow query log (queries > 1s)
+-   Connection pool status
+-   Error logs
+-   Backup status
 
-```sql
-CREATE TABLE ingredient_batches (
-    batchId SERIAL PRIMARY KEY,
-    ingredientId INT NOT NULL REFERENCES ingredients(ingredientId),
-    purchaseOrderId INT REFERENCES purchase_orders(purchaseOrderId),
-    batchNumber VARCHAR(50) NOT NULL,
-    quantity DECIMAL(10, 2) NOT NULL,
-    remainingQuantity DECIMAL(10, 2) NOT NULL,
-    unit VARCHAR(20) NOT NULL,
-    unitCost DECIMAL(10, 2),
-    expiryDate DATE,
-    receivedDate DATE NOT NULL,
-    createdAt TIMESTAMP DEFAULT NOW(),
-    updatedAt TIMESTAMP DEFAULT NOW()
-);
-```
+### 8.6. Khả năng mở rộng tương lai
 
-**stock_alerts (Cảnh báo tồn kho)**
+Các tính năng có thể bổ sung trong giai đoạn sau:
 
-```sql
-CREATE TABLE stock_alerts (
-    alertId SERIAL PRIMARY KEY,
-    ingredientId INT NOT NULL REFERENCES ingredients(ingredientId),
-    alertType VARCHAR(20) NOT NULL, -- low_stock, expiring_soon, expired
-    message TEXT NOT NULL,
-    isResolved BOOLEAN DEFAULT false,
-    resolvedAt TIMESTAMP,
-    resolvedBy INT REFERENCES staff(staffId),
-    createdAt TIMESTAMP DEFAULT NOW()
-);
-```
+1. **📦 Quản lý tồn kho (Inventory)** - Nguyên liệu, nhà cung cấp, lô hàng
+2. **👥 Customer Management** - Hồ sơ khách hàng, lịch sử đơn hàng
+3. **🎁 Loyalty Program** - Tích điểm, ưu đãi, khuyến mãi
+4. **📊 Advanced Analytics** - Dashboard phân tích doanh thu chi tiết
+5. **🏢 Multi-branch** - Hỗ trợ nhiều chi nhánh
+6. **📱 Mobile App API** - API cho ứng dụng mobile
+7. **🔔 Real-time Notifications** - WebSocket notifications
+8. **📄 E-Invoice** - Hóa đơn điện tử
 
-### 8.3. Quy trình nghiệp vụ
+### 8.7. Tài liệu tham khảo
 
-#### 8.3.1. Nhập kho (Stock In)
-
-```
-Tạo Purchase Order → Nhà cung cấp giao hàng
-    ↓
-Kiểm tra hàng → Cập nhật received_quantity
-    ↓
-Tạo ingredient_batch → Ghi stock_transaction (type: in)
-    ↓
-Cập nhật currentStock trong ingredients
-    ↓
-Kiểm tra minimum stock → Xóa alert (nếu có)
-```
-
-#### 8.3.2. Xuất kho tự động (Auto Deduction)
-
-```
-Order được tạo → Lấy recipes của các món
-    ↓
-Kiểm tra tồn kho đủ không?
-    ↓
-Trừ currentStock theo FIFO (First In First Out)
-    ↓
-Ghi stock_transaction (type: out, referenceType: order)
-    ↓
-Cập nhật remainingQuantity trong batches
-    ↓
-Kiểm tra minimumStock → Tạo alert nếu thấp
-```
-
-#### 8.3.3. Kiểm kê (Inventory Adjustment)
-
-```
-Đếm thực tế → So sánh với hệ thống
-    ↓
-Tạo stock_transaction (type: adjustment)
-    ↓
-Cập nhật currentStock
-    ↓
-Ghi nhận chênh lệch trong notes
-```
-
-### 8.4. Các truy vấn tồn kho
-
-#### 8.4.1. Kiểm tra tồn kho
-
-```sql
--- Current stock levels with alerts
-SELECT
-    i.ingredientId,
-    i.ingredientCode,
-    i.ingredientName,
-    i.unit,
-    i.currentStock,
-    i.minimumStock,
-    i.unitCost,
-    i.currentStock * i.unitCost as totalValue,
-    CASE
-        WHEN i.currentStock <= i.minimumStock THEN 'LOW'
-        WHEN i.currentStock <= i.minimumStock * 1.5 THEN 'WARNING'
-        ELSE 'OK'
-    END as stockStatus
-FROM ingredients i
-WHERE i.isActive = true
-ORDER BY
-    CASE
-        WHEN i.currentStock <= i.minimumStock THEN 1
-        WHEN i.currentStock <= i.minimumStock * 1.5 THEN 2
-        ELSE 3
-    END,
-    i.ingredientName;
-```
-
-#### 8.4.2. Tính nguyên liệu cần cho món ăn
-
-```sql
--- Calculate ingredients needed for an order
-SELECT
-    i.ingredientId,
-    i.ingredientName,
-    i.unit,
-    SUM(r.quantity * oi.quantity) as quantityNeeded,
-    i.currentStock,
-    CASE
-        WHEN i.currentStock >= SUM(r.quantity * oi.quantity) THEN 'OK'
-        ELSE 'INSUFFICIENT'
-    END as availability
-FROM order_items oi
-INNER JOIN recipes r ON oi.itemId = r.itemId
-INNER JOIN ingredients i ON r.ingredientId = i.ingredientId
-WHERE oi.orderId = $1
-GROUP BY i.ingredientId, i.ingredientName, i.unit, i.currentStock;
-```
-
-#### 8.4.3. Hạn sử dụng sắp hết
-
-```sql
--- Expiring ingredients (next 7 days)
-SELECT
-    ib.*,
-    i.ingredientName,
-    i.unit,
-    ib.expiryDate,
-    ib.expiryDate - CURRENT_DATE as daysLeft
-FROM ingredient_batches ib
-INNER JOIN ingredients i ON ib.ingredientId = i.ingredientId
-WHERE ib.remainingQuantity > 0
-    AND ib.expiryDate <= CURRENT_DATE + INTERVAL '7 days'
-    AND ib.expiryDate >= CURRENT_DATE
-ORDER BY ib.expiryDate;
-```
-
-#### 8.4.4. Báo cáo nhập xuất
-
-```sql
--- Stock movement report
-SELECT
-    DATE(st.transactionDate) as date,
-    st.transactionType,
-    COUNT(*) as transactionCount,
-    SUM(st.quantity * i.unitCost) as totalValue
-FROM stock_transactions st
-INNER JOIN ingredients i ON st.ingredientId = i.ingredientId
-WHERE st.transactionDate >= $1 AND st.transactionDate < $2
-GROUP BY DATE(st.transactionDate), st.transactionType
-ORDER BY date DESC, st.transactionType;
-```
-
-#### 8.4.5. Giá trị tồn kho
-
-```sql
--- Total inventory value
-SELECT
-    ic.categoryName,
-    COUNT(i.ingredientId) as itemCount,
-    SUM(i.currentStock * i.unitCost) as totalValue
-FROM ingredients i
-LEFT JOIN ingredient_categories ic ON i.categoryId = ic.categoryId
-WHERE i.isActive = true
-GROUP BY ic.categoryName
-ORDER BY totalValue DESC;
-```
-
-### 8.5. Triggers tự động
-
-#### 8.5.1. Tự động trừ kho khi đặt món
-
-```sql
-CREATE OR REPLACE FUNCTION auto_deduct_stock()
-RETURNS TRIGGER AS $$
-BEGIN
-    -- Insert stock transactions for each ingredient in recipes
-    INSERT INTO stock_transactions (
-        ingredientId,
-        transactionType,
-        quantity,
-        unit,
-        referenceType,
-        referenceId,
-        transactionDate
-    )
-    SELECT
-        r.ingredientId,
-        'out',
-        -(r.quantity * NEW.quantity),
-        r.unit,
-        'order',
-        NEW.orderId,
-        NOW()
-    FROM recipes r
-    WHERE r.itemId = NEW.itemId;
-
-    -- Update current stock
-    UPDATE ingredients i
-    SET currentStock = currentStock - (r.quantity * NEW.quantity),
-        updatedAt = NOW()
-    FROM recipes r
-    WHERE i.ingredientId = r.ingredientId
-        AND r.itemId = NEW.itemId;
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trigger_auto_deduct_stock
-AFTER INSERT ON order_items
-FOR EACH ROW
-EXECUTE FUNCTION auto_deduct_stock();
-```
-
-#### 8.5.2. Cảnh báo tồn kho thấp
-
-```sql
-CREATE OR REPLACE FUNCTION check_low_stock()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF NEW.currentStock <= NEW.minimumStock THEN
-        INSERT INTO stock_alerts (
-            ingredientId,
-            alertType,
-            message,
-            createdAt
-        ) VALUES (
-            NEW.ingredientId,
-            'low_stock',
-            format('Stock for %s is low: %s %s (minimum: %s %s)',
-                NEW.ingredientName,
-                NEW.currentStock,
-                NEW.unit,
-                NEW.minimumStock,
-                NEW.unit
-            ),
-            NOW()
-        );
-    END IF;
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trigger_check_low_stock
-AFTER UPDATE OF currentStock ON ingredients
-FOR EACH ROW
-EXECUTE FUNCTION check_low_stock();
-```
-
-### 8.6. Indexes đề xuất cho inventory
-
-```sql
--- Ingredients
-CREATE INDEX idx_ingredients_categoryId ON ingredients(categoryId);
-CREATE INDEX idx_ingredients_currentStock ON ingredients(currentStock);
-CREATE INDEX idx_ingredients_isActive ON ingredients(isActive);
-
--- Recipes
-CREATE INDEX idx_recipes_itemId ON recipes(itemId);
-CREATE INDEX idx_recipes_ingredientId ON recipes(ingredientId);
-
--- Stock transactions
-CREATE INDEX idx_stock_transactions_ingredientId ON stock_transactions(ingredientId);
-CREATE INDEX idx_stock_transactions_type ON stock_transactions(transactionType);
-CREATE INDEX idx_stock_transactions_date ON stock_transactions(transactionDate);
-CREATE INDEX idx_stock_transactions_reference
-ON stock_transactions(referenceType, referenceId);
-
--- Batches
-CREATE INDEX idx_ingredient_batches_ingredientId ON ingredient_batches(ingredientId);
-CREATE INDEX idx_ingredient_batches_expiryDate ON ingredient_batches(expiryDate);
-CREATE INDEX idx_ingredient_batches_remaining
-ON ingredient_batches(remainingQuantity) WHERE remainingQuantity > 0;
-
--- Purchase orders
-CREATE INDEX idx_purchase_orders_supplierId ON purchase_orders(supplierId);
-CREATE INDEX idx_purchase_orders_status ON purchase_orders(status);
-CREATE INDEX idx_purchase_orders_orderDate ON purchase_orders(orderDate);
-```
+-   **Prisma ORM**: [https://www.prisma.io/docs/](https://www.prisma.io/docs/)
+-   **PostgreSQL 16**: [https://www.postgresql.org/docs/16/](https://www.postgresql.org/docs/16/)
+-   **Database Design**: [Database Normalization](https://en.wikipedia.org/wiki/Database_normalization)
+-   **SQL Best Practices**: [Use The Index, Luke!](https://use-the-index-luke.com/)
 
 ---
 
-## 9. Kết luận
+## 9. Phụ lục
 
-### 9.1. Tóm tắt
-
-Tài liệu này cung cấp cái nhìn toàn diện về cơ sở dữ liệu hệ thống quản lý nhà hàng, bao gồm:
-
-✅ **Đã triển khai (Hiện hành):**
-
--   Hệ thống xác thực và phân quyền
--   Quản lý nhân viên
--   Quản lý thực đơn và danh mục
--   Quản lý bàn ăn
--   Hệ thống đặt bàn trực tuyến
--   Quản lý đơn hàng và bếp
--   Hệ thống thanh toán và hóa đơn
--   **Hệ thống quản lý tồn kho (Inventory Management)** 🆕
--   **Quản lý nguyên liệu và công thức** 🆕
--   **Theo dõi lô hàng và hạn sử dụng** 🆕
--   **Hệ thống đặt hàng nhà cung cấp** 🆕
-
-### 9.2. Thống kê Cơ sở dữ liệu
-
-| Loại             | Số lượng    |
-| ---------------- | ----------- |
-| **Bảng**         | 24          |
-| **Enums**        | 9           |
-| **Foreign Keys** | 31          |
-| **Indexes**      | 50+         |
-| **Triggers**     | 2 (Đề xuất) |
-
-### 9.3. Module / Chức năng
-
-| Module            | Bảng                                                                                      | Trạng thái        |
-| ----------------- | ----------------------------------------------------------------------------------------- | ----------------- |
-| Authentication    | accounts, refresh_tokens                                                                  | ✅ Hoàn thành     |
-| Staff Management  | staff                                                                                     | ✅ Hoàn thành     |
-| Menu Management   | categories, menu_items, recipes                                                           | ✅ Hoàn thành     |
-| Table Management  | restaurant_tables                                                                         | ✅ Hoàn thành     |
-| Reservation       | reservations                                                                              | ✅ Hoàn thành     |
-| Order Management  | orders, order_items                                                                       | ✅ Hoàn thành     |
-| Kitchen           | kitchen_orders                                                                            | ✅ Hoàn thành     |
-| Billing & Payment | bills, bill_items, payments                                                               | ✅ Hoàn thành     |
-| **Inventory**     | **ingredients, recipes, suppliers, purchase_orders, stock_transactions, batches, alerts** | **✅ Hoàn thành** |
-
-### 9.4. Best Practices
-
-#### Database Design
-
--   ✅ Sử dụng Foreign Keys đúng cách với cascade rules hợp lý
--   ✅ Indexes được đặt trên các cột thường xuyên query
--   ✅ Sử dụng ENUMs cho các giá trị cố định
--   ✅ UUID cho các mã code để tránh conflict
--   ✅ Timestamp tracking (createdAt, updatedAt)
--   ✅ FIFO (First In First Out) cho quản lý lô hàng
--   ✅ Soft delete pattern (isActive flags) cho dữ liệu quan trọng
-
-#### Security
-
--   🔒 Không lưu password plaintext (sử dụng bcrypt)
--   🔒 Chỉ lưu 4 số cuối của thẻ tín dụng
--   🔒 Sử dụng refresh token với expiry time
--   🔒 Row-level security cho multi-tenancy (nếu cần)
--   🔒 Audit logging cho các thay đổi nhạy cảm
-
-#### Performance
-
--   ⚡ Index optimization cho queries thường dùng
--   ⚡ Connection pooling
--   ⚡ Query optimization (avoid N+1)
--   ⚡ Caching cho data ít thay đổi (menu, categories)
--   ⚡ Pagination cho large datasets
--   ⚡ Partitioning cho historical data (optional)
-
-### 9.5. Maintenance
-
-#### Regular Tasks
-
--   📅 **Daily**: Backup database, Monitor stock alerts
--   📅 **Weekly**: Analyze slow queries, Check inventory discrepancies
--   📅 **Monthly**: Review and optimize indexes, Archive old transactions
--   📅 **Quarterly**: Archive old data, Performance tuning
-
-#### Monitoring
-
--   📊 Query performance metrics
--   📊 Database size and growth
--   📊 Connection pool status
--   📊 Slow query log
--   📊 Stock alert frequency
--   📊 Ingredient expiry notifications
-
-### 9.6. Đề xuất cải tiến tương lai
-
-1. **Audit Logging**: Thêm bảng audit_logs để ghi lại tất cả các thay đổi quan trọng
-2. **Multi-location Support**: Hỗ trợ quản lý nhiều chi nhánh nhà hàng
-3. **Loyalty Program**: Thêm customer profiles và reward system
-4. **Advanced Analytics**: Dashboard with real-time metrics
-5. **Document Management**: Hóa đơn điện tử, giấy phép
-6. **Barcode/QR Integration**: Quét mã vạch cho nguyên liệu
-7. **API Rate Limiting**: Bảng tracking API usage
-8. **Notifications Queue**: Async notification system
-
-### 9.7. Tài liệu tham khảo
-
--   **Prisma Documentation**: https://www.prisma.io/docs/
--   **PostgreSQL Documentation**: https://www.postgresql.org/docs/
--   **Database Normalization**: https://en.wikipedia.org/wiki/Database_normalization
--   **SQL Performance Best Practices**: https://use-the-index-luke.com/
--   **Inventory Management Best Practices**: https://en.wikipedia.org/wiki/Inventory_management
-
----
-
-## 10. Phụ lục
-
-### 10.1. Prisma Schema Location
+### 9.1. Vị trí file Prisma Schema
 
 ```
-server/prisma/schema.prisma
+app/server/prisma/schema.prisma
 ```
 
-### 10.2. Database Enums
+### 9.2. Các Enum Types trong Database
 
 Tất cả các enums được định nghĩa trong schema Prisma:
 
 ```prisma
-enum Role { admin, manager, waiter, chef, cashier }
-enum TableStatus { available, occupied, reserved, maintenance }
-enum OrderStatus { pending, confirmed, preparing, ready, served, cancelled }
-enum PaymentStatus { pending, paid, refunded, cancelled }
-enum PaymentMethod { cash, card, momo, bank_transfer }
-enum ReservationStatus { pending, confirmed, seated, completed, cancelled, no_show }
-enum TransactionType { in, out, adjustment, waste }
-enum PurchaseOrderStatus { pending, ordered, received, cancelled }
-enum StockAlertType { low_stock, expiring_soon, expired }
+enum Role {
+  admin
+  manager
+  waiter
+  chef
+  cashier
+}
+
+enum TableStatus {
+  available
+  occupied
+  reserved
+  maintenance
+}
+
+enum OrderStatus {
+  pending
+  confirmed
+  preparing
+  ready
+  served
+  cancelled
+}
+
+enum PaymentStatus {
+  pending
+  paid
+  refunded
+  cancelled
+}
+
+enum PaymentMethod {
+  cash
+  card
+  momo
+  bank_transfer
+}
+
+enum ReservationStatus {
+  pending
+  confirmed
+  seated
+  completed
+  cancelled
+  no_show
+}
 ```
 
-### 10.3. Migration Commands
+### 9.3. Lệnh Prisma Migration
+
+Các lệnh thường dùng để quản lý database schema:
 
 ```bash
-# Generate Prisma Client
+# 1. Generate Prisma Client (sau khi sửa schema)
 pnpm prisma:generate
 
-# View migrations status
+# 2. Xem trạng thái migrations
 pnpm prisma migrate status
 
-# Create migration
-pnpm prisma migrate dev --name migration_name
+# 3. Tạo migration mới (development)
+pnpm prisma migrate dev --name ten_migration
 
-# Deploy migration (production)
+# 4. Deploy migration (production)
 pnpm prisma migrate deploy
 
-# Reset database (⚠️ Development only)
+# 5. Reset database (⚠️ CHỈ dùng trong Development)
 pnpm prisma migrate reset
 
-# Open Prisma Studio (GUI)
+# 6. Mở Prisma Studio (GUI để xem dữ liệu)
 pnpm prisma studio
+
+# 7. Seed dữ liệu mẫu
+pnpm prisma:seed
 ```
 
-### 10.4. Backup & Restore
+### 9.4. Backup & Restore Database
+
+**Backup database (PostgreSQL với Docker):**
 
 ```bash
-# Backup PostgreSQL database
+# Backup đơn giản
 docker exec postgres pg_dump -U postgres restaurant_db > backup.sql
 
-# Restore from backup
-docker exec -i postgres psql -U postgres restaurant_db < backup.sql
+# Backup nén (tiết kiệm dung lượng)
+docker exec postgres pg_dump -U postgres restaurant_db | gzip > backup_$(date +%Y%m%d).sql.gz
 
-# Backup with compression
-docker exec postgres pg_dump -U postgres restaurant_db | gzip > backup.sql.gz
-
-# Restore from compressed backup
-zcat backup.sql.gz | docker exec -i postgres psql -U postgres restaurant_db
+# Backup với custom format (nhanh hơn cho restore)
+docker exec postgres pg_dump -U postgres -Fc restaurant_db > backup.dump
 ```
 
-### 10.5. Useful SQL Queries
+**Restore database:**
+
+```bash
+# Restore từ file .sql
+docker exec -i postgres psql -U postgres restaurant_db < backup.sql
+
+# Restore từ file nén
+zcat backup.sql.gz | docker exec -i postgres psql -U postgres restaurant_db
+
+# Restore từ custom format
+docker exec postgres pg_restore -U postgres -d restaurant_db backup.dump
+```
+
+### 9.5. Các truy vấn SQL hữu ích
 
 #### Kiểm tra kích thước database
 
@@ -2937,65 +2229,70 @@ ORDER BY mean_exec_time DESC
 LIMIT 10;
 ```
 
-### 10.6. Connection String Format
+### 9.6. Connection String Format
+
+Format chuẩn cho PostgreSQL:
 
 ```
-postgresql://user:password@host:port/database?schema=public
+postgresql://[username]:[password]@[host]:[port]/[database]?schema=public
 ```
 
-**Example:**
+**Ví dụ:**
 
 ```
 postgresql://postgres:password@localhost:5432/restaurant_db?schema=public
 ```
 
-### 10.7. Environment Variables (.env)
+### 9.7. Environment Variables (.env)
+
+File cấu hình môi trường cho dự án:
 
 ```env
 # Database
-DATABASE_URL="postgresql://user:password@localhost:5432/restaurant_db?schema=public"
+DATABASE_URL="postgresql://postgres:password@localhost:5432/restaurant_db?schema=public"
 
-# API
-API_PORT=3001
-API_HOST=http://localhost:3001
+# Server
+PORT=3001
+NODE_ENV=development
 
-# JWT
-JWT_SECRET=your-secret-key
+# JWT Authentication
+JWT_SECRET=your-super-secret-key-change-in-production
 JWT_REFRESH_SECRET=your-refresh-secret-key
 JWT_EXPIRY=15m
 JWT_REFRESH_EXPIRY=7d
 
-# Email (nếu có)
+# CORS
+CLIENT_URL=http://localhost:3000
+
+# Optional: Email (nếu có tính năng gửi email)
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
 SMTP_PASSWORD=your-app-password
 ```
 
-### 10.8. Database Diagram Mermaid (Simplified)
+### 9.8. ERD Diagram
 
-Xem file `ERD.mmd` trong thư mục `docs/` để xem sơ đồ ERD đầy đủ.
-
----
-
-## 11. Lịch sử Thay đổi
-
-| Phiên bản | Ngày       | Thay đổi                                      |
-| --------- | ---------- | --------------------------------------------- |
-| 1.0       | 2025-10-19 | Tài liệu khởi tạo                             |
-| 1.1       | 2025-10-24 | Thêm Inventory Management System - Hoàn chỉnh |
-|           |            | - Thêm 9 bảng cho quản lý tồn kho             |
-|           |            | - Thêm 30+ indexes cho inventory              |
-|           |            | - Cập nhật ERD và Foreign Keys                |
-|           |            | - Thêm Enum types cho inventory               |
-|           |            | - Cập nhật Best Practices                     |
-|           |            | - Thêm Database Enums reference               |
-|           |            | - Cập nhật Maintenance tasks                  |
+Xem sơ đồ ERD đầy đủ tại:
+- **File Mermaid**: `docs/ERD.mmd`
+- **Hình ảnh**: `docs/diagrams/`
 
 ---
 
-**Ngày cập nhật**: 2025-10-24  
-**Phiên bản**: 1.1  
-**Tác giả**: Le Huy  
-**Trạng thái**: ✅ Hoàn thành  
-**Lần cuối chỉnh sửa**: Cập nhật và bổ sung Inventory Management System
+## 📝 Lịch sử Cập nhật
+
+| Phiên bản | Ngày       | Thay đổi                                         |
+| --------- | ---------- | ------------------------------------------------ |
+| 1.0       | 2024-10-19 | Phiên bản khởi tạo                               |
+| 2.0       | 2025-11-15 | Đơn giản hóa cho dự án tốt nghiệp                |
+|           |            | - Loại bỏ Inventory Management                  |
+|           |            | - Tập trung 8 module cốt lõi (15 bảng)          |
+|           |            | - Cải thiện tài liệu cho sinh viên              |
+|           |            | - Thêm phần hướng dẫn chi tiết hơn              |
+
+---
+
+**📅 Ngày cập nhật**: 15/11/2025  
+**📌 Phiên bản**: 2.0 - Simplified for Graduation Project  
+**👨‍💻 Tác giả**: Restaurant Management Team  
+**✅ Trạng thái**: Hoàn thành - Dành cho Dự án Tốt nghiệp
