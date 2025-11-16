@@ -25,8 +25,8 @@ export function CategoryCard({ category, onEdit, onDelete, onViewDetails }: Cate
     const itemCount = category.menuItems?.length || 0;
 
     return (
-        <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group">
-            <div className="relative aspect-video bg-muted" onClick={() => onViewDetails(category)}>
+        <Card className="py-0 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group hover:scale-105">
+            <div className="relative aspect-video bg-muted transition-all duration-300 group-hover:brightness-110" onClick={() => onViewDetails(category)}>
                 {category.imageUrl ? (
                     <Image
                         src={category.imageUrl}
@@ -49,21 +49,23 @@ export function CategoryCard({ category, onEdit, onDelete, onViewDetails }: Cate
                 </div>
             </div>
 
-            <CardContent className="p-4" onClick={() => onViewDetails(category)}>
+            <CardContent className="px-4 py-0" onClick={() => onViewDetails(category)}>
                 <h3 className="font-semibold text-lg mb-1 line-clamp-1">
                     {category.categoryName}
                 </h3>
-                {category.description && (
-                    <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-                        {truncateText(category.description, 100)}
-                    </p>
-                )}
-                <Badge variant="outline" className="mt-2">
+                <div className="min-h-10 mb-2">
+                    {category.description && (
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                            {truncateText(category.description, 100)}
+                        </p>
+                    )}
+                </div>
+                <Badge variant="outline">
                     {itemCount} {itemCount === 1 ? 'item' : 'items'}
                 </Badge>
             </CardContent>
 
-            <CardFooter className="p-4 pt-0 flex justify-between items-center">
+            <CardFooter className="p-4 pt-0 pb-2 flex justify-between items-center">
                 <Button
                     variant="outline"
                     size="sm"

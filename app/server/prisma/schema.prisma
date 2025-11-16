@@ -137,6 +137,7 @@ model Category {
     displayOrder Int      @default(0)
     isActive     Boolean  @default(true)
     imageUrl     String?  @db.VarChar(500)
+    imagePath    String?  @db.VarChar(500)
     createdAt    DateTime @default(now())
     updatedAt    DateTime @updatedAt
 

@@ -2,6 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { Category } from '@/types';
 import { CategoryFormData } from '../types';
 import { categoryFormSchema } from '../utils/validation';
@@ -19,17 +20,19 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import { ImageUploadField } from '@/features/menu/components/ImageUploadField';
+import { ImageUploadField } from '@/components/shared/ImageUploadField';
 import { Loader2 } from 'lucide-react';
 
 interface CategoryFormProps {
     category?: Category | null;
-    onSubmit: (data: CategoryFormData) => Promise<void>;
+    onSubmit: (data: CategoryFormData, imageFile?: File | null) => Promise<void>;
     onCancel: () => void;
     loading?: boolean;
 }
 
 export function CategoryForm({ category, onSubmit, onCancel, loading = false }: CategoryFormProps) {
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    
     const form = useForm<CategoryFormData>({
         resolver: zodResolver(categoryFormSchema),
         defaultValues: {
@@ -44,7 +47,8 @@ export function CategoryForm({ category, onSubmit, onCancel, loading = false }: 
 
     const handleSubmit = async (data: CategoryFormData) => {
         try {
-            await onSubmit(data);
+            await onSubmit(data, selectedFile);
+            setSelectedFile(null);
             form.reset();
         } catch (error) {
             // Error is handled by parent
@@ -104,7 +108,15 @@ export function CategoryForm({ category, onSubmit, onCancel, loading = false }: 
                             <FormControl>
                                 <ImageUploadField
                                     value={field.value}
-                                    onChange={field.onChange}
+                                    onFileSelect={(file) => {
+                                        setSelectedFile(file);
+                                        if (file) {
+                                            const previewUrl = URL.createObjectURL(file);
+                                            field.onChange(previewUrl);
+                                        } else {
+                                            field.onChange('');
+                                        }
+                                    }}
                                     folder="categories"
                                     disabled={loading}
                                 />

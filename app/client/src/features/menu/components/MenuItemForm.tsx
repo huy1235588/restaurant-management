@@ -21,7 +21,7 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import { ImageUploadFieldLocal } from './ImageUploadFieldLocal';
+import { ImageUploadField } from '@/components/shared/ImageUploadField';
 import { Loader2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -482,12 +482,16 @@ export function MenuItemForm({
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormControl>
-                                                <ImageUploadFieldLocal
+                                                <ImageUploadField
                                                     value={field.value}
-                                                    file={selectedFile}
-                                                    onChange={(file, previewUrl) => {
+                                                    onFileSelect={(file) => {
                                                         setSelectedFile(file);
-                                                        field.onChange(previewUrl);
+                                                        if (file) {
+                                                            const previewUrl = URL.createObjectURL(file);
+                                                            field.onChange(previewUrl);
+                                                        } else {
+                                                            field.onChange('');
+                                                        }
                                                     }}
                                                     folder="menu"
                                                     disabled={loading}

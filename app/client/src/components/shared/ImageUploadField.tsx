@@ -7,25 +7,25 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Upload, X, AlertCircle } from 'lucide-react';
 
-interface ImageUploadFieldLocalProps {
+interface ImageUploadFieldProps {
     value?: string | null;
-    file?: File | null;
-    onChange: (file: File | null, previewUrl: string | null) => void;
+    onChange?: (url: string | null) => void;
+    onFileSelect?: (file: File | null) => void;
     folder?: string;
     label?: string;
     maxSize?: number; // in MB
     disabled?: boolean;
 }
 
-export function ImageUploadFieldLocal({
+export function ImageUploadField({
     value,
-    file,
     onChange,
+    onFileSelect,
     folder = 'menu',
     label = 'Image',
     maxSize = 5,
     disabled = false,
-}: ImageUploadFieldLocalProps) {
+}: ImageUploadFieldProps) {
     const [error, setError] = useState<string | null>(null);
     const [dragActive, setDragActive] = useState(false);
 
@@ -53,20 +53,13 @@ export function ImageUploadFieldLocal({
         }
 
         setError(null);
-
-        // Create local preview URL
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const previewUrl = reader.result as string;
-            onChange(file, previewUrl);
-        };
-        reader.readAsDataURL(file);
+        onFileSelect?.(file);
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const selectedFile = e.target.files?.[0];
-        if (selectedFile) {
-            handleFileSelect(selectedFile);
+        const file = e.target.files?.[0];
+        if (file) {
+            handleFileSelect(file);
         }
     };
 
@@ -88,16 +81,17 @@ export function ImageUploadFieldLocal({
 
             if (disabled) return;
 
-            const droppedFile = e.dataTransfer.files?.[0];
-            if (droppedFile) {
-                handleFileSelect(droppedFile);
+            const file = e.dataTransfer.files?.[0];
+            if (file) {
+                handleFileSelect(file);
             }
         },
         [disabled]
     );
 
     const handleRemove = () => {
-        onChange(null, null);
+        onChange?.(null);
+        onFileSelect?.(null);
         setError(null);
     };
 
@@ -109,7 +103,7 @@ export function ImageUploadFieldLocal({
                 <div className="relative w-full aspect-video rounded-lg overflow-hidden border bg-muted">
                     <Image
                         src={value}
-                        alt="Selected image"
+                        alt="Uploaded image"
                         fill
                         className="object-cover"
                         sizes="(max-width: 768px) 100vw, 400px"
@@ -122,42 +116,46 @@ export function ImageUploadFieldLocal({
                         onClick={handleRemove}
                         disabled={disabled}
                     >
-                        <X className="h-4 w-4" />
+                        <X className="w-4 h-4" />
                     </Button>
                 </div>
             ) : (
-                <div>
+                <div
+                    className={`relative border-2 border-dashed rounded-lg p-16 text-center transition-colors ${
+                        dragActive
+                            ? 'border-primary bg-primary/5'
+                            : 'border-muted-foreground/25 hover:border-muted-foreground/50'
+                    } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                    onDragEnter={handleDrag}
+                    onDragLeave={handleDrag}
+                    onDragOver={handleDrag}
+                    onDrop={handleDrop}
+                    onClick={() => {
+                        if (!disabled) {
+                            document.getElementById('image-upload')?.click();
+                        }
+                    }}
+                >
                     <input
+                        id="image-upload"
                         type="file"
                         accept="image/jpeg,image/jpg,image/png,image/webp"
                         onChange={handleFileChange}
                         disabled={disabled}
                         className="hidden"
-                        id="file-upload"
                     />
-                    <label htmlFor="file-upload">
-                        <div
-                            className={`relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-                                dragActive
-                                    ? 'border-primary bg-primary/5'
-                                    : 'border-muted-foreground/25 hover:border-primary/50'
-                            } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            onDragEnter={handleDrag}
-                            onDragLeave={handleDrag}
-                            onDragOver={handleDrag}
-                            onDrop={handleDrop}
-                        >
-                            <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                            <div>
-                                <p className="text-sm font-medium">
-                                    Drop image here or click to upload
-                                </p>
-                                <p className="text-xs text-muted-foreground mt-1">
-                                    JPG, PNG or WebP (max {maxSize}MB)
-                                </p>
-                            </div>
+
+                    <div className="space-y-2">
+                        <Upload className="w-8 h-8 mx-auto text-muted-foreground" />
+                        <div>
+                            <p className="text-sm font-medium">
+                                Drop image here or click to upload
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                                JPG, PNG or WebP (max {maxSize}MB)
+                            </p>
                         </div>
-                    </label>
+                    </div>
                 </div>
             )}
 

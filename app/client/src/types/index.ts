@@ -91,6 +91,7 @@ export interface Category {
     displayOrder?: number;
     isActive: boolean;
     imageUrl?: string;
+    imagePath?: string;
     menuItems?: MenuItem[];
     createdAt: string;
     updatedAt: string;

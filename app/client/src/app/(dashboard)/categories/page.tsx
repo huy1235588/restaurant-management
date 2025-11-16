@@ -25,6 +25,7 @@ import {
     useCreateCategory,
     useUpdateCategory,
     useDeleteCategory,
+    useCategoryHandlers,
 } from '@/features/categories';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -43,6 +44,33 @@ export default function CategoriesPage() {
     const { updateCategory, loading: updating } = useUpdateCategory();
     const { deleteCategory, loading: deleting } = useDeleteCategory();
 
+    // Category handlers
+    const { handleCreate, handleUpdate, handleDelete: handleDeleteCategory } = useCategoryHandlers({
+        onCreateCategory: async (data) => {
+            await createCategory(data);
+        },
+        onUpdateCategory: async (categoryId, data) => {
+            await updateCategory(categoryId, data);
+        },
+        onDeleteCategory: async (categoryId) => {
+            await deleteCategory(categoryId);
+        },
+        onCreateSuccess: () => {
+            setCreateDialogOpen(false);
+            refetch();
+        },
+        onUpdateSuccess: () => {
+            setEditDialogOpen(false);
+            setSelectedCategory(null);
+            refetch();
+        },
+        onDeleteSuccess: () => {
+            setDeleteDialogOpen(false);
+            setSelectedCategory(null);
+            refetch();
+        },
+    });
+
     // Filter categories by search query
     const filteredCategories = categories.filter((category) =>
         category.categoryName.toLowerCase().includes(searchQuery.toLowerCase())
@@ -55,32 +83,26 @@ export default function CategoriesPage() {
         inactive: categories.filter((c) => !c.isActive).length,
     };
 
-    const handleCreate = async (data: any) => {
+    // Wrapper for form submissions
+    const handleCreateFormSubmit = async (data: any, imageFile?: File | null) => {
         try {
-            await createCategory(data);
-            toast.success('Category created successfully');
-            setCreateDialogOpen(false);
-            refetch();
-        } catch (error: any) {
-            toast.error(error.message || 'Failed to create category');
+            await handleCreate(data, imageFile);
+        } catch (error) {
+            // Error already handled in hook
         }
     };
 
-    const handleUpdate = async (data: any) => {
+    const handleUpdateFormSubmit = async (data: any, imageFile?: File | null) => {
         if (!selectedCategory) return;
 
         try {
-            await updateCategory(selectedCategory.categoryId, data);
-            toast.success('Category updated successfully');
-            setEditDialogOpen(false);
-            setSelectedCategory(null);
-            refetch();
-        } catch (error: any) {
-            toast.error(error.message || 'Failed to update category');
+            await handleUpdate(selectedCategory.categoryId, selectedCategory, data, imageFile);
+        } catch (error) {
+            // Error already handled in hook
         }
     };
 
-    const handleDelete = async () => {
+    const handleDeleteConfirm = async () => {
         if (!selectedCategory) return;
 
         // Check if category has items
@@ -92,13 +114,9 @@ export default function CategoriesPage() {
         }
 
         try {
-            await deleteCategory(selectedCategory.categoryId);
-            toast.success('Category deleted successfully');
-            setDeleteDialogOpen(false);
-            setSelectedCategory(null);
-            refetch();
-        } catch (error: any) {
-            toast.error(error.message || 'Failed to delete category');
+            await handleDeleteCategory(selectedCategory.categoryId, selectedCategory);
+        } catch (error) {
+            // Error already handled in hook
         }
     };
 
@@ -197,7 +215,7 @@ export default function CategoriesPage() {
                         <DialogTitle>Create New Category</DialogTitle>
                     </DialogHeader>
                     <CategoryForm
-                        onSubmit={handleCreate}
+                        onSubmit={handleCreateFormSubmit}
                         onCancel={() => setCreateDialogOpen(false)}
                         loading={creating}
                     />
@@ -212,7 +230,7 @@ export default function CategoriesPage() {
                     </DialogHeader>
                     <CategoryForm
                         category={selectedCategory}
-                        onSubmit={handleUpdate}
+                        onSubmit={handleUpdateFormSubmit}
                         onCancel={() => {
                             setEditDialogOpen(false);
                             setSelectedCategory(null);
@@ -251,7 +269,7 @@ export default function CategoriesPage() {
                             Cancel
                         </AlertDialogCancel>
                         <AlertDialogAction
-                            onClick={handleDelete}
+                            onClick={handleDeleteConfirm}
                             disabled={
                                 deleting ||
                                 (selectedCategory?.menuItems &&

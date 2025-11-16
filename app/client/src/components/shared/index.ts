@@ -6,3 +6,4 @@
 export { EmptyState } from "./EmptyState";
 export { LoadingSpinner } from "./LoadingSpinner";
 export { PageHeader } from "./PageHeader";
+export { ImageUploadField } from "./ImageUploadField";

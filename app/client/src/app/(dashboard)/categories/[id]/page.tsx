@@ -25,6 +25,7 @@ import {
     useUpdateCategory,
     useDeleteCategory,
     CategoryForm,
+    useCategoryHandlers,
     formatDate,
 } from '@/features/categories';
 import { MenuItem } from '@/types';
@@ -46,19 +47,35 @@ export default function CategoryDetailPage({
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-    const handleUpdate = async (data: any) => {
-        try {
-            await updateCategory(categoryId, data);
-            toast.success('Category updated successfully');
+    // Category handlers
+    const { handleUpdate, handleDelete: handleDeleteCategory } = useCategoryHandlers({
+        onUpdateCategory: async (id, data) => {
+            await updateCategory(id, data);
+        },
+        onDeleteCategory: async (id) => {
+            await deleteCategory(id);
+        },
+        onUpdateSuccess: () => {
             setEditDialogOpen(false);
             refetch();
-        } catch (error: any) {
-            toast.error(error.message || 'Failed to update category');
+        },
+        onDeleteSuccess: () => {
+            router.push('/categories');
+        },
+    });
+
+    const handleUpdateFormSubmit = async (data: any, imageFile?: File | null) => {
+        try {
+            await handleUpdate(categoryId, category!, data, imageFile);
+        } catch (error) {
+            // Error already handled in hook
         }
     };
 
-    const handleDelete = async () => {
-        if (category?.menuItems && category.menuItems.length > 0) {
+    const handleDeleteConfirm = async () => {
+        if (!category) return;
+
+        if (category.menuItems && category.menuItems.length > 0) {
             toast.error(
                 `Cannot delete category with ${category.menuItems.length} menu items. Please move or delete the items first.`
             );
@@ -66,11 +83,9 @@ export default function CategoryDetailPage({
         }
 
         try {
-            await deleteCategory(categoryId);
-            toast.success('Category deleted successfully');
-            router.push('/categories');
-        } catch (error: any) {
-            toast.error(error.message || 'Failed to delete category');
+            await handleDeleteCategory(categoryId, category);
+        } catch (error) {
+            // Error already handled in hook
         }
     };
 
@@ -263,7 +278,7 @@ export default function CategoryDetailPage({
                     </DialogHeader>
                     <CategoryForm
                         category={category}
-                        onSubmit={handleUpdate}
+                        onSubmit={handleUpdateFormSubmit}
                         onCancel={() => setEditDialogOpen(false)}
                         loading={updating}
                     />
@@ -290,7 +305,7 @@ export default function CategoryDetailPage({
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                            onClick={handleDelete}
+                            onClick={handleDeleteConfirm}
                             disabled={deleting || menuItems.length > 0}
                             className="bg-destructive hover:bg-destructive/90"
                         >

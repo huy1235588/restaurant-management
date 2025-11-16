@@ -17,7 +17,7 @@ export interface UploadResponse {
     data: UploadedFileInfo | { files: UploadedFileInfo[]; count: number };
 }
 
-export type UploadFolder = 'temp' | 'menu' | 'staff' | 'documents' | 'images' | 'others';
+export type UploadFolder = 'temp' | 'menu' | "categories" | 'staff' | 'documents' | 'images' | 'others';
 export type UploadCategory = 'image' | 'document' | 'video';
 
 /**

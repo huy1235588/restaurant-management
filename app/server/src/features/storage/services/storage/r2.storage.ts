@@ -63,6 +63,7 @@ export class R2StorageProvider implements StorageProvider {
             const folderMap: Record<string, string> = {
                 'temp': 'restaurant/temp',
                 'menu': 'restaurant/menu',
+                'categories': 'restaurant/categories',
                 'staff': 'restaurant/staff',
                 'documents': 'restaurant/documents',
                 'images': 'restaurant/images',
