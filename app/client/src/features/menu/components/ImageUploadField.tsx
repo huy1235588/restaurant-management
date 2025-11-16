@@ -63,7 +63,7 @@ export function ImageUploadField({
             formData.append('file', file);
             formData.append('folder', folder);
 
-            const response = await axiosInstance.post('/storage/upload', formData, {
+            const response = await axiosInstance.post('/storage/upload/single', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -149,7 +149,7 @@ export function ImageUploadField({
                 </div>
             ) : (
                 <div
-                    className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                    className={`relative border-2 border-dashed rounded-lg p-16 text-center transition-colors ${
                         dragActive
                             ? 'border-primary bg-primary/5'
                             : 'border-muted-foreground/25 hover:border-muted-foreground/50'

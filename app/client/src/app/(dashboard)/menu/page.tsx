@@ -71,6 +71,7 @@ export default function MenuPage() {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(null);
     const [duplicateMode, setDuplicateMode] = useState(false);
+    const [isInitialized, setIsInitialized] = useState(false);
 
     // Data fetching
     const { menuItems, pagination, loading, error, refetch } = useMenuItems({
@@ -108,6 +109,8 @@ export default function MenuPage() {
         const isActive = searchParams.get('isActive');
         const search = searchParams.get('search');
         const pageParam = searchParams.get('page');
+        const sortByParam = searchParams.get('sortBy');
+        const sortOrderParam = searchParams.get('sortOrder');
         const editId = searchParams.get('edit');
         const duplicateId = searchParams.get('duplicate');
 
@@ -119,6 +122,13 @@ export default function MenuPage() {
         setFilters(newFilters);
         setSearchQuery(search || '');
         setPage(pageParam ? Number(pageParam) : 1);
+        if (sortByParam) setSortBy(sortByParam);
+        if (sortOrderParam) setSortOrder(sortOrderParam as 'asc' | 'desc');
+        
+        // Only set initialized once on mount
+        if (!isInitialized) {
+            setIsInitialized(true);
+        }
 
         // Handle edit/duplicate from URL
         if (editId) {
@@ -146,13 +156,23 @@ export default function MenuPage() {
         if (filters.isActive !== undefined) params.set('isActive', filters.isActive.toString());
         if (searchQuery) params.set('search', searchQuery);
         if (page > 1) params.set('page', page.toString());
+        if (sortBy) params.set('sortBy', sortBy);
+        if (sortOrder) params.set('sortOrder', sortOrder);
 
-        router.push(`/menu?${params.toString()}`, { scroll: false });
+        const newUrl = `/menu?${params.toString()}`;
+        const currentUrl = window.location.pathname + window.location.search;
+        
+        // Only push if URL actually changed
+        if (newUrl !== currentUrl) {
+            router.push(newUrl, { scroll: false });
+        }
     };
 
     useEffect(() => {
-        updateURL();
-    }, [filters, searchQuery, page]);
+        if (isInitialized) {
+            updateURL();
+        }
+    }, [filters, searchQuery, page, sortBy, sortOrder, isInitialized]);
 
     // Save view mode to localStorage
     useEffect(() => {
@@ -281,10 +301,16 @@ export default function MenuPage() {
                             <SelectValue placeholder="Sort by" />
                         </SelectTrigger>
                         <SelectContent>
+                            <SelectItem value="itemCode-asc">Code (A-Z)</SelectItem>
+                            <SelectItem value="itemCode-desc">Code (Z-A)</SelectItem>
                             <SelectItem value="itemName-asc">Name (A-Z)</SelectItem>
                             <SelectItem value="itemName-desc">Name (Z-A)</SelectItem>
+                            <SelectItem value="categoryId-asc">Category (A-Z)</SelectItem>
+                            <SelectItem value="categoryId-desc">Category (Z-A)</SelectItem>
                             <SelectItem value="price-asc">Price (Low-High)</SelectItem>
                             <SelectItem value="price-desc">Price (High-Low)</SelectItem>
+                            <SelectItem value="isActive-asc">Status (Inactive First)</SelectItem>
+                            <SelectItem value="isActive-desc">Status (Active First)</SelectItem>
                             <SelectItem value="createdAt-desc">Newest First</SelectItem>
                             <SelectItem value="createdAt-asc">Oldest First</SelectItem>
                             <SelectItem value="displayOrder-asc">Display Order</SelectItem>
@@ -307,6 +333,17 @@ export default function MenuPage() {
                 loading={loading}
                 error={error}
                 viewMode={viewMode}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                onSort={(field) => {
+                    if (sortBy === field) {
+                        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                    } else {
+                        setSortBy(field);
+                        setSortOrder('asc');
+                    }
+                    setPage(1);
+                }}
                 onEdit={handleEdit}
                 onDelete={handleDeleteClick}
                 onDuplicate={handleDuplicate}
@@ -382,7 +419,7 @@ export default function MenuPage() {
                     }
                 }}
             >
-                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>
                             {duplicateMode ? 'Duplicate Menu Item' : 'Create New Menu Item'}
@@ -410,7 +447,7 @@ export default function MenuPage() {
                     if (!open) setSelectedMenuItem(null);
                 }}
             >
-                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <DialogContent className="sm:max-w-6xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Edit Menu Item</DialogTitle>
                     </DialogHeader>

@@ -14,6 +14,14 @@ const nextConfig: NextConfig = {
     // Image optimization for Docker
     images: {
         unoptimized: process.env.NODE_ENV === 'production',
+        remotePatterns: process.env.NEXT_PUBLIC_IMAGE_DOMAINS
+            ? process.env.NEXT_PUBLIC_IMAGE_DOMAINS.split(',').map(domain => ({
+                  protocol: 'https',
+                  hostname: domain.trim(),
+                  port: '',
+                  pathname: '/**',
+              }))
+            : [],
     },
 };
 

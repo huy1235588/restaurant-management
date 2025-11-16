@@ -7,7 +7,7 @@ import { MenuItemListRow } from './MenuItemListRow';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, PackageX } from 'lucide-react';
+import { AlertCircle, PackageX, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -26,6 +26,9 @@ interface MenuItemListProps {
     loading: boolean;
     error: string | null;
     viewMode: ViewMode;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    onSort?: (field: string) => void;
     onEdit: (item: MenuItem) => void;
     onDelete: (item: MenuItem) => void;
     onDuplicate: (item: MenuItem) => void;
@@ -38,6 +41,9 @@ export function MenuItemList({
     loading,
     error,
     viewMode,
+    sortBy,
+    sortOrder,
+    onSort,
     onEdit,
     onDelete,
     onDuplicate,
@@ -161,19 +167,43 @@ export function MenuItemList({
     }
 
     // Table view
+    const SortableHeader = ({ field, label, align = 'left' }: { field: string; label: string; align?: 'left' | 'right' }) => {
+        const isSorted = sortBy === field;
+        const isAsc = isSorted && sortOrder === 'asc';
+        const isDesc = isSorted && sortOrder === 'desc';
+        
+        return (
+            <TableHead 
+                className={`${align === 'right' ? 'text-right' : ''} ${onSort ? 'cursor-pointer hover:bg-muted/50 select-none' : ''}`}
+                onClick={() => onSort && onSort(field)}
+            >
+                <div className={`flex items-center gap-1 ${align === 'right' ? 'justify-end' : ''}`}>
+                    <span>{label}</span>
+                    {onSort && (
+                        <span className="ml-1">
+                            {!isSorted && <ArrowUpDown className="w-3 h-3 text-muted-foreground/50" />}
+                            {isAsc && <ArrowUp className="w-3 h-3" />}
+                            {isDesc && <ArrowDown className="w-3 h-3" />}
+                        </span>
+                    )}
+                </div>
+            </TableHead>
+        );
+    };
+
     return (
         <div className="border rounded-lg overflow-auto">
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Code</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead className="text-right">Price</TableHead>
+                        <SortableHeader field="itemCode" label="Code" />
+                        <SortableHeader field="itemName" label="Name" />
+                        <SortableHeader field="categoryId" label="Category" />
+                        <SortableHeader field="price" label="Price" align="right" />
                         <TableHead className="text-right">Cost</TableHead>
                         <TableHead className="text-right">Margin</TableHead>
                         <TableHead>Available</TableHead>
-                        <TableHead>Status</TableHead>
+                        <SortableHeader field="isActive" label="Status" />
                         <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                 </TableHeader>

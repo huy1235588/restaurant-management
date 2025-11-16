@@ -37,7 +37,7 @@ export function MenuItemCard({
     };
 
     return (
-        <Card className="overflow-hidden hover:shadow-lg transition-shadow group">
+        <Card className="p-0 gap-6 overflow-hidden hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group cursor-pointer border-0 hover:border-primary/20">
             <div
                 className="relative aspect-4/3 bg-muted cursor-pointer"
                 onClick={() => onViewDetails(item)}
@@ -47,7 +47,7 @@ export function MenuItemCard({
                         src={item.imageUrl}
                         alt={item.itemName}
                         fill
-                        className="object-cover"
+                        className="object-cover group-hover:scale-110 transition-transform duration-300"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         loading="lazy"
                     />
@@ -82,10 +82,10 @@ export function MenuItemCard({
                 )}
             </div>
 
-            <CardContent className="p-4" onClick={() => onViewDetails(item)}>
+            <CardContent className="px-4 py-2" onClick={() => onViewDetails(item)}>
                 <div className="flex items-start justify-between mb-2">
                     <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-base line-clamp-1 mb-0.5">
+                        <h3 className="font-semibold text-base line-clamp-1 mb-0.5 group-hover:text-primary">
                             {item.itemName}
                         </h3>
                         <p className="text-xs text-muted-foreground">{item.itemCode}</p>
