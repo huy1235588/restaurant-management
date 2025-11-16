@@ -26,6 +26,7 @@ import {
     useUpdateMenuItem,
     useDeleteMenuItem,
     MenuItemForm,
+    useMenuItemHandlers,
 } from '@/features/menu';
 import { useCategories } from '@/features/categories';
 import {
@@ -54,24 +55,38 @@ export default function MenuItemDetailPage({
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-    const handleUpdate = async (data: any) => {
-        try {
-            await updateMenuItem(itemId, data);
-            toast.success('Menu item updated successfully');
+    // Menu item handlers
+    const { handleUpdate, handleDelete: handleDeleteItem } = useMenuItemHandlers({
+        onUpdateMenuItem: async (id, data) => {
+            await updateMenuItem(id, data);
+        },
+        onDeleteMenuItem: async (id) => {
+            await deleteMenuItem(id);
+        },
+        onUpdateSuccess: () => {
             setEditDialogOpen(false);
             refetch();
-        } catch (error: any) {
-            toast.error(error.message || 'Failed to update menu item');
+        },
+        onDeleteSuccess: () => {
+            router.push('/menu');
+        },
+    });
+
+    const handleUpdateFormSubmit = async (data: any, imageFile?: File | null) => {
+        try {
+            await handleUpdate(itemId, menuItem!, data, imageFile);
+        } catch (error) {
+            // Error already handled in hook
         }
     };
 
-    const handleDelete = async () => {
+    const handleDeleteConfirm = async () => {
+        if (!menuItem) return;
+
         try {
-            await deleteMenuItem(itemId);
-            toast.success('Menu item deleted successfully');
-            router.push('/menu');
-        } catch (error: any) {
-            toast.error(error.message || 'Failed to delete menu item');
+            await handleDeleteItem(itemId, menuItem);
+        } catch (error) {
+            // Error already handled in hook
         }
     };
 
@@ -298,7 +313,7 @@ export default function MenuItemDetailPage({
                     <MenuItemForm
                         menuItem={menuItem}
                         categories={categories}
-                        onSubmit={handleUpdate}
+                        onSubmit={handleUpdateFormSubmit}
                         onCancel={() => setEditDialogOpen(false)}
                         loading={updating}
                     />
@@ -318,7 +333,7 @@ export default function MenuItemDetailPage({
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                            onClick={handleDelete}
+                            onClick={handleDeleteConfirm}
                             disabled={deleting}
                             className="bg-destructive hover:bg-destructive/90"
                         >

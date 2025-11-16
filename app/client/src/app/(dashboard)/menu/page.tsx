@@ -34,6 +34,7 @@ import {
     useUpdateMenuItem,
     useDeleteMenuItem,
     useUpdateAvailability,
+    useMenuItemHandlers,
 } from '@/features/menu';
 import { useCategories } from '@/features/categories';
 import {
@@ -180,81 +181,61 @@ export default function MenuPage() {
         localStorage.setItem('menu-view-mode', viewMode);
     }, [viewMode]);
 
-    const handleCreate = async (data: any, imageFile?: File | null) => {
-        try {
-            let imageUrl = data.imageUrl;
-            let imagePath = data.imagePath;
-
-            // Upload image if a new file is selected
-            if (imageFile) {
-                const uploadedFile = await uploadApi.uploadSingle(imageFile, 'menu', 'image');
-                imageUrl = uploadedFile.url;
-                imagePath = uploadedFile.path;
-            }
-
-            await createMenuItem({
-                ...data,
-                imageUrl,
-                imagePath,
-            });
-            toast.success('Menu item created successfully');
+    // Menu item handlers
+    const { handleCreate, handleUpdate, handleDelete: handleDeleteItem } = useMenuItemHandlers({
+        onCreateMenuItem: async (data) => {
+            await createMenuItem(data);
+        },
+        onUpdateMenuItem: async (itemId, data) => {
+            await updateMenuItem(itemId, data);
+        },
+        onDeleteMenuItem: async (itemId) => {
+            await deleteMenuItem(itemId);
+        },
+        onCreateSuccess: () => {
             setCreateDialogOpen(false);
             setDuplicateMode(false);
             setSelectedMenuItem(null);
             refetch();
-        } catch (error: any) {
-            toast.error(error.message || 'Failed to create menu item');
-        }
-    };
-
-    const handleUpdate = async (data: any, imageFile?: File | null) => {
-        if (!selectedMenuItem) return;
-
-        try {
-            let imageUrl = data.imageUrl;
-            let imagePath = data.imagePath;
-
-            // Upload new image if a file is selected
-            if (imageFile) {
-                const uploadedFile = await uploadApi.uploadSingle(imageFile, 'menu', 'image');
-                imageUrl = uploadedFile.url;
-                imagePath = uploadedFile.path;
-
-                // Delete old image if exists
-                if (selectedMenuItem.imagePath) {
-                    try {
-                        await uploadApi.deleteFile(selectedMenuItem.imagePath);
-                    } catch (deleteError) {
-                        console.warn('Failed to delete old image:', deleteError);
-                    }
-                }
-            }
-
-            await updateMenuItem(selectedMenuItem.itemId, {
-                ...data,
-                imageUrl,
-                imagePath,
-            });
-            toast.success('Menu item updated successfully');
+        },
+        onUpdateSuccess: () => {
             setEditDialogOpen(false);
             setSelectedMenuItem(null);
             refetch();
-        } catch (error: any) {
-            toast.error(error.message || 'Failed to update menu item');
-        }
-    };
-
-    const handleDelete = async () => {
-        if (!selectedMenuItem) return;
-
-        try {
-            await deleteMenuItem(selectedMenuItem.itemId);
-            toast.success('Menu item deleted successfully');
+        },
+        onDeleteSuccess: () => {
             setDeleteDialogOpen(false);
             setSelectedMenuItem(null);
             refetch();
-        } catch (error: any) {
-            toast.error(error.message || 'Failed to delete menu item');
+        },
+    });
+
+    // Wrapper for form submissions
+    const handleCreateFormSubmit = async (data: any, imageFile?: File | null) => {
+        try {
+            await handleCreate(data, imageFile);
+        } catch (error) {
+            // Error already handled in hook
+        }
+    };
+
+    const handleUpdateFormSubmit = async (data: any, imageFile?: File | null) => {
+        if (!selectedMenuItem) return;
+
+        try {
+            await handleUpdate(selectedMenuItem.itemId, selectedMenuItem, data, imageFile);
+        } catch (error) {
+            // Error already handled in hook
+        }
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!selectedMenuItem) return;
+
+        try {
+            await handleDeleteItem(selectedMenuItem.itemId, selectedMenuItem);
+        } catch (error) {
+            // Error already handled in hook
         }
     };
 
@@ -466,7 +447,7 @@ export default function MenuPage() {
                     <MenuItemForm
                         menuItem={duplicateMode ? { ...selectedMenuItem!, itemCode: '' } : null}
                         categories={categories}
-                        onSubmit={handleCreate}
+                        onSubmit={handleCreateFormSubmit}
                         onCancel={() => {
                             setCreateDialogOpen(false);
                             setDuplicateMode(false);
@@ -492,7 +473,7 @@ export default function MenuPage() {
                     <MenuItemForm
                         menuItem={selectedMenuItem}
                         categories={categories}
-                        onSubmit={handleUpdate}
+                        onSubmit={handleUpdateFormSubmit}
                         onCancel={() => {
                             setEditDialogOpen(false);
                             setSelectedMenuItem(null);
@@ -521,7 +502,7 @@ export default function MenuPage() {
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                            onClick={handleDelete}
+                            onClick={handleDeleteConfirm}
                             disabled={deleting}
                             className="bg-destructive hover:bg-destructive/90"
                         >

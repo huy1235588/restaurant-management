@@ -94,7 +94,7 @@ export const uploadApi = {
 
         try {
             const response = await axiosInstance.post<UploadResponse>(
-                '/api/storage/upload/multiple',
+                '/storage/upload/multiple',
                 formData,
                 {
                     headers: {
@@ -122,7 +122,7 @@ export const uploadApi = {
     deleteFile: async (filePath: string): Promise<void> => {
         try {
             const response = await axiosInstance.delete<ApiResponse<null>>(
-                '/api/storage/upload',
+                '/storage/upload',
                 {
                     data: { filePath },
                 }
@@ -143,7 +143,7 @@ export const uploadApi = {
     getStatus: async () => {
         try {
             const response = await axiosInstance.get<ApiResponse<any>>(
-                '/api/storage/status'
+                '/storage/status'
             );
             return response.data.data;
         } catch (error: any) {
@@ -158,7 +158,7 @@ export const uploadApi = {
     getCurrentType: async () => {
         try {
             const response = await axiosInstance.get<ApiResponse<{ storageType: string }>>(
-                '/api/storage/current'
+                '/storage/current'
             );
             return response.data.data.storageType;
         } catch (error: any) {
