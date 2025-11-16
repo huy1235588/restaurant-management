@@ -3,7 +3,7 @@ FROM node:20-alpine AS development
 
 RUN apk add --no-cache libc6-compat openssl netcat-openbsd
 
-WORKDIR /app
+WORKDIR /app/server
 
 # Install pnpm
 RUN npm install -g pnpm

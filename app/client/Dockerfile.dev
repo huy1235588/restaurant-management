@@ -22,5 +22,8 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Start in dev mode with hot reload
-CMD ["pnpm", "dev"]
+# Build the client
+RUN pnpm run build
+
+# Start the client in production mode
+CMD ["pnpm", "run", "start"]
