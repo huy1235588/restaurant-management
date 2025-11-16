@@ -49,7 +49,7 @@ export function MenuItemCard({
                         fill
                         className="object-cover group-hover:scale-110 transition-transform duration-300"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        loading="lazy"
+                        loading="eager"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-muted to-muted-foreground/10">

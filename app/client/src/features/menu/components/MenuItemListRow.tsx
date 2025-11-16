@@ -48,7 +48,7 @@ export function MenuItemListRow({
                         fill
                         className="object-cover"
                         sizes="64px"
-                        loading="lazy"
+                        loading="eager"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-muted to-muted-foreground/10">
