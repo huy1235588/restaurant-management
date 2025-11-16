@@ -40,4 +40,5 @@ export interface StorageProvider {
     getName(): string;
 }
 
-export type StorageType = 'local' | 'cloudinary';
+// 'cloudinary' is legacy/outdated, use 'r2' instead
+export type StorageType = 'local' | 'cloudinary' | 'r2';

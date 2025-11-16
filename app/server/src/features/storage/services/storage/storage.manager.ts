@@ -6,6 +6,7 @@
 import { StorageProvider, StorageUploadResult, StorageDeleteResult, StorageType } from './storage.interface';
 import { localStorageProvider } from './local.storage';
 import { cloudinaryStorageProvider } from './cloudinary.storage';
+import { r2StorageProvider } from './r2.storage';
 import logger from '@/config/logger';
 
 export class StorageManager {
@@ -17,7 +18,15 @@ export class StorageManager {
     private constructor() {
         this.storageType = (process.env['STORAGE_TYPE'] || 'local') as StorageType;
         this.primaryProvider = this.getProvider(this.storageType);
-        this.fallbackProvider = this.getProvider(this.storageType === 'cloudinary' ? 'local' : 'cloudinary');
+        
+        // Set fallback: R2 -> Local, Local -> R2 (if available) or Cloudinary, Cloudinary -> Local
+        if (this.storageType === 'r2') {
+            this.fallbackProvider = localStorageProvider;
+        } else if (this.storageType === 'local') {
+            this.fallbackProvider = r2StorageProvider;
+        } else {
+            this.fallbackProvider = localStorageProvider;
+        }
 
         logger.info(`Storage initialized with primary provider: ${this.primaryProvider.getName()}`);
     }
@@ -37,6 +46,8 @@ export class StorageManager {
      */
     private getProvider(type: StorageType): StorageProvider {
         switch (type) {
+            case 'r2':
+                return r2StorageProvider;
             case 'cloudinary':
                 return cloudinaryStorageProvider;
             case 'local':
@@ -77,7 +88,9 @@ export class StorageManager {
     async delete(filePath: string): Promise<StorageDeleteResult> {
         try {
             // Determine which provider to use based on path
-            if (filePath.startsWith('cloudinary://')) {
+            if (filePath.startsWith('r2://')) {
+                return await r2StorageProvider.delete(filePath);
+            } else if (filePath.startsWith('cloudinary://')) {
                 return await cloudinaryStorageProvider.delete(filePath);
             } else {
                 return await localStorageProvider.delete(filePath);

@@ -47,9 +47,18 @@ if [ "$CREATE_ENV" = "yes" ]; then
     read -p "Enter Droplet IP: " DROPLET_IP
     read -p "Enter GitHub username: " GITHUB_USER
     read -p "Enter repository name: " REPO_NAME
-    read -p "Enter Cloudinary cloud name: " CLOUDINARY_CLOUD_NAME
-    read -p "Enter Cloudinary API key: " CLOUDINARY_API_KEY
-    read -p "Enter Cloudinary API secret: " CLOUDINARY_API_SECRET
+    
+    # Cloudflare R2 Configuration
+    read -p "Enter R2 Account ID: " R2_ACCOUNT_ID
+    read -p "Enter R2 Bucket Name: " R2_BUCKET_NAME
+    read -p "Enter R2 Access Key ID: " R2_ACCESS_KEY_ID
+    read -p "Enter R2 Secret Access Key: " R2_SECRET_ACCESS_KEY
+    read -p "Enter R2 Public URL: " R2_PUBLIC_URL
+    
+    # Cloudinary (Legacy - Optional)
+    read -p "Enter Cloudinary cloud name (optional, press Enter to skip): " CLOUDINARY_CLOUD_NAME
+    read -p "Enter Cloudinary API key (optional, press Enter to skip): " CLOUDINARY_API_KEY
+    read -p "Enter Cloudinary API secret (optional, press Enter to skip): " CLOUDINARY_API_SECRET
     
     cat > .env.production <<EOF
 NODE_ENV=production
@@ -76,8 +85,15 @@ JWT_SECRET=$JWT_SECRET
 JWT_EXPIRES_IN=15m
 JWT_REFRESH_EXPIRES_IN=7d
 
-# Storage
-STORAGE_TYPE=cloudinary
+# Storage (Cloudflare R2)
+STORAGE_TYPE=r2
+R2_ACCOUNT_ID=$R2_ACCOUNT_ID
+R2_BUCKET_NAME=$R2_BUCKET_NAME
+R2_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID
+R2_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY
+R2_PUBLIC_URL=$R2_PUBLIC_URL
+
+# Cloudinary (Legacy - Optional)
 CLOUDINARY_CLOUD_NAME=$CLOUDINARY_CLOUD_NAME
 CLOUDINARY_API_KEY=$CLOUDINARY_API_KEY
 CLOUDINARY_API_SECRET=$CLOUDINARY_API_SECRET

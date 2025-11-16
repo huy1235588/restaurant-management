@@ -36,7 +36,7 @@ A comprehensive, full-stack restaurant management system designed to streamline 
 - **Authentication**: JWT (jsonwebtoken 9.0+) with bcryptjs 3.0+
 - **Real-time**: Socket.io 4.8+
 - **Caching**: Redis 7
-- **File Upload**: Multer 2.0+ with Cloudinary 2.8+ integration
+- **File Upload**: Multer 2.0+ with Cloudflare R2 (primary) + Cloudinary 2.8+ (legacy)
 - **Logging**: Winston 3.17+ with Morgan 1.10+
 - **Security**: Helmet 8.0+, CORS 2.8+, express-rate-limit 8.1+
 - **API Documentation**: Swagger (swagger-jsdoc 6.2+ & swagger-ui-express 5.0+)
@@ -213,14 +213,18 @@ This system manages a full-service restaurant with:
 - **Package Manager**: Must use `pnpm` (pnpm-workspace.yaml present)
 - **TypeScript**: Strict mode enabled, no implicit any
 - **Code Organization**: Feature-based, not by file type
-- **Environment Variables**: Required for all secrets (JWT, DB, Redis, Cloudinary)
+- **Environment Variables**: Required for all secrets (JWT, DB, Redis, R2, Cloudinary)
 
 ## External Dependencies
 
 ### Third-Party Services
-- **Cloudinary**: Image upload and storage for food items, user avatars
+- **Cloudflare R2**: Object storage for file uploads (images, documents, videos)
+  - Configuration required: Account ID, bucket name, access key ID, secret access key, public URL
+  - S3-compatible API via AWS SDK
+  - Primary storage provider for production
+- **Cloudinary** (Legacy): Image storage for backward compatibility
   - Configuration required: API key, secret, cloud name
-  - Used via Multer integration in backend
+  - Deprecated - use R2 for new uploads
 
 ### Infrastructure Services
 - **PostgreSQL 16**: Primary database
@@ -250,7 +254,7 @@ This system manages a full-service restaurant with:
 
 ### File Storage
 - **Local Development**: Files stored in `/app/server/uploads/`
-- **Production**: Cloudinary for persistent storage
+- **Production**: Cloudflare R2 for persistent storage (Cloudinary legacy)
 - **Documentation**: See `/docs/FILE_STORAGE_GUIDE.md`
 
 ### Monitoring & Logging

@@ -24,12 +24,23 @@
 
 Hệ thống upload và lưu trữ file của ứng dụng Restaurant Management hỗ trợ:
 
--   **Hai nhà cung cấp lưu trữ**: Local (máy chủ) và Cloudinary (CDN)
+-   **Ba nhà cung cấp lưu trữ**: 
+    - **Cloudflare R2** (Primary): Object storage S3-compatible, zero egress fees
+    - **Local** (Development): Lưu trữ cục bộ trên máy chủ
+    - **Cloudinary** (⚠️ Legacy/Outdated): CDN cũ, chỉ để backward compatibility
 -   **Chuyển đổi nhà cung cấp** tại runtime
--   **Tự động dự phòng** giữa các nhà cung cấp nếu cái chính lỗi
+-   **Tự động dự phòng** giữa các nhà cung cấp nếu cái chính lỗi (R2 → Local → Cloudinary)
 -   **Quản lý nhiều loại file**: Hình ảnh, tài liệu, video
 -   **Bảo mật**: Xác thực, xác nhận loại file, giới hạn kích thước
 -   **Client Implementation**: Đã triển khai hoàn chỉnh với React hooks, services và utilities
+
+### ⭐ Khuyến Nghị
+
+**Production**: Sử dụng **Cloudflare R2** (storage mặc định)
+- ✅ Chi phí thấp (~$0.015/GB/month)
+- ✅ **ZERO egress fees** (không tính phí bandwidth)
+- ✅ S3-compatible API (chuẩn công nghiệp)
+- ✅ Phù hợp với đồ án sinh viên
 
 ### Thư Mục Lưu Trữ
 
@@ -76,16 +87,20 @@ flowchart TD
 
     %% Backend Layer
     subgraph "Storage Manager (Backend)"
-        K[Provider Selection<br/>Primary: Local or Cloudinary<br/>Fallback: Automatic failover<br/>Switch: Runtime provider switching]
+        K[Provider Selection<br/>Primary: R2 or Local or Cloudinary<br/>Fallback: R2 → Local → Cloudinary<br/>Switch: Runtime provider switching]
     end
 
     %% Storage Layer
+    subgraph "Cloudflare R2 (Primary)"
+        N[R2 Object Storage<br/>S3-compatible API<br/>Zero egress fees<br/>Global CDN<br/>pub-xxxxx.r2.dev]
+    end
+
     subgraph "Local Storage"
         L[/uploads/menu/<br/>/uploads/staff/<br/>/uploads/documents/<br/>/uploads/images/<br/>/uploads/others/<br/>Local Files/]
     end
 
-    subgraph "Cloudinary CDN"
-        M[cloud.cloudinary.com<br/>+ CDN globally<br/>+ Auto transform<br/>+ Secure URLs<br/>Cloud Files]
+    subgraph "Cloudinary CDN (Legacy)"
+        M[cloud.cloudinary.com<br/>⚠️ Deprecated<br/>Backward compatibility only]
     end
 
     %% Connections
@@ -100,6 +115,7 @@ flowchart TD
     G --> K
     H --> K
 
+    K --> N
     K --> L
     K --> M
 
@@ -133,8 +149,9 @@ flowchart TD
 | **Upload Controller**  | `upload.controller.ts`                                  | Xử lý yêu cầu upload file        |
 | **Upload Service**     | `services/upload.service.ts`                            | Logic upload file cấp cao        |
 | **Storage Manager**    | `services/storage/storage.manager.ts`                   | Quản lý nhà cung cấp lưu trữ     |
+| **R2 Storage** ⭐      | `services/storage/r2.storage.ts`                        | Triển khai Cloudflare R2 (Primary) |
 | **Local Storage**      | `services/storage/local.storage.ts`                     | Triển khai lưu trữ cục bộ        |
-| **Cloudinary Storage** | `services/storage/cloudinary.storage.ts`                | Triển khai Cloudinary            |
+| **Cloudinary Storage** ⚠️ | `services/storage/cloudinary.storage.ts`             | Triển khai Cloudinary (Legacy)   |
 | **Upload Middleware**  | `middlewares/upload.middleware.ts`                      | Middleware Multer & helper       |
 | **Upload Constants**   | `constants/upload.constants.ts`                         | Cấu hình & hằng số               |
 
@@ -1707,6 +1724,546 @@ const uploadWithRetry = async (file, folder, category, retries = 3) => {
 
 ---
 
+## ⭐ Hướng Dẫn Triển Khai Cloudflare R2
+
+### Tổng Quan R2
+
+**Cloudflare R2** là dịch vụ object storage S3-compatible với những ưu điểm vượt trội:
+
+| Tính Năng | Cloudflare R2 | Cloudinary Free | AWS S3 |
+|-----------|---------------|-----------------|---------|
+| **Chi phí storage** | $0.015/GB/tháng | 25GB free | $0.023/GB/tháng |
+| **Chi phí bandwidth** | **$0** (FREE) | 25GB/tháng | $0.09/GB |
+| **API** | S3-compatible | Proprietary | S3 native |
+| **CDN** | Cloudflare global | Built-in | CloudFront separate |
+| **Phù hợp sinh viên** | ✅ Rất tốt | ⚠️ Giới hạn | ❌ Đắt |
+
+**Ví dụ chi phí** (25GB storage, 100GB traffic/tháng):
+- R2: ~$0.38/tháng (chỉ storage)
+- Cloudinary: Vượt giới hạn free
+- S3: ~$9.58/tháng (storage + bandwidth)
+
+---
+
+### Bước 1: Tạo Tài Khoản Cloudflare
+
+1. Truy cập [https://dash.cloudflare.com/sign-up](https://dash.cloudflare.com/sign-up)
+2. Đăng ký tài khoản miễn phí (không cần thẻ tín dụng cho R2 trial)
+3. Xác thực email
+
+---
+
+### Bước 2: Kích Hoạt R2
+
+1. Đăng nhập vào Cloudflare Dashboard
+2. Sidebar trái → chọn **R2**
+3. Click **Purchase R2 Plan** (Free tier available)
+4. Chọn **Free tier**: 10GB storage/tháng miễn phí
+5. Nhấn **Enable R2**
+
+---
+
+### Bước 3: Tạo R2 Bucket
+
+#### 3.1. Tạo Bucket Mới
+
+1. Trong R2 Dashboard → Click **Create bucket**
+2. Điền thông tin:
+   ```
+   Bucket name: restaurant-files
+   Location: Automatic (cho tốc độ tối ưu)
+   ```
+3. Click **Create bucket**
+
+#### 3.2. Cấu Hình Public Access (Quan Trọng!)
+
+Để file có thể truy cập từ browser:
+
+1. Vào bucket vừa tạo
+2. Tab **Settings** → **Public access**
+3. Click **Connect domain** hoặc **Enable public access**
+4. Chọn một trong hai:
+
+**Option A: R2.dev Subdomain (Đơn giản - Khuyến nghị cho sinh viên)**
+```
+1. Click "Allow access"
+2. Cloudflare sẽ tạo URL: https://pub-xxxxxxxxxxxxx.r2.dev
+3. Copy URL này (cần cho bước sau)
+```
+
+**Option B: Custom Domain (Nâng cao)**
+```
+1. Có domain riêng (vd: files.myrestaurant.com)
+2. Add CNAME record trong DNS
+3. Verify domain
+```
+
+**Lưu URL Public của bucket**: `https://pub-xxxxxxxxxxxxx.r2.dev`
+
+---
+
+### Bước 4: Tạo API Tokens
+
+#### 4.1. Tạo API Token
+
+1. R2 Dashboard → Click **Manage R2 API Tokens**
+2. Click **Create API token**
+3. Điền thông tin:
+   ```
+   Token name: restaurant-app
+   Permissions:
+     ☑ Object Read & Write (để upload/delete files)
+   TTL: Never expires (hoặc chọn thời hạn nếu muốn)
+   Bucket scope: Select bucket "restaurant-files"
+   ```
+4. Click **Create API Token**
+
+#### 4.2. Lưu Credentials (CỰC KỲ QUAN TRỌNG!)
+
+Sau khi tạo token, Cloudflare sẽ hiển thị:
+
+```
+Access Key ID: 1234567890abcdef1234567890abcdef
+Secret Access Key: abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNO
+```
+
+**⚠️ LƯU Ý**: Secret Access Key chỉ hiển thị **MỘT LẦN DUY NHẤT**!
+
+Copy và lưu vào file an toàn:
+```bash
+# Tạo file .env.r2.backup (KHÔNG commit vào Git!)
+echo "R2_ACCESS_KEY_ID=1234567890abcdef1234567890abcdef" > .env.r2.backup
+echo "R2_SECRET_ACCESS_KEY=abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNO" >> .env.r2.backup
+chmod 600 .env.r2.backup
+```
+
+#### 4.3. Lấy Account ID
+
+1. R2 Dashboard → Right sidebar
+2. Copy **Account ID** (dạng: `a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6`)
+
+---
+
+### Bước 5: Cấu Hình Backend
+
+#### 5.1. Cập Nhật Environment Variables
+
+Tạo hoặc cập nhật file `.env` trong `app/server/`:
+
+```bash
+# Storage Configuration
+STORAGE_TYPE=r2
+
+# Cloudflare R2 Configuration
+R2_ACCOUNT_ID=a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6
+R2_BUCKET_NAME=restaurant-files
+R2_ACCESS_KEY_ID=1234567890abcdef1234567890abcdef
+R2_SECRET_ACCESS_KEY=abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNO
+R2_PUBLIC_URL=https://pub-xxxxxxxxxxxxx.r2.dev
+
+# Cloudinary (Legacy - Optional, để backward compatibility)
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+```
+
+#### 5.2. Cập Nhật Docker Compose (Nếu Dùng Docker)
+
+File `docker-compose.dev.yml` đã được cập nhật tự động. Kiểm tra:
+
+```yaml
+services:
+  server:
+    environment:
+      STORAGE_TYPE: ${STORAGE_TYPE:-local}
+      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID:-}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME:-}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
+      R2_PUBLIC_URL: ${R2_PUBLIC_URL:-}
+```
+
+---
+
+### Bước 6: Kiểm Tra Triển Khai
+
+#### 6.1. Khởi Động Server
+
+```bash
+# Development mode
+cd app/server
+pnpm install  # Đảm bảo @aws-sdk/client-s3 đã cài
+pnpm run dev
+
+# Hoặc với Docker
+docker-compose -f docker-compose.dev.yml up --build
+```
+
+#### 6.2. Kiểm Tra Logs
+
+Xem log khởi động, tìm dòng:
+```
+[INFO] R2 initialized successfully
+[INFO] Storage initialized with primary provider: r2
+```
+
+Nếu thấy lỗi:
+```
+[WARN] R2 not configured. Set R2_ACCOUNT_ID environment variable
+```
+→ Kiểm tra lại `.env` file
+
+#### 6.3. Test Upload qua API
+
+**Test 1: Kiểm tra storage status**
+```bash
+curl -X GET http://localhost:5000/api/v1/storage/status \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+Kết quả mong đợi:
+```json
+{
+  "success": true,
+  "data": {
+    "primary": "r2",
+    "primaryAvailable": true,
+    "fallback": "local",
+    "fallbackAvailable": true,
+    "currentType": "r2"
+  }
+}
+```
+
+**Test 2: Upload file**
+```bash
+curl -X POST http://localhost:5000/api/v1/storage/upload/single \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -F "file=@/path/to/test-image.jpg" \
+  -F "folder=menu" \
+  -F "category=image"
+```
+
+Kết quả mong đợi:
+```json
+{
+  "success": true,
+  "message": "File uploaded successfully",
+  "data": {
+    "filename": "menu_1700000000000_abc123.jpg",
+    "originalName": "test-image.jpg",
+    "path": "r2://restaurant/menu/menu_1700000000000_abc123.jpg",
+    "url": "https://pub-xxxxxxxxxxxxx.r2.dev/restaurant/menu/menu_1700000000000_abc123.jpg",
+    "size": 245000,
+    "mimetype": "image/jpeg"
+  }
+}
+```
+
+**Test 3: Truy cập file từ browser**
+
+Mở URL trong response:
+```
+https://pub-xxxxxxxxxxxxx.r2.dev/restaurant/menu/menu_1700000000000_abc123.jpg
+```
+
+Ảnh phải hiển thị thành công!
+
+#### 6.4. Test từ Frontend
+
+1. Mở ứng dụng client: `http://localhost:3000`
+2. Đăng nhập với tài khoản admin
+3. Vào **Menu Management** → **Add New Item**
+4. Upload ảnh món ăn
+5. Kiểm tra URL ảnh trong database (phải bắt đầu với `https://pub-xxxxx.r2.dev`)
+
+---
+
+### Bước 7: Production Deployment
+
+#### 7.1. Tạo Production Bucket
+
+```
+Bucket name: restaurant-files-prod
+Location: Automatic
+Public access: Enabled
+```
+
+#### 7.2. Tạo Production API Token
+
+```
+Token name: restaurant-app-prod
+Permissions: Object Read & Write
+Bucket: restaurant-files-prod
+TTL: Never expires
+```
+
+#### 7.3. Cấu Hình Production Environment
+
+File `.env.production`:
+```bash
+STORAGE_TYPE=r2
+R2_ACCOUNT_ID=<production-account-id>
+R2_BUCKET_NAME=restaurant-files-prod
+R2_ACCESS_KEY_ID=<production-access-key>
+R2_SECRET_ACCESS_KEY=<production-secret-key>
+R2_PUBLIC_URL=<production-public-url>
+```
+
+#### 7.4. Deploy lên Server
+
+```bash
+# Copy .env.production to server
+scp .env.production user@your-server:/path/to/app/server/
+
+# On server
+cd /path/to/app
+docker-compose -f docker-compose.prod.yml up -d --build
+```
+
+---
+
+### Bước 8: Monitoring và Maintenance
+
+#### 8.1. Theo Dõi Usage
+
+1. R2 Dashboard → **Metrics**
+2. Xem:
+   - Storage used (GB)
+   - Request count
+   - Bandwidth (egress is free!)
+
+#### 8.2. Backup Strategy
+
+**Option 1: Rclone Sync (Khuyến nghị)**
+```bash
+# Cài rclone
+curl https://rclone.org/install.sh | sudo bash
+
+# Cấu hình R2
+rclone config
+
+# Backup hàng ngày
+rclone sync cloudflare-r2:restaurant-files-prod /backup/r2/ --progress
+
+# Cron job (daily at 2 AM)
+0 2 * * * rclone sync cloudflare-r2:restaurant-files-prod /backup/r2/
+```
+
+**Option 2: AWS CLI (Alternative)**
+```bash
+# Cấu hình AWS CLI với R2
+aws configure --profile r2
+# Endpoint: https://<account-id>.r2.cloudflarestorage.com
+
+# Sync files
+aws s3 sync s3://restaurant-files-prod /backup/r2/ --profile r2
+```
+
+#### 8.3. Log Monitoring
+
+Kiểm tra logs định kỳ:
+```bash
+# Local development
+tail -f app/server/logs/combined.log | grep "R2"
+
+# Docker
+docker-compose logs -f server | grep "R2"
+```
+
+---
+
+### Troubleshooting
+
+#### Lỗi 1: "R2 is not initialized"
+
+**Nguyên nhân**: Thiếu environment variables
+
+**Giải pháp**:
+```bash
+# Kiểm tra .env file
+cat app/server/.env | grep R2
+
+# Đảm bảo có đủ 5 biến:
+R2_ACCOUNT_ID=...
+R2_BUCKET_NAME=...
+R2_ACCESS_KEY_ID=...
+R2_SECRET_ACCESS_KEY=...
+R2_PUBLIC_URL=...
+```
+
+#### Lỗi 2: "Access Denied" khi upload
+
+**Nguyên nhân**: API token không có quyền Write
+
+**Giải pháp**:
+1. R2 Dashboard → Manage API Tokens
+2. Xóa token cũ
+3. Tạo token mới với permission **"Object Read & Write"**
+4. Cập nhật credentials trong `.env`
+
+#### Lỗi 3: File upload nhưng không truy cập được URL
+
+**Nguyên nhân**: Bucket chưa enable public access
+
+**Giải pháp**:
+1. Vào bucket settings
+2. Enable **Public access**
+3. Verify R2_PUBLIC_URL trong `.env` khớp với public URL của bucket
+
+#### Lỗi 4: "HeadBucket failed" (isAvailable returns false)
+
+**Nguyên nhân**: Sai Account ID hoặc bucket name
+
+**Giải pháp**:
+```bash
+# Test bằng AWS CLI
+aws s3 ls s3://restaurant-files \
+  --endpoint-url https://<account-id>.r2.cloudflarestorage.com \
+  --profile r2
+
+# Nếu lỗi → sửa R2_ACCOUNT_ID hoặc R2_BUCKET_NAME
+```
+
+#### Lỗi 5: Upload chậm
+
+**Nguyên nhân**: File quá lớn, network chậm
+
+**Giải pháp**:
+- Enable compression trước khi upload (frontend)
+- Sử dụng multipart upload cho file > 100MB (future enhancement)
+- Kiểm tra network latency
+
+---
+
+### Migration từ Cloudinary sang R2
+
+Nếu đã có file trên Cloudinary, cần migrate:
+
+#### Script Migration (Node.js)
+
+```javascript
+// scripts/migrate-cloudinary-to-r2.js
+const axios = require('axios');
+const fs = require('fs');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+
+const s3Client = new S3Client({
+  region: 'auto',
+  endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+  },
+});
+
+async function migrateFile(cloudinaryUrl) {
+  // 1. Download from Cloudinary
+  const response = await axios.get(cloudinaryUrl, { responseType: 'arraybuffer' });
+  const buffer = Buffer.from(response.data);
+  
+  // 2. Extract filename
+  const filename = cloudinaryUrl.split('/').pop();
+  const key = `restaurant/menu/${filename}`;
+  
+  // 3. Upload to R2
+  await s3Client.send(new PutObjectCommand({
+    Bucket: process.env.R2_BUCKET_NAME,
+    Key: key,
+    Body: buffer,
+    ContentType: response.headers['content-type'],
+  }));
+  
+  // 4. Return new URL
+  return `${process.env.R2_PUBLIC_URL}/${key}`;
+}
+
+// Usage
+async function main() {
+  const cloudinaryUrls = [
+    'https://res.cloudinary.com/demo/image/upload/sample1.jpg',
+    'https://res.cloudinary.com/demo/image/upload/sample2.jpg',
+  ];
+  
+  for (const url of cloudinaryUrls) {
+    const newUrl = await migrateFile(url);
+    console.log(`Migrated: ${url} → ${newUrl}`);
+  }
+}
+
+main();
+```
+
+Chạy migration:
+```bash
+cd app/server
+node scripts/migrate-cloudinary-to-r2.js
+```
+
+---
+
+### Best Practices
+
+#### 1. Security
+
+✅ **DO:**
+- Lưu credentials trong `.env`, KHÔNG commit vào Git
+- Sử dụng environment-specific tokens (dev/prod riêng biệt)
+- Rotate API tokens định kỳ (6 tháng/lần)
+- Enable bucket versioning để restore file bị xóa nhầm
+
+❌ **DON'T:**
+- Hardcode credentials trong code
+- Share API tokens qua email/chat
+- Sử dụng token production cho development
+
+#### 2. Performance
+
+✅ **DO:**
+- Compress images trước khi upload (frontend)
+- Sử dụng lazy loading cho ảnh
+- Cache R2 URLs trong database
+- Set appropriate cache headers
+
+❌ **DON'T:**
+- Upload file gốc quá lớn (>5MB cho ảnh)
+- Generate URLs mỗi lần render
+
+#### 3. Cost Optimization
+
+✅ **DO:**
+- Xóa file không dùng định kỳ
+- Monitor storage usage monthly
+- Sử dụng lifecycle policies (auto-delete after X days)
+
+❌ **DON'T:**
+- Lưu duplicate files
+- Keep test files trong production bucket
+
+---
+
+### FAQ R2
+
+**Q: R2 có miễn phí không?**
+A: Có free tier 10GB storage/month. Sau đó $0.015/GB/month. Bandwidth hoàn toàn miễn phí.
+
+**Q: R2 có phù hợp với đồ án tốt nghiệp không?**
+A: Rất phù hợp! Chi phí thấp, dễ setup, và học được kỹ năng S3 API (chuẩn công nghiệp).
+
+**Q: Có thể dùng custom domain không?**
+A: Có, nhưng cần có domain riêng. Dùng R2.dev subdomain đơn giản hơn cho sinh viên.
+
+**Q: R2 có hỗ trợ image transformation không?**
+A: Không, chỉ lưu trữ raw files. Cần resize/crop ở frontend trước khi upload.
+
+**Q: Nếu vượt quá 10GB free tier thì sao?**
+A: Chỉ tốn ~$0.015/GB thêm. Ví dụ: 25GB = $0.38/tháng (rất rẻ!).
+
+**Q: Có thể migrate từ R2 sang S3 sau này không?**
+A: Dễ dàng! R2 dùng S3 API, chỉ cần đổi endpoint và credentials.
+
+---
+
 ## Tài Liệu Liên Quan
 
 ### Client Implementation Documentation
@@ -1717,6 +2274,12 @@ const uploadWithRetry = async (file, folder, category, retries = 3) => {
 -   [ARCHITECTURE_DIAGRAM.md](../../ARCHITECTURE_DIAGRAM.md) - System architecture
 -   [FILES_MANIFEST.txt](../../FILES_MANIFEST.txt) - All created files
 -   [verify-upload.sh](../../verify-upload.sh) - Verification script
+
+### R2 Resources
+
+-   [Cloudflare R2 Documentation](https://developers.cloudflare.com/r2/) - Official docs
+-   [S3 API Compatibility](https://developers.cloudflare.com/r2/api/s3/) - API reference
+-   [R2 Pricing](https://developers.cloudflare.com/r2/pricing/) - Cost breakdown
 
 ### Backend Documentation
 

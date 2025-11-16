@@ -42,21 +42,21 @@ router.use(authenticate);
  *                   properties:
  *                     primary:
  *                       type: string
- *                       enum: [local, cloudinary]
+ *                       enum: [local, cloudinary, r2]
  *                       example: local
  *                     primaryAvailable:
  *                       type: boolean
  *                       example: true
  *                     fallback:
  *                       type: string
- *                       enum: [local, cloudinary]
+ *                       enum: [local, cloudinary, r2]
  *                       example: cloudinary
  *                     fallbackAvailable:
  *                       type: boolean
  *                       example: false
  *                     currentType:
  *                       type: string
- *                       enum: [local, cloudinary]
+ *                       enum: [local, cloudinary, r2]
  *                       example: local
  *       401:
  *         description: Unauthorized
@@ -90,7 +90,7 @@ router.get('/status', storageController.getStatus.bind(storageController));
  *                   properties:
  *                     storageType:
  *                       type: string
- *                       enum: [local, cloudinary]
+ *                       enum: [local, cloudinary, r2]
  *       401:
  *         description: Unauthorized
  */
@@ -101,7 +101,7 @@ router.get('/current', storageController.getCurrentType.bind(storageController))
  * /storage/switch:
  *   post:
  *     summary: Switch storage provider
- *     description: Switch between local and Cloudinary storage providers
+ *     description: Switch between local, Cloudinary (legacy), and R2 storage providers
  *     tags: [Storage]
  *     security:
  *       - bearerAuth: []
@@ -114,7 +114,7 @@ router.get('/current', storageController.getCurrentType.bind(storageController))
  *             properties:
  *               provider:
  *                 type: string
- *                 enum: [local, cloudinary]
+ *                 enum: [local, cloudinary, r2]
  *                 description: The storage provider to switch to
  *                 example: cloudinary
  *     responses:

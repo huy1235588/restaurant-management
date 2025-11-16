@@ -30,15 +30,24 @@ interface Config {
     logLevel: string;
 
     // Storage
-    storageType: 'local' | 'cloudinary';
+    storageType: 'local' | 'cloudinary' | 'r2';
     baseUrl: string;
     uploadDir: string;
     maxFileSize: number;
 
-    // Cloudinary (optional)
+    // Cloudinary (Legacy/Outdated - use R2 instead)
     cloudinaryCloudName?: string;
     cloudinaryApiKey?: string;
     cloudinaryApiSecret?: string;
+
+    // Cloudflare R2
+    r2: {
+        accountId: string;
+        bucketName: string;
+        accessKeyId: string;
+        secretAccessKey: string;
+        publicUrl: string;
+    };
 }
 
 const config: Config = {
@@ -67,15 +76,24 @@ const config: Config = {
     logLevel: process.env['LOG_LEVEL'] || 'info',
 
     // Storage
-    storageType: (process.env['STORAGE_TYPE'] || 'local') as 'local' | 'cloudinary',
+    storageType: (process.env['STORAGE_TYPE'] || 'local') as 'local' | 'cloudinary' | 'r2',
     baseUrl: process.env['BASE_URL'] || 'http://localhost:5000',
     uploadDir: process.env['UPLOAD_DIR'] || './uploads',
     maxFileSize: parseInt(process.env['MAX_FILE_SIZE'] || '5242880', 10),
 
-    // Cloudinary
+    // Cloudinary (Legacy/Outdated)
     cloudinaryCloudName: process.env['CLOUDINARY_CLOUD_NAME'],
     cloudinaryApiKey: process.env['CLOUDINARY_API_KEY'],
     cloudinaryApiSecret: process.env['CLOUDINARY_API_SECRET'],
+
+    // Cloudflare R2
+    r2: {
+        accountId: process.env['R2_ACCOUNT_ID'] || '',
+        bucketName: process.env['R2_BUCKET_NAME'] || '',
+        accessKeyId: process.env['R2_ACCESS_KEY_ID'] || '',
+        secretAccessKey: process.env['R2_SECRET_ACCESS_KEY'] || '',
+        publicUrl: process.env['R2_PUBLIC_URL'] || '',
+    },
 };
 
 // Validate required environment variables

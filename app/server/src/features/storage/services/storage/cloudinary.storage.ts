@@ -1,6 +1,14 @@
 /**
  * Cloudinary Storage Provider
  * Stores files on Cloudinary CDN
+ * 
+ * ⚠️ **DEPRECATED/LEGACY** ⚠️
+ * This provider is maintained for backward compatibility only.
+ * New uploads should use Cloudflare R2 (R2StorageProvider).
+ * 
+ * Will be removed in a future version after data migration to R2.
+ * 
+ * @deprecated Use R2StorageProvider instead
  */
 
 import { StorageProvider, StorageUploadResult, StorageDeleteResult } from './storage.interface';

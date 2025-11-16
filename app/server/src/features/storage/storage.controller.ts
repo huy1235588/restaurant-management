@@ -29,8 +29,8 @@ export class StorageController {
         try {
             const { provider } = req.body;
 
-            if (!provider || !['local', 'cloudinary'].includes(provider)) {
-                res.status(400).json(ApiResponse.error('Invalid provider. Must be "local" or "cloudinary"'));
+            if (!provider || !['local', 'cloudinary', 'r2'].includes(provider)) {
+                res.status(400).json(ApiResponse.error('Invalid provider. Must be "local", "cloudinary", or "r2"'));
                 return;
             }
 
