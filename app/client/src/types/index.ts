@@ -72,6 +72,7 @@ export interface MenuItem {
     cost?: number;
     description?: string;
     imageUrl?: string;
+    imagePath?: string;
     isAvailable: boolean;
     isActive: boolean;
     preparationTime?: number;

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { MenuItem, Category } from '@/types';
@@ -20,7 +21,7 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import { ImageUploadField } from './ImageUploadField';
+import { ImageUploadFieldLocal } from './ImageUploadFieldLocal';
 import { Loader2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,7 +30,7 @@ import { calculateMargin, formatMargin } from '../utils';
 interface MenuItemFormProps {
     menuItem?: MenuItem | null;
     categories: Category[];
-    onSubmit: (data: MenuItemFormData) => Promise<void>;
+    onSubmit: (data: MenuItemFormData, imageFile?: File | null) => Promise<void>;
     onCancel: () => void;
     loading?: boolean;
 }
@@ -41,6 +42,8 @@ export function MenuItemForm({
     onCancel,
     loading = false,
 }: MenuItemFormProps) {
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
     const form = useForm<MenuItemFormData>({
         resolver: zodResolver(menuItemFormSchema),
         defaultValues: {
@@ -64,8 +67,9 @@ export function MenuItemForm({
 
     const handleSubmit = async (data: MenuItemFormData) => {
         try {
-            await onSubmit(data);
+            await onSubmit(data, selectedFile);
             form.reset();
+            setSelectedFile(null);
         } catch (error) {
             // Error is handled by parent
         }
@@ -478,10 +482,14 @@ export function MenuItemForm({
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormControl>
-                                                <ImageUploadField
+                                                <ImageUploadFieldLocal
                                                     value={field.value}
-                                                    onChange={field.onChange}
-                                                    folder="menu-items"
+                                                    file={selectedFile}
+                                                    onChange={(file, previewUrl) => {
+                                                        setSelectedFile(file);
+                                                        field.onChange(previewUrl);
+                                                    }}
+                                                    folder="menu"
                                                     disabled={loading}
                                                 />
                                             </FormControl>

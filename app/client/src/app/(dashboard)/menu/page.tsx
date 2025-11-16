@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { MenuItem } from '@/types';
+import { uploadApi } from '@/services/upload.service';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
@@ -179,9 +180,23 @@ export default function MenuPage() {
         localStorage.setItem('menu-view-mode', viewMode);
     }, [viewMode]);
 
-    const handleCreate = async (data: any) => {
+    const handleCreate = async (data: any, imageFile?: File | null) => {
         try {
-            await createMenuItem(data);
+            let imageUrl = data.imageUrl;
+            let imagePath = data.imagePath;
+
+            // Upload image if a new file is selected
+            if (imageFile) {
+                const uploadedFile = await uploadApi.uploadSingle(imageFile, 'menu', 'image');
+                imageUrl = uploadedFile.url;
+                imagePath = uploadedFile.path;
+            }
+
+            await createMenuItem({
+                ...data,
+                imageUrl,
+                imagePath,
+            });
             toast.success('Menu item created successfully');
             setCreateDialogOpen(false);
             setDuplicateMode(false);
@@ -192,11 +207,34 @@ export default function MenuPage() {
         }
     };
 
-    const handleUpdate = async (data: any) => {
+    const handleUpdate = async (data: any, imageFile?: File | null) => {
         if (!selectedMenuItem) return;
 
         try {
-            await updateMenuItem(selectedMenuItem.itemId, data);
+            let imageUrl = data.imageUrl;
+            let imagePath = data.imagePath;
+
+            // Upload new image if a file is selected
+            if (imageFile) {
+                const uploadedFile = await uploadApi.uploadSingle(imageFile, 'menu', 'image');
+                imageUrl = uploadedFile.url;
+                imagePath = uploadedFile.path;
+
+                // Delete old image if exists
+                if (selectedMenuItem.imagePath) {
+                    try {
+                        await uploadApi.deleteFile(selectedMenuItem.imagePath);
+                    } catch (deleteError) {
+                        console.warn('Failed to delete old image:', deleteError);
+                    }
+                }
+            }
+
+            await updateMenuItem(selectedMenuItem.itemId, {
+                ...data,
+                imageUrl,
+                imagePath,
+            });
             toast.success('Menu item updated successfully');
             setEditDialogOpen(false);
             setSelectedMenuItem(null);

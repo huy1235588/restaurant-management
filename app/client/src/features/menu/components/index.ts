@@ -7,3 +7,4 @@ export * from './MenuStatistics';
 export * from './MenuSearch';
 export * from './ViewModeSwitcher';
 export * from './ImageUploadField';
+export * from './ImageUploadFieldLocal';

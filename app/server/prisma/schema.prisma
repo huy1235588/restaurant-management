@@ -155,6 +155,7 @@ model MenuItem {
     cost            Decimal? @db.Decimal(10, 2)
     description     String?  @db.VarChar(1000)
     imageUrl        String?  @db.VarChar(500)
+    imagePath       String?  @db.VarChar(500)
     isAvailable     Boolean  @default(true)
     isActive        Boolean  @default(true)
     preparationTime Int? // in minutes
