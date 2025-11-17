@@ -120,6 +120,8 @@ model Staff {
     orders            Order[]
     bills             Bill[]
     kitchenOrders     KitchenOrder[]
+    createdReservations Reservation[]     @relation("ReservationCreator")
+    reservationAudits  ReservationAudit[] @relation("ReservationAuditActor")
 
     @@index([role])
     @@index([isActive])
@@ -216,32 +218,79 @@ model RestaurantTable {
 // RESERVATION MANAGEMENT
 // ============================================
 
-model Reservation {
-    reservationId   Int               @id @default(autoincrement())
-    reservationCode String            @unique @default(uuid()) @db.VarChar(50)
-    customerName    String            @db.VarChar(255)
-    phoneNumber     String            @db.VarChar(20)
-    email           String?           @db.VarChar(255)
-    tableId         Int
-    reservationDate DateTime          @db.Date
-    reservationTime DateTime          @db.Time(0)
-    duration        Int               @default(120) // minutes
-    headCount       Int
-    specialRequest  String?           @db.Text
-    depositAmount   Decimal?          @db.Decimal(10, 2)
-    status          ReservationStatus @default(pending)
-    notes           String?           @db.Text
-    createdAt       DateTime          @default(now())
-    updatedAt       DateTime          @updatedAt
+model Customer {
+    customerId  Int      @id @default(autoincrement())
+    name        String   @db.VarChar(255)
+    phoneNumber String   @unique @db.VarChar(20)
+    email       String?  @unique @db.VarChar(255)
+    birthday    DateTime? @db.Date
+    preferences Json?
+    notes       String?  @db.Text
+    isVip       Boolean  @default(false)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
 
-    table  RestaurantTable @relation(fields: [tableId], references: [tableId], onDelete: Restrict)
-    orders Order[]
+    reservations Reservation[]
+
+    @@index([name])
+    @@map("customers")
+}
+
+model Reservation {
+    reservationId     Int               @id @default(autoincrement())
+    reservationCode   String            @unique @default(uuid()) @db.VarChar(50)
+    customerName      String            @db.VarChar(255)
+    phoneNumber       String            @db.VarChar(20)
+    email             String?           @db.VarChar(255)
+    customerId        Int?
+    tableId           Int
+    reservationDate   DateTime          @db.Date
+    reservationTime   DateTime          @db.Time(0)
+    duration          Int               @default(120) // minutes
+    headCount         Int
+    specialRequest    String?           @db.Text
+    depositAmount     Decimal?          @db.Decimal(10, 2)
+    status            ReservationStatus @default(pending)
+    notes             String?           @db.Text
+    tags              String[]          @default([])
+    createdBy         Int?
+    confirmedAt       DateTime?
+    seatedAt          DateTime?
+    completedAt       DateTime?
+    cancelledAt       DateTime?
+    cancellationReason String?          @db.Text
+    createdAt         DateTime          @default(now())
+    updatedAt         DateTime          @updatedAt
+
+    table      RestaurantTable @relation(fields: [tableId], references: [tableId], onDelete: Restrict)
+    orders     Order[]
+    customer   Customer?        @relation(fields: [customerId], references: [customerId], onDelete: SetNull)
+    creator    Staff?           @relation("ReservationCreator", fields: [createdBy], references: [staffId], onDelete: SetNull)
+    audits     ReservationAudit[]
 
     @@index([reservationDate])
+    @@index([reservationTime])
     @@index([status])
     @@index([phoneNumber])
     @@index([tableId])
+    @@index([customerId])
     @@map("reservations")
+}
+
+model ReservationAudit {
+    auditId       Int      @id @default(autoincrement())
+    reservationId Int
+    action        String   @db.VarChar(100)
+    userId        Int?
+    changes       Json?
+    createdAt     DateTime @default(now())
+
+    reservation Reservation @relation(fields: [reservationId], references: [reservationId], onDelete: Cascade)
+    user        Staff?      @relation("ReservationAuditActor", fields: [userId], references: [staffId], onDelete: SetNull)
+
+    @@index([reservationId])
+    @@index([createdAt])
+    @@map("reservation_audits")
 }
 
 // ============================================

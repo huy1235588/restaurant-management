@@ -11,6 +11,7 @@ import staffRoutes from '../features/staff/staff.routes';
 import paymentRoutes from '../features/payment/payment.routes';
 import storageRoutes from '../features/storage/storage.routes';
 import floorPlanRoutes from '../features/floor-plan/floor-plan.routes';
+import customerRoutes from '../features/customer/customer.routes';
 import DatabaseClient from '@/config/database';
 
 const router: Router = Router();
@@ -28,6 +29,7 @@ router.use('/kitchen', kitchenRoutes);
 router.use('/staff', staffRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/storage', storageRoutes);
+router.use('/customers', customerRoutes);
 
 // Enhanced health check endpoint for production monitoring
 router.get('/health', async (_req, res) => {

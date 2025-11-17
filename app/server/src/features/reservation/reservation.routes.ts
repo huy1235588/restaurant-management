@@ -6,6 +6,7 @@ import {
     createReservationSchema,
     updateReservationSchema,
     updateReservationStatusSchema,
+    cancelReservationSchema,
 } from '@/features/reservation/validators';
 
 const router: Router = Router();
@@ -360,6 +361,17 @@ router.get('/code/:code', reservationController.getByCode.bind(reservationContro
  *         schema:
  *           type: integer
  *         description: Reservation ID
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reason:
+ *                 type: string
+ *                 maxLength: 500
+ *                 description: Optional cancellation reason
  *     responses:
  *       200:
  *         description: Reservation retrieved successfully
@@ -674,7 +686,7 @@ router.put('/:id', validate(updateReservationSchema), reservationController.upda
  *         description: Internal server error
  */
 // PATCH /api/reservations/:id/cancel - Cancel reservation
-router.patch('/:id/cancel', validate(updateReservationStatusSchema), reservationController.cancel.bind(reservationController));
+router.patch('/:id/cancel', validate(cancelReservationSchema), reservationController.cancel.bind(reservationController));
 
 /**
  * @swagger
@@ -727,7 +739,7 @@ router.patch('/:id/cancel', validate(updateReservationStatusSchema), reservation
  *         description: Internal server error
  */
 // PATCH /api/reservations/:id/confirm - Confirm reservation
-router.patch('/:id/confirm', validate(updateReservationStatusSchema), reservationController.confirm.bind(reservationController));
+router.patch('/:id/confirm', reservationController.confirm.bind(reservationController));
 
 /**
  * @swagger
@@ -780,6 +792,50 @@ router.patch('/:id/confirm', validate(updateReservationStatusSchema), reservatio
  *         description: Internal server error
  */
 // PATCH /api/reservations/:id/seated - Mark reservation as seated
-router.patch('/:id/seated', validate(updateReservationStatusSchema), reservationController.markSeated.bind(reservationController));
+router.patch('/:id/seated', reservationController.markSeated.bind(reservationController));
+
+/**
+ * @swagger
+ * /reservations/{id}/status:
+ *   post:
+ *     summary: Update reservation status
+ *     description: Change reservation status to any allowed value with auditing
+ *     tags: [Reservations]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Reservation ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - status
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [pending, confirmed, seated, completed, cancelled, no_show]
+ *                 description: New reservation status
+ *     responses:
+ *       200:
+ *         description: Reservation status updated successfully
+ *       400:
+ *         description: Invalid status transition
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Reservation not found
+ *       500:
+ *         description: Internal server error
+ */
+// POST /api/reservations/:id/status - Change status
+router.post('/:id/status', validate(updateReservationStatusSchema), reservationController.updateStatus.bind(reservationController));
 
 export default router;

@@ -1,13 +1,20 @@
 import { prisma } from '@/config/database';
-import { Prisma, Reservation } from '@prisma/client';
+import { Prisma, Reservation, ReservationAudit } from '@prisma/client';
 import { ReservationStatus } from '@/shared/types';
 import { BaseRepository, BaseFindOptions, BaseFilter } from '@/shared/base';
+import { ReservationDateUtils } from '@/features/reservation/utils/reservation-settings';
 
 interface ReservationFilter extends BaseFilter {
     status?: ReservationStatus;
+    statuses?: ReservationStatus[];
     tableId?: number;
+    tableIds?: number[];
     reservationDate?: Date;
+    startDate?: Date;
+    endDate?: Date;
     phoneNumber?: string;
+    customerId?: number;
+    floor?: number;
     search?: string;
 }
 
@@ -17,25 +24,49 @@ export class ReservationRepository extends BaseRepository<Reservation, Reservati
             return {};
         }
 
-        const { status, tableId, reservationDate, phoneNumber, search } = filters;
+        const { status, statuses, tableId, tableIds, reservationDate, startDate, endDate, phoneNumber, search, customerId, floor } = filters;
 
         const where: Prisma.ReservationWhereInput = {};
 
-        if (status) {
+        if (statuses?.length) {
+            where.status = { in: statuses };
+        } else if (status) {
             where.status = status;
         }
-        if (tableId) {
+
+        if (tableIds?.length) {
+            where.tableId = { in: tableIds };
+        } else if (tableId) {
             where.tableId = tableId;
         }
+
+        const dateFilter: Prisma.DateTimeFilter = {};
         if (reservationDate) {
-            where.reservationDate = {
-                gte: new Date(reservationDate.setHours(0, 0, 0, 0)),
-                lt: new Date(reservationDate.setHours(23, 59, 59, 999)),
-            };
+            dateFilter.gte = ReservationDateUtils.startOfDay(reservationDate);
+            dateFilter.lt = ReservationDateUtils.endOfDay(reservationDate);
         }
+        if (startDate) {
+            dateFilter.gte = ReservationDateUtils.startOfDay(startDate);
+        }
+        if (endDate) {
+            dateFilter.lte = ReservationDateUtils.endOfDay(endDate);
+        }
+        if (Object.keys(dateFilter).length > 0) {
+            where.reservationDate = dateFilter;
+        }
+
         if (phoneNumber) {
-            where.phoneNumber = { contains: phoneNumber };
+            where.phoneNumber = { contains: phoneNumber, mode: 'insensitive' };
         }
+
+        if (customerId) {
+            where.customerId = customerId;
+        }
+
+        if (typeof floor === 'number') {
+            where.table = { floor };
+        }
+
         if (search) {
             where.OR = [
                 { customerName: { contains: search, mode: 'insensitive' } },
@@ -54,6 +85,7 @@ export class ReservationRepository extends BaseRepository<Reservation, Reservati
             where: this.buildWhereClause(filters),
             include: {
                 table: true,
+                customer: true,
             },
             skip,
             take,
@@ -72,6 +104,7 @@ export class ReservationRepository extends BaseRepository<Reservation, Reservati
             data,
             include: {
                 table: true,
+                customer: true,
             },
         });
     }
@@ -81,6 +114,11 @@ export class ReservationRepository extends BaseRepository<Reservation, Reservati
             where: { reservationId },
             include: {
                 table: true,
+                customer: true,
+                audits: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 20,
+                },
                 orders: true,
             },
         });
@@ -100,6 +138,7 @@ export class ReservationRepository extends BaseRepository<Reservation, Reservati
             where: { phoneNumber },
             include: {
                 table: true,
+                customer: true,
             },
             orderBy: [{ reservationDate: 'desc' }, { reservationTime: 'desc' }],
         });
@@ -126,6 +165,7 @@ export class ReservationRepository extends BaseRepository<Reservation, Reservati
             data,
             include: {
                 table: true,
+                customer: true,
             },
         });
     }
@@ -136,6 +176,43 @@ export class ReservationRepository extends BaseRepository<Reservation, Reservati
 
     async delete(reservationId: number): Promise<Reservation> {
         return prisma.reservation.delete({ where: { reservationId } });
+    }
+
+    async findActiveByDate(
+        reservationDate: Date,
+        options?: { tableIds?: number[]; excludeReservationId?: number }
+    ): Promise<Reservation[]> {
+        const where: Prisma.ReservationWhereInput = {
+            reservationDate: {
+                gte: ReservationDateUtils.startOfDay(reservationDate),
+                lt: ReservationDateUtils.endOfDay(reservationDate),
+            },
+            status: { in: ['pending', 'confirmed', 'seated'] },
+        };
+
+        if (options?.tableIds?.length) {
+            where.tableId = { in: options.tableIds };
+        }
+
+        if (options?.excludeReservationId) {
+            where.reservationId = { not: options.excludeReservationId };
+        }
+
+        return prisma.reservation.findMany({
+            where,
+            include: { table: true, customer: true },
+        });
+    }
+
+    async createAuditEntry(data: Prisma.ReservationAuditCreateInput): Promise<ReservationAudit> {
+        return prisma.reservationAudit.create({ data });
+    }
+
+    async getAuditTrail(reservationId: number): Promise<ReservationAudit[]> {
+        return prisma.reservationAudit.findMany({
+            where: { reservationId },
+            orderBy: { createdAt: 'desc' },
+        });
     }
 }
 
