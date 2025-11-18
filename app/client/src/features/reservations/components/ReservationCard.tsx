@@ -137,7 +137,7 @@ export function ReservationCard({
 
                     {/* Special Request */}
                     {hasSpecialRequest && (
-                        <div className="flex items-start gap-2 p-2 bg-muted rounded-md">
+                        <div className="flex items-start gap-2 p-2 bg-muted/50 dark:bg-muted/20 rounded-md border border-border/50">
                             <MessageSquare className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                             <p className="text-sm text-muted-foreground line-clamp-2">
                                 {specialRequest}
@@ -151,7 +151,7 @@ export function ReservationCard({
                             {tags.map((tag) => (
                                 <span 
                                     key={tag}
-                                    className="px-2 py-0.5 text-xs bg-secondary text-secondary-foreground rounded-full"
+                                    className="px-2 py-0.5 text-xs bg-secondary/80 dark:bg-secondary/30 text-secondary-foreground rounded-full border border-border/50"
                                 >
                                     {tag}
                                 </span>

@@ -107,10 +107,10 @@ export default function ReservationsPage() {
                             <p className="text-sm font-medium text-muted-foreground">
                                 Confirmed
                             </p>
-                            <p className="text-2xl font-bold text-green-600">18</p>
+                            <p className="text-2xl font-bold text-green-600 dark:text-green-400">18</p>
                         </div>
-                        <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
-                            <span className="text-lg">✓</span>
+                        <div className="h-8 w-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                            <span className="text-lg text-green-700 dark:text-green-400">✓</span>
                         </div>
                     </div>
                 </Card>
@@ -121,9 +121,9 @@ export default function ReservationsPage() {
                             <p className="text-sm font-medium text-muted-foreground">
                                 Pending
                             </p>
-                            <p className="text-2xl font-bold text-yellow-600">6</p>
+                            <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">6</p>
                         </div>
-                        <div className="h-8 w-8 rounded-full bg-yellow-100 flex items-center justify-center">
+                        <div className="h-8 w-8 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
                             <span className="text-lg">⏳</span>
                         </div>
                     </div>
@@ -135,9 +135,9 @@ export default function ReservationsPage() {
                             <p className="text-sm font-medium text-muted-foreground">
                                 Special
                             </p>
-                            <p className="text-2xl font-bold text-pink-600">2</p>
+                            <p className="text-2xl font-bold text-pink-600 dark:text-pink-400">2</p>
                         </div>
-                        <div className="h-8 w-8 rounded-full bg-pink-100 flex items-center justify-center">
+                        <div className="h-8 w-8 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center">
                             <span className="text-lg">🎂</span>
                         </div>
                     </div>

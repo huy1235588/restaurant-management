@@ -207,11 +207,11 @@ export function ReservationTimelineView({
                                             return (
                                                 <div
                                                     key={`${table.tableId}-${time}`}
-                                                    className="w-32 flex-shrink-0 border rounded relative bg-muted/30 hover:bg-muted/50 transition-colors"
+                                                    className="w-32 flex-shrink-0 border border-border/50 rounded relative bg-muted/30 dark:bg-muted/10 hover:bg-muted/50 dark:hover:bg-muted/20 transition-colors"
                                                 >
                                                     {reservation && idx === 0 && (
                                                         <div
-                                                            className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 rounded cursor-pointer p-2 text-white text-xs overflow-hidden hover:shadow-lg transition-shadow"
+                                                            className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded cursor-pointer p-2 text-white text-xs overflow-hidden hover:shadow-lg transition-shadow"
                                                             style={{ height: getReservationHeight(reservation) }}
                                                             onClick={() => onReservationClick?.(reservation)}
                                                             title={`${reservation.customerName} (${reservation.headCount} guests)`}
@@ -240,13 +240,13 @@ export function ReservationTimelineView({
             </Card>
 
             {/* Legend */}
-            <div className="flex items-center gap-4 text-sm">
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded" />
+                    <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded shadow-sm" />
                     <span>Reserved</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-muted-400 border rounded" />
+                    <div className="w-6 h-6 bg-muted/30 dark:bg-muted/10 border border-border/50 rounded" />
                     <span>Available</span>
                 </div>
             </div>

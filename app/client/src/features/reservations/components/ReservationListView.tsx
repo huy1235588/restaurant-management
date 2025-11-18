@@ -185,7 +185,7 @@ export function ReservationListView({
                             reservations.map((reservation) => (
                                 <TableRow 
                                     key={reservation.reservationId}
-                                    className="cursor-pointer hover:bg-muted/50"
+                                    className="cursor-pointer hover:bg-muted/50 dark:hover:bg-muted/20 transition-colors"
                                     onClick={() => onReservationClick?.(reservation)}
                                 >
                                     <TableCell>

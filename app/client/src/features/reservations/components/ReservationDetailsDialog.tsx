@@ -347,7 +347,7 @@ export function ReservationDetailsDialog({
                                         {reservation.tags.map((tag) => (
                                             <span
                                                 key={tag}
-                                                className="px-3 py-1 text-sm bg-secondary text-secondary-foreground rounded-full"
+                                                className="px-3 py-1 text-sm bg-secondary/80 dark:bg-secondary/30 text-secondary-foreground rounded-full border border-border/50"
                                             >
                                                 {tag}
                                             </span>

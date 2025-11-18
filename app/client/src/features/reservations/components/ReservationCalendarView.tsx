@@ -145,10 +145,10 @@ export function ReservationCalendarView({
                                             h-20 p-2 rounded-lg border-2 transition-all
                                             flex flex-col items-start justify-start
                                             ${isSelected 
-                                                ? 'border-primary bg-primary/10' 
+                                                ? 'border-primary bg-primary/10 dark:bg-primary/20' 
                                                 : isCurrentMonth
-                                                ? 'border-border hover:border-primary/50'
-                                                : 'border-border/50 bg-muted/30 text-muted-foreground'
+                                                ? 'border-border hover:border-primary/50 hover:bg-accent/50'
+                                                : 'border-border/50 bg-muted/30 dark:bg-muted/10 text-muted-foreground'
                                             }
                                         `}
                                     >
@@ -203,8 +203,8 @@ export function ReservationCalendarView({
                                             p-4 rounded-lg border-2 transition-all
                                             flex flex-col items-center justify-center gap-2
                                             ${isSelected 
-                                                ? 'border-primary bg-primary/10' 
-                                                : 'border-border hover:border-primary/50'
+                                                ? 'border-primary bg-primary/10 dark:bg-primary/20' 
+                                                : 'border-border hover:border-primary/50 hover:bg-accent/50'
                                             }
                                         `}
                                     >

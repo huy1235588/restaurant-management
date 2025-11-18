@@ -108,6 +108,66 @@ export function ReservationFormDialog({
     const watchDuration = form.watch('duration');
     const watchFloor = form.watch('floor');
 
+    // Helper function to parse time string to HH:mm format
+    const parseTimeString = (time: string | undefined): string => {
+        if (!time) return '';
+        
+        // If it's already in HH:mm format, return as is
+        if (/^\d{2}:\d{2}$/.test(time)) {
+            return time;
+        }
+        
+        // If it's an ISO datetime or contains time part
+        try {
+            const date = new Date(time);
+            if (!isNaN(date.getTime())) {
+                return format(date, 'HH:mm');
+            }
+        } catch (e) {
+            // Fall through to regex extraction
+        }
+        
+        // Try to extract HH:mm from string
+        const match = time.match(/(\d{2}):(\d{2})/);
+        return match ? `${match[1]}:${match[2]}` : '';
+    };
+
+    // Reset form when reservation changes (edit mode)
+    useEffect(() => {
+        if (reservation && open) {
+            form.reset({
+                customerName: reservation.customerName || '',
+                phoneNumber: reservation.phoneNumber || '',
+                email: reservation.email || '',
+                reservationDate: reservation.reservationDate 
+                    ? new Date(reservation.reservationDate) 
+                    : new Date(),
+                reservationTime: parseTimeString(reservation.reservationTime),
+                headCount: reservation.headCount || 2,
+                duration: reservation.duration || 120,
+                tableId: reservation.tableId,
+                floor: reservation.table?.floor,
+                specialRequest: reservation.specialRequest || '',
+                notes: reservation.notes || '',
+            });
+        } else if (!reservation && open) {
+            // Reset to default values for new reservation
+            form.reset({
+                customerName: '',
+                phoneNumber: '',
+                email: '',
+                reservationDate: new Date(),
+                reservationTime: '',
+                headCount: 2,
+                duration: 120,
+                tableId: undefined,
+                floor: undefined,
+                specialRequest: '',
+                notes: '',
+            });
+        }
+    }, [reservation, open, form]);
+
     // Check availability when relevant fields change
     useEffect(() => {
         if (watchDate && watchTime && watchHeadCount) {
