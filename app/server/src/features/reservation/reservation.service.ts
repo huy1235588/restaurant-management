@@ -316,6 +316,21 @@ export class ReservationService {
     }
 
     /**
+     * Get all available tables for a specific time slot
+     * @returns List of available tables
+     */
+    async getAvailableTables(params: {
+        reservationDate: Date;
+        reservationTime: string;
+        duration: number;
+        partySize: number;
+        floor?: number;
+        excludeReservationId?: number;
+    }) {
+        return reservationAvailabilityService.getAvailableTables(params);
+    }
+
+    /**
      * Get all reservations for a specific phone number
      * @param phoneNumber - Customer phone number
      */

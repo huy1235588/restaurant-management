@@ -186,18 +186,39 @@ export class ReservationController {
      */
     async checkAvailability(req: Request, res: Response, next: NextFunction) {
         try {
-            const { tableId, date, time, duration } = req.query;
+            const { tableId, date, time, duration, partySize, floor } = req.query;
 
-            const availability = await reservationService.checkAvailability({
-                tableId: parseInt(tableId as string, 10),
+            // If tableId is provided, check specific table availability
+            if (tableId) {
+                const availability = await reservationService.checkAvailability({
+                    tableId: parseInt(tableId as string, 10),
+                    reservationDate: new Date(date as string),
+                    reservationTime: time as string,
+                    duration: parseInt(duration as string, 10),
+                });
+                return res.json(ApiResponse.success(availability, 'Availability checked successfully'));
+            }
+
+            // Otherwise, find all available tables for the given criteria
+            if (!partySize) {
+                return res.status(400).json(ApiResponse.error('partySize is required when tableId is not provided'));
+            }
+
+            const availableTables = await reservationService.getAvailableTables({
                 reservationDate: new Date(date as string),
                 reservationTime: time as string,
                 duration: parseInt(duration as string, 10),
+                partySize: parseInt(partySize as string, 10),
+                floor: floor ? parseInt(floor as string, 10) : undefined,
             });
 
-            res.json(ApiResponse.success(availability, 'Availability checked successfully'));
+            return res.json(ApiResponse.success(
+                { available: availableTables.length > 0, tables: availableTables },
+                'Available tables retrieved successfully'
+            ));
+
         } catch (error) {
-            next(error);
+            return next(error);
         }
     }
 

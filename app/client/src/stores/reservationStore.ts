@@ -56,9 +56,11 @@ interface ReservationStore {
     markAsNoShow: (id: number) => Promise<boolean>;
     checkAvailability: (params: {
         date: string;
+        time: string;
         partySize: number;
         duration?: number;
         floor?: number;
+        tableId?: number;
     }) => Promise<AvailabilityCheck | null>;
 
     // Actions - Customers

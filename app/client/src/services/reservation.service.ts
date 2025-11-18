@@ -124,9 +124,11 @@ export const reservationApi = {
     // Check table availability
     checkAvailability: async (params: {
         date: string;
+        time: string;
         partySize: number;
         duration?: number;
         floor?: number;
+        tableId?: number;
     }): Promise<AvailabilityCheck> => {
         const response = await axiosInstance.get<ApiResponse<AvailabilityCheck>>(
             '/reservations/check-availability',

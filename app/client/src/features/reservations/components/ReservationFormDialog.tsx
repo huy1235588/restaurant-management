@@ -122,7 +122,8 @@ export function ReservationFormDialog({
         try {
             const dateStr = format(watchDate, 'yyyy-MM-dd');
             const availability = await checkAvailability({
-                date: `${dateStr}T${watchTime}:00`,
+                date: dateStr,
+                time: watchTime,
                 partySize: watchHeadCount,
                 duration: watchDuration || 120,
                 floor: watchFloor,
@@ -180,7 +181,7 @@ export function ReservationFormDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>
                         {isEditMode ? 'Edit Reservation' : 'New Reservation'}
