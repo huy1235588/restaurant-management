@@ -125,7 +125,7 @@ export function ReservationTimelineView({
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                    <h2 className="text-2xl font-bold bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                         {format(selectedDate, 'EEEE, MMMM d, yyyy')}
                     </h2>
                     <p className="text-sm text-muted-foreground mt-1">
@@ -157,7 +157,7 @@ export function ReservationTimelineView({
                             setSelectedFloor(value === 'all' ? 'all' : parseInt(value))
                         }
                     >
-                        <SelectTrigger className="w-[160px] bg-background">
+                        <SelectTrigger className="w-40 bg-background">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -190,7 +190,7 @@ export function ReservationTimelineView({
                             {tables.map((table) => (
                                 <div
                                     key={table.tableId}
-                                    className="w-36 shrink-0 font-semibold text-sm text-center border-b-2 border-primary/20 pb-3 bg-gradient-to-b from-muted/50 to-transparent rounded-t-lg"
+                                    className="w-36 shrink-0 font-semibold text-sm text-center border-b-2 border-primary/20 pb-3 bg-linear-to-b from-muted/50 to-transparent rounded-t-lg"
                                 >
                                     <div className="text-base font-bold">Table {table.tableNumber}</div>
                                     <div className="text-xs text-muted-foreground font-normal mt-1">
@@ -205,7 +205,7 @@ export function ReservationTimelineView({
                         <div className="space-y-1">
                             {TIME_SLOTS.map((time, idx) => (
                                 <div key={time}>
-                                    <div className="flex gap-3 min-h-[64px]">
+                                    <div className="flex gap-3 min-h-16">
                                         {/* Time label */}
                                         <div className="w-24 shrink-0 text-sm font-semibold text-muted-foreground py-2">
                                             {time}
@@ -218,11 +218,11 @@ export function ReservationTimelineView({
                                             return (
                                                 <div
                                                     key={`${table.tableId}-${time}`}
-                                                    className="w-36 shrink-0 border-2 border-border/50 rounded-md relative bg-gradient-to-br from-muted/20 to-muted/40 dark:from-muted/5 dark:to-muted/15 hover:border-primary/30 hover:shadow-sm transition-all duration-200"
+                                                    className="w-36 shrink-0 border-2 border-border/50 rounded-md relative bg-linear-to-br from-muted/20 to-muted/40 dark:from-muted/5 dark:to-muted/15 hover:border-primary/30 hover:shadow-sm transition-all duration-200"
                                                 >
                                                     {reservation && idx === 0 && (
                                                         <div
-                                                            className="absolute inset-0 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 dark:from-blue-600 dark:via-blue-700 dark:to-indigo-700 rounded-md cursor-pointer p-3 text-white text-xs overflow-hidden hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
+                                                            className="absolute inset-0 bg-linear-to-br from-blue-500 via-blue-600 to-indigo-600 dark:from-blue-600 dark:via-blue-700 dark:to-indigo-700 rounded-md cursor-pointer p-3 text-white text-xs overflow-hidden hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
                                                             style={{ height: getReservationHeight(reservation) }}
                                                             onClick={() => onReservationClick?.(reservation)}
                                                             title={`${reservation.customerName} (${reservation.headCount} guests)`}
@@ -255,11 +255,11 @@ export function ReservationTimelineView({
             {/* Legend */}
             <div className="flex items-center justify-center gap-6 p-4 bg-muted/30 dark:bg-muted/10 rounded-lg border border-border/50">
                 <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 dark:from-blue-600 dark:to-indigo-700 rounded-md shadow-md" />
+                    <div className="w-8 h-8 bg-linear-to-br from-blue-500 to-indigo-600 dark:from-blue-600 dark:to-indigo-700 rounded-md shadow-md" />
                     <span className="text-sm font-medium">Reserved</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-muted/20 to-muted/40 dark:from-muted/5 dark:to-muted/15 border-2 border-border/50 rounded-md" />
+                    <div className="w-8 h-8 bg-linear-to-br from-muted/20 to-muted/40 dark:from-muted/5 dark:to-muted/15 border-2 border-border/50 rounded-md" />
                     <span className="text-sm font-medium">Available</span>
                 </div>
             </div>

@@ -52,24 +52,24 @@ export function ReservationCard({
     if (compact) {
         return (
             <Card 
-                className={`p-4 hover:shadow-xl hover:border-primary/50 transition-all duration-200 cursor-pointer border-2 bg-gradient-to-br from-background to-muted/20 ${className}`}
+                className={`p-4 hover:shadow-xl hover:border-primary/50 transition-all duration-200 cursor-pointer border-2 bg-linear-to-br from-background to-muted/20 ${className}`}
                 onClick={onClick}
             >
                 <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                         <div className="flex items-center gap-2 p-2 bg-primary/10 rounded-lg">
-                            <Clock className="h-4 w-4 text-primary flex-shrink-0" />
+                            <Clock className="h-4 w-4 text-primary shrink-0" />
                             <span className="font-bold text-sm">{formattedTime}</span>
                         </div>
                         
                         <div className="flex items-center gap-2 min-w-0">
-                            {isVip && <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 flex-shrink-0" />}
-                            {hasBirthday && <Cake className="h-4 w-4 text-pink-500 flex-shrink-0" />}
+                            {isVip && <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 shrink-0" />}
+                            {hasBirthday && <Cake className="h-4 w-4 text-pink-500 shrink-0" />}
                             <span className="truncate font-semibold">{customerName}</span>
                         </div>
                     </div>
                     
-                    <div className="flex items-center gap-3 flex-shrink-0">
+                    <div className="flex items-center gap-3 shrink-0">
                         <div className="flex items-center gap-2 text-sm font-medium">
                             <Users className="h-4 w-4 text-primary" />
                             <span>{headCount}</span>
@@ -91,7 +91,7 @@ export function ReservationCard({
 
     return (
         <Card 
-            className={`p-6 hover:shadow-2xl hover:border-primary/50 transition-all duration-200 cursor-pointer border-2 bg-gradient-to-br from-background via-background to-muted/20 ${className}`}
+            className={`p-6 hover:shadow-2xl hover:border-primary/50 transition-all duration-200 cursor-pointer border-2 bg-linear-to-br from-background via-background to-muted/20 ${className}`}
             onClick={onClick}
         >
             <div className="flex items-start justify-between gap-4">
@@ -141,7 +141,7 @@ export function ReservationCard({
                     {/* Special Request */}
                     {hasSpecialRequest && (
                         <div className="flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-900">
-                            <MessageSquare className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                            <MessageSquare className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
                             <p className="text-sm text-amber-900 dark:text-amber-100 line-clamp-2 font-medium">
                                 {specialRequest}
                             </p>
@@ -154,7 +154,7 @@ export function ReservationCard({
                             {tags.map((tag) => (
                                 <span 
                                     key={tag}
-                                    className="px-3 py-1 text-xs font-semibold bg-gradient-to-r from-primary/20 to-primary/10 text-primary rounded-full border border-primary/30"
+                                    className="px-3 py-1 text-xs font-semibold bg-linear-to-r from-primary/20 to-primary/10 text-primary rounded-full border border-primary/30"
                                 >
                                     {tag}
                                 </span>

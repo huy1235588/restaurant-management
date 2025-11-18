@@ -109,7 +109,7 @@ export function ReservationCalendarView({
                 {/* Month View */}
                 <TabsContent value="month" className="space-y-6">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                        <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                        <h2 className="text-2xl font-bold bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                             {format(selectedDate, 'MMMM yyyy')}
                         </h2>
                         <div className="flex items-center gap-2">
@@ -156,7 +156,7 @@ export function ReservationCalendarView({
                                             flex flex-col items-start justify-between
                                             hover:shadow-md hover:scale-105
                                             ${isSelected
-                                                ? 'border-primary bg-gradient-to-br from-primary/20 to-primary/10 dark:from-primary/30 dark:to-primary/20 shadow-lg'
+                                                ? 'border-primary bg-linear-to-br from-primary/20 to-primary/10 dark:from-primary/30 dark:to-primary/20 shadow-lg'
                                                 : isToday
                                                     ? 'border-primary/50 bg-primary/5 dark:bg-primary/5'
                                                     : isCurrentMonth
@@ -205,7 +205,7 @@ export function ReservationCalendarView({
                 {/* Week View */}
                 <TabsContent value="week" className="space-y-6">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                        <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                        <h2 className="text-2xl font-bold bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                             Week of {format(weekDays[0], 'MMM d')} - {format(weekDays[6], 'MMM d, yyyy')}
                         </h2>
                         <div className="flex items-center gap-2">
@@ -242,7 +242,7 @@ export function ReservationCalendarView({
                                             flex flex-col items-center justify-center gap-3
                                             hover:shadow-lg hover:scale-105
                                             ${isSelected
-                                                ? 'border-primary bg-gradient-to-br from-primary/20 to-primary/10 dark:from-primary/30 dark:to-primary/20 shadow-lg'
+                                                ? 'border-primary bg-linear-to-br from-primary/20 to-primary/10 dark:from-primary/30 dark:to-primary/20 shadow-lg'
                                                 : isToday
                                                     ? 'border-primary/50 bg-primary/5 dark:bg-primary/10'
                                                     : 'border-border hover:border-primary/50 bg-background'
@@ -289,7 +289,7 @@ export function ReservationCalendarView({
                 <TabsContent value="day" className="space-y-6">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <div>
-                            <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                            <h2 className="text-2xl font-bold bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                                 {format(selectedDate, 'EEEE, MMMM d, yyyy')}
                             </h2>
                             <p className="text-sm text-muted-foreground mt-1">
