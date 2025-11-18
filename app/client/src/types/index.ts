@@ -161,25 +161,78 @@ export interface Bill {
 }
 
 // Reservation Types
-export type ReservationStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'no-show';
+export type ReservationStatus = 'pending' | 'confirmed' | 'seated' | 'completed' | 'cancelled' | 'no_show';
+
+export interface Customer {
+    customerId: number;
+    name: string;
+    phoneNumber: string;
+    email?: string;
+    birthday?: string;
+    preferences?: Record<string, any>;
+    notes?: string;
+    isVip: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
 
 export interface Reservation {
     reservationId: number;
+    reservationCode: string;
+    customerId?: number;
+    customer?: Customer;
     customerName: string;
-    customerPhone: string;
-    customerEmail?: string;
-    tableId?: number;
+    phoneNumber: string;
+    email?: string;
+    tableId: number;
     table?: Table;
-    partySize: number;
     reservationDate: string;
     reservationTime: string;
-    duration?: number;
+    duration: number;
+    headCount: number;
     status: ReservationStatus;
-    specialRequests?: string;
-    staffId?: number;
-    staff?: User;
+    specialRequest?: string;
+    depositAmount?: number;
+    notes?: string;
+    tags?: string[];
+    createdBy?: number;
+    creator?: User;
+    confirmedAt?: string;
+    seatedAt?: string;
+    completedAt?: string;
+    cancelledAt?: string;
+    cancellationReason?: string;
     createdAt: string;
     updatedAt: string;
+}
+
+export interface ReservationAudit {
+    auditId: number;
+    reservationId: number;
+    action: 'created' | 'updated' | 'cancelled' | 'status_changed';
+    userId: number;
+    user?: User;
+    changes: Record<string, any>;
+    timestamp: string;
+}
+
+export interface AvailableTable {
+    tableId: number;
+    tableNumber: string;
+    capacity: number;
+    minCapacity?: number;
+    floor?: number;
+    location?: string;
+    isAvailable: boolean;
+}
+
+export interface AvailabilityCheck {
+    available: boolean;
+    tables: AvailableTable[];
+    alternatives?: {
+        time: string;
+        availableCount: number;
+    }[];
 }
 
 // Kitchen Types
@@ -277,61 +330,91 @@ export interface OrderFormData {
 }
 
 export interface ReservationFormData {
+    customerId?: number;
     customerName: string;
-    customerPhone: string;
-    customerEmail?: string;
-    partySize: number;
+    phoneNumber: string;
+    email?: string;
+    tableId?: number;
+    floor?: number;
+    preferredTableId?: number;
     reservationDate: string;
     reservationTime: string;
-    specialRequests?: string;
+    duration?: number;
+    headCount: number;
+    specialRequest?: string;
+    depositAmount?: number;
+    notes?: string;
+    tags?: string[];
 }
+
+export interface CreateReservationDto extends ReservationFormData {}
+
+export interface UpdateReservationDto extends Partial<ReservationFormData> {}
+
+export interface CreateCustomerDto {
+    name: string;
+    phoneNumber: string;
+    email?: string;
+    birthday?: string;
+    preferences?: Record<string, any>;
+    notes?: string;
+    isVip?: boolean;
+}
+
+export interface UpdateCustomerDto extends Partial<CreateCustomerDto> {}
 
 // Permission mapping for RBAC
 export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     admin: ['*'], // Full access
     manager: [
-        'dashboard.view',
-        'orders.view',
+        'dashboard.read',
+        'orders.read',
         'orders.create',
         'orders.update',
         'orders.delete',
-        'menu.view',
+        'kitchen.read',
+        'tables.read',
+        'tables.update',
+        'menu.read',
         'menu.create',
         'menu.update',
         'menu.delete',
-        'tables.view',
-        'tables.update',
-        'reservations.view',
+        'category.read',
+        'reservations.read',
         'reservations.create',
         'reservations.update',
-        'bills.view',
-        'staff.view',
-        'reports.view',
-    ],
-    waiter: [
-        'dashboard.view',
-        'orders.view',
-        'orders.create',
-        'orders.update',
-        'menu.view',
-        'tables.view',
-        'tables.update',
-        'reservations.view',
-        'reservations.create',
-    ],
-    chef: [
-        'kitchen.view',
-        'orders.view',
-        'orders.update',
-        'menu.view',
-    ],
-    cashier: [
-        'dashboard.view',
-        'orders.view',
-        'bills.view',
+        'reservations.delete',
+        'bills.read',
         'bills.create',
         'bills.update',
-        'payments.create',
+        'staff.read',
+        'reports.read',
+    ],
+    waiter: [
+        'dashboard.read',
+        'orders.read',
+        'orders.create',
+        'orders.update',
+        'kitchen.read',
+        'menu.read',
+        'tables.read',
+        'tables.update',
+        'reservations.read',
+        'reservations.create',
+        'bills.read',
+    ],
+    chef: [
+        'kitchen.read',
+        'orders.read',
+        'orders.update',
+        'menu.read',
+    ],
+    cashier: [
+        'dashboard.read',
+        'orders.read',
+        'bills.read',
+        'bills.create',
+        'bills.update',
     ],
 };
 

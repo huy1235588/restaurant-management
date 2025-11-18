@@ -62,10 +62,10 @@
 ### Routing & Layout
 
 - [x] Create `/reservations` page as main entry point
-- [x] Create `/reservations/new` page for creating reservations
-- [x] Create `/reservations/:id` page for viewing reservation details
-- [x] Create `/reservations/:id/edit` page for editing reservations
-- [x] Add "Reservations" link to main navigation sidebar
+- [x] Create `/reservations/new` page for creating reservations (integrated into dialog)
+- [x] Create `/reservations/:id` page for viewing reservation details (integrated into dialog)
+- [x] Create `/reservations/:id/edit` page for editing reservations (integrated into dialog)
+- [ ] Add "Reservations" link to main navigation sidebar (PENDING)
 - [x] Create reservation layout component with header and view toggle
 
 ### State Management
@@ -73,9 +73,9 @@
 - [x] Create Zustand store: `useReservationStore` with state: reservations, selectedDate, viewMode, filters, loading
 - [x] Add store actions: fetchReservations, createReservation, updateReservation, cancelReservation, changeStatus
 - [x] Add store actions: setDate, setViewMode, setFilters
-- [x] Create custom hook: `useReservations` for fetching with filters
-- [x] Create custom hook: `useAvailability` for checking table availability
-- [x] Create custom hook: `useCustomers` for customer search/autocomplete
+- [x] Create custom hook: `useReservations` for fetching with filters (integrated in store)
+- [x] Create custom hook: `useAvailability` for checking table availability (integrated in store)
+- [x] Create custom hook: `useCustomers` for customer search/autocomplete (integrated in store)
 
 ### Reservation Interface - Calendar View
 
