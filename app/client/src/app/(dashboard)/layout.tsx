@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 
 import { useAuthStore } from '@/stores/authStore';
-import { hasPermission } from '@/types';
+import { hasPermission } from '@/types/permissions';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
 import { DashboardSidebar, NavItem, NavGroup } from '@/components/layouts/DashboardSidebar';
 import { MobileSidebar } from '@/components/layouts/MobileSidebar';
