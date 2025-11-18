@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { reservationService } from '@/features/reservation/reservation.service';
+import { ReservationSerializer } from '@/features/reservation/reservation.serializer';
 import { ApiResponse } from '@/shared/utils/response';
 import { AuthRequest } from '@/shared/middlewares/auth';
 
@@ -47,7 +48,9 @@ export class ReservationController {
                 sortOrder: (sortOrder as string).toLowerCase() as 'asc' | 'desc',
             });
 
-            res.json(ApiResponse.success(reservations, 'Reservations retrieved successfully'));
+            const serialized = ReservationSerializer.serializePaginated(reservations);
+
+            res.json(ApiResponse.success(serialized, 'Reservations retrieved successfully'));
         } catch (error) {
             next(error);
         }
@@ -61,8 +64,9 @@ export class ReservationController {
             const reservationId = parseInt(req.params['id'] || '0');
 
             const reservation = await reservationService.getReservationById(reservationId);
+            const serialized = ReservationSerializer.serialize(reservation);
 
-            res.json(ApiResponse.success(reservation, 'Reservation retrieved successfully'));
+            res.json(ApiResponse.success(serialized, 'Reservation retrieved successfully'));
         } catch (error) {
             next(error);
         }
@@ -76,8 +80,9 @@ export class ReservationController {
             const code = req.params['code'] || '';
 
             const reservation = await reservationService.getReservationByCode(code);
+            const serialized = ReservationSerializer.serialize(reservation);
 
-            res.json(ApiResponse.success(reservation, 'Reservation retrieved successfully'));
+            res.json(ApiResponse.success(serialized, 'Reservation retrieved successfully'));
         } catch (error) {
             next(error);
         }
@@ -95,8 +100,9 @@ export class ReservationController {
                 },
                 req.user?.staffId
             );
+            const serialized = ReservationSerializer.serialize(reservation);
 
-            res.status(201).json(ApiResponse.success(reservation, 'Reservation created successfully'));
+            res.status(201).json(ApiResponse.success(serialized, 'Reservation created successfully'));
         } catch (error) {
             next(error);
         }
@@ -117,8 +123,9 @@ export class ReservationController {
                 },
                 req.user?.staffId
             );
+            const serialized = ReservationSerializer.serialize(reservation);
 
-            res.json(ApiResponse.success(reservation, 'Reservation updated successfully'));
+            res.json(ApiResponse.success(serialized, 'Reservation updated successfully'));
         } catch (error) {
             next(error);
         }
@@ -133,8 +140,9 @@ export class ReservationController {
             const { reason } = req.body;
 
             const reservation = await reservationService.cancelReservation(reservationId, reason, req.user?.staffId);
+            const serialized = ReservationSerializer.serialize(reservation);
 
-            res.json(ApiResponse.success(reservation, 'Reservation cancelled successfully'));
+            res.json(ApiResponse.success(serialized, 'Reservation cancelled successfully'));
         } catch (error) {
             next(error);
         }
@@ -148,8 +156,9 @@ export class ReservationController {
             const reservationId = parseInt(req.params['id'] || '0');
 
             const reservation = await reservationService.confirmReservation(reservationId, req.user?.staffId);
+            const serialized = ReservationSerializer.serialize(reservation);
 
-            res.json(ApiResponse.success(reservation, 'Reservation confirmed successfully'));
+            res.json(ApiResponse.success(serialized, 'Reservation confirmed successfully'));
         } catch (error) {
             next(error);
         }
@@ -163,8 +172,9 @@ export class ReservationController {
             const reservationId = parseInt(req.params['id'] || '0');
 
             const reservation = await reservationService.markReservationSeated(reservationId, req.user?.staffId);
+            const serialized = ReservationSerializer.serialize(reservation);
 
-            res.json(ApiResponse.success(reservation, 'Reservation marked as seated successfully'));
+            res.json(ApiResponse.success(serialized, 'Reservation marked as seated successfully'));
         } catch (error) {
             next(error);
         }
@@ -175,7 +185,8 @@ export class ReservationController {
             const reservationId = parseInt(req.params['id'] || '0');
             const { status } = req.body;
             const reservation = await reservationService.changeStatus(reservationId, status, req.user?.staffId);
-            res.json(ApiResponse.success(reservation, 'Reservation status updated successfully'));
+            const serialized = ReservationSerializer.serialize(reservation);
+            res.json(ApiResponse.success(serialized, 'Reservation status updated successfully'));
         } catch (error) {
             next(error);
         }
@@ -230,8 +241,9 @@ export class ReservationController {
             const phone = req.params['phone'] || '';
 
             const reservations = await reservationService.getReservationsByPhone(phone);
+            const serialized = ReservationSerializer.serializeMany(reservations);
 
-            res.json(ApiResponse.success(reservations, 'Reservations retrieved successfully'));
+            res.json(ApiResponse.success(serialized, 'Reservations retrieved successfully'));
         } catch (error) {
             next(error);
         }

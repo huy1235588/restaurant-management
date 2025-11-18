@@ -31,6 +31,7 @@ import {
     Ban,
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { formatReservationDate, formatReservationTime, formatTimestamp } from '@/lib/utils/date';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -69,21 +70,10 @@ export function ReservationDetailsDialog({
     if (!reservation) return null;
 
     const formatDate = (date: string) => {
-        try {
-            return format(new Date(date), 'EEEE, MMMM dd, yyyy');
-        } catch {
-            return date;
-        }
+        return formatReservationDate(date, 'EEEE, MMMM dd, yyyy');
     };
 
-    const formatDateTime = (dateTime?: string) => {
-        if (!dateTime) return 'N/A';
-        try {
-            return format(new Date(dateTime), 'MMM dd, yyyy • hh:mm a');
-        } catch {
-            return dateTime;
-        }
-    };
+
 
     const handleAction = async (action: string) => {
         setIsProcessing(true);
@@ -233,7 +223,7 @@ export function ReservationDetailsDialog({
                                     <div>
                                         <p className="text-sm font-medium text-muted-foreground">Time</p>
                                         <p className="text-base">
-                                            {reservation.reservationTime}
+                                            {formatReservationTime(reservation.reservationTime)}
                                             {reservation.duration && ` (${reservation.duration} min)`}
                                         </p>
                                     </div>
@@ -360,18 +350,18 @@ export function ReservationDetailsDialog({
                         {/* Timestamps */}
                         <Separator />
                         <div className="space-y-2 text-sm text-muted-foreground">
-                            <p>Created: {formatDateTime(reservation.createdAt)}</p>
+                            <p>Created: {formatTimestamp(reservation.createdAt)}</p>
                             {reservation.confirmedAt && (
-                                <p>Confirmed: {formatDateTime(reservation.confirmedAt)}</p>
+                                <p>Confirmed: {formatTimestamp(reservation.confirmedAt)}</p>
                             )}
                             {reservation.seatedAt && (
-                                <p>Seated: {formatDateTime(reservation.seatedAt)}</p>
+                                <p>Seated: {formatTimestamp(reservation.seatedAt)}</p>
                             )}
                             {reservation.completedAt && (
-                                <p>Completed: {formatDateTime(reservation.completedAt)}</p>
+                                <p>Completed: {formatTimestamp(reservation.completedAt)}</p>
                             )}
                             {reservation.cancelledAt && (
-                                <p>Cancelled: {formatDateTime(reservation.cancelledAt)}</p>
+                                <p>Cancelled: {formatTimestamp(reservation.cancelledAt)}</p>
                             )}
                         </div>
                     </div>

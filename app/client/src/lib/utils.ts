@@ -27,3 +27,16 @@ export function formatTime(minutes: number): string {
     }
     return `${mins}m`;
 }
+
+// Re-export date utilities
+export {
+    parseReservationDate,
+    formatReservationDate,
+    parseReservationTime,
+    formatReservationTime,
+    combineDateAndTime,
+    formatBirthday,
+    formatTimestamp,
+    isNewDateFormat,
+    isNewTimeFormat,
+} from './utils/date';

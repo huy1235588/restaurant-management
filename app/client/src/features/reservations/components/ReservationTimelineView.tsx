@@ -25,6 +25,7 @@ import {
     addDays,
     isSameDay,
 } from 'date-fns';
+import { formatReservationDate, formatReservationTime, parseReservationTime } from '@/lib/utils/date';
 
 interface ReservationTimelineViewProps {
     onReservationClick?: (reservation: Reservation) => void;
@@ -60,10 +61,7 @@ export function ReservationTimelineView({
     const dateReservations = useMemo(() => {
         const dateStr = format(selectedDate, 'yyyy-MM-dd');
         return reservations.filter((r) => {
-            // Handle both Date objects and string formats
-            const resDate = typeof r.reservationDate === 'string' 
-                ? r.reservationDate.split('T')[0] // ISO string: "2024-11-18T00:00:00.000Z" -> "2024-11-18"
-                : format(new Date(r.reservationDate), 'yyyy-MM-dd');
+            const resDate = formatReservationDate(r.reservationDate);
             return resDate === dateStr;
         });
     }, [reservations, selectedDate]);
@@ -93,7 +91,8 @@ export function ReservationTimelineView({
         return dateReservations.find((res) => {
             if (res.tableId !== table.tableId) return false;
 
-            const resStart = parse(res.reservationTime, 'HH:mm', new Date());
+            const timeStr = parseReservationTime(res.reservationTime);
+            const resStart = parse(timeStr.substring(0, 5), 'HH:mm', new Date());
             const resEnd = addMinutes(resStart, res.duration || 120);
 
             const slotStart = parse(time, 'HH:mm', new Date());
@@ -226,7 +225,7 @@ export function ReservationTimelineView({
                                                                 {reservation.customerName}
                                                             </div>
                                                             <div className="text-xs opacity-90">
-                                                                {reservation.reservationTime}
+                                                                {formatReservationTime(reservation.reservationTime)}
                                                             </div>
                                                             <div className="text-xs opacity-80">
                                                                 {reservation.headCount} guest{reservation.headCount > 1 ? 's' : ''}

@@ -14,6 +14,7 @@ import {
     MessageSquare
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { formatReservationTime } from '@/lib/utils/date';
 
 interface ReservationCardProps {
     reservation: Reservation;
@@ -41,7 +42,7 @@ export function ReservationCard({
     } = reservation;
 
     // Format time (HH:mm)
-    const formattedTime = reservationTime;
+    const formattedTime = formatReservationTime(reservationTime);
 
     // Check for VIP or special tags
     const isVip = customer?.isVip || tags?.includes('vip');

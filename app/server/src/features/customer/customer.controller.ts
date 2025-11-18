@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { customerService } from '@/features/customer/customer.service';
+import { CustomerSerializer } from '@/features/customer/customer.serializer';
 import { ApiResponse } from '@/shared/utils/response';
 
 const parseNumberFromQuery = (value: unknown, fallback: number) => {
@@ -28,8 +29,9 @@ export class CustomerController {
                 sortBy: 'createdAt',
                 sortOrder: 'desc',
             });
+            const serialized = CustomerSerializer.serializePaginated(result);
 
-            res.json(ApiResponse.success(result, 'Customers retrieved successfully'));
+            res.json(ApiResponse.success(serialized, 'Customers retrieved successfully'));
         } catch (error) {
             next(error);
         }
@@ -39,7 +41,8 @@ export class CustomerController {
         try {
             const customerId = Number(req.params['id']);
             const customer = await customerService.getCustomerById(customerId);
-            res.json(ApiResponse.success(customer, 'Customer retrieved successfully'));
+            const serialized = CustomerSerializer.serialize(customer);
+            res.json(ApiResponse.success(serialized, 'Customer retrieved successfully'));
         } catch (error) {
             next(error);
         }
@@ -52,7 +55,8 @@ export class CustomerController {
                 birthday: req.body.birthday ? new Date(req.body.birthday) : undefined,
             };
             const customer = await customerService.createCustomer(payload);
-            res.status(201).json(ApiResponse.success(customer, 'Customer created successfully'));
+            const serialized = CustomerSerializer.serialize(customer);
+            res.status(201).json(ApiResponse.success(serialized, 'Customer created successfully'));
         } catch (error) {
             next(error);
         }
@@ -66,7 +70,8 @@ export class CustomerController {
                 birthday: req.body.birthday ? new Date(req.body.birthday) : undefined,
             };
             const customer = await customerService.updateCustomer(customerId, payload);
-            res.json(ApiResponse.success(customer, 'Customer updated successfully'));
+            const serialized = CustomerSerializer.serialize(customer);
+            res.json(ApiResponse.success(serialized, 'Customer updated successfully'));
         } catch (error) {
             next(error);
         }
@@ -77,7 +82,8 @@ export class CustomerController {
             const customerId = Number(req.params['id']);
             const historyLimit = parseNumberFromQuery(req.query['limit'], 50);
             const history = await customerService.getReservationHistory(customerId, historyLimit);
-            res.json(ApiResponse.success(history, 'Reservation history retrieved successfully'));
+            const serialized = CustomerSerializer.serializeMany(history);
+            res.json(ApiResponse.success(serialized, 'Reservation history retrieved successfully'));
         } catch (error) {
             next(error);
         }
@@ -90,7 +96,8 @@ export class CustomerController {
                 term as string,
                 parseNumberFromQuery(limit, 10)
             );
-            res.json(ApiResponse.success(results, 'Customer search results'));
+            const serialized = CustomerSerializer.serializeMany(results);
+            res.json(ApiResponse.success(serialized, 'Customer search results'));
         } catch (error) {
             next(error);
         }
@@ -101,7 +108,8 @@ export class CustomerController {
             const primaryCustomerId = Number(req.params['id']);
             const { duplicateCustomerId } = req.body;
             const customer = await customerService.mergeCustomers(primaryCustomerId, duplicateCustomerId);
-            res.json(ApiResponse.success(customer, 'Customers merged successfully'));
+            const serialized = CustomerSerializer.serialize(customer);
+            res.json(ApiResponse.success(serialized, 'Customers merged successfully'));
         } catch (error) {
             next(error);
         }
