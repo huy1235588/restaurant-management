@@ -16,6 +16,8 @@ import { Separator } from '@/components/ui/separator';
 import {
     ChevronLeft,
     ChevronRight,
+    Clock,
+    Users,
 } from 'lucide-react';
 import {
     format,
@@ -119,41 +121,43 @@ export function ReservationTimelineView({
     const handleToday = () => setSelectedDate(new Date());
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-xl font-semibold">
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                         {format(selectedDate, 'EEEE, MMMM d, yyyy')}
                     </h2>
-                    <p className="text-sm text-muted-foreground">
-                        {dateReservations.length} reservation{dateReservations.length !== 1 ? 's' : ''} for this date
+                    <p className="text-sm text-muted-foreground mt-1">
+                        {dateReservations.length} reservation{dateReservations.length !== 1 ? 's' : ''} scheduled
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={handleToday}>
+                    <Button variant="outline" size="sm" onClick={handleToday} className="font-medium">
                         Today
                     </Button>
-                    <Button variant="outline" size="icon" onClick={handlePrevDay}>
-                        <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="icon" onClick={handleNextDay}>
-                        <ChevronRight className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center gap-1">
+                        <Button variant="outline" size="icon" onClick={handlePrevDay} className="hover:bg-primary/10">
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <Button variant="outline" size="icon" onClick={handleNextDay} className="hover:bg-primary/10">
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                    </div>
                 </div>
             </div>
 
             {/* Floor Filter */}
             {floors.length > 0 && (
-                <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">Floor:</span>
+                <div className="flex items-center gap-3 p-4 bg-muted/30 dark:bg-muted/10 rounded-lg border border-border/50">
+                    <span className="text-sm font-semibold">Floor:</span>
                     <Select
                         value={selectedFloor.toString()}
                         onValueChange={(value) =>
                             setSelectedFloor(value === 'all' ? 'all' : parseInt(value))
                         }
                     >
-                        <SelectTrigger className="w-[150px]">
+                        <SelectTrigger className="w-[160px] bg-background">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -169,39 +173,41 @@ export function ReservationTimelineView({
             )}
 
             {/* Timeline */}
-            <Card className="p-4 overflow-x-auto">
+            <Card className="p-6 overflow-x-auto shadow-lg border-2">
                 {tables.length === 0 ? (
-                    <div className="text-center py-12 text-muted-foreground">
-                        No tables with reservations for the selected date and floor
+                    <div className="text-center py-16 text-muted-foreground">
+                        <p className="text-lg font-medium">No reservations found</p>
+                        <p className="text-sm mt-1">No tables with reservations for the selected date and floor</p>
                     </div>
                 ) : (
                     <div className="min-w-max">
                         {/* Table Headers */}
-                        <div className="flex gap-2 mb-4">
+                        <div className="flex gap-3 mb-6">
                             {/* Time column header */}
-                            <div className="w-24 flex-shrink-0 font-semibold text-sm">Time</div>
+                            <div className="w-24 shrink-0 font-bold text-sm text-primary">Time</div>
 
                             {/* Table columns */}
                             {tables.map((table) => (
                                 <div
                                     key={table.tableId}
-                                    className="w-32 flex-shrink-0 font-semibold text-sm text-center border-b pb-2"
+                                    className="w-36 shrink-0 font-semibold text-sm text-center border-b-2 border-primary/20 pb-3 bg-gradient-to-b from-muted/50 to-transparent rounded-t-lg"
                                 >
-                                    <div>Table {table.tableNumber}</div>
-                                    <div className="text-xs text-muted-foreground font-normal">
-                                        Capacity: {table.capacity}
+                                    <div className="text-base font-bold">Table {table.tableNumber}</div>
+                                    <div className="text-xs text-muted-foreground font-normal mt-1">
+                                        <Users className="inline h-3 w-3 mr-1" />
+                                        {table.capacity} seats
                                     </div>
                                 </div>
                             ))}
                         </div>
 
                         {/* Timeline Grid */}
-                        <div className="space-y-0.5">
+                        <div className="space-y-1">
                             {TIME_SLOTS.map((time, idx) => (
                                 <div key={time}>
-                                    <div className="flex gap-2 min-h-[60px]">
+                                    <div className="flex gap-3 min-h-[64px]">
                                         {/* Time label */}
-                                        <div className="w-24 flex-shrink-0 text-xs font-medium text-muted-foreground py-1">
+                                        <div className="w-24 shrink-0 text-sm font-semibold text-muted-foreground py-2">
                                             {time}
                                         </div>
 
@@ -212,22 +218,24 @@ export function ReservationTimelineView({
                                             return (
                                                 <div
                                                     key={`${table.tableId}-${time}`}
-                                                    className="w-32 flex-shrink-0 border border-border/50 rounded relative bg-muted/30 dark:bg-muted/10 hover:bg-muted/50 dark:hover:bg-muted/20 transition-colors"
+                                                    className="w-36 shrink-0 border-2 border-border/50 rounded-md relative bg-gradient-to-br from-muted/20 to-muted/40 dark:from-muted/5 dark:to-muted/15 hover:border-primary/30 hover:shadow-sm transition-all duration-200"
                                                 >
                                                     {reservation && idx === 0 && (
                                                         <div
-                                                            className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded cursor-pointer p-2 text-white text-xs overflow-hidden hover:shadow-lg transition-shadow"
+                                                            className="absolute inset-0 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 dark:from-blue-600 dark:via-blue-700 dark:to-indigo-700 rounded-md cursor-pointer p-3 text-white text-xs overflow-hidden hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
                                                             style={{ height: getReservationHeight(reservation) }}
                                                             onClick={() => onReservationClick?.(reservation)}
                                                             title={`${reservation.customerName} (${reservation.headCount} guests)`}
                                                         >
-                                                            <div className="font-semibold text-xs">
+                                                            <div className="font-bold text-sm mb-1">
                                                                 {reservation.customerName}
                                                             </div>
-                                                            <div className="text-xs opacity-90">
+                                                            <div className="flex items-center gap-1 text-xs opacity-95">
+                                                                <Clock className="h-3 w-3" />
                                                                 {formatReservationTime(reservation.reservationTime)}
                                                             </div>
-                                                            <div className="text-xs opacity-80">
+                                                            <div className="flex items-center gap-1 text-xs opacity-90 mt-1">
+                                                                <Users className="h-3 w-3" />
                                                                 {reservation.headCount} guest{reservation.headCount > 1 ? 's' : ''}
                                                             </div>
                                                         </div>
@@ -236,7 +244,7 @@ export function ReservationTimelineView({
                                             );
                                         })}
                                     </div>
-                                    {idx < TIME_SLOTS.length - 1 && <Separator className="my-0.5" />}
+                                    {idx < TIME_SLOTS.length - 1 && <Separator className="my-1 opacity-50" />}
                                 </div>
                             ))}
                         </div>
@@ -245,14 +253,14 @@ export function ReservationTimelineView({
             </Card>
 
             {/* Legend */}
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center justify-center gap-6 p-4 bg-muted/30 dark:bg-muted/10 rounded-lg border border-border/50">
                 <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded shadow-sm" />
-                    <span>Reserved</span>
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 dark:from-blue-600 dark:to-indigo-700 rounded-md shadow-md" />
+                    <span className="text-sm font-medium">Reserved</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-muted/30 dark:bg-muted/10 border border-border/50 rounded" />
-                    <span>Available</span>
+                    <div className="w-8 h-8 bg-gradient-to-br from-muted/20 to-muted/40 dark:from-muted/5 dark:to-muted/15 border-2 border-border/50 rounded-md" />
+                    <span className="text-sm font-medium">Available</span>
                 </div>
             </div>
         </div>

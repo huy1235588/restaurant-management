@@ -65,10 +65,10 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
     return (
         <Badge 
             variant={config.variant}
-            className={`flex items-center gap-1 ${config.className} ${className || ''}`}
+            className={`flex items-center gap-1.5 px-3 py-1 font-semibold border-2 ${config.className} ${className || ''}`}
         >
             {config.icon}
-            <span>{config.label}</span>
+            <span className="text-xs">{config.label}</span>
         </Badge>
     );
 }

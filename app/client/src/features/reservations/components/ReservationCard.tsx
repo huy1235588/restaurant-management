@@ -52,24 +52,26 @@ export function ReservationCard({
     if (compact) {
         return (
             <Card 
-                className={`p-3 hover:shadow-md transition-shadow cursor-pointer ${className}`}
+                className={`p-4 hover:shadow-xl hover:border-primary/50 transition-all duration-200 cursor-pointer border-2 bg-gradient-to-br from-background to-muted/20 ${className}`}
                 onClick={onClick}
             >
-                <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <Clock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                        <span className="font-medium text-sm">{formattedTime}</span>
+                <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className="flex items-center gap-2 p-2 bg-primary/10 rounded-lg">
+                            <Clock className="h-4 w-4 text-primary flex-shrink-0" />
+                            <span className="font-bold text-sm">{formattedTime}</span>
+                        </div>
                         
-                        <div className="flex items-center gap-1 min-w-0">
-                            {isVip && <Star className="h-3 w-3 text-yellow-500 flex-shrink-0" />}
-                            {hasBirthday && <Cake className="h-3 w-3 text-pink-500 flex-shrink-0" />}
-                            <span className="truncate text-sm">{customerName}</span>
+                        <div className="flex items-center gap-2 min-w-0">
+                            {isVip && <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 flex-shrink-0" />}
+                            {hasBirthday && <Cake className="h-4 w-4 text-pink-500 flex-shrink-0" />}
+                            <span className="truncate font-semibold">{customerName}</span>
                         </div>
                     </div>
                     
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                            <Users className="h-3 w-3" />
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                        <div className="flex items-center gap-2 text-sm font-medium">
+                            <Users className="h-4 w-4 text-primary" />
                             <span>{headCount}</span>
                         </div>
                         <StatusBadge status={status} />
@@ -77,10 +79,10 @@ export function ReservationCard({
                 </div>
                 
                 {table && (
-                    <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
-                        <MapPin className="h-3 w-3" />
-                        <span>Table {table.tableNumber}</span>
-                        {table.floor && <span>• Floor {table.floor}</span>}
+                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
+                        <MapPin className="h-4 w-4 text-primary" />
+                        <span className="text-sm font-medium">Table {table.tableNumber}</span>
+                        {table.floor && <span className="text-sm text-muted-foreground">• Floor {table.floor}</span>}
                     </div>
                 )}
             </Card>
@@ -89,48 +91,48 @@ export function ReservationCard({
 
     return (
         <Card 
-            className={`p-4 hover:shadow-lg transition-shadow cursor-pointer ${className}`}
+            className={`p-6 hover:shadow-2xl hover:border-primary/50 transition-all duration-200 cursor-pointer border-2 bg-gradient-to-br from-background via-background to-muted/20 ${className}`}
             onClick={onClick}
         >
-            <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 space-y-3">
+            <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 space-y-4">
                     {/* Header - Time and Status */}
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <Clock className="h-5 w-5 text-primary" />
-                            <span className="text-lg font-semibold">{formattedTime}</span>
+                        <div className="flex items-center gap-3 p-3 bg-primary/10 rounded-xl">
+                            <Clock className="h-6 w-6 text-primary" />
+                            <span className="text-xl font-bold">{formattedTime}</span>
                         </div>
                         <StatusBadge status={status} />
                     </div>
 
                     {/* Customer Info */}
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                         <div className="flex items-center gap-2">
                             {isVip && (
-                                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                                <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
                             )}
                             {hasBirthday && (
-                                <Cake className="h-4 w-4 text-pink-500" />
+                                <Cake className="h-5 w-5 text-pink-500" />
                             )}
-                            <span className="font-medium text-base">{customerName}</span>
+                            <span className="font-bold text-lg">{customerName}</span>
                         </div>
 
-                        <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-1">
-                                <Phone className="h-3 w-3" />
-                                <span>{phoneNumber}</span>
+                        <div className="flex flex-wrap gap-4 text-sm">
+                            <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-lg">
+                                <Phone className="h-4 w-4 text-primary" />
+                                <span className="font-medium">{phoneNumber}</span>
                             </div>
                             
-                            <div className="flex items-center gap-1">
-                                <Users className="h-3 w-3" />
-                                <span>{headCount} {headCount > 1 ? 'guests' : 'guest'}</span>
+                            <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-lg">
+                                <Users className="h-4 w-4 text-primary" />
+                                <span className="font-medium">{headCount} {headCount > 1 ? 'guests' : 'guest'}</span>
                             </div>
 
                             {table && (
-                                <div className="flex items-center gap-1">
-                                    <MapPin className="h-3 w-3" />
-                                    <span>Table {table.tableNumber}</span>
-                                    {table.floor && <span className="text-xs">• Floor {table.floor}</span>}
+                                <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-lg">
+                                    <MapPin className="h-4 w-4 text-primary" />
+                                    <span className="font-medium">Table {table.tableNumber}</span>
+                                    {table.floor && <span className="text-xs text-muted-foreground">• Floor {table.floor}</span>}
                                 </div>
                             )}
                         </div>
@@ -138,9 +140,9 @@ export function ReservationCard({
 
                     {/* Special Request */}
                     {hasSpecialRequest && (
-                        <div className="flex items-start gap-2 p-2 bg-muted/50 dark:bg-muted/20 rounded-md border border-border/50">
-                            <MessageSquare className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                            <p className="text-sm text-muted-foreground line-clamp-2">
+                        <div className="flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-900">
+                            <MessageSquare className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                            <p className="text-sm text-amber-900 dark:text-amber-100 line-clamp-2 font-medium">
                                 {specialRequest}
                             </p>
                         </div>
@@ -148,11 +150,11 @@ export function ReservationCard({
 
                     {/* Tags */}
                     {tags && tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
+                        <div className="flex flex-wrap gap-2">
                             {tags.map((tag) => (
                                 <span 
                                     key={tag}
-                                    className="px-2 py-0.5 text-xs bg-secondary/80 dark:bg-secondary/30 text-secondary-foreground rounded-full border border-border/50"
+                                    className="px-3 py-1 text-xs font-semibold bg-gradient-to-r from-primary/20 to-primary/10 text-primary rounded-full border border-primary/30"
                                 >
                                     {tag}
                                 </span>

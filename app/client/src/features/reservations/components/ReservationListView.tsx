@@ -127,25 +127,25 @@ export function ReservationListView({
     }
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-6">
             {/* Search and Filters */}
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-4 p-4 bg-muted/30 dark:bg-muted/10 rounded-lg border-2 border-border/50">
                 <div className="flex-1 flex gap-2">
                     <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input
                             placeholder="Search by name, phone, or code..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                            className="pl-9"
+                            className="pl-10 h-11 bg-background border-2 font-medium"
                         />
                     </div>
-                    <Button onClick={handleSearch}>Search</Button>
+                    <Button onClick={handleSearch} size="lg" className="font-semibold">Search</Button>
                 </div>
 
                 <Select value={statusFilter} onValueChange={handleStatusFilter}>
-                    <SelectTrigger className="w-full sm:w-[180px]">
+                    <SelectTrigger className="w-full sm:w-[200px] h-11 bg-background border-2 font-medium">
                         <SelectValue placeholder="All Statuses" />
                     </SelectTrigger>
                     <SelectContent>
@@ -161,17 +161,17 @@ export function ReservationListView({
             </div>
 
             {/* Reservations Table */}
-            <div className="rounded-md border">
+            <div className="rounded-xl border-2 shadow-lg overflow-hidden">
                 <Table>
                     <TableHeader>
-                        <TableRow>
-                            <TableHead>Date & Time</TableHead>
-                            <TableHead>Customer</TableHead>
-                            <TableHead>Contact</TableHead>
-                            <TableHead className="text-center">Party Size</TableHead>
-                            <TableHead>Table</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                        <TableRow className="bg-muted/50 dark:bg-muted/20 border-b-2">
+                            <TableHead className="font-bold text-sm">Date & Time</TableHead>
+                            <TableHead className="font-bold text-sm">Customer</TableHead>
+                            <TableHead className="font-bold text-sm">Contact</TableHead>
+                            <TableHead className="text-center font-bold text-sm">Party Size</TableHead>
+                            <TableHead className="font-bold text-sm">Table</TableHead>
+                            <TableHead className="font-bold text-sm">Status</TableHead>
+                            <TableHead className="text-right font-bold text-sm">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -306,7 +306,7 @@ export function ReservationListView({
             </div>
 
             {/* Pagination */}
-            {pagination.totalPages > 1 && (
+            {pagination.totalPages >= 1 && (
                 <div className="flex items-center justify-between">
                     <div className="text-sm text-muted-foreground">
                         Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
