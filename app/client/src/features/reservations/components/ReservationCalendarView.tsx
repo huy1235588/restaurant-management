@@ -52,9 +52,13 @@ export function ReservationCalendarView({
     // Get reservations for selected date
     const reservationsForDate = useMemo(() => {
         const dateStr = format(selectedDate, 'yyyy-MM-dd');
-        return reservations.filter(
-            (r) => r.reservationDate === dateStr
-        ).sort((a, b) => a.reservationTime.localeCompare(b.reservationTime));
+        return reservations.filter((r) => {
+            // Handle both Date objects and string formats
+            const resDate = typeof r.reservationDate === 'string' 
+                ? r.reservationDate.split('T')[0] // ISO string: "2024-11-18T00:00:00.000Z" -> "2024-11-18"
+                : format(new Date(r.reservationDate), 'yyyy-MM-dd');
+            return resDate === dateStr;
+        }).sort((a, b) => a.reservationTime.localeCompare(b.reservationTime));
     }, [reservations, selectedDate]);
 
     // Get calendar days for month view
@@ -74,7 +78,12 @@ export function ReservationCalendarView({
     // Count reservations for a specific date
     const getReservationCount = (date: Date) => {
         const dateStr = format(date, 'yyyy-MM-dd');
-        return reservations.filter((r) => r.reservationDate === dateStr).length;
+        return reservations.filter((r) => {
+            const resDate = typeof r.reservationDate === 'string' 
+                ? r.reservationDate.split('T')[0]
+                : format(new Date(r.reservationDate), 'yyyy-MM-dd');
+            return resDate === dateStr;
+        }).length;
     };
 
     // Navigate functions

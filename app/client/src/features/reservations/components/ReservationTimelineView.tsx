@@ -59,7 +59,13 @@ export function ReservationTimelineView({
     // Get reservations for selected date
     const dateReservations = useMemo(() => {
         const dateStr = format(selectedDate, 'yyyy-MM-dd');
-        return reservations.filter((r) => r.reservationDate === dateStr);
+        return reservations.filter((r) => {
+            // Handle both Date objects and string formats
+            const resDate = typeof r.reservationDate === 'string' 
+                ? r.reservationDate.split('T')[0] // ISO string: "2024-11-18T00:00:00.000Z" -> "2024-11-18"
+                : format(new Date(r.reservationDate), 'yyyy-MM-dd');
+            return resDate === dateStr;
+        });
     }, [reservations, selectedDate]);
 
     // Get unique tables for selected floor
