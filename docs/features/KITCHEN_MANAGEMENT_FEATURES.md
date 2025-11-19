@@ -2,15 +2,17 @@
 
 ## Overview
 
-**Kitchen Management** (Quản Lý Bếp) là hệ thống được thiết kế dành cho các đầu bếp và nhân viên bếp, giúp quản lý quy trình nấu nướng và chuẩn bị các món ăn một cách hiệu quả. Tính năng này kết nối trực tiếp với hệ thống Order Management, nhận đơn hàng từ phục vụ, quản lý tiến độ nấu, và thông báo khi các món đã sẵn sàng.
+**Kitchen Management** (Quản Lý Bếp) là hệ thống dành riêng cho **đầu bếp và nhân viên bếp** (chefs/kitchen staff) để quản lý quy trình nấu nướng từ phía back-of-house. Hệ thống này tập trung vào việc nhận đơn từ phục vụ, tổ chức sản xuất, và đảm bảo các món được nấu đúng chất lượng và kịp thời.
 
-**Đặc điểm chính:**
-- **Kitchen Display System (KDS)**: Hiển thị toàn bộ đơn hàng và tiến độ nấu trên màn hình
-- **Real-time Order Updates**: Nhận đơn hàng mới ngay lập tức khi phục vụ gửi
-- **Priority Management**: Quản lý độ ưu tiên (VIP, khẩn cấp, bình thường)
-- **Team Coordination**: Phân công công việc giữa các đầu bếp
-- **Status Tracking**: Theo dõi từng giai đoạn nấu (chờ, đang nấu, sắp xong, sẵn sàng)
-- **Performance Analytics**: Thống kê hiệu suất và thời gian chuẩn bị
+**Vai trò chính:**
+- 📺 **Kitchen Display System (KDS)**: Màn hình hiển thị tất cả đơn bếp và tiến độ real-time
+- 🔔 **Nhận đơn từ Waiters**: Tự động nhận đơn khi phục vụ gửi, thông báo bằng âm thanh
+- 👨‍🍳 **Quản lý production**: Phân công đầu bếp, theo dõi tiến độ nấu từng món
+- ⏰ **Priority & Timing**: Quản lý độ ưu tiên (VIP, Express), đếm giờ nấu
+- 🏭 **Workstation Management**: Phân vùng bếp (Nướng, Chiên, Hấp) và phân bổ công việc
+- 📊 **Performance Tracking**: Thống kê hiệu suất đầu bếp, thời gian chuẩn bị thực tế
+
+**Lưu ý:** Tạo đơn hàng và quản lý khách hàng nằm trong **Order Management System** (xem `ORDER_MANAGEMENT_FEATURES.md`)
 
 ---
 
@@ -172,16 +174,23 @@
 
 ## 2. CORE FUNCTIONALITY (Chức năng cốt lõi)
 
-### 2.1 Nhận Đơn Hàng (Receive Order)
+### 2.1 Nhận Đơn Hàng (Receive Order from Waiters)
 
-**Trigger:** Nhân viên phục vụ gửi đơn hàng từ hệ thống Order Management
+**Source:** Đơn gửi từ **Order Management System** khi waiter nhấn "Gửi Bếp"
 
 **Auto Workflow:**
-1. Đơn hàng được tạo từ phục vụ
-2. Hệ thống tự động gửi đơn đến bếp (WebSocket)
-3. Bếp nhận thông báo (âm thanh + visual)
-4. Đơn xuất hiện trong tab "Chờ Chuẩn Bị"
-5. Thẻ card hiển thị toàn bộ thông tin cần thiết
+1. Waiter tạo đơn và nhấn "Gửi Bếp" trong Order Management
+2. Order System chuyển trạng thái đơn: `PENDING` → `CONFIRMED`
+3. Hệ thống gửi đơn đến Kitchen qua **WebSocket** (real-time)
+4. **Kitchen Display System (KDS)** nhận đơn:
+   - Phát âm thanh thông báo (🔊)
+   - Hiện popup: "🔔 Đơn Mới - Bàn X"
+   - Đơn xuất hiện ở tab "CHỞ CHUẨN BỊ"
+5. Card đơn hiển thị:
+   - Số đơn (#001), Bàn (3), Thời gian (2 phút trước)
+   - Danh sách món + số lượng
+   - Yêu cầu đặc biệt (nổi bật bằng màu)
+   - Độ ưu tiên (VIP/Express/Normal)
 
 **Notification on Receive:**
 ```
@@ -360,6 +369,101 @@ Danh sách Món:
 
 ---
 
+## 2.6 Integration with Order Management System
+
+**Two-way Communication:**
+
+```
+╭───────────────────────╮     ╭───────────────────────╮
+│  ORDER MANAGEMENT     │ ⇄ │  KITCHEN MANAGEMENT   │
+│  (Waiter Interface)   │     │  (Chef Interface)     │
+╰───────────────────────╯     ╰───────────────────────╯
+```
+
+**Workflow Integration:**
+
+1. **Waiter tạo đơn → Kitchen nhận**
+   ```
+   Order: CREATE order (#001) with items
+   ↓
+   Order: Set status = CONFIRMED
+   ↓
+   Kitchen: Receive order via WebSocket
+   ↓
+   Kitchen: Display on KDS (tab "Chờ Chuẩn Bị")
+   ↓
+   Kitchen: Play sound notification
+   ```
+
+2. **Kitchen bắt đầu nấu → Order cập nhật**
+   ```
+   Kitchen: Chef clicks "Bắt Đầu Nấu"
+   ↓
+   Kitchen: Set status = PREPARING
+   ↓
+   Order: Update order status = PREPARING
+   ↓
+   Order: Notify waiter "Bếp đang nấu"
+   ```
+
+3. **Kitchen hoàn tất → Order thông báo**
+   ```
+   Kitchen: Chef clicks "Sẵn Sàng"
+   ↓
+   Kitchen: Set status = READY
+   ↓
+   Order: Update order status = READY
+   ↓
+   Order: Alert waiter 🔔 "Món sẵn sàng - Bàn X"
+   ↓
+   Order: Waiter clicks "Xác Nhận Đã Lấy"
+   ↓
+   Kitchen: Set status = COMPLETED, remove from KDS
+   ```
+
+4. **Waiter hủy món → Kitchen xác nhận**
+   ```
+   Order: Waiter requests cancel item
+   ↓
+   Order: Send cancel request to Kitchen
+   ↓
+   Kitchen: Display confirmation dialog
+   ↓
+   Kitchen: Chef accepts/rejects
+   ↓
+   Order: Receive response and update
+   ↓
+   Order: Notify waiter result
+   ```
+
+**Shared Data Models:**
+
+| Field | Order Management | Kitchen Management |
+|-------|------------------|--------------------|
+| `orderId` | Primary key | Foreign key |
+| `status` | PENDING → SERVING | PENDING → READY |
+| `items[]` | Full details + price | Focus on prep instructions |
+| `specialRequest` | Editable by waiter | Read-only, highlighted |
+| `priority` | Set by waiter | Display prominently |
+| `timestamps` | Created, confirmed | Started, ready, completed |
+
+**WebSocket Events:**
+
+```javascript
+// Order → Kitchen
+order.created
+order.item_added
+order.item_cancelled_request
+
+// Kitchen → Order  
+kitchen.status_changed
+kitchen.item_ready
+kitchen.cancel_accepted
+kitchen.cancel_rejected
+```
+
+---
+
 ## 3. PRIORITY & TEAM MANAGEMENT (Quản lý ưu tiên và nhóm)
 
 ### 3.1 Priority Levels
@@ -434,43 +538,47 @@ Khi tạo đơn, phục vụ có thể đánh dấu:
 
 ## 4. STATUS MANAGEMENT (Quản lý trạng thái)
 
-### 4.1 Kitchen Order Status Types
+### 4.1 Kitchen Order Status from Chef's Perspective
 
-**Available Statuses:**
+**Trạng thái đơn bếp (từ góc nhìn đầu bếp):**
 
-1. **PENDING** (Chờ) - ⏳ Xám
-   - Đơn vừa được gửi từ phục vụ
-   - Chưa có đầu bếp nhận
-   - Cần hành động
+1. **PENDING** (Đơn mới - Chờ xác nhận) - ⏳ Xám
+   - Đơn vừa nhận từ Order System, chưa ai nhận
+   - **Hành động cần làm**: Nhấn "Bắt Đầu Nấu" để nhận đơn
+   - **Ưu tiên**: Đơn cũ nhất hoặc VIP lên đầu
 
-2. **CONFIRMED** (Đã xác nhận) - 🔵 Xanh lam
-   - Đầu bếp đã xác nhận nhận đơn
-   - Sắp sàng bắt đầu nấu
+2. **CONFIRMED** (Đã nhận đơn) - 🔵 Xanh lam
+   - Đầu bếp đã xác nhận nhận, chuẩn bị nguyên liệu
+   - **Hành động cần làm**: Chuẩn bị dụng cụ, nguyên liệu
+   - **Chuyển tiếp**: Chuyển sang PREPARING khi bắt đầu nấu
 
-3. **PREPARING** (Đang nấu) - 🔥 Cam
-   - Đầu bếp đang nấu
-   - Hiển thị thời gian dự kiến
-   - Có timer đếm ngược
+3. **PREPARING** (Đang nấu nướng) - 🔥 Cam
+   - Đang chế biến món, timer đang chạy
+   - **Hành động cần làm**: 
+     - Cập nhật tiến độ từng món
+     - Theo dõi thời gian nấu
+     - Xử lý yêu cầu đặc biệt
+   - **Cảnh báo**: Nếu quá thời gian dự kiến → Màu đỏ
 
-4. **ALMOST_READY** (Sắp xong) - 🟡 Vàng
-   - Một số món sắp xong
-   - Chưa tất cả các món
-   - Phục vụ chuẩn bị lấy
+4. **ALMOST_READY** (Sắp xong - Kiểm tra cuối) - 🟡 Vàng
+   - Hầu hết các món đã xong, chờ 1-2 món cuối
+   - **Hành động cần làm**: Kiểm tra chất lượng, trình bày
+   - **Thông báo**: Waiter nhận notification "Sắp sẵn sàng"
 
-5. **READY** (Sẵn sàng) - ✅ Xanh lục
-   - Tất cả các món đã nấu xong
-   - Sẵn sàng lấy
-   - Chờ phục vụ lấy
+5. **READY** (Sẵn sàng lấy) - ✅ Xanh lục
+   - Tất cả món hoàn tất, đặt lên khu pass (lấy món)
+   - **Hành động cần làm**: 🔔 Bấm chuông/thông báo waiter
+   - **Chờ**: Waiter đến lấy (nếu quá lâu → cảnh báo)
 
-6. **COMPLETED** (Đã lấy) - ⚪ Xám nhạt
-   - Phục vụ đã lấy từ bếp
-   - Không còn trên KDS
-   - Lưu cho báo cáo
+6. **COMPLETED** (Waiter đã lấy) - ⚪ Xám nhạt
+   - Món đã được lấy khỏi bếp, biến mất khỏi KDS
+   - **Kết quả**: Ghi nhận thời gian thực tế vào báo cáo
+   - **Dữ liệu**: Lưu lại để phân tích hiệu suất
 
-7. **CANCELLED** (Đã hủy) - ❌ Đen
-   - Đơn đã bị hủy
-   - Không còn nấu
-   - Lưu cho báo cáo
+7. **CANCELLED** (Bị hủy) - ❌ Đen
+   - Đơn/món bị hủy bởi waiter hoặc bếp
+   - **Lý do**: Hết nguyên liệu, khách đổi ý, món hỏng
+   - **Hành động**: Dừng nấu, thông báo lại waiter
 
 ### 4.2 Item-level Status Tracking
 
@@ -602,30 +710,46 @@ kitchen.item_added → {
 
 ### 7.1 Kitchen Performance Dashboard
 
-**Key Metrics:**
+**Dashboard dành cho Kitchen Manager:**
+
+**Key Metrics (Thống kê chính):**
 ```
-┌────────────────────────────────────────┐
-│  Kitchen Performance - Hôm nay         │
-├────────────────────────────────────────┤
-│  Tổng đơn: 42                          │
-│  Đơn hoàn tát: 40 (95%)                │
-│  Đơn hủy: 2 (4.7%)                     │
-│  Đơn trễ hạn: 3 (7%)                   │
-│                                        │
-│  Thời gian chuẩn bị trung bình: 16 min │
-│  Thời gian nhanh nhất: 5 min           │
-│  Thời gian lâu nhất: 35 min            │
-│                                        │
-│  [Chi Tiết] [Xuất Excel] [In]         │
-└────────────────────────────────────────┘
+┌────────────────────────────────────────────────┐
+│  🍳 Kitchen Performance - Hôm nay              │
+├────────────────────────────────────────────────┤
+│  📊 PRODUCTION METRICS                        │
+│  ────────────────────────────────────────  │
+│  Tổng đơn nhận: 42                            │
+│  Đơn hoàn tất: 40 (95.2%) ✅                  │
+│  Đơn hủy: 2 (4.8%) ❌                          │
+│  Đơn trễ hạn (>20min): 3 (7.1%) ⚠️            │
+│                                                │
+│  ⏱️ TIMING ANALYSIS                             │
+│  ────────────────────────────────────────  │
+│  Thời gian chuẩn bị trung bình: 16 phút        │
+│  Nhanh nhất: 5 phút 🚀                       │
+│  Chậm nhất: 35 phút 🐌                      │
+│  Chênh lệch so với dự kiến: +2 phút           │
+│                                                │
+│  👨‍🍳 TEAM WORKLOAD                             │
+│  ────────────────────────────────────────  │
+│  Đầu bếp đang hoạt động: 4/5                │
+│  Đơn đang xử lý: 8                           │
+│  Workstation: Nướng(5), Chiên(2), Hấp(1)      │
+│                                                │
+│  [Chi Tiết] [Xuất Excel] [In Báo Cáo]       │
+└────────────────────────────────────────────────┘
 ```
 
-### 7.2 Chef Performance
+**Lưu ý:** Báo cáo doanh thu và khách hàng nằm trong Order Management System.
 
-**Per Chef Analytics:**
+### 7.2 Chef Performance Analysis
 
-| Đầu Bếp | Đơn | Hoàn Tát | Quá Hạn | Thời Gian TB |
-|---------|-----|---------|---------|--------------|
+**Báo cáo hiệu suất từng đầu bếp:**
+
+| Đầu Bếp | Đơn Xử Lý | Hoàn Tất | Quá Hạn | Prep Time TB | Accuracy |
+|---------|-------------|---------|---------|--------------|----------|
+| Hải     | 15          | 14      | 1 (6.7%)| 15 phút      | 93%      |
 | Hải     | 15  | 14      | 1       | 15 phút      |
 | Linh    | 12  | 12      | 0       | 14 phút      |
 | Tâm     | 10  | 9       | 1       | 18 phút      |
@@ -990,7 +1114,64 @@ EXPRESS       → Đỏ (#F44336)
 
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** November 18, 2025  
+## SCOPE & BOUNDARIES (Phạm vi và ranh giới)
+
+### What Kitchen Management DOES (Chức năng cốt lõi)
+
+✅ **Production Focus (Tập trung sản xuất):**
+- Nhận đơn từ Order Management qua WebSocket
+- Hiển thị đơn trên Kitchen Display System (KDS)
+- Quản lý tiến độ nấu từng món
+- Phân công đầu bếp và workstation
+- Đếm giờ chuẩn bị (prep time tracking)
+- Quản lý độ ưu tiên (VIP, Express, Normal)
+- Thông báo waiter khi món sẵn sàng
+- Xác nhận/từ chối yêu cầu hủy món
+- Báo cáo hiệu suất bếp và đầu bếp
+
+### What Kitchen Management DOES NOT DO (Không phải chức năng)
+
+❌ **Not Kitchen's Responsibility:**
+- Tạo đơn hàng mới (Order Management)
+- Giao tiếp trực tiếp với khách hàng (Order Management)
+- Quản lý thông tin khách (tên, SĐT) (Order Management)
+- Tính tiền và thanh toán (Bill/Payment Management)
+- Báo cáo doanh thu tổng thể (Order/Bill Management)
+- Quản lý bàn và reservation (Table/Reservation Management)
+- Quản lý nguyên liệu và kho (Inventory Management)
+
+### Integration Points (Các điểm tích hợp)
+
+```
+Kitchen Management tích hợp với:
+
+1. Order Management (↔️ Two-way)
+   - Nhận: Đơn mới, yêu cầu hủy
+   - Gửi: Cập nhật tiến độ, thông báo sẵn sàng
+
+2. Inventory Management (← One-way)
+   - Cảnh báo hết nguyên liệu
+   - Tự động trừ kho khi nấu (future)
+
+3. Menu Management (← Read-only)
+   - Lấy thông tin món (tên, recipe, prep time)
+   - Hiển thị hướng dẫn nấu
+
+4. Staff Management (← Read-only)
+   - Danh sách đầu bếp
+   - Phân ca và workstation
+```
+
+### Related Documents
+
+- **Order Management**: `ORDER_MANAGEMENT_FEATURES.md` - Tạo đơn và quản lý khách hàng
+- **Inventory Management**: `INVENTORY_MANAGEMENT.md` - Quản lý kho và nguyên liệu
+- **Menu Management**: `MENU_MANAGEMENT_FEATURES.md` - Quản lý thực đơn
+- **Bill/Payment**: `BILL_PAYMENT_MANAGEMENT.md` - Thanh toán và hóa đơn
+
+---
+
+**Document Version:** 2.0  
+**Last Updated:** November 19, 2025  
 **Author:** Restaurant Management System Team  
-**Status:** Approved
+**Status:** Approved - Focused on Kitchen Operations

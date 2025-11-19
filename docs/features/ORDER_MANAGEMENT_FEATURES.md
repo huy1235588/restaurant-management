@@ -2,14 +2,16 @@
 
 ## Overview
 
-**Order Management** (Quản Lý Đơn Hàng) là tính năng cốt lõi của hệ thống quản lý nhà hàng, kết nối giữa khách hàng, nhân viên phục vụ, bếp và thanh toán. Tính năng này cho phép tạo, theo dõi, chỉnh sửa và quản lý toàn bộ vòng đời của đơn hàng từ khi khách gọi món cho đến khi hoàn tất thanh toán.
+**Order Management** (Quản Lý Đơn Hàng) là hệ thống dành cho **nhân viên phục vụ** (waiters/staff) để quản lý đơn hàng từ phía front-of-house. Tính năng này tập trung vào việc tiếp nhận yêu cầu từ khách hàng, tạo đơn, gửi đến bếp, và theo dõi tiến độ để phục vụ kịp thời.
 
-**Đặc điểm chính:**
-- **Tạo đơn hàng nhanh chóng**: Giao diện thân thiện, thêm món từ menu dễ dàng
-- **Quản lý trạng thái đơn hàng**: Theo dõi từng giai đoạn (chờ, đang chuẩn bị, sẵn sàng, đã phục vụ, hoàn tất)
-- **Gửi thông tin đến bếp real-time**: Đơn bếp tự động, thông báo trực tiếp tới bếp
-- **Chỉnh sửa linh hoạt**: Thêm, sửa, hủy món dễ dàng trong quá trình phục vụ
-- **Báo cáo chi tiết**: Thống kê doanh thu, món bán chạy, thời gian phục vụ
+**Vai trò chính:**
+- 👥 **Giao tiếp với khách hàng**: Nhận order, tư vấn món, ghi chú yêu cầu đặc biệt
+- 📝 **Tạo và quản lý đơn hàng**: Tạo mới, chỉnh sửa, thêm/bớt món theo yêu cầu khách
+- 🔄 **Kết nối với Kitchen**: Gửi đơn đến bếp và nhận thông báo khi món sẵn sàng
+- 🍽️ **Điều phối phục vụ**: Theo dõi trạng thái để biết khi nào lấy món và mang ra bàn
+- 💰 **Chuẩn bị thanh toán**: Tạo hóa đơn từ đơn hàng khi khách xin tính tiền
+
+**Lưu ý:** Các chức năng nấu ăn và quản lý bếp nằm trong **Kitchen Management System** (xem `KITCHEN_MANAGEMENT_FEATURES.md`)
 
 ---
 
@@ -379,37 +381,44 @@ Hủy [tên món] x[số lượng]?
 
 ## 4. STATUS MANAGEMENT (Quản lý trạng thái)
 
-### 4.1 Status Types
+### 4.1 Order Status from Waiter's Perspective
 
-**Available Statuses:**
+**Trạng thái đơn hàng (từ góc nhìn phục vụ):**
 
-1. **PENDING** (Chờ xác nhận) - 🔴 Đỏ
-   - Đơn hàng vừa được tạo, chưa gửi bếp
-   - Nhân viên có thể sửa/hủy tự do
+1. **PENDING** (Chờ gửi bếp) - 🔴 Đỏ
+   - Đơn vừa tạo, đang chỉnh sửa/xác nhận với khách
+   - **Hành động được phép**: Sửa tự do, thêm/bớt món, hủy đơn
+   - **Cần làm**: Xác nhận và gửi bếp càng sớm càng tốt
 
-2. **CONFIRMED** (Đã xác nhận) - 🟡 Vàng
-   - Đơn hàng đã được xác nhận, gửi đến bếp
-   - Nhân viên có thể thêm/hủy món nhưng cần xác nhận bếp
+2. **CONFIRMED** (Đã gửi bếp) - 🟡 Vàng
+   - Đơn đã gửi đến Kitchen, bếp đã nhận
+   - **Hành động được phép**: Thêm món mới, yêu cầu hủy món (cần bếp chấp nhận)
+   - **Cần làm**: Theo dõi thông báo từ bếp
 
-3. **PREPARING** (Đang chuẩn bị) - 🟠 Cam
-   - Bếp đã nhận đơn, đang nấu
-   - Không thể hủy toàn bộ đơn, chỉ hủy từng món với xác nhận
+3. **PREPARING** (Bếp đang nấu) - 🟠 Cam
+   - Bếp đang chuẩn bị món, cập nhật từ Kitchen System
+   - **Hành động được phép**: Xem tiến độ, yêu cầu hủy món (khó khăn hơn)
+   - **Cần làm**: Chuẩn bị đồ ăn (đĩa, muỗng) và chờ thông báo sẵn sàng
 
-4. **READY** (Sẵn sàng) - 🟢 Xanh
-   - Tất cả các món đã nấu xong, chờ lấy
-   - Chỉ có thể xác nhận lấy hoặc hoàn lại
+4. **READY** (Sẵn sàng lấy) - 🟢 Xanh
+   - Món đã nấu xong, bếp thông báo đến lấy
+   - **Hành động được phép**: Xác nhận đã lấy, chuyển sang SERVING
+   - **Cần làm**: LẤY MÓN NGAY để không để nguội
 
-5. **SERVING** (Đã phục vụ) - 🔵 Xanh Lục
-   - Đơn hàng đã được mang ra cho khách
-   - Chờ khách ăn xong thanh toán
+5. **SERVING** (Đang phục vụ) - 🔵 Xanh Lục
+   - Món đã mang ra bàn, khách đang ăn
+   - **Hành động được phép**: Thêm món mới (nếu khách gọi thêm)
+   - **Cần làm**: Kiểm tra khách có hài lòng không, chuẩn bị thanh toán
 
-6. **COMPLETED** (Hoàn tất) - ⚪ Xám
-   - Đơn hàng đã thanh toán, hoàn tất
-   - Dữ liệu lưu cho báo cáo
+6. **COMPLETED** (Đã thanh toán) - ⚪ Xám
+   - Khách đã thanh toán và rời đi
+   - **Hành động được phép**: Chỉ xem lại thông tin
+   - **Kết quả**: Đơn được lưu vào lịch sử
 
 7. **CANCELLED** (Đã hủy) - ⚫ Đen
-   - Đơn hàng đã bị hủy
-   - Không thể sửa/xóa thêm
+   - Đơn bị hủy bởi khách hoặc nhân viên
+   - **Lý do**: Khách đổi ý, nhập sai, bàn bỏ đi
+   - **Kết quả**: Lưu lại để phân tích và báo cáo
 
 ### 4.2 Status Flow Diagram
 
@@ -606,16 +615,42 @@ order.item_status_changed → {
 └─────────────────────────────────────────┘
 ```
 
-### 8.2 Report Types
+### 8.2 Report Types for Front-of-House
 
-**Available Reports:**
+**Báo cáo dành cho phục vụ và quản lý:**
 
-1. **Báo cáo doanh thu**: Tổng doanh thu theo ngày/tuần/tháng
-2. **Báo cáo món bán chạy**: Top 10 món được gọi nhiều nhất
-3. **Báo cáo hiệu suất phục vụ**: Thời gian trung bình từ đặt đến phục vụ
-4. **Báo cáo đơn hủy**: Số lượng, lý do, tác động tài chính
-5. **Báo cáo theo ca làm việc**: Doanh thu, số đơn, hiệu suất / ca
-6. **Báo cáo theo nhân viên**: Hiệu suất từng nhân viên phục vụ
+1. **Báo cáo doanh thu theo bàn**
+   - Tổng doanh thu từng bàn
+   - Bàn nào sinh lời cao nhất
+   - Tỷ lệ lấp đầy bàn theo giờ
+
+2. **Báo cáo món bán chạy**
+   - Top món được gọi nhiều nhất
+   - Món nào hay bị hủy
+   - Yêu cầu đặc biệt phổ biến
+
+3. **Báo cáo hiệu suất phục vụ**
+   - Thời gian trung bình: Đặt món → Gửi bếp
+   - Thời gian trung bình: Món sẵn sàng → Lấy món
+   - Thời gian phục vụ tổng thể
+
+4. **Báo cáo đơn hủy**
+   - Số lượng món/đơn bị hủy
+   - Lý do hủy (khách đổi ý, hết hàng, nhập sai)
+   - Tác động doanh thu (tiền mất)
+
+5. **Báo cáo theo ca và nhân viên**
+   - Số đơn mỗi nhân viên xử lý
+   - Doanh thu từng người tạo ra
+   - Rating/feedback từ khách (nếu có)
+   - Thời gian phục vụ trung bình
+
+6. **Báo cáo khách hàng**
+   - Khách quen (theo SĐT)
+   - Lịch sử order của khách
+   - Sở thích món ăn
+
+**Lưu ý:** Báo cáo về hiệu suất bếp (prep time, chef performance) nằm trong Kitchen Management System.
 
 **Export Options:**
 
@@ -636,32 +671,37 @@ order.item_status_changed → {
 - Sau đó "Đang chuẩn bị" (màu cam)
 - Cuối cùng "Sẵn sàng" (màu xanh)
 
-### 9.2 Kitchen Display System (KDS)
+### 9.2 Integration with Kitchen System
 
-**Dashboard cho Bếp:**
+**Giao tiếp với bếp:**
 
 ```
-┌──────────────────────────────────────┐
-│  🍳 Kitchen Display System            │
-├──────────────────────────────────────┤
-│                                      │
-│  📋 CHỜ CHUẨN BỊ (5)                 │
-│  ┌──────────────────────────────────┐│
-│  │ #001 Bàn 3  (Chờ 5 phút)  [VIP] ││
-│  │ • Thịt bò nướng x1              ││
-│  │ • Cơm tấm x2                    ││
-│  │ • Nước cam x2 - Ít đá            ││
-│  │ [Bắt đầu nấu]                   ││
-│  └──────────────────────────────────┘│
-│                                      │
-│  🔥 ĐANG NẤU (8)                     │
-│  │ [Card tương tự]                  │
-│                                      │
-│  ✅ SẴN SÀNG (3)                     │
-│  │ [Card tương tự]                  │
-│                                      │
-└──────────────────────────────────────┘
+Waiter (Order Management) ←──→ Kitchen (Kitchen Management)
+
+1. Waiter tạo đơn và gửi bếp
+   → Kitchen nhận đơn trên KDS (Kitchen Display System)
+
+2. Kitchen cập nhật tiến độ nấu
+   → Waiter nhận notification real-time
+
+3. Kitchen đánh dấu món sẵn sàng
+   → Waiter nhận alert "Món sẵn sàng - Bàn X"
+
+4. Waiter xác nhận đã lấy món
+   → Kitchen xóa đơn khỏi màn hình
+
+5. Waiter yêu cầu hủy món
+   → Kitchen xác nhận/từ chối hủy
 ```
+
+**Notifications nhận từ Kitchen:**
+
+- 🔔 **Món sẵn sàng**: "Đơn #001 - Bàn 3 sẵn sàng lấy" (âm thanh + popup)
+- ⚠️ **Yêu cầu xác nhận hủy**: "Bếp chấp nhận hủy Thịt bò nướng"
+- ⏰ **Cảnh báo chậm**: "Đơn #005 chờ quá lâu (>20 phút)"
+- 🚫 **Từ chối hủy**: "Không thể hủy món đã nấu xong"
+
+**Xem chi tiết Kitchen workflow tại:** `KITCHEN_MANAGEMENT_FEATURES.md`
 
 ### 9.3 Split Bill Functionality
 
