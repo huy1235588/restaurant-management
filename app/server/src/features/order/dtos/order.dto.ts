@@ -1,3 +1,7 @@
+/**
+ * Order DTOs - Synced with Frontend Types
+ */
+
 import { OrderStatus } from '@/shared/types';
 
 export interface CreateOrderDTO {
@@ -25,10 +29,23 @@ export interface UpdateOrderDTO {
     taxRate?: number;
 }
 
-export interface CancelOrderDTO {
-    reason: string;
+export interface AddOrderItemsDTO {
+    items: Array<{
+        itemId: number;
+        quantity: number;
+        specialRequest?: string;
+    }>;
 }
 
+export interface CancelOrderDTO {
+    reason?: string;
+}
+
+export interface UpdateOrderItemStatusDTO {
+    status: OrderStatus;
+}
+
+// Report DTOs
 export interface OrderReportByTableDTO {
     tableId: number;
     tableName: string;
@@ -56,9 +73,10 @@ export interface OrderReportByWaiterDTO {
 
 export interface OrderReportCustomerHistoryDTO {
     customerPhone: string;
-    customerName: string;
+    customerName?: string;
     totalOrders: number;
     totalSpent: number;
     lastOrderDate: Date;
     averageOrderValue: number;
+    orders?: any[];
 }

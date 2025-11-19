@@ -6,8 +6,21 @@ export type { UserRole, User, LoginCredentials, AuthResponse, LoginFormData } fr
 // ============================================
 // Order Types
 // ============================================
-export type { OrderStatus, OrderType, OrderFormData, SocketOrder } from './order';
-export { type OrderItem, type Order } from './order';
+export type { 
+    OrderStatus, 
+    OrderFormData,
+    Order,
+    OrderItem,
+    CreateOrderDto,
+    UpdateOrderDto,
+    AddOrderItemsDto,
+    CancelOrderDto,
+    UpdateOrderItemStatusDto,
+    OrderReportByTable,
+    OrderReportPopularItems,
+    OrderReportByWaiter,
+    OrderReportCustomerHistory,
+} from './order';
 
 // ============================================
 // Menu Types
@@ -44,7 +57,18 @@ export type {
 // ============================================
 // Kitchen Types
 // ============================================
-export { type KitchenOrder, type KitchenOrderItem } from './kitchen';
+export type {
+    KitchenOrderStatus,
+    KitchenOrder,
+    KitchenStation,
+    CreateKitchenOrderDto,
+    UpdateKitchenOrderDto,
+    AssignChefDto,
+    AssignStationDto,
+    UpdateStatusDto,
+    HandleCancellationDto,
+    KitchenStats,
+} from './kitchen';
 
 // ============================================
 // Inventory Types

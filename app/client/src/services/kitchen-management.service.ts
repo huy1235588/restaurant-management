@@ -1,99 +1,21 @@
 import axiosInstance from '@/lib/axios';
 import { ApiResponse, PaginatedResponse } from '@/types';
-import { Order, OrderItem } from './order-management.service';
+import { 
+    KitchenOrder, 
+    KitchenOrderStatus, 
+    KitchenStation,
+    CreateKitchenOrderDto,
+    UpdateKitchenOrderDto,
+    AssignChefDto,
+    AssignStationDto,
+    UpdateStatusDto,
+    HandleCancellationDto,
+    KitchenStats
+} from '@/types/kitchen';
 
 // ============================================
-// Kitchen Types
+// Kitchen Management API
 // ============================================
-
-export type KitchenOrderStatus = 'PENDING' | 'CONFIRMED' | 'PREPARING' | 'ALMOST_READY' | 'READY' | 'COMPLETED' | 'CANCELLED';
-export type OrderPriority = 'NORMAL' | 'EXPRESS' | 'VIP';
-export type StationType = 'GRILL' | 'FRY' | 'STEAM' | 'DESSERT' | 'DRINKS';
-
-export interface KitchenOrder {
-    id: number;
-    orderId: number;
-    status: KitchenOrderStatus;
-    priority: OrderPriority;
-    chefId?: number;
-    stationId?: number;
-    prepTimeEstimated: number; // in minutes
-    prepTimeActual?: number; // in minutes
-    startedAt?: string;
-    completedAt?: string;
-    createdAt: string;
-    updatedAt: string;
-    order?: Order;
-    chef?: {
-        staffId: number;
-        firstName: string;
-        lastName: string;
-    };
-    station?: KitchenStation;
-}
-
-export interface KitchenStation {
-    id: number;
-    name: string;
-    type: StationType;
-    isActive: boolean;
-    createdAt: string;
-    currentWorkload?: number; // Number of active orders assigned
-}
-
-export interface CreateKitchenOrderDto {
-    orderId: number;
-    priority?: OrderPriority;
-    chefId?: number;
-    stationId?: number;
-    prepTimeEstimated?: number;
-}
-
-export interface UpdateKitchenOrderDto {
-    priority?: OrderPriority;
-    chefId?: number;
-    stationId?: number;
-    status?: KitchenOrderStatus;
-}
-
-export interface StartPreparingDto {
-    chefId?: number;
-    stationId?: number;
-}
-
-export interface CompleteOrderDto {
-    prepTimeActual?: number;
-}
-
-export interface UpdatePriorityDto {
-    priority: OrderPriority;
-}
-
-export interface AssignChefDto {
-    chefId: number;
-}
-
-export interface AssignStationDto {
-    stationId: number;
-}
-
-export interface UpdateStatusDto {
-    status: KitchenOrderStatus;
-}
-
-export interface CancelKitchenOrderDto {
-    reason: string;
-}
-
-export interface KitchenStats {
-    pending: number;
-    preparing: number;
-    ready: number;
-    completed: number;
-    averagePrepTime: number; // in minutes
-    overdueOrders: number; // orders waiting > 20 minutes
-    totalOrdersToday: number;
-}
 
 // ============================================
 // Kitchen Management API
@@ -107,9 +29,7 @@ export const kitchenManagementApi = {
      */
     getAll: async (params?: {
         status?: KitchenOrderStatus;
-        priority?: OrderPriority;
-        chefId?: number;
-        stationId?: string;
+        stationId?: number;
         page?: number;
         limit?: number;
         sortBy?: string;
@@ -179,10 +99,10 @@ export const kitchenManagementApi = {
     /**
      * Start preparing order
      */
-    startPreparing: async (id: number, data?: StartPreparingDto): Promise<KitchenOrder> => {
+    startPreparing: async (id: number, staffId?: number): Promise<KitchenOrder> => {
         const response = await axiosInstance.patch<ApiResponse<KitchenOrder>>(
             `/kitchen/${id}/start`,
-            data
+            staffId ? { staffId } : undefined
         );
         return response.data.data;
     },
@@ -190,10 +110,9 @@ export const kitchenManagementApi = {
     /**
      * Mark order as complete
      */
-    complete: async (id: number, data?: CompleteOrderDto): Promise<KitchenOrder> => {
+    complete: async (id: number): Promise<KitchenOrder> => {
         const response = await axiosInstance.patch<ApiResponse<KitchenOrder>>(
-            `/kitchen/${id}/complete`,
-            data
+            `/kitchen/${id}/complete`
         );
         return response.data.data;
     },
@@ -210,12 +129,12 @@ export const kitchenManagementApi = {
     },
 
     /**
-     * Cancel kitchen order
+     * Handle cancellation request (accept or reject)
      */
-    cancel: async (id: number, reason: string): Promise<KitchenOrder> => {
-        const response = await axiosInstance.post<ApiResponse<KitchenOrder>>(
+    handleCancellation: async (id: number, accepted: boolean, reason?: string): Promise<any> => {
+        const response = await axiosInstance.post<ApiResponse<any>>(
             `/kitchen/${id}/cancel`,
-            { reason }
+            { accepted, reason }
         );
         return response.data.data;
     },
@@ -223,9 +142,9 @@ export const kitchenManagementApi = {
     // ========== Assignment Management ==========
     
     /**
-     * Update order priority
+     * Update order priority (0-10)
      */
-    updatePriority: async (id: number, priority: OrderPriority): Promise<KitchenOrder> => {
+    updatePriority: async (id: number, priority: number): Promise<KitchenOrder> => {
         const response = await axiosInstance.patch<ApiResponse<KitchenOrder>>(
             `/kitchen/${id}/priority`,
             { priority }
@@ -236,10 +155,10 @@ export const kitchenManagementApi = {
     /**
      * Assign chef to order
      */
-    assignChef: async (id: number, chefId: number): Promise<KitchenOrder> => {
+    assignChef: async (id: number, staffId: number): Promise<KitchenOrder> => {
         const response = await axiosInstance.patch<ApiResponse<KitchenOrder>>(
             `/kitchen/${id}/assign`,
-            { chefId }
+            { staffId }
         );
         return response.data.data;
     },

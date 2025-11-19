@@ -126,12 +126,12 @@
 - [ ] 5.4.6 OrderTimeline component (status progression)
 
 ### 5.5 Order Hooks & State
-- [ ] 5.5.1 `useOrders` hook - Fetch and manage order list
-- [ ] 5.5.2 `useOrder` hook - Fetch single order details
-- [ ] 5.5.3 `useCreateOrder` hook - Create order mutation
-- [ ] 5.5.4 `useUpdateOrder` hook - Update order mutation
-- [ ] 5.5.5 `useCancelOrder` hook - Cancel order mutation
-- [ ] 5.5.6 Integrate with Zustand store for global order state (optional)
+- [x] 5.5.1 `useOrders` hook - Fetch and manage order list
+- [x] 5.5.2 `useOrder` hook - Fetch single order details
+- [x] 5.5.3 `useCreateOrder` hook - Create order mutation
+- [x] 5.5.4 `useUpdateOrder` hook - Update order mutation
+- [x] 5.5.5 `useCancelOrder` hook - Cancel order mutation
+- [x] 5.5.6 Integrate with Zustand store for global order state (optional)
 
 ## 6. Frontend - Kitchen Management UI
 
@@ -171,44 +171,44 @@
 - [ ] 6.4.6 ChefAssignment component (dropdown with chef list)
 
 ### 6.5 Kitchen Hooks & State
-- [ ] 6.5.1 `useKitchenOrders` hook - Fetch kitchen orders with filters
-- [ ] 6.5.2 `useStartCooking` hook - Start preparing order
-- [ ] 6.5.3 `useUpdateItemStatus` hook - Update individual item status
-- [ ] 6.5.4 `useCompleteOrder` hook - Mark order ready
-- [ ] 6.5.5 `useCancelKitchenOrder` hook - Cancel from kitchen
-- [ ] 6.5.6 `useAssignChef` hook - Assign order to chef
-- [ ] 6.5.7 Integrate with Zustand for kitchen state management
+- [x] 6.5.1 `useKitchenOrders` hook - Fetch kitchen orders with filters
+- [x] 6.5.2 `useStartCooking` hook - Start preparing order
+- [x] 6.5.3 `useUpdateItemStatus` hook - Update individual item status
+- [x] 6.5.4 `useCompleteOrder` hook - Mark order ready
+- [x] 6.5.5 `useCancelKitchenOrder` hook - Cancel from kitchen
+- [x] 6.5.6 `useAssignChef` hook - Assign order to chef
+- [x] 6.5.7 Integrate with Zustand for kitchen state management
 
 ## 7. Frontend - WebSocket Integration
 
 ### 7.1 Socket Context Setup
-- [ ] 7.1.1 Extend SocketContext to handle order and kitchen events
-- [ ] 7.1.2 Connect to socket server on app mount (for authenticated users)
-- [ ] 7.1.3 Join appropriate rooms based on user role (waiters → `waiters`, chefs → `kitchen`)
-- [ ] 7.1.4 Implement reconnection logic with exponential backoff
-- [ ] 7.1.5 Add connection status indicator (connected, disconnected, reconnecting)
+- [x] 7.1.1 Extend SocketContext to handle order and kitchen events
+- [x] 7.1.2 Connect to socket server on app mount (for authenticated users)
+- [x] 7.1.3 Join appropriate rooms based on user role (waiters → `waiters`, chefs → `kitchen`)
+- [x] 7.1.4 Implement reconnection logic with exponential backoff
+- [x] 7.1.5 Add connection status indicator (connected, disconnected, reconnecting)
 
 ### 7.2 Event Listeners - Orders
-- [ ] 7.2.1 Listen: `order:created` - Update order list, show notification
-- [ ] 7.2.2 Listen: `order:status_changed` - Update order status in UI
-- [ ] 7.2.3 Listen: `kitchen:order_ready` - Alert waiter with sound + popup
-- [ ] 7.2.4 Listen: `kitchen:item_ready` - Update item status indicator
-- [ ] 7.2.5 Listen: `kitchen:cancel_accepted` - Update order, show confirmation
-- [ ] 7.2.6 Listen: `kitchen:cancel_rejected` - Show rejection message with reason
+- [x] 7.2.1 Listen: `order:created` - Update order list, show notification
+- [x] 7.2.2 Listen: `order:status_changed` - Update order status in UI
+- [x] 7.2.3 Listen: `kitchen:order_ready` - Alert waiter with sound + popup
+- [x] 7.2.4 Listen: `kitchen:item_ready` - Update item status indicator
+- [x] 7.2.5 Listen: `kitchen:cancel_accepted` - Update order, show confirmation
+- [x] 7.2.6 Listen: `kitchen:cancel_rejected` - Show rejection message with reason
 
 ### 7.3 Event Listeners - Kitchen
-- [ ] 7.3.1 Listen: `order:confirmed` - Add order to KDS, play notification sound
-- [ ] 7.3.2 Listen: `order:item_added` - Update order card with new items
-- [ ] 7.3.3 Listen: `order:cancel_request` - Show cancel request dialog
-- [ ] 7.3.4 Listen: `kitchen:status_changed` - Update order card status
-- [ ] 7.3.5 Auto-remove completed orders from KDS after 30 seconds
+- [x] 7.3.1 Listen: `order:confirmed` - Add order to KDS, play notification sound
+- [x] 7.3.2 Listen: `order:item_added` - Update order card with new items
+- [x] 7.3.3 Listen: `order:cancel_request` - Show cancel request dialog
+- [x] 7.3.4 Listen: `kitchen:status_changed` - Update order card status
+- [ ] 7.3.5 Auto-remove completed orders from KDS after 30 seconds (requires component)
 
 ### 7.4 Notifications System
-- [ ] 7.4.1 Browser notification permission request
-- [ ] 7.4.2 Audio alerts: New order (kitchen), Order ready (waiter)
-- [ ] 7.4.3 Visual toast notifications for events
-- [ ] 7.4.4 Settings: Mute/unmute audio, adjust volume
-- [ ] 7.4.5 Desktop notification for urgent orders (VIP, overdue)
+- [x] 7.4.1 Browser notification permission request
+- [x] 7.4.2 Audio alerts: New order (kitchen), Order ready (waiter)
+- [x] 7.4.3 Visual toast notifications for events
+- [ ] 7.4.4 Settings: Mute/unmute audio, adjust volume (requires settings component)
+- [ ] 7.4.5 Desktop notification for urgent orders (VIP, overdue) (partial - implemented for new orders and cancel requests)
 
 ## 8. Testing & Validation
 
