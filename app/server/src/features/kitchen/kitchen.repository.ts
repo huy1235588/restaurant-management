@@ -1,11 +1,11 @@
 import { prisma } from '@/config/database';
 import { Prisma, KitchenOrder } from '@prisma/client';
-import { OrderStatus } from '@/shared/types';
 import { BaseFilter, BaseFindOptions, BaseRepository } from '@/shared';
 
 interface KitchenOrderFilter extends BaseFilter {
-    status?: OrderStatus;
+    status?: any; // KitchenOrderStatus
     staffId?: number;
+    stationId?: number;
 }
 
 export class KitchenOrderRepository extends BaseRepository<KitchenOrder, KitchenOrderFilter> {
@@ -16,6 +16,7 @@ export class KitchenOrderRepository extends BaseRepository<KitchenOrder, Kitchen
 
         if (filters.status) where.status = filters.status;
         if (filters.staffId) where.staffId = filters.staffId;
+        if (filters.stationId) where.stationId = filters.stationId;
         if (filters.search) {
             where.OR = [
                 { notes: { contains: filters.search, mode: 'insensitive' } },
@@ -60,7 +61,7 @@ export class KitchenOrderRepository extends BaseRepository<KitchenOrder, Kitchen
         });
     }
 
-    async findById(kitchenOrderId: number): Promise<KitchenOrder | null> {
+    async findById(kitchenOrderId: number): Promise<any> {
         return prisma.kitchenOrder.findUnique({
             where: { kitchenOrderId },
             include: {
@@ -73,6 +74,7 @@ export class KitchenOrderRepository extends BaseRepository<KitchenOrder, Kitchen
                     },
                 },
                 chef: true,
+                station: true,
             },
         });
     }
@@ -134,15 +136,15 @@ export class KitchenOrderRepository extends BaseRepository<KitchenOrder, Kitchen
         });
     }
 
-    async updateStatus(kitchenOrderId: number, status: OrderStatus, staffId?: number): Promise<KitchenOrder> {
-        const updateData: Prisma.KitchenOrderUpdateInput = { status };
+    async updateStatus(kitchenOrderId: number, status: string, staffId?: number): Promise<any> {
+        const updateData: Prisma.KitchenOrderUpdateInput = { status: status as any };
 
         if (status === 'preparing') {
             updateData.startedAt = new Date();
             if (staffId) {
                 updateData.chef = { connect: { staffId } };
             }
-        } else if (status === 'ready' || status === 'served') {
+        } else if (status === 'ready' || status === 'completed') {
             updateData.completedAt = new Date();
         }
 
@@ -151,6 +153,38 @@ export class KitchenOrderRepository extends BaseRepository<KitchenOrder, Kitchen
 
     async delete(kitchenOrderId: number): Promise<KitchenOrder> {
         return prisma.kitchenOrder.delete({ where: { kitchenOrderId } });
+    }
+
+    async getAllStations() {
+        return prisma.kitchenStation.findMany({
+            where: { isActive: true },
+            orderBy: { name: 'asc' },
+        });
+    }
+
+    async findByStation(stationId: number): Promise<KitchenOrder[]> {
+        return prisma.kitchenOrder.findMany({
+            where: { stationId, status: { in: ['pending', 'preparing'] } },
+            include: {
+                order: {
+                    include: {
+                        table: true,
+                        orderItems: {
+                            include: { menuItem: true },
+                        },
+                    },
+                },
+                chef: true,
+                station: true,
+            },
+            orderBy: [{ priority: 'desc' }, { createdAt: 'asc' }],
+        });
+    }
+
+    async countByStatus(status: string) {
+        return prisma.kitchenOrder.count({
+            where: { status: status as any },
+        });
     }
 }
 

@@ -4,10 +4,12 @@ import orderRepository from '@/features/order/order.repository';
 import staffRepository from '@/features/staff/staff.repository';
 import { NotFoundError, BadRequestError } from '@/shared/utils/errors';
 import { BaseFindOptions } from '@/shared';
+import socketService from '@/shared/utils/socket';
 
 interface KitchenOrderFilters {
     status?: OrderStatus;
     staffId?: number;
+    stationId?: number;
     search?: string;
 }
 
@@ -125,7 +127,17 @@ export class KitchenService {
             updateData.staffId = staffId;
         }
 
-        return kitchenRepository.update(kitchenOrderId, updateData as any);
+        const updatedOrder = await kitchenRepository.update(kitchenOrderId, updateData as any);
+        const fullOrder = await kitchenRepository.findById(kitchenOrderId);
+
+        // Emit WebSocket event
+        socketService.emitKitchenOrderPreparing(
+            kitchenOrderId,
+            kitchenOrder.orderId,
+            fullOrder?.order?.tableId || 0
+        );
+
+        return updatedOrder;
     }
 
     /**
@@ -138,19 +150,41 @@ export class KitchenService {
             throw new BadRequestError('Only preparing orders can be completed');
         }
 
-        return kitchenRepository.update(kitchenOrderId, {
+        const completedAt = new Date();
+        const prepTime = kitchenOrder.startedAt 
+            ? Math.floor((completedAt.getTime() - kitchenOrder.startedAt.getTime()) / 1000 / 60)
+            : 0;
+
+        const updatedOrder = await kitchenRepository.update(kitchenOrderId, {
             status: 'ready',
-            completedAt: new Date(),
+            completedAt,
+            prepTimeActual: prepTime,
         } as any);
+
+        // Fetch full order for tableId
+        const fullOrder = await kitchenRepository.findById(kitchenOrderId);
+        
+        // Emit WebSocket event
+        socketService.emitKitchenOrderReady(
+            kitchenOrderId,
+            kitchenOrder.orderId,
+            fullOrder?.order?.tableId || 0
+        );
+
+        return updatedOrder;
     }
 
     /**
      * Update order priority
      */
     async updateOrderPriority(kitchenOrderId: number, priority: number) {
-        await this.getKitchenOrderById(kitchenOrderId);
-
-        return kitchenRepository.update(kitchenOrderId, { priority } as any);
+        const kitchenOrder = await this.getKitchenOrderById(kitchenOrderId);
+        const updatedOrder = await kitchenRepository.update(kitchenOrderId, { priority } as any);
+        
+        // Emit WebSocket event
+        socketService.emitKitchenPriorityChanged(kitchenOrderId, kitchenOrder.orderId, priority.toString());
+        
+        return updatedOrder;
     }
 
     /**
@@ -201,6 +235,147 @@ export class KitchenService {
             filters: { staffId },
         });
     }
+
+    /**
+     * Handle order cancellation
+     */
+    async handleCancellation(kitchenOrderId: number, accepted: boolean, reason?: string) {
+        const kitchenOrder = await this.getKitchenOrderById(kitchenOrderId);
+
+        if (accepted) {
+            // Accept cancellation - mark as cancelled
+            await kitchenRepository.update(kitchenOrderId, {
+                status: 'cancelled',
+            } as any);
+
+            // Update main order status
+            await orderRepository.updateStatus(kitchenOrder.orderId, 'cancelled');
+
+            // Fetch full order for tableId
+            const fullOrder = await kitchenRepository.findById(kitchenOrderId);
+            
+            // Send WebSocket event to waiter
+            socketService.emitKitchenCancelAccepted(
+                kitchenOrderId,
+                kitchenOrder.orderId,
+                fullOrder?.order?.tableId || 0
+            );
+
+            return { status: 'cancelled', message: 'Cancellation accepted' };
+        } else {
+            // Reject cancellation - send event to waiter with rejection reason
+            const fullOrder = await kitchenRepository.findById(kitchenOrderId);
+            
+            socketService.emitKitchenCancelRejected(
+                kitchenOrderId,
+                kitchenOrder.orderId,
+                fullOrder?.order?.tableId || 0,
+                reason || 'No reason provided'
+            );
+
+            return { status: kitchenOrder.status, message: `Cancellation rejected: ${reason || 'No reason'}` };
+        }
+    }
+
+    /**
+     * Get kitchen statistics
+     */
+    async getKitchenStats() {
+        const pending = await kitchenRepository.count({ status: 'pending' } as any);
+        const preparing = await kitchenRepository.count({ status: 'preparing' } as any);
+        const ready = await kitchenRepository.count({ status: 'ready' } as any);
+
+        // TODO: Calculate average prep time
+        return {
+            pending,
+            preparing,
+            ready,
+            total: pending + preparing + ready,
+        };
+    }
+
+    /**
+     * Get all kitchen stations
+     */
+    async getKitchenStations() {
+        return kitchenRepository.getAllStations();
+    }
+
+    /**
+     * Assign to station
+     */
+    async assignStation(kitchenOrderId: number, stationId: number) {
+        const kitchenOrder = await this.getKitchenOrderById(kitchenOrderId);
+        const updatedOrder = await kitchenRepository.update(kitchenOrderId, {
+            station: { connect: { stationId } },
+        } as any);
+        
+        // Get station name for event
+        const stations = await kitchenRepository.getAllStations();
+        const station = stations.find(s => s.stationId === stationId);
+        
+        // Emit WebSocket event
+        socketService.emitKitchenStationAssigned(
+            kitchenOrderId,
+            kitchenOrder.orderId,
+            stationId,
+            station?.name || 'Unknown Station'
+        );
+        
+        return updatedOrder;
+    }
+
+    /**
+     * Update status
+     */
+    async updateStatus(kitchenOrderId: number, status: string, chefId?: number) {
+        const kitchenOrder = await this.getKitchenOrderById(kitchenOrderId);
+        const fullOrder = await kitchenRepository.findById(kitchenOrderId);
+
+        const updateData: any = { status: status as any };
+
+        // Auto-set timestamps based on status
+        if (status === 'preparing' && !kitchenOrder.startedAt) {
+            updateData.startedAt = new Date();
+        } else if (status === 'ready' && !kitchenOrder.completedAt) {
+            updateData.completedAt = new Date();
+        }
+
+        // Auto-assign chef if provided
+        if (chefId && !kitchenOrder.staffId) {
+            updateData.chef = { connect: { staffId: chefId } };
+        }
+
+        const updatedOrder = await kitchenRepository.update(kitchenOrderId, updateData);
+
+        // Emit appropriate WebSocket events based on status
+        const tableId = fullOrder?.order?.tableId || 0;
+        
+        if (status === 'acknowledged' && chefId) {
+            const chef = await staffRepository.findById(chefId);
+            socketService.emitKitchenOrderAcknowledged(
+                kitchenOrderId,
+                kitchenOrder.orderId,
+                chefId,
+                chef?.fullName || 'Unknown Chef'
+            );
+        } else if (status === 'preparing') {
+            socketService.emitKitchenOrderPreparing(kitchenOrderId, kitchenOrder.orderId, tableId);
+        } else if (status === 'ready') {
+            socketService.emitKitchenOrderReady(kitchenOrderId, kitchenOrder.orderId, tableId);
+        } else if (status === 'completed') {
+            const prepTime = kitchenOrder.startedAt && updatedOrder.completedAt
+                ? Math.floor((updatedOrder.completedAt.getTime() - kitchenOrder.startedAt.getTime()) / 1000 / 60)
+                : 0;
+            socketService.emitKitchenOrderCompleted(kitchenOrderId, kitchenOrder.orderId, tableId, prepTime);
+        }
+
+        // Emit general status update
+        socketService.emitKitchenOrderUpdate(kitchenOrderId, status, { orderId: kitchenOrder.orderId, tableId });
+
+        return updatedOrder;
+    }
 }
 
 export const kitchenService = new KitchenService();
+export default kitchenService;

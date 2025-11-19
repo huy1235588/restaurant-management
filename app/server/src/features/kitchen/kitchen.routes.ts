@@ -768,4 +768,122 @@ router.patch('/:id/priority', kitchenController.updatePriority.bind(kitchenContr
 // PATCH /api/kitchen/:id/assign - Assign chef to kitchen order
 router.patch('/:id/assign', validate(assignChefSchema), kitchenController.assignChef.bind(kitchenController));
 
+/**
+ * @swagger
+ * /kitchen/{id}/status:
+ *   patch:
+ *     summary: Update kitchen order status
+ *     tags: [Kitchen]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [pending, acknowledged, preparing, ready, completed, cancelled]
+ *     responses:
+ *       200:
+ *         description: Status updated successfully
+ */
+router.patch('/:id/status', kitchenController.updateStatus.bind(kitchenController));
+
+/**
+ * @swagger
+ * /kitchen/{id}/cancel:
+ *   post:
+ *     summary: Handle cancellation request
+ *     tags: [Kitchen]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               accepted:
+ *                 type: boolean
+ *               reason:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Cancellation handled
+ */
+router.post('/:id/cancel', kitchenController.handleCancellation.bind(kitchenController));
+
+/**
+ * @swagger
+ * /kitchen/stats:
+ *   get:
+ *     summary: Get kitchen statistics
+ *     tags: [Kitchen]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Stats retrieved successfully
+ */
+router.get('/stats', kitchenController.getStats.bind(kitchenController));
+
+/**
+ * @swagger
+ * /kitchen/stations:
+ *   get:
+ *     summary: Get all kitchen stations
+ *     tags: [Kitchen]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Stations retrieved successfully
+ */
+router.get('/stations', kitchenController.getStations.bind(kitchenController));
+
+/**
+ * @swagger
+ * /kitchen/{id}/assign-station:
+ *   patch:
+ *     summary: Assign to station
+ *     tags: [Kitchen]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               stationId:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Station assigned
+ */
+router.patch('/:id/assign-station', kitchenController.assignStation.bind(kitchenController));
+
 export default router;

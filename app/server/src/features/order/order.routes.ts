@@ -627,4 +627,163 @@ router.delete(
     orderController.deleteOrder.bind(orderController)
 );
 
+/**
+ * @swagger
+ * /orders/{orderId}/items/{itemId}/status:
+ *   patch:
+ *     summary: Update order item status
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: orderId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: path
+ *         name: itemId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [pending, preparing, ready, served, cancelled]
+ *     responses:
+ *       200:
+ *         description: Order item status updated successfully
+ */
+router.patch(
+    '/:orderId/items/:itemId/status',
+    authorize('admin', 'manager', 'chef', 'waiter'),
+    orderController.updateOrderItemStatus.bind(orderController)
+);
+
+/**
+ * @swagger
+ * /orders/reports/by-table:
+ *   get:
+ *     summary: Get orders report grouped by table
+ *     tags: [Orders, Reports]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Report retrieved successfully
+ */
+router.get(
+    '/reports/by-table',
+    authorize('admin', 'manager'),
+    orderController.getReportByTable.bind(orderController)
+);
+
+/**
+ * @swagger
+ * /orders/reports/popular-items:
+ *   get:
+ *     summary: Get popular menu items report
+ *     tags: [Orders, Reports]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *     responses:
+ *       200:
+ *         description: Report retrieved successfully
+ */
+router.get(
+    '/reports/popular-items',
+    authorize('admin', 'manager'),
+    orderController.getReportPopularItems.bind(orderController)
+);
+
+/**
+ * @swagger
+ * /orders/reports/by-waiter:
+ *   get:
+ *     summary: Get orders report by waiter
+ *     tags: [Orders, Reports]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: staffId
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Report retrieved successfully
+ */
+router.get(
+    '/reports/by-waiter',
+    authorize('admin', 'manager'),
+    orderController.getReportByWaiter.bind(orderController)
+);
+
+/**
+ * @swagger
+ * /orders/reports/customer-history/{phone}:
+ *   get:
+ *     summary: Get customer order history
+ *     tags: [Orders, Reports]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: phone
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Report retrieved successfully
+ */
+router.get(
+    '/reports/customer-history/:phone',
+    authorize('admin', 'manager', 'waiter'),
+    orderController.getReportCustomerHistory.bind(orderController)
+);
+
 export default router;

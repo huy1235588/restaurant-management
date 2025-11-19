@@ -212,7 +212,7 @@ export class TableService {
             orders: {
                 where: {
                     status: {
-                        notIn: ['served', 'cancelled']
+                        notIn: ['completed', 'cancelled']
                     }
                 },
                 include: {

@@ -15,8 +15,8 @@ export class BillService {
             throw new NotFoundError('Order not found');
         }
 
-        if (order.status !== 'served') {
-            throw new BadRequestError('Can only create bill for served orders');
+        if (order.status !== 'completed') {
+            throw new BadRequestError('Can only create bill for completed orders');
         }
 
         // Check if bill already exists
@@ -25,17 +25,13 @@ export class BillService {
             throw new BadRequestError('Bill already exists for this order');
         }
 
-        // Calculate bill totals
-        const subtotal = order.orderItems.reduce(
-            (sum: number, item) => sum + Number(item.subtotal),
-            0
-        );
-
-        const taxRate = data.taxRate || 10; // Default 10%
-        const taxAmount = (subtotal * taxRate) / 100;
-        const discountAmount = data.discountAmount || 0;
-        const serviceCharge = data.serviceCharge || 0;
-        const totalAmount = subtotal + taxAmount + serviceCharge - discountAmount;
+        // Use bill data passed in (already calculated)
+        const subtotal = data.subtotal;
+        const taxAmount = data.taxAmount;
+        const taxRate = data.taxRate;
+        const discountAmount = data.discountAmount;
+        const serviceCharge = data.serviceCharge;
+        const totalAmount = data.totalAmount;
 
         // Create bill
         const billData: Prisma.BillCreateInput = {
@@ -55,7 +51,7 @@ export class BillService {
 
         const bill = await billRepository.create(billData);
 
-        // Create bill items
+        // Create bill items from order items
         await Promise.all(
             order.orderItems.map((orderItem) =>
                 billRepository.update(bill.billId, {
@@ -65,9 +61,9 @@ export class BillService {
                             itemName: orderItem.menuItem.itemName,
                             quantity: orderItem.quantity,
                             unitPrice: orderItem.unitPrice,
-                            subtotal: orderItem.subtotal,
+                            subtotal: orderItem.totalPrice,
                             discount: 0,
-                            total: orderItem.subtotal,
+                            total: orderItem.totalPrice,
                         },
                     },
                 })

@@ -84,7 +84,7 @@ export class RestaurantTableRepository extends BaseRepository<RestaurantTable, T
                     where: { status: { in: ['pending', 'confirmed'] } },
                 },
                 orders: {
-                    where: { status: { notIn: ['served', 'cancelled'] } },
+                    where: { status: { notIn: ['completed', 'cancelled'] } },
                 },
             },
         });

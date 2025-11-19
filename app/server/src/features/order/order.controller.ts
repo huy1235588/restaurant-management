@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express';
 import orderService from '@/features/order/order.service';
 import ResponseHandler from '@/shared/utils/response';
 import { AuthRequest } from '@/shared/middlewares/auth';
+import { ForbiddenError } from '@/shared/utils/errors';
 
 export class OrderController {
     /**
@@ -72,6 +73,17 @@ export class OrderController {
     async updateOrder(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             const orderId = parseInt(req.params['id'] || '0', 10);
+            const order = await orderService.getOrderById(orderId);
+
+            // Waiter can only edit their own orders (unless admin/manager)
+            const userRole = req.user?.role;
+            const isWaiter = userRole === 'waiter';
+            const isOwnOrder = order.staffId === req.user?.staffId;
+
+            if (isWaiter && !isOwnOrder) {
+                throw new ForbiddenError('Waiters can only edit their own orders');
+            }
+
             const result = await orderService.updateOrder(orderId, req.body);
             ResponseHandler.success(res, 'Order updated successfully', result);
         } catch (error) {
@@ -94,12 +106,13 @@ export class OrderController {
     }
 
     /**
-     * DELETE /api/orders/:id/cancel
+     * POST /api/orders/:id/cancel
      */
     async cancelOrder(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             const orderId = parseInt(req.params['id'] || '0', 10);
-            const result = await orderService.cancelOrder(orderId);
+            const { reason } = req.body;
+            const result = await orderService.cancelOrder(orderId, reason || 'No reason provided');
             ResponseHandler.success(res, 'Order cancelled successfully', result);
         } catch (error) {
             next(error);
@@ -114,6 +127,84 @@ export class OrderController {
             const orderId = parseInt(req.params['id'] || '0', 10);
             await orderService.deleteOrder(orderId);
             ResponseHandler.noContent(res);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
+     * PATCH /api/orders/:orderId/items/:itemId/status
+     */
+    async updateOrderItemStatus(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            const orderId = parseInt(req.params['orderId'] || '0', 10);
+            const itemId = parseInt(req.params['itemId'] || '0', 10);
+            const { status } = req.body;
+            const result = await orderService.updateOrderItemStatus(orderId, itemId, status);
+            ResponseHandler.success(res, 'Order item status updated successfully', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
+     * GET /api/orders/reports/by-table
+     */
+    async getReportByTable(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            const { startDate, endDate } = req.query;
+            const result = await orderService.getReportByTable({
+                startDate: startDate as string,
+                endDate: endDate as string,
+            });
+            ResponseHandler.success(res, 'Report retrieved successfully', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
+     * GET /api/orders/reports/popular-items
+     */
+    async getReportPopularItems(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            const { startDate, endDate, limit } = req.query;
+            const result = await orderService.getReportPopularItems({
+                startDate: startDate as string,
+                endDate: endDate as string,
+                limit: limit ? parseInt(limit as string, 10) : 10,
+            });
+            ResponseHandler.success(res, 'Report retrieved successfully', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
+     * GET /api/orders/reports/by-waiter
+     */
+    async getReportByWaiter(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            const { startDate, endDate, staffId } = req.query;
+            const result = await orderService.getReportByWaiter({
+                startDate: startDate as string,
+                endDate: endDate as string,
+                staffId: staffId ? parseInt(staffId as string, 10) : undefined,
+            });
+            ResponseHandler.success(res, 'Report retrieved successfully', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
+     * GET /api/orders/reports/customer-history/:phone
+     */
+    async getReportCustomerHistory(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            const customerPhone = req.params['phone'] || '';
+            const result = await orderService.getReportCustomerHistory(customerPhone);
+            ResponseHandler.success(res, 'Report retrieved successfully', result);
         } catch (error) {
             next(error);
         }

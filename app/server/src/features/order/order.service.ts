@@ -6,6 +6,7 @@ import { NotFoundError, BadRequestError } from '@/shared/utils/errors';
 import { CreateOrderDTO, UpdateOrderDTO } from '@/features/order/dtos';
 import { Prisma } from '@prisma/client';
 import { OrderStatus } from '@/shared/types';
+import socketService from '@/shared/utils/socket';
 
 export class OrderService {
     /**
@@ -36,18 +37,26 @@ export class OrderService {
                 throw new BadRequestError(`${menuItem.itemName} is currently unavailable`);
             }
 
-            const subtotal = Number(menuItem.price) * item.quantity;
-            orderTotal += subtotal;
+            const itemTotal = Number(menuItem.price) * item.quantity;
+            orderTotal += itemTotal;
 
             orderItems.push({
                 itemId: item.itemId,
                 quantity: item.quantity,
                 unitPrice: Number(menuItem.price),
-                subtotal,
+                totalPrice: itemTotal, // Changed from subtotal to totalPrice
                 specialRequest: item.specialRequest,
                 status: 'pending',
             });
         }
+
+        // Calculate financial fields
+        const totalAmount = orderTotal;
+        const discountAmount = data.discountAmount || 0;
+        const taxRate = data.taxRate || 0;
+        const subtotalAfterDiscount = totalAmount - discountAmount;
+        const taxAmount = (subtotalAfterDiscount * taxRate) / 100;
+        const finalAmount = subtotalAfterDiscount + taxAmount;
 
         // Create order
         const orderData: Prisma.OrderCreateInput = {
@@ -59,6 +68,10 @@ export class OrderService {
             headCount: data.headCount || 1,
             notes: data.notes,
             status: 'pending',
+            totalAmount,
+            discountAmount,
+            taxAmount,
+            finalAmount,
         };
 
         const order = await orderRepository.create(orderData, orderItems);
@@ -69,8 +82,17 @@ export class OrderService {
         // Create kitchen order
         await kitchenRepository.create({
             order: { connect: { orderId: order.orderId } },
-            priority: 0,
+            priority: 'normal',
             status: 'pending',
+        });
+
+        // Emit WebSocket event
+        socketService.emitNewOrder(order.orderId, order.tableId, {
+            orderNumber: order.orderNumber,
+            status: order.status,
+            totalAmount: order.totalAmount,
+            finalAmount: order.finalAmount,
+            items: order.orderItems,
         });
 
         return order;
@@ -145,8 +167,18 @@ export class OrderService {
         const updatedOrder = await orderRepository.updateStatus(orderId, status);
 
         // If order is completed or cancelled, update table status
-        if (status === 'served' || status === 'cancelled') {
+        if (status === 'completed' || status === 'cancelled') {
             await tableRepository.updateStatus(order.tableId, 'available');
+        }
+
+        // Emit WebSocket event
+        socketService.emitOrderStatusUpdate(orderId, order.tableId, status);
+
+        if (status === 'confirmed') {
+            socketService.emitOrderConfirmed(orderId, order.tableId, {
+                orderNumber: updatedOrder.orderNumber,
+                confirmedAt: updatedOrder.confirmedAt,
+            });
         }
 
         return updatedOrder;
@@ -164,10 +196,11 @@ export class OrderService {
      * Add items to existing order
      */
     async addOrderItems(orderId: number, items: CreateOrderDTO['items']) {
-        await this.getOrderById(orderId);
+        const order = await this.getOrderById(orderId);
 
         // Calculate order items totals
         const orderItems: Omit<Prisma.OrderItemCreateManyInput, 'orderId'>[] = [];
+        let addedTotal = 0;
 
         for (const item of items) {
             const menuItem = await menuItemRepository.findById(item.itemId);
@@ -179,36 +212,68 @@ export class OrderService {
                 throw new BadRequestError(`${menuItem.itemName} is currently unavailable`);
             }
 
-            const subtotal = Number(menuItem.price) * item.quantity;
+            const itemTotal = Number(menuItem.price) * item.quantity;
+            addedTotal += itemTotal;
 
             orderItems.push({
                 itemId: item.itemId,
                 quantity: item.quantity,
                 unitPrice: Number(menuItem.price),
-                subtotal,
+                totalPrice: itemTotal, // Changed from subtotal to totalPrice
                 specialRequest: item.specialRequest,
                 status: 'pending',
             });
         }
 
-        return orderRepository.addItems(orderId, orderItems);
+        // Recalculate order financial fields
+        const newTotalAmount = Number(order.totalAmount || 0) + addedTotal;
+        const discountAmount = Number(order.discountAmount || 0);
+        const subtotalAfterDiscount = newTotalAmount - discountAmount;
+        const taxRate = order.taxAmount ? (Number(order.taxAmount) / (newTotalAmount - discountAmount)) * 100 : 0;
+        const taxAmount = (subtotalAfterDiscount * taxRate) / 100;
+        const finalAmount = subtotalAfterDiscount + taxAmount;
+
+        // Update order financial fields
+        await orderRepository.update(orderId, {
+            totalAmount: newTotalAmount,
+            taxAmount,
+            finalAmount,
+        });
+
+        const addedItems = await orderRepository.addItems(orderId, orderItems);
+
+        // Emit WebSocket event
+        socketService.emitOrderItemAdded(orderId, order.tableId, {
+            items: addedItems,
+            newTotalAmount,
+            newFinalAmount: finalAmount,
+        });
+
+        return addedItems;
     }
 
     /**
      * Cancel order
      */
-    async cancelOrder(orderId: number) {
+    async cancelOrder(orderId: number, reason: string) {
         const order = await this.getOrderById(orderId);
 
-        if (order.status === 'served') {
-            throw new BadRequestError('Cannot cancel served order');
+        if (order.status === 'completed') {
+            throw new BadRequestError('Cannot cancel completed order');
         }
 
-        // Update order status
-        const updatedOrder = await orderRepository.updateStatus(orderId, 'cancelled');
+        // Update order status with cancellation details
+        const updatedOrder = await orderRepository.update(orderId, {
+            status: 'cancelled',
+            cancelledAt: new Date(),
+            cancellationReason: reason,
+        });
 
         // Update table status
         await tableRepository.updateStatus(order.tableId, 'available');
+
+        // Send WebSocket event to kitchen to notify cancellation
+        socketService.emitOrderCancelRequest(orderId, order.tableId, reason, order.staffId || undefined);
 
         return updatedOrder;
     }
@@ -219,6 +284,47 @@ export class OrderService {
     async deleteOrder(orderId: number) {
         await this.getOrderById(orderId);
         return orderRepository.delete(orderId);
+    }
+
+    /**
+     * Update order item status
+     */
+    async updateOrderItemStatus(orderId: number, itemId: number, status: string) {
+        const order = await this.getOrderById(orderId);
+        const result = await orderRepository.updateOrderItemStatus(orderId, itemId, status);
+        
+        // Emit WebSocket event
+        socketService.emitOrderItemStatusChanged(orderId, order.tableId, itemId, status);
+        
+        return result;
+    }
+
+    /**
+     * Get report: Orders grouped by table
+     */
+    async getReportByTable(filters?: { startDate?: string; endDate?: string }) {
+        return orderRepository.getReportByTable(filters);
+    }
+
+    /**
+     * Get report: Popular menu items
+     */
+    async getReportPopularItems(filters?: { startDate?: string; endDate?: string; limit?: number }) {
+        return orderRepository.getReportPopularItems(filters);
+    }
+
+    /**
+     * Get report: Orders by waiter
+     */
+    async getReportByWaiter(filters?: { startDate?: string; endDate?: string; staffId?: number }) {
+        return orderRepository.getReportByWaiter(filters);
+    }
+
+    /**
+     * Get report: Customer order history
+     */
+    async getReportCustomerHistory(customerPhone: string) {
+        return orderRepository.getReportCustomerHistory(customerPhone);
     }
 }
 

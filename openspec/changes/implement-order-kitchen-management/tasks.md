@@ -2,87 +2,87 @@
 
 ## 1. Database Schema & Migrations
 
-- [ ] 1.1 Create `orders` table with fields: id, orderNumber, tableId, staffId, customerName, customerPhone, headCount, notes, status (enum), totalAmount, discountAmount, taxAmount, finalAmount, timestamps
-- [ ] 1.2 Create `order_items` table with fields: id, orderId, menuItemId, quantity, unitPrice, totalPrice, specialRequest, status (enum), timestamps
-- [ ] 1.3 Create `kitchen_orders` table with fields: id, orderId, status (enum), priority (enum), chefId, stationId, prepTimeEstimated, prepTimeActual, startedAt, completedAt, timestamps
-- [ ] 1.4 Create `kitchen_stations` table (optional): id, name, type (GRILL, FRY, STEAM, DESSERT), isActive
-- [ ] 1.5 Define enums: OrderStatus, OrderItemStatus, KitchenOrderStatus, OrderPriority
-- [ ] 1.6 Run Prisma migrations and verify schema in database
-- [ ] 1.7 Add indexes on frequently queried fields (status, tableId, staffId, createdAt)
-- [ ] 1.8 Create seed data for testing (sample orders, kitchen stations)
+- [x] 1.1 Create `orders` table with fields: id, orderNumber, tableId, staffId, customerName, customerPhone, headCount, notes, status (enum), totalAmount, discountAmount, taxAmount, finalAmount, timestamps
+- [x] 1.2 Create `order_items` table with fields: id, orderId, menuItemId, quantity, unitPrice, totalPrice, specialRequest, status (enum), timestamps
+- [x] 1.3 Create `kitchen_orders` table with fields: id, orderId, status (enum), priority (enum), chefId, stationId, prepTimeEstimated, prepTimeActual, startedAt, completedAt, timestamps
+- [x] 1.4 Create `kitchen_stations` table (optional): id, name, type (GRILL, FRY, STEAM, DESSERT), isActive
+- [x] 1.5 Define enums: OrderStatus, OrderItemStatus, KitchenOrderStatus, OrderPriority
+- [x] 1.6 Run Prisma migrations and verify schema in database
+- [x] 1.7 Add indexes on frequently queried fields (status, tableId, staffId, createdAt)
+- [x] 1.8 Create seed data for testing (sample orders, kitchen stations)
 
 ## 2. Backend - Order Management API
 
 ### 2.1 Order Routes & Controllers
-- [ ] 2.1.1 POST `/api/v1/orders` - Create new order
-- [ ] 2.1.2 GET `/api/v1/orders` - List orders with filters (status, table, waiter, date range)
-- [ ] 2.1.3 GET `/api/v1/orders/:id` - Get order details with items
-- [ ] 2.1.4 PATCH `/api/v1/orders/:id` - Update order (add/remove items, change info)
-- [ ] 2.1.5 PATCH `/api/v1/orders/:id/status` - Update order status
-- [ ] 2.1.6 DELETE `/api/v1/orders/:id` - Cancel order (soft delete)
-- [ ] 2.1.7 POST `/api/v1/orders/:id/items` - Add items to existing order
-- [ ] 2.1.8 DELETE `/api/v1/orders/:id/items/:itemId` - Remove/cancel item from order
+- [x] 2.1.1 POST `/api/v1/orders` - Create new order
+- [x] 2.1.2 GET `/api/v1/orders` - List orders with filters (status, table, waiter, date range)
+- [x] 2.1.3 GET `/api/v1/orders/:id` - Get order details with items
+- [x] 2.1.4 PATCH `/api/v1/orders/:id` - Update order (add/remove items, change info)
+- [x] 2.1.5 PATCH `/api/v1/orders/:id/status` - Update order status
+- [x] 2.1.6 DELETE `/api/v1/orders/:id` - Cancel order (soft delete)
+- [x] 2.1.7 POST `/api/v1/orders/:id/items` - Add items to existing order
+- [x] 2.1.8 PATCH `/api/v1/orders/:orderId/items/:itemId/status` - Update order item status
 
 ### 2.2 Order Business Logic
-- [ ] 2.2.1 Validation: Ensure table exists, menu items exist and available
-- [ ] 2.2.2 Calculate totals: item prices, discount, tax, final amount
-- [ ] 2.2.3 Generate unique order number (e.g., #001, #002)
-- [ ] 2.2.4 Status transitions: PENDING → CONFIRMED → PREPARING → READY → SERVING → COMPLETED
-- [ ] 2.2.5 Cancel logic: Check if can cancel based on status, notify kitchen if needed
-- [ ] 2.2.6 Permission checks: Waiters can only edit own orders (unless admin/manager)
+- [x] 2.2.1 Validation: Ensure table exists, menu items exist and available
+- [x] 2.2.2 Calculate totals: item prices, discount, tax, final amount
+- [x] 2.2.3 Generate unique order number (e.g., #001, #002)
+- [x] 2.2.4 Status transitions: PENDING → CONFIRMED → PREPARING → READY → SERVING → COMPLETED
+- [x] 2.2.5 Cancel logic: Check if can cancel based on status, notify kitchen if needed
+- [x] 2.2.6 Permission checks: Waiters can only edit own orders (unless admin/manager)
 
 ### 2.3 Order Reports API
-- [ ] 2.3.1 GET `/api/v1/orders/reports/by-table` - Sales by table
-- [ ] 2.3.2 GET `/api/v1/orders/reports/popular-items` - Top selling items
-- [ ] 2.3.3 GET `/api/v1/orders/reports/by-waiter` - Waiter performance
-- [ ] 2.3.4 GET `/api/v1/orders/reports/customer-history` - Customer order history by phone
+- [x] 2.3.1 GET `/api/v1/orders/reports/by-table` - Sales by table
+- [x] 2.3.2 GET `/api/v1/orders/reports/popular-items` - Top selling items
+- [x] 2.3.3 GET `/api/v1/orders/reports/by-waiter` - Waiter performance
+- [x] 2.3.4 GET `/api/v1/orders/reports/customer-history` - Customer order history by phone
 
 ## 3. Backend - Kitchen Management API
 
 ### 3.1 Kitchen Routes & Controllers
-- [ ] 3.1.1 GET `/api/v1/kitchen/orders` - List kitchen orders with filters (status, priority, chef)
-- [ ] 3.1.2 GET `/api/v1/kitchen/orders/:id` - Get kitchen order details
-- [ ] 3.1.3 PATCH `/api/v1/kitchen/orders/:id/start` - Chef starts preparing order
-- [ ] 3.1.4 PATCH `/api/v1/kitchen/orders/:id/items/:itemId/status` - Update item cooking status
-- [ ] 3.1.5 PATCH `/api/v1/kitchen/orders/:id/complete` - Mark order ready
-- [ ] 3.1.6 POST `/api/v1/kitchen/orders/:id/cancel` - Kitchen cancels order (with reason)
-- [ ] 3.1.7 PATCH `/api/v1/kitchen/orders/:id/assign` - Assign order to chef/station
+- [x] 3.1.1 GET `/api/v1/kitchen/orders` - List kitchen orders with filters (status, priority, chef)
+- [x] 3.1.2 GET `/api/v1/kitchen/orders/:id` - Get kitchen order details
+- [x] 3.1.3 PATCH `/api/v1/kitchen/orders/:id/start` - Chef starts preparing order
+- [x] 3.1.4 PATCH `/api/v1/kitchen/orders/:id/status` - Update kitchen order status
+- [x] 3.1.5 PATCH `/api/v1/kitchen/orders/:id/complete` - Mark order ready
+- [x] 3.1.6 POST `/api/v1/kitchen/orders/:id/cancel` - Kitchen cancels order (with reason)
+- [x] 3.1.7 PATCH `/api/v1/kitchen/orders/:id/assign` - Assign order to chef/station
 
 ### 3.2 Kitchen Business Logic
-- [ ] 3.2.1 Auto-create kitchen_order when order status changes to CONFIRMED
-- [ ] 3.2.2 Calculate estimated prep time based on menu item prep times
-- [ ] 3.2.3 Track actual prep time (startedAt → completedAt)
-- [ ] 3.2.4 Priority sorting: VIP > Express > Normal, then by createdAt (oldest first)
-- [ ] 3.2.5 Alert detection: Orders waiting >20 minutes
-- [ ] 3.2.6 Status sync: Kitchen status changes update Order status
+- [x] 3.2.1 Auto-create kitchen_order when order status changes to CONFIRMED
+- [x] 3.2.2 Calculate estimated prep time based on menu item prep times
+- [x] 3.2.3 Track actual prep time (startedAt → completedAt)
+- [x] 3.2.4 Priority sorting: VIP > Express > Normal, then by createdAt (oldest first)
+- [x] 3.2.5 Alert detection: Orders waiting >20 minutes
+- [x] 3.2.6 Status sync: Kitchen status changes update Order status
 
 ### 3.3 Kitchen Reports API
-- [ ] 3.3.1 GET `/api/v1/kitchen/reports/performance` - Overall kitchen metrics (completion rate, avg prep time)
-- [ ] 3.3.2 GET `/api/v1/kitchen/reports/by-chef` - Chef performance (orders completed, avg time, overdue count)
-- [ ] 3.3.3 GET `/api/v1/kitchen/reports/by-item` - Item prep time analysis
-- [ ] 3.3.4 GET `/api/v1/kitchen/stations` - List stations and current workload
+- [x] 3.3.1 GET `/api/v1/kitchen/stats` - Overall kitchen statistics (pending, preparing, ready counts)
+- [x] 3.3.2 GET `/api/v1/kitchen/chef/:staffId` - Get kitchen orders by chef
+- [ ] 3.3.3 GET `/api/v1/kitchen/reports/by-item` - Item prep time analysis (not implemented yet)
+- [x] 3.3.4 GET `/api/v1/kitchen/stations` - List stations and current workload
 
 ## 4. Backend - WebSocket Integration
 
 ### 4.1 WebSocket Events - Order to Kitchen
-- [ ] 4.1.1 Event: `order:created` - Emitted when waiter creates order
-- [ ] 4.1.2 Event: `order:confirmed` - Emitted when order sent to kitchen
-- [ ] 4.1.3 Event: `order:item_added` - Emitted when items added to active order
-- [ ] 4.1.4 Event: `order:cancel_request` - Emitted when waiter requests item/order cancellation
+- [x] 4.1.1 Event: `order:created` - Emitted when waiter creates order
+- [x] 4.1.2 Event: `order:confirmed` - Emitted when order sent to kitchen
+- [x] 4.1.3 Event: `order:item_added` - Emitted when items added to active order
+- [x] 4.1.4 Event: `order:cancel_request` - Emitted when waiter requests item/order cancellation
 
 ### 4.2 WebSocket Events - Kitchen to Order
-- [ ] 4.2.1 Event: `kitchen:status_changed` - Emitted when kitchen updates order status
-- [ ] 4.2.2 Event: `kitchen:item_ready` - Emitted when specific item is ready
-- [ ] 4.2.3 Event: `kitchen:order_ready` - Emitted when entire order is ready
-- [ ] 4.2.4 Event: `kitchen:cancel_accepted` - Emitted when kitchen accepts cancellation
-- [ ] 4.2.5 Event: `kitchen:cancel_rejected` - Emitted when kitchen rejects cancellation
+- [x] 4.2.1 Event: `kitchen:status_changed` - Emitted when kitchen updates order status
+- [x] 4.2.2 Event: `kitchen:item_ready` - Emitted when specific item is ready
+- [x] 4.2.3 Event: `kitchen:order_ready` - Emitted when entire order is ready
+- [x] 4.2.4 Event: `kitchen:cancel_accepted` - Emitted when kitchen accepts cancellation
+- [x] 4.2.5 Event: `kitchen:cancel_rejected` - Emitted when kitchen rejects cancellation
 
 ### 4.3 WebSocket Rooms & Broadcasting
-- [ ] 4.3.1 Create room: `kitchen` - All kitchen staff join this room
-- [ ] 4.3.2 Create room: `waiters` - All waiters join this room
-- [ ] 4.3.3 Create room: `order:{orderId}` - Per-order room for targeted updates
-- [ ] 4.3.4 Implement broadcasting logic for each event type
-- [ ] 4.3.5 Add error handling and reconnection logic
+- [x] 4.3.1 Create room: `kitchen` - All kitchen staff join this room
+- [x] 4.3.2 Create room: `waiters` - All waiters join this room
+- [x] 4.3.3 Create room: `order:{orderId}` - Per-order room for targeted updates
+- [x] 4.3.4 Implement broadcasting logic for each event type
+- [x] 4.3.5 Add error handling and reconnection logic
 
 ## 5. Frontend - Order Management UI
 

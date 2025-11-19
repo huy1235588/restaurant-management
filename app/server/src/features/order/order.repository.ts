@@ -172,7 +172,7 @@ export class OrderRepository extends BaseRepository<Order, OrderFilter> {
 
         if (status === 'confirmed') {
             updateData.confirmedAt = new Date();
-        } else if (status === 'served') {
+        } else if (status === 'completed') {
             updateData.completedAt = new Date();
         }
 
@@ -195,6 +195,94 @@ export class OrderRepository extends BaseRepository<Order, OrderFilter> {
 
     async delete(orderId: number): Promise<Order> {
         return prisma.order.delete({ where: { orderId } });
+    }
+
+    async updateOrderItemStatus(orderId: number, itemId: number, status: string): Promise<OrderItem> {
+        return prisma.orderItem.updateMany({
+            where: { orderId, itemId },
+            data: { status: status as any },
+        }) as any;
+    }
+
+    async getReportByTable(filters?: { startDate?: string; endDate?: string }) {
+        const where: Prisma.OrderWhereInput = {};
+        if (filters?.startDate || filters?.endDate) {
+            where.orderTime = {};
+            if (filters.startDate) {
+                where.orderTime.gte = new Date(filters.startDate);
+            }
+            if (filters.endDate) {
+                where.orderTime.lte = new Date(filters.endDate);
+            }
+        }
+
+        return prisma.order.groupBy({
+            by: ['tableId'],
+            where,
+            _count: { orderId: true },
+            _sum: { finalAmount: true },
+            _avg: { finalAmount: true },
+        });
+    }
+
+    async getReportPopularItems(filters?: { startDate?: string; endDate?: string; limit?: number }) {
+        const where: Prisma.OrderWhereInput = {};
+        if (filters?.startDate || filters?.endDate) {
+            where.orderTime = {};
+            if (filters.startDate) {
+                where.orderTime.gte = new Date(filters.startDate);
+            }
+            if (filters.endDate) {
+                where.orderTime.lte = new Date(filters.endDate);
+            }
+        }
+
+        const result = await prisma.orderItem.groupBy({
+            by: ['itemId'],
+            where: {
+                order: where,
+            },
+            _sum: { quantity: true, totalPrice: true },
+            _count: { orderId: true },
+            orderBy: { _sum: { quantity: 'desc' } },
+            take: filters?.limit || 10,
+        });
+
+        return result;
+    }
+
+    async getReportByWaiter(filters?: { startDate?: string; endDate?: string; staffId?: number }) {
+        const where: Prisma.OrderWhereInput = {};
+        if (filters?.startDate || filters?.endDate) {
+            where.orderTime = {};
+            if (filters.startDate) {
+                where.orderTime.gte = new Date(filters.startDate);
+            }
+            if (filters.endDate) {
+                where.orderTime.lte = new Date(filters.endDate);
+            }
+        }
+        if (filters?.staffId) {
+            where.staffId = filters.staffId;
+        }
+
+        return prisma.order.groupBy({
+            by: ['staffId'],
+            where,
+            _count: { orderId: true },
+            _sum: { finalAmount: true },
+            _avg: { finalAmount: true },
+        });
+    }
+
+    async getReportCustomerHistory(customerPhone: string) {
+        return prisma.order.aggregate({
+            where: { customerPhone },
+            _count: { orderId: true },
+            _sum: { finalAmount: true },
+            _avg: { finalAmount: true },
+            _max: { orderTime: true },
+        });
     }
 }
 
