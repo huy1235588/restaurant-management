@@ -1,16 +1,18 @@
 # Project Context
 
 ## Purpose
-A comprehensive, full-stack restaurant management system designed to streamline restaurant operations including:
-- Order management with real-time kitchen display
-- Table reservation and status tracking
-- Menu and inventory management
-- Staff management with role-based access control
-- Payment processing and billing
-- Real-time updates via WebSocket
-- Multi-language support (EN/VI)
+Đồ án tốt nghiệp cá nhân: Hệ thống quản lý nhà hàng full-stack được thiết kế để tối ưu hóa các hoạt động nhà hàng bao gồm:
+- Quản lý đặt món với màn hình bếp thời gian thực
+- Quản lý đặt bàn và theo dõi trạng thái bàn
+- Quản lý thực đơn và kho hàng
+- Quản lý nhân viên với phân quyền dựa trên vai trò
+- Xử lý thanh toán và hóa đơn
+- Cập nhật thời gian thực qua WebSocket
+- Hỗ trợ đa ngôn ngữ (EN/VI)
 
-**Target Users**: Restaurant owners, managers, waitstaff, kitchen staff, and cashiers.
+**Người dùng mục tiêu**: Chủ nhà hàng, quản lý, nhân viên phục vụ, nhân viên bếp, và thu ngân.
+
+**Loại dự án**: Đồ án tốt nghiệp cá nhân - mục tiêu là minh họa kiến thức và kỹ năng phát triển phần mềm, không phải sản phẩm thương mại.
 
 ## Tech Stack
 
@@ -119,29 +121,26 @@ A comprehensive, full-stack restaurant management system designed to streamline 
 - **Error Handling**: Centralized error middleware with Winston logging
 
 ### Testing Strategy
-- **Current Status**: Test infrastructure ready (Jest referenced in package.json)
-- **Recommended Approach**:
-  - **Unit Tests**: Jest for business logic and utilities
-  - **Integration Tests**: Supertest for API endpoints
-  - **E2E Tests**: Playwright or Cypress for critical user flows
-  - **Coverage**: Target 80%+ for core business logic
-- **Test Organization**: Co-locate tests with source files using `.test.ts` or `.spec.ts` extension
+- **Phạm vi**: Đồ án tốt nghiệp - testing cơ bản thông qua manual testing và demonstration
+- **Không bao gồm**: 
+  - Automated unit tests
+  - Integration tests
+  - E2E tests
+  - CI/CD pipelines
+  - Test coverage metrics
+- **Focus**: Chức năng hoạt động đúng và demo được các use case chính
 
 ### Git Workflow
-- **Branching Strategy**: (Inferred best practices)
-  - `main` - Production-ready code
-  - `develop` - Integration branch for features
-  - `feature/*` - New features
-  - `bugfix/*` - Bug fixes
-  - `hotfix/*` - Production hotfixes
-- **Commit Conventions**: Use conventional commits
-  - `feat:` - New feature
-  - `fix:` - Bug fix
-  - `docs:` - Documentation changes
-  - `refactor:` - Code refactoring
-  - `style:` - Formatting changes
-  - `test:` - Adding/updating tests
-  - `chore:` - Maintenance tasks
+- **Phạm vi**: Đồ án cá nhân - quy trình Git đơn giản
+- **Branching Strategy**: 
+  - `main` - Code chính của dự án
+  - `feature/*` - Phát triển tính năng mới (nếu cần)
+- **Commit Conventions**: Conventional commits (không bắt buộc nghiêm ngặt)
+  - `feat:` - Tính năng mới
+  - `fix:` - Sửa lỗi
+  - `docs:` - Cập nhật tài liệu
+  - `refactor:` - Tái cấu trúc code
+  - `chore:` - Công việc bảo trì
 
 ## Domain Context
 
@@ -187,33 +186,36 @@ This system manages a full-service restaurant with:
 
 ### Technical Constraints
 - **Node.js**: Version 20+ required
-- **Docker**: Engine 20.10+, Compose V2+ required
-- **RAM**: Minimum 4GB for Docker deployment
-- **Database**: PostgreSQL 16 only (not compatible with older versions)
+- **Docker**: Sử dụng cho môi trường development local (không deploy production)
+- **RAM**: Minimum 4GB cho Docker local
+- **Database**: PostgreSQL 16
 - **Platform**: 
-  - Windows development requires special handling for Next.js standalone output (EPERM symlink issues)
-  - Production builds use standalone output on Linux/Docker only
-- **Image Optimization**: Disabled in production Docker builds (unoptimized: true)
+  - Development trên Windows với Next.js dev server
+  - Không có production deployment
+  - Không có CI/CD pipeline
 
 ### Business Constraints
-- **Multi-tenancy**: Currently single-restaurant (can be extended)
-- **Currency**: Not specified (implement as needed)
-- **Time Zone**: Handle restaurant local time for reservations and orders
-- **Language**: Support for English and Vietnamese (extensible)
+- **Multi-tenancy**: Single-restaurant (đồ án demo)
+- **Currency**: VND (Vietnamese Dong) - đơn giản hóa cho demo
+- **Time Zone**: Vietnam local time
+- **Language**: Hỗ trợ tiếng Anh và tiếng Việt
 
-### Security Constraints
-- **JWT Secrets**: Must be 32+ characters
-- **Password Hashing**: bcryptjs with salt rounds
-- **HTTPS**: Required for production deployment
-- **CORS**: Restricted to configured client URL
-- **Rate Limiting**: Enabled on all API endpoints
-- **File Uploads**: Validated and size-limited (via Multer)
+### Security Constraints (Demo Level)
+- **JWT Secrets**: Basic implementation cho authentication demo
+- **Password Hashing**: bcryptjs cơ bản
+- **HTTPS**: Không bắt buộc (development only)
+- **CORS**: Cấu hình cho localhost development
+- **Rate Limiting**: Có nhưng không nghiêm ngặt
+- **File Uploads**: Validation cơ bản
 
 ### Development Constraints
-- **Package Manager**: Must use `pnpm` (pnpm-workspace.yaml present)
-- **TypeScript**: Strict mode enabled, no implicit any
-- **Code Organization**: Feature-based, not by file type
-- **Environment Variables**: Required for all secrets (JWT, DB, Redis, R2, Cloudinary)
+- **Package Manager**: Sử dụng `pnpm`
+- **TypeScript**: Strict mode enabled
+- **Code Organization**: Feature-based architecture
+- **Environment Variables**: Cấu hình cho development local
+- **Deployment**: Không có production deployment plan
+- **Monitoring**: Không có monitoring/logging phức tạp cho production
+- **Performance**: Tối ưu cơ bản, không cần high-scale performance tuning
 
 ## External Dependencies
 
@@ -226,16 +228,18 @@ This system manages a full-service restaurant with:
   - Configuration required: API key, secret, cloud name
   - Deprecated - use R2 for new uploads
 
-### Infrastructure Services
-- **PostgreSQL 16**: Primary database
+### Infrastructure Services (Development)
+- **PostgreSQL 16**: Primary database cho development
   - Connection string format: `postgresql://user:password@host:port/database?schema=public`
-  - Requires health checks in Docker
+  - Chạy trong Docker container local
   - Default port: 5432
 
-- **Redis 7**: Caching and session storage
+- **Redis 7**: Caching cơ bản cho session
   - URL format: `redis://host:port`
-  - Used for session management and performance optimization
+  - Session management đơn giản
+  - Chạy trong Docker container local
   - Default port: 6379
+  - **Lưu ý**: Không có Redis clustering hay high-availability setup
 
 ### APIs & Integrations
 - **Socket.io**: Real-time bidirectional communication
@@ -252,12 +256,14 @@ This system manages a full-service restaurant with:
 - **Docker Desktop**: Required for local development with containers
 - **Nginx**: Optional reverse proxy (--profile nginx)
 
-### File Storage
-- **Local Development**: Files stored in `/app/server/uploads/`
-- **Production**: Cloudflare R2 for persistent storage (Cloudinary legacy)
+### File Storage (Simplified)
+- **Development**: Files stored in `/app/server/uploads/` cho local development
+- **Cloud Storage**: Cloudflare R2 hoặc Cloudinary cho demo upload cloud
+- **Lưu ý**: Không có CDN setup, backup strategy, hay disaster recovery plan
 - **Documentation**: See `/docs/FILE_STORAGE_GUIDE.md`
 
-### Monitoring & Logging
-- **Winston**: Application logging to `/app/server/logs/`
-- **Morgan**: HTTP request logging
-- **Health Check**: Available at `/health` endpoint
+### Logging (Development Only)
+- **Winston**: Application logging cơ bản đến `/app/server/logs/` cho debug
+- **Morgan**: HTTP request logging trong development
+- **Health Check**: Endpoint `/health` đơn giản để kiểm tra server
+- **Không bao gồm**: Production monitoring, alerting, performance tracking, APM tools
