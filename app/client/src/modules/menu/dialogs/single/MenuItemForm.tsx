@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { MenuItem, Category } from '@/types';
-import { MenuItemFormData } from '../types';
-import { menuItemFormSchema } from '../utils/validation';
+import { MenuItemFormData } from '../../types';
+import { menuItemFormSchema } from '../../utils/validation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -25,7 +25,7 @@ import { ImageUploadField } from '@/components/shared/ImageUploadField';
 import { Loader2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { calculateMargin, formatMargin } from '../utils';
+import { calculateMargin, formatMargin } from '../../utils';
 
 interface MenuItemFormProps {
     menuItem?: MenuItem | null;

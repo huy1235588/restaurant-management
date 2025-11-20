@@ -1,7 +1,7 @@
 'use client';
 
 import { Category } from '@/types';
-import { CategoryCard } from './CategoryCard';
+import { CategoryCard } from '../components/CategoryCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
 import { AlertCircle, PackageX } from 'lucide-react';

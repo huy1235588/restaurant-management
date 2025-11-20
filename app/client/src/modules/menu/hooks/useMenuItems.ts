@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { menuApi } from '@/services/menu.service';
+import { menuApi } from '../services';
 import { MenuItem, PaginatedResponse } from '@/types';
 import { MenuFilters } from '../types';
 

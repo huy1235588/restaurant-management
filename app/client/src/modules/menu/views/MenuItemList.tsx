@@ -2,8 +2,8 @@
 
 import { MenuItem } from '@/types';
 import { ViewMode } from '../types';
-import { MenuItemCard } from './MenuItemCard';
-import { MenuItemListRow } from './MenuItemListRow';
+import { MenuItemCard } from '../components/MenuItemCard';
+import { MenuItemListRow } from '../components/MenuItemListRow';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
