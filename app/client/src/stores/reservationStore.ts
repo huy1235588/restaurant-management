@@ -7,7 +7,7 @@ import {
     Customer,
     AvailabilityCheck,
 } from '@/types';
-import { reservationApi } from '@/services/reservation.service';
+import { reservationApi } from '@/modules/reservations/services';
 import { toast } from 'sonner';
 
 export type ViewMode = 'calendar' | 'timeline' | 'list';

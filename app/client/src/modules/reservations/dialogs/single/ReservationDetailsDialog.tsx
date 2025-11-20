@@ -12,7 +12,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { StatusBadge } from './StatusBadge';
+import { StatusBadge } from '../../components/StatusBadge';
 import { Separator } from '@/components/ui/separator';
 import {
     Calendar,

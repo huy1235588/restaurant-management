@@ -14,13 +14,13 @@ import {
     Filter,
     RefreshCw,
 } from 'lucide-react';
-import { 
+import {
     ReservationListView,
     ReservationFormDialog,
     ReservationDetailsDialog,
     ReservationCalendarView,
     ReservationTimelineView
-} from '@/modules/reservations/components';
+} from '@/modules/reservations';
 import { format } from 'date-fns';
 
 export default function ReservationsPage() {

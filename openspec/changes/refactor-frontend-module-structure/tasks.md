@@ -39,14 +39,14 @@
 - [ ] 4.8 Create module README.md
 
 ## 5. Reservations Module Refactoring
-- [ ] 5.1 Create complete structure following standard pattern
-- [ ] 5.2 Move reservation.service.ts to modules/reservations/services/
-- [ ] 5.3 Organize components into components/views/dialogs
-- [ ] 5.4 Create hooks for reservation operations
-- [ ] 5.5 Define types and utils
-- [ ] 5.6 Update barrel exports
-- [ ] 5.7 Update imports throughout app
-- [ ] 5.8 Create module README.md
+- [x] 5.1 Create complete structure following standard pattern
+- [x] 5.2 Move reservation.service.ts to modules/reservations/services/
+- [x] 5.3 Organize components into components/views/dialogs
+- [x] 5.4 Create hooks for reservation operations
+- [x] 5.5 Define types and utils
+- [x] 5.6 Update barrel exports
+- [x] 5.7 Update imports throughout app
+- [x] 5.8 Create module README.md
 
 ## 6. Kitchen Module Refactoring
 - [ ] 6.1 Create complete structure following standard pattern

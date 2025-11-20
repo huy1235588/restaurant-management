@@ -29,7 +29,7 @@ import {
     getDay,
 } from 'date-fns';
 import { formatReservationDate } from '@/lib/utils/date';
-import { ReservationCard } from './ReservationCard';
+import { ReservationCard } from '../components/ReservationCard';
 import { Badge } from '@/components/ui/badge';
 
 type CalendarViewType = 'month' | 'week' | 'day';

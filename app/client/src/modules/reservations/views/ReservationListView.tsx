@@ -11,7 +11,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { StatusBadge } from './StatusBadge';
+import { StatusBadge } from '../components/StatusBadge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
