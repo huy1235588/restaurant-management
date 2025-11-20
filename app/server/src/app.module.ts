@@ -10,6 +10,8 @@ import { AuthModule } from '@/modules/auth/auth.module';
 import { StaffModule } from '@/modules/staff/staff.module';
 import { CategoryModule } from '@/modules/category/category.module';
 import { MenuModule } from '@/modules/menu/menu.module';
+import { StorageModule } from '@/modules/storage/storage.module';
+import { TableModule } from '@/modules/table/table.module';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import configuration from '@/config/configuration';
 
@@ -40,6 +42,10 @@ import configuration from '@/config/configuration';
         CategoryModule,
         // Menu
         MenuModule,
+        // Storage
+        StorageModule,
+        // Table
+        TableModule,
     ],
     controllers: [AppController],
     providers: [

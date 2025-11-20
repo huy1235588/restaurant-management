@@ -80,36 +80,36 @@
 - [x] 11.8 Test all staff endpoints
 
 ## 12. Category Module
-- [ ] 12.1 Create `src/modules/category/category.module.ts`
-- [ ] 12.2 Create `src/modules/category/category.controller.ts`
-- [ ] 12.3 Create `src/modules/category/category.service.ts`
-- [ ] 12.4 Create DTOs: `create-category.dto.ts`, `update-category.dto.ts`
-- [ ] 12.5 Apply guards and add Swagger decorators
-- [ ] 12.6 Test all category endpoints
+- [x] 12.1 Create `src/modules/category/category.module.ts`
+- [x] 12.2 Create `src/modules/category/category.controller.ts`
+- [x] 12.3 Create `src/modules/category/category.service.ts`
+- [x] 12.4 Create DTOs: `create-category.dto.ts`, `update-category.dto.ts`
+- [x] 12.5 Apply guards and add Swagger decorators
+- [x] 12.6 Test all category endpoints
 
 ## 13. Menu Module
-- [ ] 13.1 Create `src/modules/menu/menu.module.ts`
-- [ ] 13.2 Create `src/modules/menu/menu.controller.ts`
-- [ ] 13.3 Create `src/modules/menu/menu.service.ts`
-- [ ] 13.4 Create DTOs: `create-menu-item.dto.ts`, `update-menu-item.dto.ts`
-- [ ] 13.5 Apply guards and add Swagger decorators
-- [ ] 13.6 Test all menu endpoints
+- [x] 13.1 Create `src/modules/menu/menu.module.ts`
+- [x] 13.2 Create `src/modules/menu/menu.controller.ts`
+- [x] 13.3 Create `src/modules/menu/menu.service.ts`
+- [x] 13.4 Create DTOs: `create-menu-item.dto.ts`, `update-menu-item.dto.ts`
+- [x] 13.5 Apply guards and add Swagger decorators
+- [x] 13.6 Test all menu endpoints
 
 ## 14. Storage Module
-- [ ] 14.1 Create `src/modules/storage/storage.module.ts`
-- [ ] 14.2 Create `src/modules/storage/storage.controller.ts` with @UseInterceptors(FileInterceptor())
-- [ ] 14.3 Create `src/modules/storage/storage.service.ts` with Cloudflare R2 and Cloudinary logic
-- [ ] 14.4 Configure Multer for file size limits and allowed types
-- [ ] 14.5 Test file upload and delete endpoints
+- [x] 14.1 Create `src/modules/storage/storage.module.ts`
+- [x] 14.2 Create `src/modules/storage/storage.controller.ts` with @UseInterceptors(FileInterceptor())
+- [x] 14.3 Create `src/modules/storage/storage.service.ts` with Cloudflare R2 and Cloudinary logic
+- [x] 14.4 Configure Multer for file size limits and allowed types
+- [x] 14.5 Test file upload and delete endpoints
 
 ## 15. Table Module
-- [ ] 15.1 Create `src/modules/table/table.module.ts`
-- [ ] 15.2 Create `src/modules/table/table.controller.ts`
-- [ ] 15.3 Create `src/modules/table/table.service.ts`
-- [ ] 15.4 Create `src/modules/table/table.repository.ts`
-- [ ] 15.5 Create DTOs: `create-table.dto.ts`, `update-table.dto.ts`, `update-table-status.dto.ts`
-- [ ] 15.6 Apply guards and add Swagger decorators
-- [ ] 15.7 Test all table endpoints
+- [x] 15.1 Create `src/modules/table/table.module.ts`
+- [x] 15.2 Create `src/modules/table/table.controller.ts`
+- [x] 15.3 Create `src/modules/table/table.service.ts`
+- [x] 15.4 Create `src/modules/table/table.repository.ts`
+- [x] 15.5 Create DTOs: `create-table.dto.ts`, `update-table.dto.ts`, `update-table-status.dto.ts`
+- [x] 15.6 Apply guards and add Swagger decorators
+- [x] 15.7 Test all table endpoints
 
 ## 16. Floor Plan Module
 - [ ] 16.1 Create `src/modules/floor-plan/floor-plan.module.ts`

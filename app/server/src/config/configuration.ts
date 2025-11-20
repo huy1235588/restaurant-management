@@ -3,6 +3,11 @@ export default () => ({
     port: parseInt(process.env['PORT'] || '8000', 10),
     apiVersion: process.env['API_VERSION'] || 'v1',
 
+    // App
+    app: {
+        url: process.env['APP_URL'] || 'http://localhost:8000',
+    },
+
     // Database
     databaseUrl: process.env['DATABASE_URL'],
 
@@ -26,21 +31,33 @@ export default () => ({
         10,
     ),
 
-    // File Storage
-    uploadDir: process.env['UPLOAD_DIR'] || './uploads',
-    maxFileSize: parseInt(process.env['MAX_FILE_SIZE'] || '10485760', 10), // 10MB
-
-    // Cloudflare R2
-    r2AccountId: process.env['R2_ACCOUNT_ID'],
-    r2AccessKeyId: process.env['R2_ACCESS_KEY_ID'],
-    r2SecretAccessKey: process.env['R2_SECRET_ACCESS_KEY'],
-    r2BucketName: process.env['R2_BUCKET_NAME'],
-    r2PublicUrl: process.env['R2_PUBLIC_URL'],
-
-    // Cloudinary (Legacy)
-    cloudinaryCloudName: process.env['CLOUDINARY_CLOUD_NAME'],
-    cloudinaryApiKey: process.env['CLOUDINARY_API_KEY'],
-    cloudinaryApiSecret: process.env['CLOUDINARY_API_SECRET'],
+    // Storage
+    storage: {
+        provider: process.env['STORAGE_PROVIDER'] || 'local', // 'local', 'r2', 'cloudinary'
+        uploadDir: process.env['UPLOAD_DIR'] || './uploads',
+        maxFileSize: parseInt(process.env['MAX_FILE_SIZE'] || '10485760', 10), // 10MB
+        allowedMimetypes: process.env['ALLOWED_MIMETYPES']
+            ? process.env['ALLOWED_MIMETYPES'].split(',')
+            : [
+                  'image/jpeg',
+                  'image/png',
+                  'image/gif',
+                  'image/webp',
+                  'application/pdf',
+              ],
+        r2: {
+            accountId: process.env['R2_ACCOUNT_ID'],
+            accessKeyId: process.env['R2_ACCESS_KEY_ID'],
+            secretAccessKey: process.env['R2_SECRET_ACCESS_KEY'],
+            bucketName: process.env['R2_BUCKET_NAME'],
+            publicUrl: process.env['R2_PUBLIC_URL'],
+        },
+        cloudinary: {
+            cloudName: process.env['CLOUDINARY_CLOUD_NAME'],
+            apiKey: process.env['CLOUDINARY_API_KEY'],
+            apiSecret: process.env['CLOUDINARY_API_SECRET'],
+        },
+    },
 
     // Email
     emailHost: process.env['EMAIL_HOST'],
