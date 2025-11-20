@@ -1,62 +1,62 @@
 # Implementation Tasks
 
 ## 1. Project Setup & Infrastructure
-- [ ] 1.1 Create `/app/server/` directory for new NestJS application
-- [ ] 1.2 Initialize NestJS project: `nest new server --package-manager pnpm --skip-git`
-- [ ] 1.3 Install core dependencies: `@nestjs/config`, `@nestjs/swagger`, `@nestjs/passport`, `@nestjs/jwt`, `@nestjs/platform-socket.io`, `@nestjs/schedule`, `class-validator`, `class-transformer`, `passport`, `passport-jwt`, `@prisma/client`
-- [ ] 1.4 Install additional dependencies: `bcryptjs`, `@types/bcryptjs`, `cookie-parser`, `@types/cookie-parser`, `helmet`, `compression`, `@types/multer`, `@aws-sdk/client-s3`, `cloudinary`, `date-fns`, `nodemailer`, `@types/nodemailer`
-- [ ] 1.5 Copy Prisma schema from `/app/server-old/prisma/` to `/app/server/prisma/`
-- [ ] 1.6 Run `npx prisma generate` to generate Prisma Client
-- [ ] 1.7 Create `.env` file with all required environment variables (copy from server-old)
-- [ ] 1.8 Configure `tsconfig.json` with path aliases (`@/*` for `src/*`)
-- [ ] 1.9 Setup `nest-cli.json` with path mappings
+- [x] 1.1 Create `/app/server/` directory for new NestJS application
+- [x] 1.2 Initialize NestJS project: `nest new server --package-manager pnpm --skip-git`
+- [x] 1.3 Install core dependencies: `@nestjs/config`, `@nestjs/swagger`, `@nestjs/passport`, `@nestjs/jwt`, `@nestjs/platform-socket.io`, `@nestjs/schedule`, `class-validator`, `class-transformer`, `passport`, `passport-jwt`, `@prisma/client`
+- [x] 1.4 Install additional dependencies: `bcryptjs`, `@types/bcryptjs`, `cookie-parser`, `@types/cookie-parser`, `helmet`, `compression`, `@types/multer`, `@aws-sdk/client-s3`, `cloudinary`, `date-fns`, `nodemailer`, `@types/nodemailer`
+- [x] 1.5 Copy Prisma schema from `/app/server-old/prisma/` to `/app/server/prisma/`
+- [x] 1.6 Run `npx prisma generate` to generate Prisma Client
+- [x] 1.7 Create `.env` file with all required environment variables (copy from server-old)
+- [x] 1.8 Configure `tsconfig.json` with path aliases (`@/*` for `src/*`)
+- [x] 1.9 Setup `nest-cli.json` with path mappings
 
 ## 2. Configuration Module
-- [ ] 2.1 Create `src/config/configuration.ts` with typed configuration interface
-- [ ] 2.2 Setup `ConfigModule.forRoot()` in `app.module.ts` with global scope
-- [ ] 2.3 Define environment variable validation schema (optional but recommended)
-- [ ] 2.4 Export configuration service for typed access to env vars
+- [x] 2.1 Create `src/config/configuration.ts` with typed configuration interface
+- [x] 2.2 Setup `ConfigModule.forRoot()` in `app.module.ts` with global scope
+- [x] 2.3 Define environment variable validation schema (optional but recommended)
+- [x] 2.4 Export configuration service for typed access to env vars
 
 ## 3. Database Module
-- [ ] 3.1 Create `src/database/prisma.service.ts` extending PrismaClient
-- [ ] 3.2 Implement `onModuleInit()` for $connect lifecycle
-- [ ] 3.3 Implement `onModuleDestroy()` for $disconnect lifecycle
-- [ ] 3.4 Create `src/database/database.module.ts` as @Global() module
-- [ ] 3.5 Export PrismaService for dependency injection
+- [x] 3.1 Create `src/database/prisma.service.ts` extending PrismaClient
+- [x] 3.2 Implement `onModuleInit()` for $connect lifecycle
+- [x] 3.3 Implement `onModuleDestroy()` for $disconnect lifecycle
+- [x] 3.4 Create `src/database/database.module.ts` as @Global() module
+- [x] 3.5 Export PrismaService for dependency injection
 
 ## 4. Common Layer - Guards
-- [ ] 4.1 Create `src/common/guards/jwt-auth.guard.ts` using Passport
-- [ ] 4.2 Create `src/common/guards/roles.guard.ts` for role-based authorization
-- [ ] 4.3 Implement `@Public()` decorator to bypass authentication
-- [ ] 4.4 Implement `@Roles(...roles)` decorator for role checking
+- [x] 4.1 Create `src/common/guards/jwt-auth.guard.ts` using Passport
+- [x] 4.2 Create `src/common/guards/roles.guard.ts` for role-based authorization
+- [x] 4.3 Implement `@Public()` decorator to bypass authentication
+- [x] 4.4 Implement `@Roles(...roles)` decorator for role checking
 
 ## 5. Common Layer - Decorators
-- [ ] 5.1 Create `src/common/decorators/current-user.decorator.ts` to extract user from request
-- [ ] 5.2 Create `src/common/decorators/public.decorator.ts` for @Public()
-- [ ] 5.3 Create `src/common/decorators/roles.decorator.ts` for @Roles()
+- [x] 5.1 Create `src/common/decorators/current-user.decorator.ts` to extract user from request
+- [x] 5.2 Create `src/common/decorators/public.decorator.ts` for @Public()
+- [x] 5.3 Create `src/common/decorators/roles.decorator.ts` for @Roles()
 
 ## 6. Common Layer - Filters
-- [ ] 6.1 Create custom error classes in `src/common/errors/` (UnauthorizedError, ForbiddenError, NotFoundError, ValidationError, ConflictError)
-- [ ] 6.2 Create `src/common/filters/all-exceptions.filter.ts` to catch and format errors
-- [ ] 6.3 Register exception filter globally in `main.ts`
+- [x] 6.1 Create custom error classes in `src/common/errors/` (UnauthorizedError, ForbiddenError, NotFoundError, ValidationError, ConflictError)
+- [x] 6.2 Create `src/common/filters/all-exceptions.filter.ts` to catch and format errors
+- [x] 6.3 Register exception filter globally in `main.ts`
 
 ## 7. Common Layer - Pipes
-- [ ] 7.1 Setup global ValidationPipe in `main.ts` with transform options
-- [ ] 7.2 Configure ValidationPipe to use class-validator decorators
+- [x] 7.1 Setup global ValidationPipe in `main.ts` with transform options
+- [x] 7.2 Configure ValidationPipe to use class-validator decorators
 
 ## 8. Common Layer - Interceptors
 - [ ] 8.1 Create `src/common/interceptors/logging.interceptor.ts` for HTTP request logging (optional)
 - [ ] 8.2 Create `src/common/interceptors/transform.interceptor.ts` for response wrapping (optional)
 
 ## 9. Main Bootstrap
-- [ ] 9.1 Configure `main.ts` with global prefix `/api/v1`
-- [ ] 9.2 Enable CORS with credentials support
-- [ ] 9.3 Setup Helmet middleware for security headers
-- [ ] 9.4 Setup compression middleware
-- [ ] 9.5 Setup cookie-parser middleware
-- [ ] 9.6 Setup rate limiting (ThrottlerModule)
-- [ ] 9.7 Configure Swagger documentation with `SwaggerModule.setup('/api-docs')`
-- [ ] 9.8 Setup graceful shutdown hooks
+- [x] 9.1 Configure `main.ts` with global prefix `/api/v1`
+- [x] 9.2 Enable CORS with credentials support
+- [x] 9.3 Setup Helmet middleware for security headers
+- [x] 9.4 Setup compression middleware
+- [x] 9.5 Setup cookie-parser middleware
+- [x] 9.6 Setup rate limiting (ThrottlerModule)
+- [x] 9.7 Configure Swagger documentation with `SwaggerModule.setup('/api-docs')`
+- [x] 9.8 Setup graceful shutdown hooks
 - [ ] 9.9 Configure static file serving for `/uploads` directory
 
 ## 10. Auth Module
