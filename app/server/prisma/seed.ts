@@ -3,7 +3,7 @@ import 'dotenv/config';
 import { PrismaClient } from '@prisma/generated/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
-import * as bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -829,27 +829,162 @@ async function main() {
     await prisma.restaurantTable.createMany({
         data: [
             // Tầng 1 - Khu vực chính
-            { tableNumber: 'T01', tableName: 'Bàn 1', capacity: 4, minCapacity: 2, floor: 1, section: 'Indoor', status: 'available', isActive: true },
-            { tableNumber: 'T02', tableName: 'Bàn 2', capacity: 4, minCapacity: 2, floor: 1, section: 'Indoor', status: 'available', isActive: true },
-            { tableNumber: 'T03', tableName: 'Bàn 3', capacity: 6, minCapacity: 4, floor: 1, section: 'Indoor', status: 'available', isActive: true },
-            { tableNumber: 'T04', tableName: 'Bàn 4', capacity: 2, minCapacity: 1, floor: 1, section: 'Indoor', status: 'available', isActive: true },
-            { tableNumber: 'T05', tableName: 'Bàn 5', capacity: 4, minCapacity: 2, floor: 1, section: 'Indoor', status: 'available', isActive: true },
-            { tableNumber: 'T06', tableName: 'Bàn 6', capacity: 8, minCapacity: 6, floor: 1, section: 'Indoor', status: 'available', isActive: true },
+            {
+                tableNumber: 'T01',
+                tableName: 'Bàn 1',
+                capacity: 4,
+                minCapacity: 2,
+                floor: 1,
+                section: 'Indoor',
+                status: 'available',
+                isActive: true,
+            },
+            {
+                tableNumber: 'T02',
+                tableName: 'Bàn 2',
+                capacity: 4,
+                minCapacity: 2,
+                floor: 1,
+                section: 'Indoor',
+                status: 'available',
+                isActive: true,
+            },
+            {
+                tableNumber: 'T03',
+                tableName: 'Bàn 3',
+                capacity: 6,
+                minCapacity: 4,
+                floor: 1,
+                section: 'Indoor',
+                status: 'available',
+                isActive: true,
+            },
+            {
+                tableNumber: 'T04',
+                tableName: 'Bàn 4',
+                capacity: 2,
+                minCapacity: 1,
+                floor: 1,
+                section: 'Indoor',
+                status: 'available',
+                isActive: true,
+            },
+            {
+                tableNumber: 'T05',
+                tableName: 'Bàn 5',
+                capacity: 4,
+                minCapacity: 2,
+                floor: 1,
+                section: 'Indoor',
+                status: 'available',
+                isActive: true,
+            },
+            {
+                tableNumber: 'T06',
+                tableName: 'Bàn 6',
+                capacity: 8,
+                minCapacity: 6,
+                floor: 1,
+                section: 'Indoor',
+                status: 'available',
+                isActive: true,
+            },
 
             // Tầng 1 - Khu vực ngoài trời
-            { tableNumber: 'O01', tableName: 'Outdoor 1', capacity: 4, minCapacity: 2, floor: 1, section: 'Outdoor', status: 'available', isActive: true },
-            { tableNumber: 'O02', tableName: 'Outdoor 2', capacity: 4, minCapacity: 2, floor: 1, section: 'Outdoor', status: 'available', isActive: true },
-            { tableNumber: 'O03', tableName: 'Outdoor 3', capacity: 6, minCapacity: 4, floor: 1, section: 'Outdoor', status: 'available', isActive: true },
+            {
+                tableNumber: 'O01',
+                tableName: 'Outdoor 1',
+                capacity: 4,
+                minCapacity: 2,
+                floor: 1,
+                section: 'Outdoor',
+                status: 'available',
+                isActive: true,
+            },
+            {
+                tableNumber: 'O02',
+                tableName: 'Outdoor 2',
+                capacity: 4,
+                minCapacity: 2,
+                floor: 1,
+                section: 'Outdoor',
+                status: 'available',
+                isActive: true,
+            },
+            {
+                tableNumber: 'O03',
+                tableName: 'Outdoor 3',
+                capacity: 6,
+                minCapacity: 4,
+                floor: 1,
+                section: 'Outdoor',
+                status: 'available',
+                isActive: true,
+            },
 
             // Tầng 2 - Khu VIP
-            { tableNumber: 'V01', tableName: 'VIP 1', capacity: 10, minCapacity: 6, floor: 2, section: 'VIP', status: 'available', isActive: true },
-            { tableNumber: 'V02', tableName: 'VIP 2', capacity: 12, minCapacity: 8, floor: 2, section: 'VIP', status: 'available', isActive: true },
-            { tableNumber: 'V03', tableName: 'VIP 3', capacity: 8, minCapacity: 6, floor: 2, section: 'VIP', status: 'available', isActive: true },
+            {
+                tableNumber: 'V01',
+                tableName: 'VIP 1',
+                capacity: 10,
+                minCapacity: 6,
+                floor: 2,
+                section: 'VIP',
+                status: 'available',
+                isActive: true,
+            },
+            {
+                tableNumber: 'V02',
+                tableName: 'VIP 2',
+                capacity: 12,
+                minCapacity: 8,
+                floor: 2,
+                section: 'VIP',
+                status: 'available',
+                isActive: true,
+            },
+            {
+                tableNumber: 'V03',
+                tableName: 'VIP 3',
+                capacity: 8,
+                minCapacity: 6,
+                floor: 2,
+                section: 'VIP',
+                status: 'available',
+                isActive: true,
+            },
 
             // Tầng 2 - Khu vườn
-            { tableNumber: 'G01', tableName: 'Garden 1', capacity: 4, minCapacity: 2, floor: 2, section: 'Garden', status: 'available', isActive: true },
-            { tableNumber: 'G02', tableName: 'Garden 2', capacity: 6, minCapacity: 4, floor: 2, section: 'Garden', status: 'available', isActive: true },
-            { tableNumber: 'G03', tableName: 'Garden 3', capacity: 4, minCapacity: 2, floor: 2, section: 'Garden', status: 'available', isActive: true },
+            {
+                tableNumber: 'G01',
+                tableName: 'Garden 1',
+                capacity: 4,
+                minCapacity: 2,
+                floor: 2,
+                section: 'Garden',
+                status: 'available',
+                isActive: true,
+            },
+            {
+                tableNumber: 'G02',
+                tableName: 'Garden 2',
+                capacity: 6,
+                minCapacity: 4,
+                floor: 2,
+                section: 'Garden',
+                status: 'available',
+                isActive: true,
+            },
+            {
+                tableNumber: 'G03',
+                tableName: 'Garden 3',
+                capacity: 4,
+                minCapacity: 2,
+                floor: 2,
+                section: 'Garden',
+                status: 'available',
+                isActive: true,
+            },
         ],
     });
 
@@ -939,7 +1074,13 @@ async function main() {
         return time;
     };
 
-    type SeedStatus = 'pending' | 'confirmed' | 'seated' | 'completed' | 'cancelled' | 'no_show';
+    type SeedStatus =
+        | 'pending'
+        | 'confirmed'
+        | 'seated'
+        | 'completed'
+        | 'cancelled'
+        | 'no_show';
 
     const reservationSeeds: Array<{
         customer: Awaited<typeof customers>[number];
@@ -1093,7 +1234,10 @@ async function main() {
                 customerId: seed.customer.customerId,
                 tableId: seed.table.tableId,
                 reservationDate: daysFromNow(seed.dateOffset),
-                reservationTime: timeOfDay(seed.time.hour, seed.time.minute ?? 0),
+                reservationTime: timeOfDay(
+                    seed.time.hour,
+                    seed.time.minute ?? 0,
+                ),
                 duration: seed.duration ?? 120,
                 headCount: seed.headCount,
                 specialRequest: seed.specialRequest,

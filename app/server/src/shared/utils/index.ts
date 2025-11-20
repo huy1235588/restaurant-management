@@ -1,17 +1,17 @@
-import * as bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
 
 // Note: JWT will be handled by NestJS JwtService in auth module
 export class AuthUtils {
     static async hashPassword(password: string): Promise<string> {
         const salt = await bcrypt.genSalt(10);
-        return bcrypt.hash(password, salt);
+        return await bcrypt.hash(password, salt);
     }
 
     static async comparePassword(
         password: string,
         hashedPassword: string,
     ): Promise<boolean> {
-        return bcrypt.compare(password, hashedPassword);
+        return await bcrypt.compare(password, hashedPassword);
     }
 }
 
