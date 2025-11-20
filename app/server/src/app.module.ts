@@ -8,6 +8,8 @@ import { AppService } from '@/app.service';
 import { DatabaseModule } from '@/database/database.module';
 import { AuthModule } from '@/modules/auth/auth.module';
 import { StaffModule } from '@/modules/staff/staff.module';
+import { CategoryModule } from '@/modules/category/category.module';
+import { MenuModule } from '@/modules/menu/menu.module';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import configuration from '@/config/configuration';
 
@@ -34,6 +36,10 @@ import configuration from '@/config/configuration';
         AuthModule,
         // Staff
         StaffModule,
+        // Category
+        CategoryModule,
+        // Menu
+        MenuModule,
     ],
     controllers: [AppController],
     providers: [
