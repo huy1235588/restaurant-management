@@ -11,7 +11,7 @@ import {
 } from '@/modules/table/table.repository';
 import { CreateTableDto, UpdateTableDto } from '@/modules/table/dto';
 import { PrismaService } from '@/database/prisma.service';
-import { TableStatus } from '@prisma/client';
+import { TableStatus } from '@prisma/generated/client';
 
 @Injectable()
 export class TableService {

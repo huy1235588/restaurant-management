@@ -4,7 +4,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
 import { PrismaService } from '@/database/prisma.service';
-import { Role } from '@prisma/client';
+import { Role } from '@prisma/generated/client';
 
 export interface JwtPayload {
     accountId: number;

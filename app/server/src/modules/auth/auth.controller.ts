@@ -18,7 +18,11 @@ import {
 import type { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '@/modules/auth/auth.service';
-import { LoginDto, RegisterDto, CreateStaffDto } from '@/modules/auth/dto';
+import {
+    LoginDto,
+    RegisterDto,
+    CreateStaffWithAccountDto,
+} from '@/modules/auth/dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { Public } from '@/common/decorators/public.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
@@ -134,7 +138,7 @@ export class AuthController {
         status: 409,
         description: 'Username/Email/Phone already exists',
     })
-    async createStaff(@Body() createStaffDto: CreateStaffDto) {
+    async createStaff(@Body() createStaffDto: CreateStaffWithAccountDto) {
         const result = await this.authService.createStaff(createStaffDto);
         return {
             message: 'Staff created successfully',

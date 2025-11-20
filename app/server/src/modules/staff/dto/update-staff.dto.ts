@@ -6,7 +6,7 @@ import {
     IsDateString,
 } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
+import { Role } from '@prisma/generated/client';
 
 export class UpdateStaffDto {
     @ApiPropertyOptional({ example: 'John Doe', description: 'Full name' })

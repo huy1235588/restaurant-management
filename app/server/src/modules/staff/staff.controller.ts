@@ -20,7 +20,7 @@ import {
     ApiBearerAuth,
     ApiQuery,
 } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
+import { Role } from '@prisma/generated/client';
 import { StaffService } from './staff.service';
 import { CreateStaffDto, UpdateStaffDto, UpdateStaffRoleDto } from './dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';

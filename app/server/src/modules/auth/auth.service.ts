@@ -10,8 +10,12 @@ import { ConfigService } from '@nestjs/config';
 import { AccountRepository } from '@/modules/auth/account.repository';
 import { RefreshTokenRepository } from '@/modules/auth/refresh-token.repository';
 import { AuthUtils, TokenPayload } from '@/modules/auth/auth.utils';
-import { LoginDto, RegisterDto, CreateStaffDto } from '@/modules/auth/dto';
-import { Prisma } from '@prisma/client';
+import {
+    LoginDto,
+    RegisterDto,
+    CreateStaffWithAccountDto,
+} from '@/modules/auth/dto';
+import { Prisma } from '@prisma/generated/client';
 import { StaffRepository } from '@/modules/staff/staff.repository';
 
 @Injectable()
@@ -187,7 +191,7 @@ export class AuthService {
     /**
      * Create staff with account
      */
-    async createStaff(data: CreateStaffDto) {
+    async createStaff(data: CreateStaffWithAccountDto) {
         // Check if username exists
         const existingUsername = await this.accountRepository.findByUsername(
             data.username,

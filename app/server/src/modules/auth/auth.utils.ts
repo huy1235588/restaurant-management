@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcryptjs';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
-import { Role } from '@prisma/client';
+import { Role } from '@prisma/generated/client';
 
 export interface TokenPayload {
     accountId: number;

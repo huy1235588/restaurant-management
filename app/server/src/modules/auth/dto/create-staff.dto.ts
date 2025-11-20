@@ -9,9 +9,9 @@ import {
     IsEnum,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
+import { Role } from '@prisma/generated/client';
 
-export class CreateStaffDto {
+export class CreateStaffWithAccountDto {
     @ApiProperty({ example: 'john_doe', description: 'Username' })
     @IsString()
     @IsNotEmpty()

@@ -27,7 +27,7 @@ import {
     UpdateTableStatusDto,
 } from '@/modules/table/dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
-import { TableStatus } from '@prisma/client';
+import { TableStatus } from '@prisma/generated/client';
 
 @ApiTags('table')
 @Controller('table')

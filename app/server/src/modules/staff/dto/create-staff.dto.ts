@@ -7,7 +7,7 @@ import {
     IsDateString,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
+import { Role } from '@prisma/generated/client';
 
 export class CreateStaffDto {
     @ApiProperty({ example: 1, description: 'Account ID' })

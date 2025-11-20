@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/database/prisma.service';
-import { Prisma, Category } from '@prisma/client';
+import { Prisma, Category } from '@prisma/generated/client';
 
 export type CategoryWithItems = Prisma.CategoryGetPayload<{
     include: { menuItems: true };
