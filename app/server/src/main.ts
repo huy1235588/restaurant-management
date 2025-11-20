@@ -2,25 +2,33 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
 import * as compression from 'compression';
 import helmet from 'helmet';
+import { join } from 'path';
 import { AppModule } from '@/app.module';
 import { AllExceptionsFilter } from '@/common/filters/all-exceptions.filter';
 
 async function bootstrap() {
     const logger = new Logger('Bootstrap');
 
-    const app = await NestFactory.create(AppModule, {
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, {
         logger: ['error', 'warn', 'log', 'debug', 'verbose'],
     });
 
     const configService = app.get(ConfigService);
-    const port = configService.get<number>('port') || 8000;
-    const apiVersion = configService.get<string>('apiVersion') || 'v1';
-    const nodeEnv = configService.get<string>('nodeEnv') || 'development';
-    const corsOrigin =
-        configService.get<string>('corsOrigin') || 'http://localhost:3000';
+    const port = configService.get<number>('PORT') || 8000;
+    const apiVersion = configService.get<string>('API_VERSION') || 'v1';
+    const nodeEnv = configService.get<string>('NODE_ENV') || 'development';
+    const corsOriginString =
+        configService.get<string>('CLIENT_URL') || 'http://localhost:3000';
+
+    // Parse CORS origins (supports comma-separated list)
+    const corsOrigins = corsOriginString
+        .split(',')
+        .map((origin) => origin.trim())
+        .filter((origin) => origin.length > 0);
 
     // Global prefix
     app.setGlobalPrefix(`api/${apiVersion}`);
@@ -28,10 +36,17 @@ async function bootstrap() {
     // Security middleware
     app.use(helmet());
 
-    // CORS
+    // CORS - use array of origins or function to handle dynamic origins
     app.enableCors({
-        origin: corsOrigin,
+        origin: corsOrigins.length === 1 ? corsOrigins[0] : corsOrigins,
         credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        allowedHeaders: [
+            'Content-Type',
+            'Authorization',
+            'Accept',
+            'X-Requested-With',
+        ],
     });
 
     // Compression
@@ -39,6 +54,11 @@ async function bootstrap() {
 
     // Cookie parser
     app.use(cookieParser.default());
+
+    // Static file serving for uploads
+    app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+        prefix: '/uploads/',
+    });
 
     // Global validation pipe
     app.useGlobalPipes(

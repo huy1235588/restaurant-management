@@ -7,8 +7,9 @@ export enum Role {
 }
 
 export interface TokenPayload {
-    userId: string;
-    email: string;
+    accountId: number;
+    staffId?: number;
+    username: string;
     role: Role;
     iat?: number;
     exp?: number;

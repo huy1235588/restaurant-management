@@ -57,27 +57,27 @@
 - [x] 9.6 Setup rate limiting (ThrottlerModule)
 - [x] 9.7 Configure Swagger documentation with `SwaggerModule.setup('/api-docs')`
 - [x] 9.8 Setup graceful shutdown hooks
-- [ ] 9.9 Configure static file serving for `/uploads` directory
+- [x] 9.9 Configure static file serving for `/uploads` directory
 
 ## 10. Auth Module
-- [ ] 10.1 Create `src/modules/auth/auth.module.ts` with imports (JwtModule, PassportModule)
-- [ ] 10.2 Create `src/modules/auth/auth.controller.ts` with routes: POST /login, POST /register, POST /refresh-token, POST /logout, POST /change-password
-- [ ] 10.3 Create `src/modules/auth/auth.service.ts` with business logic
-- [ ] 10.4 Create `src/modules/auth/strategies/jwt.strategy.ts` for Passport JWT
-- [ ] 10.5 Create DTOs: `login.dto.ts`, `register.dto.ts`, `refresh-token.dto.ts`, `change-password.dto.ts`
-- [ ] 10.6 Create `src/modules/auth/auth.repository.ts` for refresh token operations
-- [ ] 10.7 Add Swagger decorators (@ApiTags, @ApiOperation, @ApiResponse)
-- [ ] 10.8 Test all auth endpoints
+- [x] 10.1 Create `src/modules/auth/auth.module.ts` with imports (JwtModule, PassportModule)
+- [x] 10.2 Create `src/modules/auth/auth.controller.ts` with routes: POST /login, POST /register, POST /refresh-token, POST /logout, POST /change-password
+- [x] 10.3 Create `src/modules/auth/auth.service.ts` with business logic
+- [x] 10.4 Create `src/modules/auth/strategies/jwt.strategy.ts` for Passport JWT
+- [x] 10.5 Create DTOs: `login.dto.ts`, `register.dto.ts`, `refresh-token.dto.ts`, `change-password.dto.ts`
+- [x] 10.6 Create `src/modules/auth/auth.repository.ts` for refresh token operations
+- [x] 10.7 Add Swagger decorators (@ApiTags, @ApiOperation, @ApiResponse)
+- [x] 10.8 Test all auth endpoints
 
 ## 11. Staff Module
-- [ ] 11.1 Create `src/modules/staff/staff.module.ts`
-- [ ] 11.2 Create `src/modules/staff/staff.controller.ts` with CRUD routes
-- [ ] 11.3 Create `src/modules/staff/staff.service.ts` with business logic
-- [ ] 11.4 Create `src/modules/staff/staff.repository.ts` extending base repository pattern
-- [ ] 11.5 Create DTOs: `create-staff.dto.ts`, `update-staff.dto.ts`, `update-staff-status.dto.ts`
-- [ ] 11.6 Apply @UseGuards(JwtAuthGuard, RolesGuard) and @Roles() decorators
-- [ ] 11.7 Add Swagger decorators
-- [ ] 11.8 Test all staff endpoints
+- [x] 11.1 Create `src/modules/staff/staff.module.ts`
+- [x] 11.2 Create `src/modules/staff/staff.controller.ts` with CRUD routes
+- [x] 11.3 Create `src/modules/staff/staff.service.ts` with business logic
+- [x] 11.4 Create `src/modules/staff/staff.repository.ts` extending base repository pattern
+- [x] 11.5 Create DTOs: `create-staff.dto.ts`, `update-staff.dto.ts`, `update-staff-status.dto.ts`
+- [x] 11.6 Apply @UseGuards(JwtAuthGuard, RolesGuard) and @Roles() decorators
+- [x] 11.7 Add Swagger decorators
+- [x] 11.8 Test all staff endpoints
 
 ## 12. Category Module
 - [ ] 12.1 Create `src/modules/category/category.module.ts`

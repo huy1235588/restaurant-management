@@ -2,9 +2,13 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
+import { APP_GUARD } from '@nestjs/core';
 import { AppController } from '@/app.controller';
 import { AppService } from '@/app.service';
 import { DatabaseModule } from '@/database/database.module';
+import { AuthModule } from '@/modules/auth/auth.module';
+import { StaffModule } from '@/modules/staff/staff.module';
+import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import configuration from '@/config/configuration';
 
 @Module({
@@ -26,8 +30,19 @@ import configuration from '@/config/configuration';
         ScheduleModule.forRoot(),
         // Database
         DatabaseModule,
+        // Auth
+        AuthModule,
+        // Staff
+        StaffModule,
     ],
     controllers: [AppController],
-    providers: [AppService],
+    providers: [
+        AppService,
+        // Global JWT auth guard
+        {
+            provide: APP_GUARD,
+            useClass: JwtAuthGuard,
+        },
+    ],
 })
 export class AppModule {}
