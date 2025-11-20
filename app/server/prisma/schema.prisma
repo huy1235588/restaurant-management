@@ -1,0 +1,537 @@
+// Restaurant Management System - PostgreSQL Database Schema
+// Redesigned from scratch with best practices
+
+generator client {
+    provider = "prisma-client"
+    output   = "../node_modules/@prisma/generated/client"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum Role {
+    admin
+    manager
+    waiter
+    chef
+    cashier
+}
+
+enum TableStatus {
+    available
+    occupied
+    reserved
+    maintenance
+}
+
+enum OrderStatus {
+    pending // Just created, not sent to kitchen
+    confirmed // Sent to kitchen, awaiting preparation
+    preparing // Kitchen is cooking
+    ready // All items ready, waiting for pickup
+    serving // Delivered to table, customer eating
+    completed // Finished and paid
+    cancelled // Cancelled by waiter or kitchen
+}
+
+enum OrderItemStatus {
+    pending // Not started
+    preparing // Being cooked
+    ready // Finished
+    served // Delivered to customer
+    cancelled // Cancelled
+}
+
+enum KitchenOrderStatus {
+    pending // New order, not yet acknowledged
+    confirmed // Chef acknowledged, preparing ingredients
+    preparing // Actively cooking
+    almost_ready // Most items done, final touches
+    ready // All items complete, ready for pickup
+    completed // Waiter picked up order
+    cancelled // Order cancelled
+}
+
+enum OrderPriority {
+    normal // Standard order
+    express // Rush order (customer in hurry)
+    vip // VIP customer
+}
+
+enum StationType {
+    grill
+    fry
+    steam
+    dessert
+    drinks
+}
+
+enum PaymentStatus {
+    pending
+    paid
+    refunded
+    cancelled
+}
+
+enum PaymentMethod {
+    cash
+    card
+    momo
+    bank_transfer
+}
+
+enum ReservationStatus {
+    pending
+    confirmed
+    seated
+    completed
+    cancelled
+    no_show
+}
+
+// ============================================
+// AUTHENTICATION & USER MANAGEMENT
+// ============================================
+
+model Account {
+    accountId   Int       @id @default(autoincrement())
+    username    String    @unique @db.VarChar(50)
+    email       String    @unique @db.VarChar(255)
+    phoneNumber String    @unique @db.VarChar(20)
+    password    String    @db.VarChar(255)
+    isActive    Boolean   @default(true)
+    lastLogin   DateTime?
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+
+    staff         Staff?
+    refreshTokens RefreshToken[]
+
+    @@index([email])
+    @@index([username])
+    @@map("accounts")
+}
+
+model RefreshToken {
+    tokenId    Int       @id @default(autoincrement())
+    accountId  Int
+    token      String    @unique @db.Text
+    expiresAt  DateTime
+    deviceInfo String?   @db.VarChar(500)
+    ipAddress  String?   @db.VarChar(45)
+    isRevoked  Boolean   @default(false)
+    createdAt  DateTime  @default(now())
+    revokedAt  DateTime?
+
+    account Account @relation(fields: [accountId], references: [accountId], onDelete: Cascade)
+
+    @@index([accountId])
+    @@index([token])
+    @@index([expiresAt])
+    @@map("refresh_tokens")
+}
+
+model Staff {
+    staffId     Int       @id @default(autoincrement())
+    accountId   Int       @unique
+    fullName    String    @db.VarChar(255)
+    address     String?   @db.VarChar(500)
+    dateOfBirth DateTime? @db.Date
+    hireDate    DateTime  @default(now()) @db.Date
+    salary      Decimal?  @db.Decimal(12, 2)
+    role        Role
+    isActive    Boolean   @default(true)
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+
+    account             Account            @relation(fields: [accountId], references: [accountId], onDelete: Cascade)
+    orders              Order[]
+    bills               Bill[]
+    kitchenOrders       KitchenOrder[]
+    createdReservations Reservation[]      @relation("ReservationCreator")
+    reservationAudits   ReservationAudit[] @relation("ReservationAuditActor")
+
+    @@index([role])
+    @@index([isActive])
+    @@map("staff")
+}
+
+// ============================================
+// MENU & CATEGORY MANAGEMENT
+// ============================================
+
+model Category {
+    categoryId   Int      @id @default(autoincrement())
+    categoryName String   @unique @db.VarChar(100)
+    description  String?  @db.VarChar(500)
+    displayOrder Int      @default(0)
+    isActive     Boolean  @default(true)
+    imageUrl     String?  @db.VarChar(500)
+    imagePath    String?  @db.VarChar(500)
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+
+    menuItems MenuItem[]
+
+    @@index([isActive])
+    @@map("categories")
+}
+
+model MenuItem {
+    itemId          Int      @id @default(autoincrement())
+    itemCode        String   @unique @db.VarChar(20)
+    itemName        String   @db.VarChar(100)
+    categoryId      Int
+    price           Decimal  @db.Decimal(10, 2)
+    cost            Decimal? @db.Decimal(10, 2)
+    description     String?  @db.VarChar(1000)
+    imageUrl        String?  @db.VarChar(500)
+    imagePath       String?  @db.VarChar(500)
+    isAvailable     Boolean  @default(true)
+    isActive        Boolean  @default(true)
+    preparationTime Int? // in minutes
+    spicyLevel      Int?     @default(0) // 0-5
+    isVegetarian    Boolean  @default(false)
+    calories        Int?
+    displayOrder    Int      @default(0)
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+
+    category   Category    @relation(fields: [categoryId], references: [categoryId], onDelete: Restrict)
+    orderItems OrderItem[]
+    billItems  BillItem[]
+
+    @@index([categoryId])
+    @@index([isAvailable])
+    @@index([isActive])
+    @@map("menu_items")
+}
+
+// ============================================
+// TABLE MANAGEMENT
+// ============================================
+
+model RestaurantTable {
+    tableId     Int         @id @default(autoincrement())
+    tableNumber String      @unique @db.VarChar(20)
+    tableName   String?     @db.VarChar(50)
+    capacity    Int
+    minCapacity Int         @default(1)
+    floor       Int         @default(1)
+    section     String?     @db.VarChar(50) // VIP, Garden, Indoor, Outdoor
+    status      TableStatus @default(available)
+    qrCode      String?     @unique @db.VarChar(255)
+    isActive    Boolean     @default(true)
+    // Floor plan positioning
+    positionX   Float?      @default(0)
+    positionY   Float?      @default(0)
+    rotation    Float?      @default(0) // 0-360 degrees
+    shape       String?     @default("rectangle") @db.VarChar(20) // rectangle, circle, square, oval
+    width       Float?      @default(100)
+    height      Float?      @default(80)
+    createdAt   DateTime    @default(now())
+    updatedAt   DateTime    @updatedAt
+
+    reservations Reservation[]
+    orders       Order[]
+    bills        Bill[]
+
+    @@index([status])
+    @@index([floor])
+    @@index([isActive])
+    @@map("restaurant_tables")
+}
+
+// ============================================
+// RESERVATION MANAGEMENT
+// ============================================
+
+model Customer {
+    customerId  Int       @id @default(autoincrement())
+    name        String    @db.VarChar(255)
+    phoneNumber String    @unique @db.VarChar(20)
+    email       String?   @unique @db.VarChar(255)
+    birthday    DateTime? @db.Date
+    preferences Json?
+    notes       String?   @db.Text
+    isVip       Boolean   @default(false)
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+
+    reservations Reservation[]
+
+    @@index([name])
+    @@map("customers")
+}
+
+model Reservation {
+    reservationId      Int               @id @default(autoincrement())
+    reservationCode    String            @unique @default(uuid()) @db.VarChar(50)
+    customerName       String            @db.VarChar(255)
+    phoneNumber        String            @db.VarChar(20)
+    email              String?           @db.VarChar(255)
+    customerId         Int?
+    tableId            Int
+    reservationDate    DateTime          @db.Date
+    reservationTime    DateTime          @db.Time(0)
+    duration           Int               @default(120) // minutes
+    headCount          Int
+    specialRequest     String?           @db.Text
+    depositAmount      Decimal?          @db.Decimal(10, 2)
+    status             ReservationStatus @default(pending)
+    notes              String?           @db.Text
+    tags               String[]          @default([])
+    createdBy          Int?
+    confirmedAt        DateTime?
+    seatedAt           DateTime?
+    completedAt        DateTime?
+    cancelledAt        DateTime?
+    cancellationReason String?           @db.Text
+    createdAt          DateTime          @default(now())
+    updatedAt          DateTime          @updatedAt
+
+    table    RestaurantTable    @relation(fields: [tableId], references: [tableId], onDelete: Restrict)
+    orders   Order[]
+    customer Customer?          @relation(fields: [customerId], references: [customerId], onDelete: SetNull)
+    creator  Staff?             @relation("ReservationCreator", fields: [createdBy], references: [staffId], onDelete: SetNull)
+    audits   ReservationAudit[]
+
+    @@index([reservationDate])
+    @@index([reservationTime])
+    @@index([status])
+    @@index([phoneNumber])
+    @@index([tableId])
+    @@index([customerId])
+    @@map("reservations")
+}
+
+model ReservationAudit {
+    auditId       Int      @id @default(autoincrement())
+    reservationId Int
+    action        String   @db.VarChar(100)
+    userId        Int?
+    changes       Json?
+    createdAt     DateTime @default(now())
+
+    reservation Reservation @relation(fields: [reservationId], references: [reservationId], onDelete: Cascade)
+    user        Staff?      @relation("ReservationAuditActor", fields: [userId], references: [staffId], onDelete: SetNull)
+
+    @@index([reservationId])
+    @@index([createdAt])
+    @@map("reservation_audits")
+}
+
+// ============================================
+// ORDER MANAGEMENT
+// ============================================
+
+model Order {
+    orderId            Int         @id @default(autoincrement())
+    orderNumber        String      @unique @default(uuid()) @db.VarChar(50)
+    tableId            Int
+    staffId            Int? // waiter who took the order
+    reservationId      Int?
+    customerName       String?     @db.VarChar(255)
+    customerPhone      String?     @db.VarChar(20)
+    headCount          Int         @default(1)
+    status             OrderStatus @default(pending)
+    notes              String?     @db.Text
+    // Financial fields
+    totalAmount        Decimal     @default(0) @db.Decimal(12, 2)
+    discountAmount     Decimal     @default(0) @db.Decimal(12, 2)
+    taxAmount          Decimal     @default(0) @db.Decimal(12, 2)
+    finalAmount        Decimal     @default(0) @db.Decimal(12, 2)
+    // Timestamps
+    orderTime          DateTime    @default(now())
+    confirmedAt        DateTime?
+    completedAt        DateTime?
+    cancelledAt        DateTime?
+    cancellationReason String?     @db.Text
+    createdAt          DateTime    @default(now())
+    updatedAt          DateTime    @updatedAt
+
+    table         RestaurantTable @relation(fields: [tableId], references: [tableId], onDelete: Restrict)
+    staff         Staff?          @relation(fields: [staffId], references: [staffId], onDelete: SetNull)
+    reservation   Reservation?    @relation(fields: [reservationId], references: [reservationId], onDelete: SetNull)
+    orderItems    OrderItem[]
+    kitchenOrders KitchenOrder[]
+    bill          Bill?
+
+    @@index([orderNumber])
+    @@index([tableId])
+    @@index([staffId])
+    @@index([status])
+    @@index([orderTime])
+    @@index([createdAt])
+    @@map("orders")
+}
+
+model OrderItem {
+    orderItemId    Int             @id @default(autoincrement())
+    orderId        Int
+    itemId         Int
+    quantity       Int
+    unitPrice      Decimal         @db.Decimal(10, 2)
+    totalPrice     Decimal         @db.Decimal(10, 2)
+    specialRequest String?         @db.VarChar(500)
+    status         OrderItemStatus @default(pending)
+    createdAt      DateTime        @default(now())
+    updatedAt      DateTime        @updatedAt
+
+    order    Order    @relation(fields: [orderId], references: [orderId], onDelete: Cascade)
+    menuItem MenuItem @relation(fields: [itemId], references: [itemId], onDelete: Restrict)
+
+    @@index([orderId])
+    @@index([itemId])
+    @@index([status])
+    @@map("order_items")
+}
+
+// ============================================
+// KITCHEN MANAGEMENT
+// ============================================
+
+model KitchenOrder {
+    kitchenOrderId    Int                @id @default(autoincrement())
+    orderId           Int                @unique // One-to-one with Order
+    staffId           Int? // chef assigned
+    stationId         Int? // kitchen station assigned
+    priority          OrderPriority      @default(normal)
+    status            KitchenOrderStatus @default(pending)
+    prepTimeEstimated Int? // in minutes
+    prepTimeActual    Int? // in minutes
+    startedAt         DateTime?
+    completedAt       DateTime?
+    notes             String?            @db.Text
+    createdAt         DateTime           @default(now())
+    updatedAt         DateTime           @updatedAt
+
+    order   Order           @relation(fields: [orderId], references: [orderId], onDelete: Cascade)
+    chef    Staff?          @relation(fields: [staffId], references: [staffId], onDelete: SetNull)
+    station KitchenStation? @relation(fields: [stationId], references: [stationId], onDelete: SetNull)
+
+    @@index([orderId])
+    @@index([staffId])
+    @@index([stationId])
+    @@index([status])
+    @@index([priority])
+    @@index([createdAt])
+    @@map("kitchen_orders")
+}
+
+model KitchenStation {
+    stationId Int         @id @default(autoincrement())
+    name      String      @db.VarChar(100)
+    type      StationType
+    isActive  Boolean     @default(true)
+    createdAt DateTime    @default(now())
+    updatedAt DateTime    @updatedAt
+
+    kitchenOrders KitchenOrder[]
+
+    @@index([type])
+    @@index([isActive])
+    @@map("kitchen_stations")
+}
+
+// ============================================
+// BILLING & PAYMENT
+// ============================================
+
+model Bill {
+    billId         Int            @id @default(autoincrement())
+    billNumber     String         @unique @default(uuid()) @db.VarChar(50)
+    orderId        Int            @unique
+    tableId        Int
+    staffId        Int? // cashier
+    subtotal       Decimal        @db.Decimal(12, 2)
+    taxAmount      Decimal        @default(0) @db.Decimal(12, 2)
+    taxRate        Decimal        @default(0) @db.Decimal(5, 2) // percentage
+    discountAmount Decimal        @default(0) @db.Decimal(12, 2)
+    serviceCharge  Decimal        @default(0) @db.Decimal(12, 2)
+    totalAmount    Decimal        @db.Decimal(12, 2)
+    paidAmount     Decimal        @default(0) @db.Decimal(12, 2)
+    changeAmount   Decimal        @default(0) @db.Decimal(12, 2)
+    paymentStatus  PaymentStatus  @default(pending)
+    paymentMethod  PaymentMethod?
+    notes          String?        @db.Text
+    createdAt      DateTime       @default(now())
+    paidAt         DateTime?
+    updatedAt      DateTime       @updatedAt
+
+    order     Order           @relation(fields: [orderId], references: [orderId], onDelete: Restrict)
+    table     RestaurantTable @relation(fields: [tableId], references: [tableId], onDelete: Restrict)
+    staff     Staff?          @relation(fields: [staffId], references: [staffId], onDelete: SetNull)
+    billItems BillItem[]
+    payments  Payment[]
+
+    @@index([billNumber])
+    @@index([orderId])
+    @@index([paymentStatus])
+    @@index([createdAt])
+    @@map("bills")
+}
+
+model BillItem {
+    billItemId Int      @id @default(autoincrement())
+    billId     Int
+    itemId     Int
+    itemName   String   @db.VarChar(100)
+    quantity   Int
+    unitPrice  Decimal  @db.Decimal(10, 2)
+    subtotal   Decimal  @db.Decimal(10, 2)
+    discount   Decimal  @default(0) @db.Decimal(10, 2)
+    total      Decimal  @db.Decimal(10, 2)
+    createdAt  DateTime @default(now())
+
+    bill     Bill     @relation(fields: [billId], references: [billId], onDelete: Cascade)
+    menuItem MenuItem @relation(fields: [itemId], references: [itemId], onDelete: Restrict)
+
+    @@index([billId])
+    @@map("bill_items")
+}
+
+model Payment {
+    paymentId      Int           @id @default(autoincrement())
+    billId         Int
+    paymentMethod  PaymentMethod
+    amount         Decimal       @db.Decimal(12, 2)
+    transactionId  String?       @db.VarChar(100)
+    cardNumber     String?       @db.VarChar(20) // last 4 digits only
+    cardHolderName String?       @db.VarChar(255)
+    status         PaymentStatus @default(pending)
+    notes          String?       @db.Text
+    paymentDate    DateTime      @default(now())
+    createdAt      DateTime      @default(now())
+
+    bill Bill @relation(fields: [billId], references: [billId], onDelete: Cascade)
+
+    @@index([billId])
+    @@index([transactionId])
+    @@map("payments")
+}
+
+// ============================================
+// VISUAL FLOOR PLAN
+// ============================================
+
+model FloorPlanLayout {
+    layoutId    Int      @id @default(autoincrement())
+    floor       Int
+    name        String   @db.VarChar(100) // e.g., "Weekday", "Weekend", "Private Event"
+    description String?  @db.Text
+    data        Json // Stores table positions and properties
+    isActive    Boolean  @default(false)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    @@unique([floor, name])
+    @@index([floor])
+    @@index([isActive])
+    @@map("floor_plan_layouts")
+}
