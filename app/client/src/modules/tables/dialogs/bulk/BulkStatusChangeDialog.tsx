@@ -6,7 +6,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { TableStatus } from '@/types';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
-import { TableStatusBadge } from '@/features/tables/components/TableStatusBadge';
+import { TableStatusBadge } from '@/modules/tables/components/TableStatusBadge';
 
 interface BulkStatusChangeDialogProps {
     open: boolean;

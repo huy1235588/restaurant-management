@@ -26,7 +26,7 @@ import {
     useUpdateCategory,
     useDeleteCategory,
     useCategoryHandlers,
-} from '@/features/categories';
+} from '@/modules/categories';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 

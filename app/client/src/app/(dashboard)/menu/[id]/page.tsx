@@ -27,8 +27,8 @@ import {
     useDeleteMenuItem,
     MenuItemForm,
     useMenuItemHandlers,
-} from '@/features/menu';
-import { useCategories } from '@/features/categories';
+} from '@/modules/menu';
+import { useCategories } from '@/modules/categories';
 import {
     formatPrice,
     formatMargin,
@@ -36,7 +36,7 @@ import {
     formatPreparationTime,
     getSpicyLevelLabel,
     getSpicyLevelEmoji,
-} from '@/features/menu/utils';
+} from '@/modules/menu/utils';
 
 export default function MenuItemDetailPage({
     params,

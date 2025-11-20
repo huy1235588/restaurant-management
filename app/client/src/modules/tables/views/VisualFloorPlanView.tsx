@@ -1,6 +1,6 @@
 'use client';
 
-import { VisualEditorPage } from '@/features/visual-editor';
+import { VisualEditorPage } from '@/modules/visual-editor';
 
 export function VisualFloorPlanView() {
     return (

@@ -35,8 +35,8 @@ import {
     useDeleteMenuItem,
     useUpdateAvailability,
     useMenuItemHandlers,
-} from '@/features/menu';
-import { useCategories } from '@/features/categories';
+} from '@/modules/menu';
+import { useCategories } from '@/modules/categories';
 import {
     Pagination,
     PaginationContent,

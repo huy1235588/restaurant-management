@@ -4,8 +4,6 @@
  */
 
 export { baseSocketService, BaseSocketService } from './base';
-export { orderSocketService } from './order.socket';
-export { kitchenSocketService } from './kitchen.socket';
 export { tableSocketService } from './table.socket';
 
 // Re-export types

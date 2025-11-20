@@ -20,7 +20,7 @@ import {
     ReservationDetailsDialog,
     ReservationCalendarView,
     ReservationTimelineView
-} from '@/features/reservations/components';
+} from '@/modules/reservations/components';
 import { format } from 'date-fns';
 
 export default function ReservationsPage() {

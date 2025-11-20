@@ -8,10 +8,10 @@ import { tableApi } from '@/services/table.service';
 import { Table, TableStatus } from '@/types';
 import { useTableStore } from '@/stores/tableStore';
 import { Button } from '@/components/ui/button';
-import { TableHeader, TableStats, TableFilters, TablePagination, QuickViewPanel } from '@/features/tables/components';
-import { TableListView } from '@/features/tables/views';
-import { VisualFloorPlanView } from '@/features/tables/views';
-import { TableDialogs } from '@/features/tables/TableDialogs';
+import { TableHeader, TableStats, TableFilters, TablePagination, QuickViewPanel } from '@/modules/tables/components';
+import { TableListView } from '@/modules/tables/views';
+import { VisualFloorPlanView } from '@/modules/tables/views';
+import { TableDialogs } from '@/modules/tables/TableDialogs';
 import {
     BulkStatusChangeDialog,
     BulkDeleteDialog,
@@ -20,7 +20,7 @@ import {
     BulkQRCodeGenerator,
     TableHistoryDialog,
     KeyboardShortcutsDialog,
-} from '@/features/tables/dialogs';
+} from '@/modules/tables/dialogs';
 import { useTableSocket } from '@/hooks/useTableSocket';
 
 type ViewMode = 'list' | 'visual';

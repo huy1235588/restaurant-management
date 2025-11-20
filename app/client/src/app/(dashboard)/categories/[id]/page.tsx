@@ -27,9 +27,9 @@ import {
     CategoryForm,
     useCategoryHandlers,
     formatDate,
-} from '@/features/categories';
+} from '@/modules/categories';
 import { MenuItem } from '@/types';
-import { MenuItemCard } from '@/features/menu/components/MenuItemCard';
+import { MenuItemCard } from '@/modules/menu/components/MenuItemCard';
 
 export default function CategoryDetailPage({
     params,
