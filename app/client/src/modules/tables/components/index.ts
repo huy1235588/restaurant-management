@@ -5,3 +5,6 @@ export { TableStats } from './TableStats';
 export { TableStatusBadge } from './TableStatusBadge';
 export { TablePagination } from './TablePagination';
 export { QuickViewPanel } from './QuickViewPanel';
+
+// Visual Editor Components
+export * from './visual-editor';

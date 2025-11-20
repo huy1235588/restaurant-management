@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useCallback } from 'react';
-import { useEditorStore } from '../stores';
+import { useEditorStore } from '../../stores';
 
 interface EditorCanvasProps {
     width: number;

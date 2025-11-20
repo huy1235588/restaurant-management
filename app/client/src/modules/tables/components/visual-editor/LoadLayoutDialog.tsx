@@ -16,9 +16,9 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { floorPlanApi } from '@/services/floor-plan.service';
-import { useLayoutStore, useEditorStore } from '../stores';
+import { useLayoutStore, useEditorStore } from '../../stores';
 import { Check, Trash2, Copy, CheckCircle2 } from 'lucide-react';
-import type { FloorPlanLayout } from '../types';
+import type { FloorPlanLayout } from '../../types';
 
 interface LoadLayoutDialogProps {
     open: boolean;

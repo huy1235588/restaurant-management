@@ -58,11 +58,14 @@
 - [ ] 6.7 Update imports throughout app
 - [ ] 6.8 Create module README.md
 
-## 7. Visual Editor Module Validation
-- [ ] 7.1 Review existing structure (already good)
-- [ ] 7.2 Ensure consistency with standard pattern
-- [ ] 7.3 Add any missing barrel exports
-- [ ] 7.4 Update README.md if needed
+## 7. Tables Module Validation & Visual Editor Integration
+- [x] 7.1 Review existing tables structure (already well-organized)
+- [x] 7.2 Merge visual-editor module into tables (VisualFloorPlanView dependency)
+- [x] 7.3 Fix import paths for moved visual-editor components
+- [x] 7.4 Create root barrel export (index.ts) for tables module
+- [x] 7.5 Remove old visual-editor module folder
+- [x] 7.6 Update README.md with complete structure including visual editor
+- [x] 7.7 Build validation
 
 ## 8. Shared Components Organization
 - [ ] 8.1 Keep components/shared/ for truly shared components

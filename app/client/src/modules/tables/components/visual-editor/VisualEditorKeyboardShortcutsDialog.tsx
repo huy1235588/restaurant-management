@@ -15,7 +15,7 @@ interface KeyboardShortcutsDialogProps {
     onOpenChange: (open: boolean) => void;
 }
 
-export function KeyboardShortcutsDialog({ open, onOpenChange }: KeyboardShortcutsDialogProps) {
+export function VisualEditorKeyboardShortcutsDialog({ open, onOpenChange }: KeyboardShortcutsDialogProps) {
     const shortcuts = [
         { category: 'Tools', key: 'V', description: 'Select Tool' },
         { category: 'Tools', key: 'H', description: 'Pan Tool' },

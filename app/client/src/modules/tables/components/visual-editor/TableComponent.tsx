@@ -3,10 +3,10 @@
 import React, { useState, useCallback } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import type { TablePosition, Tool } from '../types';
+import type { TablePosition, Tool } from '../../types';
 import { cn } from '@/lib/utils';
-import { snapSizeToGrid } from '../utils/geometry';
-import { useEditorStore } from '../stores';
+import { snapSizeToGrid } from '../../utils/geometry';
+import { useEditorStore } from '../../stores';
 
 interface TableComponentProps {
     table: TablePosition;

@@ -3,18 +3,18 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { DndContext, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
 import { toast } from 'sonner';
-import { useEditorStore, useLayoutStore, useHistoryStore } from '../stores';
-import { useFloorPlanData } from '../hooks';
+import { useEditorStore, useLayoutStore, useHistoryStore } from '../../stores';
+import { useFloorPlanData } from '../../hooks';
 import { EditorCanvas } from './EditorCanvas';
 import { EditorToolbar } from './EditorToolbar';
 import { TableComponent } from './TableComponent';
 import { PropertiesPanel } from './PropertiesPanel';
-import { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
+import { VisualEditorKeyboardShortcutsDialog } from './VisualEditorKeyboardShortcutsDialog';
 import { QuickCreateTableDialog } from './QuickCreateTableDialog';
-import { DeleteTableDialog } from './DeleteTableDialog';
-import { checkTableCollision, snapPositionToGrid } from '../utils/geometry';
+import { VisualEditorDeleteTableDialog } from './VisualEditorDeleteTableDialog';
+import { checkTableCollision, snapPositionToGrid } from '../../utils/geometry';
 import { floorPlanApi } from '@/services/floor-plan.service';
-import type { TablePosition } from '../types';
+import type { TablePosition } from '../../types';
 import { Button } from '@/components/ui/button';
 
 export function VisualEditorPage() {
@@ -741,7 +741,7 @@ export function VisualEditorPage() {
             </div>
             
             {/* Keyboard Shortcuts Dialog */}
-            <KeyboardShortcutsDialog
+            <VisualEditorKeyboardShortcutsDialog
                 open={showKeyboardShortcuts}
                 onOpenChange={toggleKeyboardShortcuts}
             />
@@ -756,7 +756,7 @@ export function VisualEditorPage() {
             />
             
             {/* Delete Table Dialog */}
-            <DeleteTableDialog
+            <VisualEditorDeleteTableDialog
                 open={showDeleteDialog}
                 onOpenChange={setShowDeleteDialog}
                 onConfirm={handleDeleteConfirm}

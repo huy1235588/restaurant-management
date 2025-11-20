@@ -7,5 +7,6 @@ export { FloorSelector } from './FloorSelector';
 export { SaveLayoutDialog } from './SaveLayoutDialog';
 export { LoadLayoutDialog } from './LoadLayoutDialog';
 export { UnsavedChangesDialog } from './UnsavedChangesDialog';
-export { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
+export { VisualEditorKeyboardShortcutsDialog } from './VisualEditorKeyboardShortcutsDialog';
 export { QuickCreateTableDialog } from './QuickCreateTableDialog';
+export { VisualEditorDeleteTableDialog } from './VisualEditorDeleteTableDialog';

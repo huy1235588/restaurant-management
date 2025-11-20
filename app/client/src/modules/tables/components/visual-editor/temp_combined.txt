@@ -1,0 +1,2663 @@
+'use client';
+
+import React, { useRef, useEffect, useCallback } from 'react';
+import { useEditorStore } from '../../stores';
+
+interface EditorCanvasProps {
+    width: number;
+    height: number;
+    children?: React.ReactNode;
+}
+
+export function EditorCanvas({ width, height, children }: EditorCanvasProps) {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const { zoom, pan, grid } = useEditorStore();
+    const performanceRef = useRef({ frameCount: 0, lastTime: Date.now() });
+    const cacheRef = useRef<{ key: string; imageData: ImageData | null }>({ key: '', imageData: null });
+    
+    // Performance monitoring for canvas rendering
+    const monitorPerformance = useCallback(() => {
+        const now = Date.now();
+        const perf = performanceRef.current;
+        perf.frameCount++;
+        
+        // Log FPS every second
+        if (now - perf.lastTime >= 1000) {
+            const fps = perf.frameCount;
+            if (process.env.NODE_ENV === 'development') {
+                console.debug(`Canvas render FPS: ${fps}`);
+            }
+            perf.frameCount = 0;
+            perf.lastTime = now;
+        }
+    }, []);
+    
+    // Draw grid on canvas using requestAnimationFrame with caching
+    const drawGrid = useCallback(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        
+        // Use requestAnimationFrame for smooth rendering
+        requestAnimationFrame(() => {
+            monitorPerformance();
+            
+            // Check cache key for static grid rendering
+            const cacheKey = `${width}-${height}-${grid.enabled}-${grid.size}-${zoom}-${pan.x}-${pan.y}`;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            if (!grid.enabled) return;
+            
+            // Use cached rendering if available and key matches
+            if (cacheRef.current.key === cacheKey && cacheRef.current.imageData) {
+                ctx.putImageData(cacheRef.current.imageData, 0, 0);
+                return;
+            }
+            
+            // Set up grid style - check for dark mode
+            const isDarkMode = document.documentElement.classList.contains('dark');
+            ctx.strokeStyle = isDarkMode ? '#4b5563' : '#e0e0e0'; // gray-600 for dark mode
+            ctx.lineWidth = 1;
+            
+            const gridSize = grid.size * zoom;
+            const offsetX = pan.x % gridSize;
+            const offsetY = pan.y % gridSize;
+            
+            // Draw vertical lines
+            for (let x = offsetX; x < width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+                ctx.stroke();
+            }
+            
+            // Draw horizontal lines
+            for (let y = offsetY; y < height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+            
+            // Cache the rendered grid (only for static zoom levels)
+            if (zoom === 1 || zoom === 0.5 || zoom === 0.25 || zoom === 1.5 || zoom === 2) {
+                try {
+                    cacheRef.current = {
+                        key: cacheKey,
+                        imageData: ctx.getImageData(0, 0, width, height),
+                    };
+                } catch (e) {
+                    // Canvas might be tainted, skip caching
+                }
+            }
+        });
+    }, [width, height, zoom, pan, grid, monitorPerformance]);
+    
+    useEffect(() => {
+        drawGrid();
+    }, [drawGrid]);
+    
+    // Redraw grid on theme changes
+    useEffect(() => {
+        const observer = new MutationObserver(() => {
+            drawGrid();
+        });
+        
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class'],
+        });
+        
+        return () => observer.disconnect();
+    }, [drawGrid]);
+    
+    return (
+        <div className="relative w-full h-full overflow-hidden bg-gray-50 dark:bg-gray-900">
+            {/* Canvas layer for grid */}
+            <canvas
+                ref={canvasRef}
+                width={width}
+                height={height}
+                className="absolute inset-0 pointer-events-none"
+            />
+            
+            {/* DOM layer for interactive elements */}
+            <div
+                className="absolute inset-0 transition-transform duration-100 ease-out"
+                style={{
+                    transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
+                    transformOrigin: '0 0',
+                }}
+            >
+                {children}
+            </div>
+        </div>
+    );
+}
+'use client';
+
+import React, { useState } from 'react';
+import {
+    MousePointer2,
+    Hand,
+    Plus,
+    Trash2,
+    ZoomIn,
+    ZoomOut,
+    Maximize2,
+    Grid3x3,
+    Save,
+    Undo2,
+    Redo2,
+    RotateCcw,
+    FolderOpen,
+    Download,
+    Keyboard,
+} from 'lucide-react';
+import { useEditorStore } from '../../stores';
+import { useHistoryStore } from '../../stores';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { FloorSelector } from './FloorSelector';
+import { SaveLayoutDialog } from './SaveLayoutDialog';
+import { LoadLayoutDialog } from './LoadLayoutDialog';
+import { KeyboardShortcutsDialog } from './VisualEditorKeyboardShortcutsDialog';
+
+interface EditorToolbarProps {
+    onSave: () => void;
+    onUndo: () => void;
+    onRedo: () => void;
+    hasUnsavedChanges?: boolean;
+    isSaving?: boolean;
+}
+
+export function EditorToolbar({
+    onSave,
+    onUndo,
+    onRedo,
+    hasUnsavedChanges = false,
+    isSaving = false,
+}: EditorToolbarProps) {
+    const [showSaveDialog, setShowSaveDialog] = useState(false);
+    const [showLoadDialog, setShowLoadDialog] = useState(false);
+    const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
+    
+    const {
+        currentTool,
+        setTool,
+        zoom,
+        setZoom,
+        grid,
+        setGrid,
+        toggleFullscreen,
+        resetView,
+    } = useEditorStore();
+    
+    const { canUndo, canRedo } = useHistoryStore();
+    
+    const tools = [
+        { id: 'select' as const, icon: MousePointer2, label: 'Select (V)', shortcut: 'V' },
+        { id: 'pan' as const, icon: Hand, label: 'Pan (H)', shortcut: 'H' },
+        { id: 'add' as const, icon: Plus, label: 'Add Table (T)', shortcut: 'T' },
+        { id: 'delete' as const, icon: Trash2, label: 'Delete (Del)', shortcut: 'Del' },
+    ];
+    
+    const handleZoomIn = () => {
+        setZoom(Math.min(zoom + 0.1, 2.0));
+    };
+    
+    const handleZoomOut = () => {
+        setZoom(Math.max(zoom - 0.1, 0.25));
+    };
+    
+    const handleToggleGrid = () => {
+        setGrid({ enabled: !grid.enabled });
+    };
+    
+    return (
+        <TooltipProvider>
+            <div className="flex items-center gap-2 p-2 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
+                {/* Floor Selector */}
+                <FloorSelector />
+                
+                <Separator orientation="vertical" className="h-8" />
+                
+                {/* Tool Selection */}
+                <div className="flex items-center gap-1">
+                    {tools.map((tool) => {
+                        const Icon = tool.icon;
+                        return (
+                            <Tooltip key={tool.id}>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant={currentTool === tool.id ? 'default' : 'ghost'}
+                                        size="icon"
+                                        onClick={() => setTool(tool.id)}
+                                    >
+                                        <Icon className="h-4 w-4" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{tool.label}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        );
+                    })}
+                </div>
+                
+                <Separator orientation="vertical" className="h-8" />
+                
+                {/* History Actions */}
+                <div className="flex items-center gap-1">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={onUndo}
+                                disabled={!canUndo()}
+                            >
+                                <Undo2 className="h-4 w-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Undo (Ctrl+Z)</p>
+                        </TooltipContent>
+                    </Tooltip>
+                    
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={onRedo}
+                                disabled={!canRedo()}
+                            >
+                                <Redo2 className="h-4 w-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Redo (Ctrl+Shift+Z)</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </div>
+                
+                <Separator orientation="vertical" className="h-8" />
+                
+                {/* View Controls */}
+                <div className="flex items-center gap-1">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" onClick={handleZoomOut}>
+                                <ZoomOut className="h-4 w-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Zoom Out</p>
+                        </TooltipContent>
+                    </Tooltip>
+                    
+                    <span className="text-sm font-medium min-w-16 text-center">
+                        {Math.round(zoom * 100)}%
+                    </span>
+                    
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" onClick={handleZoomIn}>
+                                <ZoomIn className="h-4 w-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Zoom In</p>
+                        </TooltipContent>
+                    </Tooltip>
+                    
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" onClick={resetView}>
+                                <RotateCcw className="h-4 w-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Reset View (0)</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </div>
+                
+                <Separator orientation="vertical" className="h-8" />
+                
+                {/* Grid Toggle */}
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            variant={grid.enabled ? 'default' : 'ghost'}
+                            size="icon"
+                            onClick={handleToggleGrid}
+                        >
+                            <Grid3x3 className="h-4 w-4" />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Toggle Grid (G)</p>
+                    </TooltipContent>
+                </Tooltip>
+                
+                <Separator orientation="vertical" className="h-8" />
+                
+                {/* Fullscreen */}
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" onClick={toggleFullscreen}>
+                            <Maximize2 className="h-4 w-4" />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Fullscreen (F)</p>
+                    </TooltipContent>
+                </Tooltip>
+                
+                <div className="flex-1" />
+                
+                {/* Layout Management */}
+                <div className="flex items-center gap-1">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => setShowLoadDialog(true)}
+                            >
+                                <FolderOpen className="h-4 w-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Load Layout</p>
+                        </TooltipContent>
+                    </Tooltip>
+                    
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => setShowSaveDialog(true)}
+                            >
+                                <Download className="h-4 w-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Save as Layout</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </div>
+                
+                <Separator orientation="vertical" className="h-8" />
+                
+                {/* Keyboard Shortcuts */}
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setShowKeyboardShortcuts(true)}
+                        >
+                            <Keyboard className="h-4 w-4" />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Keyboard Shortcuts (?)</p>
+                    </TooltipContent>
+                </Tooltip>
+                
+                <Separator orientation="vertical" className="h-8" />
+                
+                {/* Save Button */}
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button onClick={onSave} className="gap-2" disabled={isSaving}>
+                            <Save className={`h-4 w-4 ${isSaving ? 'animate-spin' : ''}`} />
+                            {isSaving ? 'Saving...' : 'Save Positions'}
+                            {hasUnsavedChanges && !isSaving && (
+                                <span className="ml-1 text-yellow-500 dark:text-yellow-400">*</span>
+                            )}
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Save Table Positions (Ctrl+S)</p>
+                    </TooltipContent>
+                </Tooltip>
+            </div>
+            
+            {/* Dialogs */}
+            <SaveLayoutDialog open={showSaveDialog} onOpenChange={setShowSaveDialog} />
+            <LoadLayoutDialog open={showLoadDialog} onOpenChange={setShowLoadDialog} />
+            <KeyboardShortcutsDialog 
+                open={showKeyboardShortcuts} 
+                onOpenChange={setShowKeyboardShortcuts} 
+            />
+        </TooltipProvider>
+    );
+}
+'use client';
+
+import React, { useState, useCallback } from 'react';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { useEditorStore, useLayoutStore } from '../../stores';
+import { UnsavedChangesDialog } from './UnsavedChangesDialog';
+import { toast } from 'sonner';
+import { floorPlanApi } from '@/services/floor-plan.service';
+
+interface FloorSelectorProps {
+    maxFloors?: number;
+}
+
+export function FloorSelector({ maxFloors = 5 }: FloorSelectorProps) {
+    const { currentFloor, setCurrentFloor } = useEditorStore();
+    const { unsavedChanges, tables, setUnsavedChanges, loadFloorData } = useLayoutStore();
+    const [pendingFloor, setPendingFloor] = useState<number | null>(null);
+    const [showDialog, setShowDialog] = useState(false);
+    
+    const handleFloorChange = (value: string) => {
+        const newFloor = parseInt(value);
+        
+        if (unsavedChanges) {
+            setPendingFloor(newFloor);
+            setShowDialog(true);
+        } else {
+            switchFloor(newFloor);
+        }
+    };
+    
+    const switchFloor = useCallback((floor: number) => {
+        setCurrentFloor(floor);
+        loadFloorData(floor);
+        toast.success(`Switched to Floor ${floor}`);
+    }, [setCurrentFloor, loadFloorData]);
+    
+    const handleSaveAndSwitch = useCallback(async () => {
+        if (pendingFloor === null) return;
+        
+        try {
+            const positions = tables.map((table) => ({
+                tableId: table.tableId,
+                x: table.x,
+                y: table.y,
+                width: table.width,
+                height: table.height,
+                rotation: table.rotation,
+                shape: table.shape,
+            }));
+            
+            await floorPlanApi.updateTablePositions(positions);
+            setUnsavedChanges(false);
+            toast.success('Layout saved successfully');
+            switchFloor(pendingFloor);
+        } catch (error) {
+            toast.error('Failed to save layout');
+        } finally {
+            setShowDialog(false);
+            setPendingFloor(null);
+        }
+    }, [pendingFloor, tables, setUnsavedChanges, switchFloor]);
+    
+    const handleDiscardAndSwitch = useCallback(() => {
+        if (pendingFloor === null) return;
+        
+        setUnsavedChanges(false);
+        switchFloor(pendingFloor);
+        setShowDialog(false);
+        setPendingFloor(null);
+        toast.info('Changes discarded');
+    }, [pendingFloor, setUnsavedChanges, switchFloor]);
+    
+    const floors = Array.from({ length: maxFloors }, (_, i) => i + 1);
+    
+    return (
+        <>
+            <div className="flex items-center gap-2">
+                <Select value={currentFloor.toString()} onValueChange={handleFloorChange}>
+                    <SelectTrigger className="w-32">
+                        <SelectValue placeholder="Select floor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {floors.map((floor) => (
+                            <SelectItem key={floor} value={floor.toString()}>
+                                Floor {floor}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                {unsavedChanges && (
+                    <span className="text-xs text-yellow-600 dark:text-yellow-400">*</span>
+                )}
+            </div>
+            
+            <UnsavedChangesDialog
+                open={showDialog}
+                onOpenChange={setShowDialog}
+                onSaveAndSwitch={handleSaveAndSwitch}
+                onDiscardAndSwitch={handleDiscardAndSwitch}
+            />
+        </>
+    );
+}
+'use client';
+
+import React, { useState } from 'react';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
+import { floorPlanApi } from '@/services/floor-plan.service';
+import { useLayoutStore, useEditorStore } from '../../stores';
+import { Check, Trash2, Copy, CheckCircle2 } from 'lucide-react';
+import type { FloorPlanLayout } from '../../types';
+
+interface LoadLayoutDialogProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+}
+
+export function LoadLayoutDialog({ open, onOpenChange }: LoadLayoutDialogProps) {
+    const { savedLayouts, setSavedLayouts, setTables, setUnsavedChanges } = useLayoutStore();
+    const { setZoom, setGrid, currentFloor } = useEditorStore();
+    const [selectedLayout, setSelectedLayout] = useState<number | null>(null);
+    const [duplicatingId, setDuplicatingId] = useState<number | null>(null);
+    const [duplicateName, setDuplicateName] = useState('');
+    
+    const handleLoad = async (layout: FloorPlanLayout) => {
+        try {
+            // Load layout data
+            const data = layout.data as any;
+            
+            // Update canvas settings
+            if (data.canvasSettings) {
+                if (data.canvasSettings.zoom) {
+                    setZoom(data.canvasSettings.zoom);
+                }
+                if (data.canvasSettings.gridSize) {
+                    setGrid({ size: data.canvasSettings.gridSize });
+                }
+            }
+            
+            // Update table positions
+            if (data.tables && Array.isArray(data.tables)) {
+                setTables(data.tables);
+            }
+            
+            setUnsavedChanges(false);
+            toast.success(`Loaded layout: ${layout.name}`);
+            onOpenChange(false);
+        } catch (error) {
+            toast.error('Failed to load layout');
+            console.error(error);
+        }
+    };
+    
+    const handleDelete = async (layoutId: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        
+        if (!confirm('Are you sure you want to delete this layout?')) {
+            return;
+        }
+        
+        try {
+            await floorPlanApi.deleteLayout(layoutId);
+            
+            // Refresh layouts list
+            const layouts = await floorPlanApi.getLayouts(currentFloor);
+            setSavedLayouts(layouts);
+            
+            toast.success('Layout deleted successfully');
+        } catch (error) {
+            toast.error('Failed to delete layout');
+            console.error(error);
+        }
+    };
+
+    const handleActivate = async (layoutId: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        
+        try {
+            await floorPlanApi.activateLayout(layoutId);
+            
+            // Refresh layouts list
+            const layouts = await floorPlanApi.getLayouts(currentFloor);
+            setSavedLayouts(layouts);
+            
+            toast.success('Layout activated successfully');
+        } catch (error) {
+            toast.error('Failed to activate layout');
+            console.error(error);
+        }
+    };
+
+    const handleDuplicate = async (layoutId: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        
+        const layout = savedLayouts.find((l) => l.layoutId === layoutId);
+        if (!layout) return;
+        
+        setDuplicatingId(layoutId);
+        setDuplicateName(`${layout.name} - Copy`);
+    };
+
+    const handleDuplicateConfirm = async () => {
+        if (!duplicatingId || !duplicateName.trim()) {
+            toast.error('Please provide a name for the duplicate layout');
+            return;
+        }
+        
+        try {
+            await floorPlanApi.duplicateLayout(duplicatingId, duplicateName.trim());
+            
+            // Refresh layouts list
+            const layouts = await floorPlanApi.getLayouts(currentFloor);
+            setSavedLayouts(layouts);
+            
+            setDuplicatingId(null);
+            setDuplicateName('');
+            toast.success('Layout duplicated successfully');
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || 'Failed to duplicate layout');
+            console.error(error);
+        }
+    };
+    
+    const formatDate = (dateStr: string) => {
+        return new Date(dateStr).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    };
+    
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle>Load Layout</DialogTitle>
+                    <DialogDescription>
+                        Choose a saved layout to load
+                    </DialogDescription>
+                </DialogHeader>
+                
+                <ScrollArea className="h-96 pr-4">
+                    {savedLayouts.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400">
+                            <p>No saved layouts found</p>
+                            <p className="text-sm">Save your current layout to get started</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-2">
+                            {savedLayouts.map((layout) => {
+                                const data = layout.data as any;
+                                const tableCount = data?.tables?.length || 0;
+                                
+                                return (
+                                    <Card
+                                        key={layout.layoutId}
+                                        className={`cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 ${
+                                            selectedLayout === layout.layoutId
+                                                ? 'ring-2 ring-primary'
+                                                : ''
+                                        }`}
+                                        onClick={() => setSelectedLayout(layout.layoutId)}
+                                    >
+                                        <CardContent className="p-4">
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <h3 className="font-semibold">
+                                                            {layout.name}
+                                                        </h3>
+                                                        {layout.isActive && (
+                                                            <Badge variant="default">
+                                                                <Check className="h-3 w-3 mr-1" />
+                                                                Active
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                    
+                                                    {layout.description && (
+                                                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                                            {layout.description}
+                                                        </p>
+                                                    )}
+                                                    
+                                                    <div className="flex items-center gap-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                                        <span>{tableCount} tables</span>
+                                                        <span>•</span>
+                                                        <span>{formatDate(layout.updatedAt)}</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="flex items-center gap-1">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={(e) => handleActivate(layout.layoutId, e)}
+                                                        title="Set as active"
+                                                    >
+                                                        <CheckCircle2 className={`h-4 w-4 ${layout.isActive ? 'text-green-500' : 'text-gray-400'}`} />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={(e) => handleDuplicate(layout.layoutId, e)}
+                                                        title="Duplicate"
+                                                    >
+                                                        <Copy className="h-4 w-4 text-blue-500" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={(e) => handleDelete(layout.layoutId, e)}
+                                                        title="Delete"
+                                                    >
+                                                        <Trash2 className="h-4 w-4 text-red-500" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                );
+                            })}
+                        </div>
+                    )}
+                </ScrollArea>
+                
+                {duplicatingId && (
+                    <div className="border-t pt-4 space-y-2">
+                        <label className="text-sm font-medium">
+                            Duplicate Layout Name
+                        </label>
+                        <Input
+                            value={duplicateName}
+                            onChange={(e) => setDuplicateName(e.target.value)}
+                            placeholder="Enter name for duplicate"
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleDuplicateConfirm();
+                                }
+                            }}
+                        />
+                        <div className="flex gap-2">
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    setDuplicatingId(null);
+                                    setDuplicateName('');
+                                }}
+                                size="sm"
+                            >
+                                Cancel
+                            </Button>
+                            <Button onClick={handleDuplicateConfirm} size="sm">
+                                Confirm Duplicate
+                            </Button>
+                        </div>
+                    </div>
+                )}
+                
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => onOpenChange(false)}>
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            const layout = savedLayouts.find(
+                                (l) => l.layoutId === selectedLayout
+                            );
+                            if (layout) handleLoad(layout);
+                        }}
+                        disabled={!selectedLayout}
+                    >
+                        Load Selected
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+'use client';
+
+import React, { useCallback } from 'react';
+import { useEditorStore, useLayoutStore, useHistoryStore } from '../../stores';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Trash2, Copy } from 'lucide-react';
+import { toast } from 'sonner';
+import type { TablePosition } from '../../types';
+
+interface PropertiesPanelProps {
+    onDelete?: (tableId: number) => void;
+}
+
+export function PropertiesPanel({ onDelete }: PropertiesPanelProps) {
+    const { selectedTableIds, showPropertiesPanel, clearSelection, selectTable } = useEditorStore();
+    const { tables, updateTablePosition, addTable, removeTable, updateTableProperties } = useLayoutStore();
+    const { push: pushHistory } = useHistoryStore();
+    const [editingTableNumber, setEditingTableNumber] = React.useState<string>('');
+    const [editingCapacity, setEditingCapacity] = React.useState<string>('');
+    
+    // Find selected table
+    const selectedTable = selectedTableIds.length === 1 
+        ? tables.find((table) => table.tableId === selectedTableIds[0])
+        : null;
+
+    // Initialize editing states when table changes
+    React.useEffect(() => {
+        if (selectedTable) {
+            setEditingTableNumber(selectedTable.tableNumber);
+            setEditingCapacity(String(selectedTable.capacity));
+        }
+    }, [selectedTable?.tableId]);
+
+    const handleTableNumberChange = useCallback((value: string) => {
+        setEditingTableNumber(value);
+    }, []);
+
+    const handleTableNumberBlur = useCallback(() => {
+        if (!selectedTable) return;
+        const trimmed = editingTableNumber.trim();
+        if (trimmed && trimmed !== selectedTable.tableNumber) {
+            updateTableProperties(selectedTable.tableId, { tableNumber: trimmed });
+            toast.success('Table number updated');
+        } else {
+            setEditingTableNumber(selectedTable.tableNumber);
+        }
+    }, [editingTableNumber, selectedTable, updateTableProperties]);
+
+    const handleCapacityChange = useCallback((value: string) => {
+        setEditingCapacity(value);
+    }, []);
+
+    const handleCapacityBlur = useCallback(() => {
+        if (!selectedTable) return;
+        const capacity = parseInt(editingCapacity);
+        if (!isNaN(capacity) && capacity > 0 && capacity !== selectedTable.capacity) {
+            updateTableProperties(selectedTable.tableId, { capacity });
+            toast.success('Capacity updated');
+        } else {
+            setEditingCapacity(String(selectedTable.capacity));
+        }
+    }, [editingCapacity, selectedTable, updateTableProperties]);
+    
+    const handleDuplicate = useCallback(() => {
+        if (!selectedTable) return;
+        // Create a copy with offset position
+        // Use negative ID for temporary tables (not yet saved to DB)
+        const tempId = -(Date.now() % 1000000); // Negative ID in safe range
+        const duplicatedTable: TablePosition = {
+            ...selectedTable,
+            tableId: tempId, // Temporary negative ID
+            tableNumber: `${selectedTable.tableNumber}-Copy`,
+            x: selectedTable.x + 20,
+            y: selectedTable.y + 20,
+        };
+        
+        addTable(duplicatedTable);
+        
+        pushHistory({
+            type: 'create',
+            table: duplicatedTable,
+            timestamp: Date.now(),
+        });
+        
+        // Select the new table
+        clearSelection();
+        selectTable(duplicatedTable.tableId, false);
+        
+        toast.success('Table duplicated');
+    }, [selectedTable, addTable, pushHistory, clearSelection, selectTable]);
+    
+    const handleDelete = useCallback(() => {
+        if (!selectedTable || !onDelete) return;
+        onDelete(selectedTable.tableId);
+    }, [selectedTable, onDelete]);
+    
+    // Early returns after all hooks
+    if (!showPropertiesPanel) return null;
+    
+    if (selectedTableIds.length === 0) {
+        return (
+            <div className="w-80 border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-4">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Properties</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            Select a table to view and edit its properties.
+                        </p>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
+    
+    if (selectedTableIds.length > 1) {
+        return (
+            <div className="w-80 border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-4">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Multiple Selection</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {selectedTableIds.length} tables selected
+                        </p>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
+    
+    if (!selectedTable) return null;
+    
+    return (
+        <div className="w-80 border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-4 overflow-y-auto">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Table Properties</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    {/* Table Number */}
+                    <div className="space-y-2">
+                        <Label>Table Number</Label>
+                        <Input 
+                            value={editingTableNumber} 
+                            onChange={(e) => handleTableNumberChange(e.target.value)}
+                            onBlur={handleTableNumberBlur}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.currentTarget.blur();
+                                }
+                            }}
+                            placeholder="Enter table number"
+                        />
+                    </div>
+                    
+                    {/* Status */}
+                    <div className="space-y-2">
+                        <Label>Status</Label>
+                        <div className="text-sm capitalize">{selectedTable.status}</div>
+                    </div>
+                    
+                    {/* Capacity */}
+                    <div className="space-y-2">
+                        <Label>Capacity (people)</Label>
+                        <Input 
+                            type="number"
+                            min="1"
+                            value={editingCapacity} 
+                            onChange={(e) => handleCapacityChange(e.target.value)}
+                            onBlur={handleCapacityBlur}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.currentTarget.blur();
+                                }
+                            }}
+                            placeholder="Enter capacity"
+                        />
+                    </div>
+                    
+                    {/* Position */}
+                    <div className="space-y-2">
+                        <Label>Position</Label>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div>
+                                <Label className="text-xs">X</Label>
+                                <Input
+                                    type="number"
+                                    value={Math.round(selectedTable.x)}
+                                    onChange={(e) =>
+                                        updateTablePosition(selectedTable.tableId, {
+                                            x: parseInt(e.target.value),
+                                            y: selectedTable.y,
+                                        })
+                                    }
+                                />
+                            </div>
+                            <div>
+                                <Label className="text-xs">Y</Label>
+                                <Input
+                                    type="number"
+                                    value={Math.round(selectedTable.y)}
+                                    onChange={(e) =>
+                                        updateTablePosition(selectedTable.tableId, {
+                                            x: selectedTable.x,
+                                            y: parseInt(e.target.value),
+                                        })
+                                    }
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Dimensions */}
+                    <div className="space-y-2">
+                        <Label>Dimensions</Label>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div>
+                                <Label className="text-xs">Width</Label>
+                                <Input
+                                    type="number"
+                                    value={Math.round(selectedTable.width)}
+                                    readOnly
+                                />
+                            </div>
+                            <div>
+                                <Label className="text-xs">Height</Label>
+                                <Input
+                                    type="number"
+                                    value={Math.round(selectedTable.height)}
+                                    readOnly
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Shape */}
+                    <div className="space-y-2">
+                        <Label>Shape</Label>
+                        <div className="text-sm capitalize">{selectedTable.shape}</div>
+                    </div>
+                    
+                    {/* Rotation */}
+                    <div className="space-y-2">
+                        <Label>Rotation</Label>
+                        <Input value={`${selectedTable.rotation}°`} readOnly />
+                    </div>
+                    
+                    {/* Actions */}
+                    <div className="space-y-2 pt-4 border-t">
+                        <Button 
+                            variant="outline" 
+                            className="w-full gap-2"
+                            onClick={handleDuplicate}
+                        >
+                            <Copy className="h-4 w-4" />
+                            Duplicate
+                        </Button>
+                        <Button 
+                            variant="destructive" 
+                            className="w-full gap-2"
+                            onClick={handleDelete}
+                        >
+                            <Trash2 className="h-4 w-4" />
+                            Delete
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    );
+}
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+
+interface QuickCreateTableDialogProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    position: { x: number; y: number };
+    onCreateTable: (data: {
+        tableNumber: string;
+        capacity: number;
+        shape: 'circle' | 'square' | 'rectangle' | 'oval';
+        x: number;
+        y: number;
+    }) => void;
+    existingTableNumbers: string[];
+}
+
+export function QuickCreateTableDialog({
+    open,
+    onOpenChange,
+    position,
+    onCreateTable,
+    existingTableNumbers,
+}: QuickCreateTableDialogProps) {
+    const [tableNumber, setTableNumber] = useState('');
+    const [capacity, setCapacity] = useState('4');
+    const [shape, setShape] = useState<'circle' | 'square' | 'rectangle' | 'oval'>('circle');
+    
+    // Auto-generate next table number
+    useEffect(() => {
+        if (open) {
+            const numbers = existingTableNumbers
+                .map(num => parseInt(num.replace(/\D/g, '')))
+                .filter(num => !isNaN(num));
+            
+            const maxNumber = numbers.length > 0 ? Math.max(...numbers) : 0;
+            setTableNumber(`T${maxNumber + 1}`);
+        }
+    }, [open, existingTableNumbers]);
+    
+    const handleCreate = () => {
+        if (!tableNumber.trim()) {
+            return;
+        }
+        
+        onCreateTable({
+            tableNumber: tableNumber.trim(),
+            capacity: parseInt(capacity) || 4,
+            shape,
+            x: position.x,
+            y: position.y,
+        });
+        
+        onOpenChange(false);
+    };
+    
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleCreate();
+        }
+    };
+    
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle>Create New Table</DialogTitle>
+                    <DialogDescription>
+                        Add a new table at position ({Math.round(position.x)}, {Math.round(position.y)})
+                    </DialogDescription>
+                </DialogHeader>
+                
+                <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="tableNumber" className="text-right">
+                            Table Number
+                        </Label>
+                        <Input
+                            id="tableNumber"
+                            value={tableNumber}
+                            onChange={(e) => setTableNumber(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            className="col-span-3"
+                            autoFocus
+                        />
+                    </div>
+                    
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="capacity" className="text-right">
+                            Capacity
+                        </Label>
+                        <Input
+                            id="capacity"
+                            type="number"
+                            min="1"
+                            max="20"
+                            value={capacity}
+                            onChange={(e) => setCapacity(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            className="col-span-3"
+                        />
+                    </div>
+                    
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="shape" className="text-right">
+                            Shape
+                        </Label>
+                        <Select value={shape} onValueChange={(value: any) => setShape(value)}>
+                            <SelectTrigger className="col-span-3">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="circle">Circle</SelectItem>
+                                <SelectItem value="square">Square</SelectItem>
+                                <SelectItem value="rectangle">Rectangle</SelectItem>
+                                <SelectItem value="oval">Oval</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+                
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => onOpenChange(false)}>
+                        Cancel
+                    </Button>
+                    <Button onClick={handleCreate}>
+                        Create Table
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+'use client';
+
+import React, { useState } from 'react';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
+import { floorPlanApi } from '@/services/floor-plan.service';
+import { useEditorStore, useLayoutStore } from '../../stores';
+
+interface SaveLayoutDialogProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+}
+
+export function SaveLayoutDialog({ open, onOpenChange }: SaveLayoutDialogProps) {
+    const [name, setName] = useState('');
+    const [description, setDescription] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    
+    const { currentFloor, zoom, grid } = useEditorStore();
+    const { tables, setSavedLayouts } = useLayoutStore();
+    
+    const handleSave = async () => {
+        if (!name.trim()) {
+            toast.error('Layout name is required');
+            return;
+        }
+        
+        setIsLoading(true);
+        try {
+            const layoutData = {
+                version: '1.0',
+                floor: currentFloor,
+                canvasSettings: {
+                    gridSize: grid.size,
+                    zoom,
+                },
+                tables: tables.map((table) => ({
+                    tableId: table.tableId,
+                    x: table.x,
+                    y: table.y,
+                    width: table.width,
+                    height: table.height,
+                    rotation: table.rotation,
+                    shape: table.shape,
+                })),
+            };
+            
+            const newLayout = await floorPlanApi.createLayout(
+                currentFloor,
+                name,
+                description || null,
+                layoutData
+            );
+            
+            // Refresh layouts list
+            const layouts = await floorPlanApi.getLayouts(currentFloor);
+            setSavedLayouts(layouts);
+            
+            toast.success('Layout saved successfully');
+            setName('');
+            setDescription('');
+            onOpenChange(false);
+        } catch (error) {
+            toast.error('Failed to save layout');
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Save Layout</DialogTitle>
+                    <DialogDescription>
+                        Save the current table arrangement as a named layout
+                    </DialogDescription>
+                </DialogHeader>
+                
+                <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="layout-name">Layout Name *</Label>
+                        <Input
+                            id="layout-name"
+                            placeholder="e.g., Weekend Layout"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                        />
+                    </div>
+                    
+                    <div className="space-y-2">
+                        <Label htmlFor="layout-description">Description</Label>
+                        <Textarea
+                            id="layout-description"
+                            placeholder="Optional description for this layout"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            rows={3}
+                        />
+                    </div>
+                    
+                    <div className="text-sm text-gray-500">
+                        <p>This layout will save:</p>
+                        <ul className="list-disc list-inside mt-1">
+                            <li>{tables.length} table positions</li>
+                            <li>Current grid settings</li>
+                            <li>Zoom level</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => onOpenChange(false)}>
+                        Cancel
+                    </Button>
+                    <Button onClick={handleSave} disabled={isLoading}>
+                        {isLoading ? 'Saving...' : 'Save Layout'}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+'use client';
+
+import React, { useState, useCallback } from 'react';
+import { useDraggable } from '@dnd-kit/core';
+import { CSS } from '@dnd-kit/utilities';
+import type { TablePosition, Tool } from '../../types';
+import { cn } from '@/lib/utils';
+import { snapSizeToGrid } from '../../utils/geometry';
+import { useEditorStore } from '../../stores';
+
+interface TableComponentProps {
+    table: TablePosition;
+    isSelected: boolean;
+    isColliding?: boolean;
+    currentTool?: Tool;
+    onClick: (tableId: number, multi: boolean) => void;
+    onDoubleClick?: (tableId: number) => void;
+    onResize?: (tableId: number, width: number, height: number) => void;
+}
+
+type ResizeHandle = 'nw' | 'ne' | 'sw' | 'se' | 'n' | 's' | 'w' | 'e' | null;
+
+const MIN_SIZE = 40;
+const MAX_SIZE = 200;
+
+const TableComponentRaw = ({
+    table,
+    isSelected,
+    isColliding = false,
+    currentTool = 'select',
+    onClick,
+    onDoubleClick,
+    onResize,
+}: TableComponentProps) => {
+    const [resizing, setResizing] = useState<ResizeHandle>(null);
+    const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
+    
+    const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+        id: `table-${table.tableId}`,
+        data: { table },
+        disabled: currentTool !== 'select' || resizing !== null,
+    });
+    
+    const style = {
+        position: 'absolute' as const,
+        left: table.x,
+        top: table.y,
+        width: table.width,
+        height: table.height,
+        transform: CSS.Translate.toString(transform),
+        rotate: `${table.rotation}deg`,
+    };
+    
+    const handleClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onClick(table.tableId, e.shiftKey);
+    };
+    
+    const handleDoubleClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onDoubleClick?.(table.tableId);
+    };
+    
+    const handleResizeStart = useCallback((handle: ResizeHandle, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setResizing(handle);
+        setResizeStart({
+            x: e.clientX,
+            y: e.clientY,
+            width: table.width,
+            height: table.height,
+        });
+    }, [table.width, table.height]);
+    
+    const handleResizeMove = useCallback((e: MouseEvent) => {
+        if (!resizing || !onResize) return;
+        
+        const deltaX = e.clientX - resizeStart.x;
+        const deltaY = e.clientY - resizeStart.y;
+        
+        let newWidth = resizeStart.width;
+        let newHeight = resizeStart.height;
+        
+        // Calculate new dimensions based on handle
+        switch (resizing) {
+            case 'se':
+                newWidth = resizeStart.width + deltaX;
+                newHeight = resizeStart.height + deltaY;
+                break;
+            case 'sw':
+                newWidth = resizeStart.width - deltaX;
+                newHeight = resizeStart.height + deltaY;
+                break;
+            case 'ne':
+                newWidth = resizeStart.width + deltaX;
+                newHeight = resizeStart.height - deltaY;
+                break;
+            case 'nw':
+                newWidth = resizeStart.width - deltaX;
+                newHeight = resizeStart.height - deltaY;
+                break;
+            case 'e':
+                newWidth = resizeStart.width + deltaX;
+                break;
+            case 'w':
+                newWidth = resizeStart.width - deltaX;
+                break;
+            case 's':
+                newHeight = resizeStart.height + deltaY;
+                break;
+            case 'n':
+                newHeight = resizeStart.height - deltaY;
+                break;
+        }
+        
+        // Apply constraints
+        newWidth = Math.max(MIN_SIZE, Math.min(MAX_SIZE, newWidth));
+        newHeight = Math.max(MIN_SIZE, Math.min(MAX_SIZE, newHeight));
+        
+        onResize(table.tableId, newWidth, newHeight);
+    }, [resizing, resizeStart, table.tableId, onResize]);
+    
+    const handleResizeEnd = useCallback(() => {
+        if (!resizing || !onResize) {
+            setResizing(null);
+            return;
+        }
+        
+        // Get current size
+        const currentWidth = table.width;
+        const currentHeight = table.height;
+        
+        // Apply grid snapping on resize end
+        const { grid } = useEditorStore.getState();
+        if (grid.snapEnabled) {
+            const snappedSize = snapSizeToGrid(
+                { width: currentWidth, height: currentHeight },
+                grid.size
+            );
+            onResize(table.tableId, snappedSize.width, snappedSize.height);
+        }
+        
+        setResizing(null);
+    }, [resizing, onResize, table.tableId, table.width, table.height]);
+    
+    React.useEffect(() => {
+        if (resizing) {
+            document.addEventListener('mousemove', handleResizeMove);
+            document.addEventListener('mouseup', handleResizeEnd);
+            return () => {
+                document.removeEventListener('mousemove', handleResizeMove);
+                document.removeEventListener('mouseup', handleResizeEnd);
+            };
+        }
+    }, [resizing, handleResizeMove, handleResizeEnd]);
+    
+    const getStatusColor = () => {
+        switch (table.status) {
+            case 'available':
+                return 'bg-green-100 dark:bg-green-900/30 border-green-500 dark:border-green-600';
+            case 'occupied':
+                return 'bg-red-100 dark:bg-red-900/30 border-red-500 dark:border-red-600';
+            case 'reserved':
+                return 'bg-yellow-100 dark:bg-yellow-900/30 border-yellow-500 dark:border-yellow-600';
+            case 'maintenance':
+                return 'bg-gray-100 dark:bg-gray-800 border-gray-500 dark:border-gray-600';
+            default:
+                return 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600';
+        }
+    };
+    
+    const getShapeClass = () => {
+        switch (table.shape) {
+            case 'circle':
+            case 'oval':
+                return 'rounded-full';
+            case 'square':
+            case 'rectangle':
+            default:
+                return 'rounded-lg';
+        }
+    };
+    
+    const getCursorClass = () => {
+        if (currentTool === 'select') return 'cursor-move';
+        if (currentTool === 'delete') return 'cursor-not-allowed';
+        return 'cursor-pointer';
+    };
+    
+    return (
+        <div
+            ref={setNodeRef}
+            style={style}
+            {...(currentTool === 'select' ? listeners : {})}
+            {...(currentTool === 'select' ? attributes : {})}
+            onClick={handleClick}
+            onDoubleClick={handleDoubleClick}
+            className={cn(
+                'flex flex-col items-center justify-center',
+                'border-2 transition-all',
+                'select-none text-gray-900 dark:text-gray-100',
+                getShapeClass(),
+                getStatusColor(),
+                getCursorClass(),
+                isSelected && 'ring-4 ring-blue-500 dark:ring-blue-400 ring-opacity-50',
+                isColliding && 'border-red-500 dark:border-red-600 bg-red-100 dark:bg-red-900/30',
+                isDragging && 'opacity-50 shadow-lg dark:shadow-gray-900/50'
+            )}
+            role="button"
+            tabIndex={0}
+            aria-label={`Table ${table.tableNumber}, ${table.status}, capacity ${table.capacity}`}
+            aria-pressed={isSelected}
+        >
+            <div className="text-lg font-bold">{table.tableNumber}</div>
+            <div className="text-xs text-gray-600 dark:text-gray-400">
+                {table.capacity} {table.capacity === 1 ? 'seat' : 'seats'}
+            </div>
+            
+            {/* Resize handles (only show when selected) */}
+            {isSelected && currentTool === 'select' && (
+                <>
+                    {/* Corner handles */}
+                    <div 
+                        className="absolute -top-1 -left-1 w-3 h-3 bg-blue-500 dark:bg-blue-400 rounded-full cursor-nw-resize z-10"
+                        onMouseDown={(e) => handleResizeStart('nw', e)}
+                    />
+                    <div 
+                        className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 dark:bg-blue-400 rounded-full cursor-ne-resize z-10"
+                        onMouseDown={(e) => handleResizeStart('ne', e)}
+                    />
+                    <div 
+                        className="absolute -bottom-1 -left-1 w-3 h-3 bg-blue-500 dark:bg-blue-400 rounded-full cursor-sw-resize z-10"
+                        onMouseDown={(e) => handleResizeStart('sw', e)}
+                    />
+                    <div 
+                        className="absolute -bottom-1 -right-1 w-3 h-3 bg-blue-500 dark:bg-blue-400 rounded-full cursor-se-resize z-10"
+                        onMouseDown={(e) => handleResizeStart('se', e)}
+                    />
+                    
+                    {/* Edge handles */}
+                    <div 
+                        className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-blue-500 dark:bg-blue-400 rounded-full cursor-n-resize z-10"
+                        onMouseDown={(e) => handleResizeStart('n', e)}
+                    />
+                    <div 
+                        className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-blue-500 dark:bg-blue-400 rounded-full cursor-s-resize z-10"
+                        onMouseDown={(e) => handleResizeStart('s', e)}
+                    />
+                    <div 
+                        className="absolute -left-1 top-1/2 -translate-y-1/2 w-3 h-3 bg-blue-500 dark:bg-blue-400 rounded-full cursor-w-resize z-10"
+                        onMouseDown={(e) => handleResizeStart('w', e)}
+                    />
+                    <div 
+                        className="absolute -right-1 top-1/2 -translate-y-1/2 w-3 h-3 bg-blue-500 dark:bg-blue-400 rounded-full cursor-e-resize z-10"
+                        onMouseDown={(e) => handleResizeStart('e', e)}
+                    />
+                </>
+            )}
+        </div>
+    );
+};
+
+// Memoize component for performance optimization
+export const TableComponent = React.memo(TableComponentRaw, (prevProps, nextProps) => {
+    return (
+        prevProps.table.tableId === nextProps.table.tableId &&
+        prevProps.table.x === nextProps.table.x &&
+        prevProps.table.y === nextProps.table.y &&
+        prevProps.table.width === nextProps.table.width &&
+        prevProps.table.height === nextProps.table.height &&
+        prevProps.table.rotation === nextProps.table.rotation &&
+        prevProps.isSelected === nextProps.isSelected &&
+        prevProps.isColliding === nextProps.isColliding &&
+        prevProps.currentTool === nextProps.currentTool
+    );
+});
+'use client';
+
+import React from 'react';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+
+interface UnsavedChangesDialogProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    onSaveAndSwitch: () => void;
+    onDiscardAndSwitch: () => void;
+}
+
+export function UnsavedChangesDialog({
+    open,
+    onOpenChange,
+    onSaveAndSwitch,
+    onDiscardAndSwitch,
+}: UnsavedChangesDialogProps) {
+    return (
+        <AlertDialog open={open} onOpenChange={onOpenChange}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Unsaved Changes</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        You have unsaved changes on this floor. What would you like to do?
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel onClick={() => onOpenChange(false)}>
+                        Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction 
+                        onClick={onDiscardAndSwitch}
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                        Discard Changes
+                    </AlertDialogAction>
+                    <AlertDialogAction onClick={onSaveAndSwitch}>
+                        Save & Switch
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    );
+}
+'use client';
+
+import React from 'react';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+
+interface DeleteTableDialogProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    onConfirm: () => void;
+    tableNumbers: string[];
+}
+
+export function VisualEditorDeleteTableDialog({
+    open,
+    onOpenChange,
+    onConfirm,
+    tableNumbers,
+}: DeleteTableDialogProps) {
+    const handleConfirm = () => {
+        onConfirm();
+        onOpenChange(false);
+    };
+    
+    return (
+        <AlertDialog open={open} onOpenChange={onOpenChange}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Delete Table{tableNumbers.length > 1 ? 's' : ''}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        {tableNumbers.length === 1 ? (
+                            <>Are you sure you want to delete table <strong>{tableNumbers[0]}</strong>?</>
+                        ) : (
+                            <>Are you sure you want to delete <strong>{tableNumbers.length} tables</strong>?</>
+                        )}
+                        <br />
+                        This action cannot be undone, but you can use Undo (Ctrl+Z) to restore them.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                        onClick={handleConfirm}
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                        Delete
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    );
+}
+'use client';
+
+import React from 'react';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from '@/components/ui/dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
+interface KeyboardShortcutsDialogProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+}
+
+export function VisualEditorKeyboardShortcutsDialog({ open, onOpenChange }: KeyboardShortcutsDialogProps) {
+    const shortcuts = [
+        { category: 'Tools', key: 'V', description: 'Select Tool' },
+        { category: 'Tools', key: 'H', description: 'Pan Tool' },
+        { category: 'Tools', key: 'T', description: 'Add Table Tool' },
+        { category: 'Tools', key: 'Delete/Backspace', description: 'Delete Selected Tables' },
+        { category: 'View', key: 'G', description: 'Toggle Grid' },
+        { category: 'View', key: '0', description: 'Reset Zoom (100%)' },
+        { category: 'View', key: 'Ctrl + Scroll', description: 'Zoom In/Out' },
+        { category: 'View', key: 'F', description: 'Toggle Fullscreen' },
+        { category: 'Edit', key: 'Ctrl + Z', description: 'Undo' },
+        { category: 'Edit', key: 'Ctrl + Shift + Z', description: 'Redo' },
+        { category: 'Edit', key: 'Ctrl + Y', description: 'Redo (Alternative)' },
+        { category: 'Edit', key: 'Ctrl + S', description: 'Save Layout' },
+        { category: 'Selection', key: 'Shift + Click', description: 'Multi-Select Tables' },
+        { category: 'Selection', key: 'Esc', description: 'Clear Selection / Cancel' },
+        { category: 'Drag', key: 'Shift + Drag', description: 'Disable Grid Snapping' },
+        { category: 'Floors', key: '1-9', description: 'Quick Switch Floor' },
+    ];
+    
+    const groupedShortcuts = shortcuts.reduce((acc, shortcut) => {
+        if (!acc[shortcut.category]) {
+            acc[shortcut.category] = [];
+        }
+        acc[shortcut.category].push(shortcut);
+        return acc;
+    }, {} as Record<string, typeof shortcuts>);
+    
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle>Keyboard Shortcuts</DialogTitle>
+                    <DialogDescription>
+                        Use these keyboard shortcuts to work more efficiently with the visual floor plan editor.
+                    </DialogDescription>
+                </DialogHeader>
+                
+                <div className="space-y-6 mt-4">
+                    {Object.entries(groupedShortcuts).map(([category, items]) => (
+                        <div key={category}>
+                            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                {category}
+                            </h3>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-1/3">Key</TableHead>
+                                        <TableHead>Action</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {items.map((shortcut, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell>
+                                                <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded">
+                                                    {shortcut.key}
+                                                </kbd>
+                                            </TableCell>
+                                            <TableCell className="text-sm">{shortcut.description}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    ))}
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
+}
+'use client';
+
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { DndContext, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
+import { toast } from 'sonner';
+import { useEditorStore, useLayoutStore, useHistoryStore } from '../../stores';
+import { useFloorPlanData } from '../../hooks';
+import { EditorCanvas } from './EditorCanvas';
+import { EditorToolbar } from './EditorToolbar';
+import { TableComponent } from './TableComponent';
+import { PropertiesPanel } from './PropertiesPanel';
+import { VisualEditorKeyboardShortcutsDialog } from './VisualEditorKeyboardShortcutsDialog';
+import { QuickCreateTableDialog } from './QuickCreateTableDialog';
+import { VisualEditorDeleteTableDialog } from './VisualEditorDeleteTableDialog';
+import { checkTableCollision, snapPositionToGrid } from '../../utils/geometry';
+import { floorPlanApi } from '@/services/floor-plan.service';
+import type { TablePosition } from '../../types';
+import { Button } from '@/components/ui/button';
+
+export function VisualEditorPage() {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [dimensions, setDimensions] = useState({ width: 1200, height: 1000 });
+    const [draggedTable, setDraggedTable] = useState<TablePosition | null>(null);
+    const [tempPosition, setTempPosition] = useState<{ x: number; y: number } | null>(null);
+    const [isDraggingWithShift, setIsDraggingWithShift] = useState(false);
+    const dragMoveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    
+    // Pan tool state
+    const [isPanning, setIsPanning] = useState(false);
+    const [panStart, setPanStart] = useState<{ x: number; y: number } | null>(null);
+    
+    // Add table tool state
+    const [ghostPosition, setGhostPosition] = useState<{ x: number; y: number } | null>(null);
+    const [showCreateDialog, setShowCreateDialog] = useState(false);
+    const [createPosition, setCreatePosition] = useState({ x: 0, y: 0 });
+    
+    // Snap preview state
+    const [snapPreview, setSnapPreview] = useState<{ x: number; y: number } | null>(null);
+    
+    // Delete dialog state
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [tablesToDelete, setTablesToDelete] = useState<number[]>([]);
+    
+    // Save state
+    const [isSaving, setIsSaving] = useState(false);
+    
+    // Load floor plan data
+    useFloorPlanData();
+    
+    const {
+        currentTool,
+        selectedTableIds,
+        selectTable,
+        clearSelection,
+        grid,
+        zoom,
+        pan,
+        setPan,
+        setTool,
+        setZoom,
+        showKeyboardShortcuts,
+        toggleKeyboardShortcuts,
+        isFullscreen,
+    } = useEditorStore();
+    
+    const {
+        tables,
+        updateTablePosition,
+        removeTable,
+        unsavedChanges,
+        setUnsavedChanges,
+    } = useLayoutStore();
+    
+    const { push: pushHistory, undo, redo } = useHistoryStore();
+    
+    // Update dimensions on mount and resize
+    useEffect(() => {
+        const updateDimensions = () => {
+            if (containerRef.current) {
+                const { width, height } = containerRef.current.getBoundingClientRect();
+                setDimensions({ width, height });
+            }
+        };
+        
+        updateDimensions();
+        window.addEventListener('resize', updateDimensions);
+        return () => window.removeEventListener('resize', updateDimensions);
+    }, []);
+    
+    // Handle fullscreen changes
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            const { setFullscreen } = useEditorStore.getState();
+            if (document.fullscreenElement) {
+                setFullscreen(true);
+            } else {
+                setFullscreen(false);
+            }
+        };
+        
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    }, []);
+
+    // Warn on exit if there are unsaved changes
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (unsavedChanges) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [unsavedChanges]);
+    
+    // Handle drag start
+    const handleDragStart = useCallback((event: any) => {
+        const table = event.active.data.current?.table;
+        if (table) {
+            setDraggedTable(table);
+            // Select table when dragging to show properties
+            selectTable(table.tableId, false);
+        }
+    }, [selectTable]);
+    
+    // Handle drag move (real-time collision detection with debouncing)
+    const handleDragMove = useCallback((event: DragMoveEvent) => {
+        if (!draggedTable) return;
+        
+        // Debounce position updates to 16ms (60fps)
+        if (dragMoveTimeoutRef.current) {
+            clearTimeout(dragMoveTimeoutRef.current);
+        }
+        
+        dragMoveTimeoutRef.current = setTimeout(() => {
+            const delta = event.delta;
+            const newX = draggedTable.x + delta.x / zoom;
+            const newY = draggedTable.y + delta.y / zoom;
+            
+            setTempPosition({ x: newX, y: newY });
+            
+            // Show snap preview if grid snapping is enabled
+            if (grid.snapEnabled && !isDraggingWithShift) {
+                const snapped = snapPositionToGrid({ x: newX, y: newY }, grid.size);
+                setSnapPreview(snapped);
+            } else {
+                setSnapPreview(null);
+            }
+        }, 16);
+    }, [draggedTable, zoom, grid.snapEnabled, grid.size, isDraggingWithShift]);
+    
+    // Handle drag end
+    const handleDragEnd = useCallback((event: DragEndEvent) => {
+        if (!draggedTable) return;
+        
+        // Clear debounce timeout
+        if (dragMoveTimeoutRef.current) {
+            clearTimeout(dragMoveTimeoutRef.current);
+        }
+        
+        const delta = event.delta;
+        let newX = draggedTable.x + delta.x / zoom;
+        let newY = draggedTable.y + delta.y / zoom;
+        
+        // Apply grid snapping if enabled and Shift is not held
+        if (grid.snapEnabled && !isDraggingWithShift) {
+            const snapped = snapPositionToGrid({ x: newX, y: newY }, grid.size);
+            newX = snapped.x;
+            newY = snapped.y;
+        }
+        
+        // Check for collision
+        const movedTable = { ...draggedTable, x: newX, y: newY };
+        const hasCollision = checkTableCollision(movedTable, tables, [draggedTable.tableId]);
+        
+        if (hasCollision) {
+            toast.error('Table overlaps with another table');
+            setDraggedTable(null);
+            setTempPosition(null);
+            setIsDraggingWithShift(false);
+            return;
+        }
+        
+        // Record history
+        pushHistory({
+            type: 'move',
+            tableId: draggedTable.tableId,
+            oldPosition: { x: draggedTable.x, y: draggedTable.y },
+            newPosition: { x: newX, y: newY },
+            timestamp: Date.now(),
+        });
+        
+        // Update position with smooth animation (handled by CSS transition)
+        updateTablePosition(draggedTable.tableId, { x: newX, y: newY });
+        
+        setDraggedTable(null);
+        setTempPosition(null);
+        setIsDraggingWithShift(false);
+        setSnapPreview(null);
+    }, [draggedTable, tables, grid, zoom, isDraggingWithShift, updateTablePosition, pushHistory]);
+    
+    // Handle table click
+    const handleTableClick = useCallback((tableId: number, multi: boolean) => {
+        if (currentTool === 'select') {
+            selectTable(tableId, multi);
+        } else if (currentTool === 'delete') {
+            setTablesToDelete([tableId]);
+            setShowDeleteDialog(true);
+        }
+    }, [currentTool, selectTable]);
+    
+    // Handle delete confirm
+    const handleDeleteConfirm = useCallback(() => {
+        tablesToDelete.forEach((tableId) => {
+            const table = tables.find((t) => t.tableId === tableId);
+            if (table) {
+                pushHistory({
+                    type: 'delete',
+                    table: table,
+                    timestamp: Date.now(),
+                });
+                removeTable(tableId);
+            }
+        });
+        clearSelection();
+        toast.success(`Deleted ${tablesToDelete.length} table(s)`);
+        setTablesToDelete([]);
+    }, [tablesToDelete, tables, removeTable, pushHistory, clearSelection]);
+    
+    // Handle delete from properties panel
+    const handleDeleteFromPanel = useCallback((tableId: number) => {
+        setTablesToDelete([tableId]);
+        setShowDeleteDialog(true);
+    }, []);
+    
+    // Handle table resize
+    const handleTableResize = useCallback((tableId: number, width: number, height: number) => {
+        const { updateTableSize } = useLayoutStore.getState();
+        updateTableSize(tableId, { width, height });
+    }, []);
+    
+    // Handle create table
+    const handleCreateTable = useCallback(async (data: {
+        tableNumber: string;
+        capacity: number;
+        shape: 'circle' | 'square' | 'rectangle' | 'oval';
+        x: number;
+        y: number;
+    }) => {
+        try {
+            // Tính kích thước bàn
+            const tableWidth = data.shape === 'rectangle' ? 120 : 80;
+            const tableHeight = 80;
+            
+            // Create new table object - đặt ở chính giữa vị trí ghost preview
+            // Use negative ID for temporary tables (not yet saved to DB)
+            const tempId = -(Date.now() % 1000000); // Negative ID in safe range
+            const newTable: TablePosition = {
+                tableId: tempId, // Temporary negative ID
+                tableNumber: data.tableNumber,
+                capacity: data.capacity,
+                shape: data.shape,
+                x: data.x - tableWidth / 2,
+                y: data.y - tableHeight / 2,
+                width: tableWidth,
+                height: tableHeight,
+                rotation: 0,
+                status: 'available',
+            };
+            
+            // Check for collision
+            const hasCollision = checkTableCollision(newTable, tables);
+            if (hasCollision) {
+                toast.error('Cannot place table here - overlaps with another table');
+                return;
+            }
+            
+            // Add to store
+            const { addTable } = useLayoutStore.getState();
+            addTable(newTable);
+            
+            // Record history
+            pushHistory({
+                type: 'create',
+                table: newTable,
+                timestamp: Date.now(),
+            });
+            
+            toast.success(`Table ${data.tableNumber} created`);
+            
+            // Keep tool active for adding more tables
+        } catch (error) {
+            toast.error('Failed to create table');
+        }
+    }, [tables, pushHistory]);
+    
+    // Handle canvas click
+    const handleCanvasClick = useCallback((e: React.MouseEvent) => {
+        if (currentTool === 'select') {
+            clearSelection();
+        } else if (currentTool === 'add' && ghostPosition) {
+            setCreatePosition(ghostPosition);
+            setShowCreateDialog(true);
+        }
+    }, [currentTool, clearSelection, ghostPosition]);
+    
+    // Handle mouse down for pan tool
+    const handleMouseDown = useCallback((e: React.MouseEvent) => {
+        if (currentTool === 'pan') {
+            setIsPanning(true);
+            setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
+            e.preventDefault();
+        }
+    }, [currentTool, pan]);
+    
+    // Handle mouse move for pan and add tools
+    const handleMouseMove = useCallback((e: React.MouseEvent) => {
+        // Pan tool
+        if (isPanning && panStart && currentTool === 'pan') {
+            const newPan = {
+                x: e.clientX - panStart.x,
+                y: e.clientY - panStart.y,
+            };
+            setPan(newPan);
+        }
+        
+        // Add tool ghost preview - cập nhật ngay lập tức không debounce
+        if (currentTool === 'add' && containerRef.current) {
+            const rect = containerRef.current.getBoundingClientRect();
+            // Tính toán vị trí chính xác với zoom và pan
+            const x = (e.clientX - rect.left) / zoom - pan.x / zoom;
+            const y = (e.clientY - rect.top) / zoom - pan.y / zoom;
+            
+            // Snap to grid if enabled
+            if (grid.snapEnabled) {
+                const snapped = snapPositionToGrid({ x, y }, grid.size);
+                setGhostPosition(snapped);
+            } else {
+                setGhostPosition({ x, y });
+            }
+        }
+    }, [isPanning, panStart, currentTool, pan, zoom, grid, setPan]);
+    
+    // Handle mouse up for pan tool
+    const handleMouseUp = useCallback(() => {
+        if (currentTool === 'pan') {
+            setIsPanning(false);
+            setPanStart(null);
+        }
+    }, [currentTool]);
+    
+    // Handle wheel for zoom (Ctrl+Scroll) with center-point
+    const handleWheel = useCallback((e: React.WheelEvent) => {
+        if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            
+            // Get cursor position relative to container
+            if (containerRef.current) {
+                const rect = containerRef.current.getBoundingClientRect();
+                const centerPoint = {
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top,
+                };
+                
+                const delta = -e.deltaY * 0.001;
+                const newZoom = Math.max(0.25, Math.min(2.0, zoom + delta));
+                setZoom(newZoom, centerPoint);
+            }
+        }
+    }, [zoom, setZoom]);
+    
+    // Handle save
+    const handleSave = useCallback(async () => {
+        if (isSaving) return;
+        
+        try {
+            setIsSaving(true);
+            
+            // Only save tables with positive IDs (existing in DB)
+            // Tables with negative IDs are temporary and need to be created first
+            const existingTables = tables.filter(table => table.tableId > 0);
+            
+            if (existingTables.length === 0) {
+                toast.warning('No existing tables to save. New tables need to be created through the API.');
+                setIsSaving(false);
+                return;
+            }
+            
+            const positions = existingTables.map((table) => ({
+                tableId: table.tableId,
+                x: table.x,
+                y: table.y,
+                width: table.width,
+                height: table.height,
+                rotation: table.rotation,
+                shape: table.shape,
+            }));
+            
+            await floorPlanApi.updateTablePositions(positions);
+            setUnsavedChanges(false);
+            
+            const tempTablesCount = tables.length - existingTables.length;
+            if (tempTablesCount > 0) {
+                toast.success(`Layout saved successfully. ${tempTablesCount} new table(s) not saved (temporary).`);
+            } else {
+                toast.success('Layout saved successfully');
+            }
+        } catch (error) {
+            toast.error('Failed to save layout');
+        } finally {
+            setIsSaving(false);
+        }
+    }, [tables, setUnsavedChanges, isSaving]);
+    
+    // Handle undo
+    const handleUndo = useCallback(() => {
+        const action = undo();
+        if (action && action.type === 'move') {
+            updateTablePosition(action.tableId, action.oldPosition);
+        }
+    }, [undo, updateTablePosition]);
+    
+    // Handle redo
+    const handleRedo = useCallback(() => {
+        const action = redo();
+        if (action && action.type === 'move') {
+            updateTablePosition(action.tableId, action.newPosition);
+        }
+    }, [redo, updateTablePosition]);
+    
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Prevent shortcuts if typing in input
+            if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+                return;
+            }
+            
+            // Track Shift key for disabling snap during drag
+            if (e.key === 'Shift' && draggedTable) {
+                setIsDraggingWithShift(true);
+            }
+            
+            // Tool shortcuts
+            if (e.key === 'v' || e.key === 'V') {
+                e.preventDefault();
+                setTool('select');
+            } else if (e.key === 'h' || e.key === 'H') {
+                e.preventDefault();
+                setTool('pan');
+            } else if (e.key === 't' || e.key === 'T') {
+                e.preventDefault();
+                setTool('add');
+            } else if (e.key === 'Delete' || e.key === 'Backspace') {
+                // Delete selected tables
+                if (selectedTableIds.length > 0 && currentTool === 'select') {
+                    e.preventDefault();
+                    setTablesToDelete(selectedTableIds);
+                    setShowDeleteDialog(true);
+                }
+            } else if (e.key === 'Escape') {
+                // Cancel current action
+                e.preventDefault();
+                
+                // Exit fullscreen if active
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else if (draggedTable) {
+                    // Cancel drag operation
+                    setDraggedTable(null);
+                    setTempPosition(null);
+                    setIsDraggingWithShift(false);
+                    if (dragMoveTimeoutRef.current) {
+                        clearTimeout(dragMoveTimeoutRef.current);
+                    }
+                } else if (currentTool === 'add') {
+                    setGhostPosition(null);
+                } else if (currentTool === 'pan') {
+                    setIsPanning(false);
+                    setPanStart(null);
+                } else {
+                    clearSelection();
+                }
+            }
+            
+            // Ctrl/Cmd + S: Save
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                handleSave();
+            }
+            
+            // Ctrl/Cmd + Z: Undo
+            if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'z') {
+                e.preventDefault();
+                handleUndo();
+            }
+            
+            // Ctrl/Cmd + Shift + Z: Redo
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z') {
+                e.preventDefault();
+                handleRedo();
+            }
+            
+            // Ctrl/Cmd + Y: Redo (alternative)
+            if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+                e.preventDefault();
+                handleRedo();
+            }
+            
+            // G: Toggle grid
+            if (e.key === 'g' || e.key === 'G') {
+                e.preventDefault();
+                useEditorStore.getState().setGrid({ enabled: !grid.enabled });
+            }
+            
+            // F: Toggle fullscreen
+            if (e.key === 'f' || e.key === 'F') {
+                e.preventDefault();
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else {
+                    containerRef.current?.parentElement?.requestFullscreen();
+                }
+                useEditorStore.getState().toggleFullscreen();
+            }
+            
+            // Arrow keys: Move selected table
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                if (selectedTableIds.length === 1 && currentTool === 'select') {
+                    e.preventDefault();
+                    const tableId = selectedTableIds[0];
+                    const table = tables.find((t) => t.tableId === tableId);
+                    if (table) {
+                        const step = e.shiftKey ? 10 : 1; // Shift for faster movement
+                        let newX = table.x;
+                        let newY = table.y;
+                        
+                        switch (e.key) {
+                            case 'ArrowUp':
+                                newY -= step;
+                                break;
+                            case 'ArrowDown':
+                                newY += step;
+                                break;
+                            case 'ArrowLeft':
+                                newX -= step;
+                                break;
+                            case 'ArrowRight':
+                                newX += step;
+                                break;
+                        }
+                        
+                        // Check for collision
+                        const movedTable = { ...table, x: newX, y: newY };
+                        const hasCollision = checkTableCollision(movedTable, tables, [tableId]);
+                        
+                        if (!hasCollision) {
+                            updateTablePosition(tableId, { x: newX, y: newY });
+                        }
+                    }
+                }
+            }
+            
+            // ?: Show keyboard shortcuts
+            if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+                e.preventDefault();
+                useEditorStore.getState().toggleKeyboardShortcuts();
+            }
+            
+            // 0: Reset zoom
+            if (e.key === '0' && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                setZoom(1);
+            }
+            
+            // 1-9: Switch floors (number keys)
+            const floorNum = parseInt(e.key);
+            if (!isNaN(floorNum) && floorNum >= 1 && floorNum <= 9 && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                useEditorStore.getState().setCurrentFloor(floorNum);
+            }
+        };
+        
+        const handleKeyUp = (e: KeyboardEvent) => {
+            if (e.key === 'Shift') {
+                setIsDraggingWithShift(false);
+            }
+        };
+        
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+    }, [handleSave, handleUndo, handleRedo, setTool, currentTool, selectedTableIds, tables, removeTable, pushHistory, clearSelection, grid.enabled, setZoom, draggedTable]);
+    
+    // Get cursor style based on tool
+    const getCursorStyle = () => {
+        switch (currentTool) {
+            case 'pan':
+                return isPanning ? 'grabbing' : 'grab';
+            case 'add':
+                return 'crosshair';
+            case 'delete':
+                return 'not-allowed';
+            default:
+                return 'default';
+        }
+    };
+    
+    return (
+        <div className="flex flex-col h-[calc(100vh+0rem)] border rounded-lg bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800">
+            {/* Fullscreen Exit Button */}
+            {isFullscreen && (
+                <div className="absolute top-4 right-4 z-50">
+                    <Button
+                        onClick={() => document.exitFullscreen()}
+                        className="bg-black/50 hover:bg-black/70 text-white"
+                        size="sm"
+                    >
+                        Exit Fullscreen (ESC)
+                    </Button>
+                </div>
+            )}
+            
+            <EditorToolbar
+                onSave={handleSave}
+                onUndo={handleUndo}
+                onRedo={handleRedo}
+                hasUnsavedChanges={unsavedChanges}
+                isSaving={isSaving}
+            />
+            
+            <div className="flex flex-1 overflow-hidden">
+                <div
+                    ref={containerRef}
+                    className="flex-1 relative"
+                    style={{ cursor: getCursorStyle() }}
+                    onClick={handleCanvasClick}
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseUp}
+                    onWheel={handleWheel}
+                >
+                    <DndContext
+                        onDragStart={handleDragStart}
+                        onDragMove={handleDragMove}
+                        onDragEnd={handleDragEnd}
+                    >
+                        <EditorCanvas width={dimensions.width} height={dimensions.height}>
+                            {tables.map((table) => {
+                                const isSelected = selectedTableIds.includes(table.tableId);
+                                const isDragged = draggedTable?.tableId === table.tableId;
+                                const displayTable = isDragged && tempPosition
+                                    ? { ...table, x: tempPosition.x, y: tempPosition.y }
+                                    : table;
+                                
+                                const isColliding = isDragged && tempPosition
+                                    ? checkTableCollision(displayTable, tables, [table.tableId])
+                                    : false;
+                                
+                                return (
+                                    <TableComponent
+                                        key={table.tableId}
+                                        table={displayTable}
+                                        isSelected={isSelected}
+                                        isColliding={isColliding}
+                                        currentTool={currentTool}
+                                        onClick={handleTableClick}
+                                        onResize={handleTableResize}
+                                    />
+                                );
+                            })}
+                            
+                            {/* Snap preview indicator */}
+                            {snapPreview && draggedTable && (
+                                <div
+                                    className="absolute pointer-events-none z-10"
+                                    style={{
+                                        left: snapPreview.x,
+                                        top: snapPreview.y,
+                                        width: draggedTable.width,
+                                        height: draggedTable.height,
+                                    }}
+                                >
+                                    <div className="w-full h-full border-2 border-dashed border-blue-400 bg-blue-400/10 rounded" />
+                                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                                        Snap: ({Math.round(snapPreview.x)}, {Math.round(snapPreview.y)})
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {/* Ghost preview for Add Table tool */}
+                            {currentTool === 'add' && ghostPosition && (() => {
+                                const ghostWidth = 80;
+                                const ghostHeight = 80;
+                                const ghostTable: TablePosition = {
+                                    tableId: -1,
+                                    tableNumber: 'New',
+                                    capacity: 4,
+                                    shape: 'circle',
+                                    x: ghostPosition.x - ghostWidth / 2,
+                                    y: ghostPosition.y - ghostHeight / 2,
+                                    width: ghostWidth,
+                                    height: ghostHeight,
+                                    rotation: 0,
+                                    status: 'available',
+                                };
+                                const hasCollision = checkTableCollision(ghostTable, tables);
+                                const colorClass = hasCollision 
+                                    ? 'border-red-500 bg-red-500/20' 
+                                    : 'border-green-500 bg-green-500/20';
+                                const textClass = hasCollision ? 'text-red-600' : 'text-green-600';
+                                
+                                return (
+                                    <div
+                                        className={`absolute border-2 border-dashed ${colorClass} rounded-full pointer-events-none`}
+                                        style={{
+                                            left: ghostTable.x,
+                                            top: ghostTable.y,
+                                            width: ghostWidth,
+                                            height: ghostHeight,
+                                        }}
+                                    >
+                                        <div className={`flex items-center justify-center h-full ${textClass} font-medium text-2xl`}>
+                                            {hasCollision ? '✕' : '✓'}
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+                        </EditorCanvas>
+                    </DndContext>
+                </div>
+                
+                <PropertiesPanel onDelete={handleDeleteFromPanel} />
+            </div>
+            
+            {/* Keyboard Shortcuts Dialog */}
+            <VisualEditorKeyboardShortcutsDialog
+                open={showKeyboardShortcuts}
+                onOpenChange={toggleKeyboardShortcuts}
+            />
+            
+            {/* Quick Create Table Dialog */}
+            <QuickCreateTableDialog
+                open={showCreateDialog}
+                onOpenChange={setShowCreateDialog}
+                position={createPosition}
+                onCreateTable={handleCreateTable}
+                existingTableNumbers={tables.map(t => t.tableNumber)}
+            />
+            
+            {/* Delete Table Dialog */}
+            <VisualEditorDeleteTableDialog
+                open={showDeleteDialog}
+                onOpenChange={setShowDeleteDialog}
+                onConfirm={handleDeleteConfirm}
+                tableNumbers={tablesToDelete.map(id => {
+                    const table = tables.find(t => t.tableId === id);
+                    return table?.tableNumber || 'Unknown';
+                })}
+            />
+        </div>
+    );
+}

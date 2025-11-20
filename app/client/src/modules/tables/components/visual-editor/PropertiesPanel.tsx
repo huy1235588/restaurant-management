@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { useEditorStore, useLayoutStore, useHistoryStore } from '../stores';
+import { useEditorStore, useLayoutStore, useHistoryStore } from '../../stores';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Trash2, Copy } from 'lucide-react';
 import { toast } from 'sonner';
-import type { TablePosition } from '../types';
+import type { TablePosition } from '../../types';
 
 interface PropertiesPanelProps {
     onDelete?: (tableId: number) => void;

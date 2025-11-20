@@ -18,8 +18,8 @@ import {
     Download,
     Keyboard,
 } from 'lucide-react';
-import { useEditorStore } from '../stores';
-import { useHistoryStore } from '../stores';
+import { useEditorStore } from '../../stores';
+import { useHistoryStore } from '../../stores';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -31,7 +31,7 @@ import {
 import { FloorSelector } from './FloorSelector';
 import { SaveLayoutDialog } from './SaveLayoutDialog';
 import { LoadLayoutDialog } from './LoadLayoutDialog';
-import { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
+import { VisualEditorKeyboardShortcutsDialog } from './VisualEditorKeyboardShortcutsDialog';
 
 interface EditorToolbarProps {
     onSave: () => void;
@@ -301,7 +301,7 @@ export function EditorToolbar({
             {/* Dialogs */}
             <SaveLayoutDialog open={showSaveDialog} onOpenChange={setShowSaveDialog} />
             <LoadLayoutDialog open={showLoadDialog} onOpenChange={setShowLoadDialog} />
-            <KeyboardShortcutsDialog 
+            <VisualEditorKeyboardShortcutsDialog 
                 open={showKeyboardShortcuts} 
                 onOpenChange={setShowKeyboardShortcuts} 
             />

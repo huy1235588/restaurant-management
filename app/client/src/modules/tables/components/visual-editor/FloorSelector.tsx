@@ -8,7 +8,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { useEditorStore, useLayoutStore } from '../stores';
+import { useEditorStore, useLayoutStore } from '../../stores';
 import { UnsavedChangesDialog } from './UnsavedChangesDialog';
 import { toast } from 'sonner';
 import { floorPlanApi } from '@/services/floor-plan.service';

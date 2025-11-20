@@ -19,7 +19,7 @@ interface DeleteTableDialogProps {
     tableNumbers: string[];
 }
 
-export function DeleteTableDialog({
+export function VisualEditorDeleteTableDialog({
     open,
     onOpenChange,
     onConfirm,
