@@ -7,12 +7,12 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { AccountRepository } from './account.repository';
-import { RefreshTokenRepository } from './refresh-token.repository';
-import { AuthUtils, TokenPayload } from './auth.utils';
-import { LoginDto, RegisterDto, CreateStaffDto } from './dto';
+import { AccountRepository } from '@/modules/auth/account.repository';
+import { RefreshTokenRepository } from '@/modules/auth/refresh-token.repository';
+import { AuthUtils, TokenPayload } from '@/modules/auth/auth.utils';
+import { LoginDto, RegisterDto, CreateStaffDto } from '@/modules/auth/dto';
 import { Prisma } from '@prisma/client';
-import { StaffRepository } from '../staff/staff.repository';
+import { StaffRepository } from '@/modules/staff/staff.repository';
 
 @Injectable()
 export class AuthService {

@@ -17,12 +17,12 @@ import {
 } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
-import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto, CreateStaffDto, RefreshTokenDto } from './dto';
+import { AuthService } from '@/modules/auth/auth.service';
+import { LoginDto, RegisterDto, CreateStaffDto } from '@/modules/auth/dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { Public } from '@/common/decorators/public.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
-import type { JwtPayload } from './strategies/jwt.strategy';
+import type { JwtPayload } from '@/modules/auth/strategies/jwt.strategy';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -149,13 +149,11 @@ export class AuthController {
     @ApiResponse({ status: 200, description: 'Token refreshed successfully' })
     @ApiResponse({ status: 401, description: 'Invalid refresh token' })
     async refreshToken(
-        @Body() refreshTokenDto: RefreshTokenDto,
         @Req() req: Request,
         @Res({ passthrough: true }) res: Response,
     ) {
-        const refreshToken =
-            (req.cookies['refreshToken'] as string) ||
-            refreshTokenDto.refreshToken;
+        const refreshToken = req.cookies['refreshToken'] as string;
+
         if (!refreshToken) {
             throw new Error('No refresh token provided');
         }
