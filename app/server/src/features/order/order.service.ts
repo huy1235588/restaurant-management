@@ -2,6 +2,7 @@ import orderRepository from '@/features/order/order.repository';
 import menuItemRepository from '@/features/menu/menuItem.repository';
 import tableRepository from '@/features/table/table.repository';
 import kitchenRepository from '@/features/kitchen/kitchen.repository';
+import reservationRepository from '@/features/reservation/reservation.repository';
 import { NotFoundError, BadRequestError } from '@/shared/utils/errors';
 import { CreateOrderDTO, UpdateOrderDTO } from '@/features/order/dtos';
 import { Prisma } from '@prisma/client';
@@ -21,6 +22,30 @@ export class OrderService {
 
         if (table.status === 'maintenance') {
             throw new BadRequestError('Table is under maintenance');
+        }
+
+        // If reservationId provided, verify it exists and auto-fill customer info if not provided
+        if (data.reservationId) {
+            const reservation = await reservationRepository.findById(data.reservationId);
+            if (!reservation) {
+                throw new NotFoundError('Reservation not found');
+            }
+
+            // Verify reservation is for the same table
+            if (reservation.tableId !== data.tableId) {
+                throw new BadRequestError('Reservation is not for this table');
+            }
+
+            // Auto-fill customer info from reservation if not provided
+            if (!data.customerName) {
+                data.customerName = reservation.customerName;
+            }
+            if (!data.customerPhone) {
+                data.customerPhone = reservation.phoneNumber;
+            }
+            if (!data.headCount || data.headCount === 1) {
+                data.headCount = reservation.headCount;
+            }
         }
 
         // Calculate order items totals

@@ -15,6 +15,7 @@ This change implements a comprehensive order and kitchen management system with 
 
 ### Order Management (Front-of-House)
 - **Order CRUD**: Waiters can create, read, update orders with table assignment
+- **Reservation Linking**: Link orders to reservations when customer had pre-booking
 - **Menu Integration**: Browse menu, add items with quantities and special requests
 - **Status Tracking**: Track order lifecycle (PENDING → CONFIRMED → PREPARING → READY → SERVING → COMPLETED)
 - **Real-time Updates**: Receive notifications when kitchen marks food ready
@@ -37,7 +38,7 @@ This change implements a comprehensive order and kitchen management system with 
 - **Notification System**: Audio + visual alerts for new orders, ready items, urgent requests
 
 ### Database Schema
-- `orders` table: Order details, table, waiter, customer info, status, timestamps
+- `orders` table: Order details, table, reservation (optional), waiter, customer info, status, timestamps
 - `order_items` table: Items in order, quantity, price, special requests, item status
 - `kitchen_orders` table: Kitchen-specific tracking (chef, station, prep times)
 
@@ -72,6 +73,7 @@ This change implements a comprehensive order and kitchen management system with 
 - Requires `staff-management` for waiter/chef user accounts
 - Will be consumed by `bill-payment` (order → bill conversion)
 - Optional: `table-management` for table selection (can use manual input as fallback)
+- Optional: `reservation-management` for linking orders to reservations (can create orders without reservations)
 
 ### Breaking Changes
 None - This is a new feature addition.

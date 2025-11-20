@@ -2,7 +2,7 @@
 
 ## 1. Database Schema & Migrations
 
-- [x] 1.1 Create `orders` table with fields: id, orderNumber, tableId, staffId, customerName, customerPhone, headCount, notes, status (enum), totalAmount, discountAmount, taxAmount, finalAmount, timestamps
+- [x] 1.1 Create `orders` table with fields: id, orderNumber, tableId, reservationId (optional), staffId, customerName, customerPhone, headCount, notes, status (enum), totalAmount, discountAmount, taxAmount, finalAmount, timestamps
 - [x] 1.2 Create `order_items` table with fields: id, orderId, menuItemId, quantity, unitPrice, totalPrice, specialRequest, status (enum), timestamps
 - [x] 1.3 Create `kitchen_orders` table with fields: id, orderId, status (enum), priority (enum), chefId, stationId, prepTimeEstimated, prepTimeActual, startedAt, completedAt, timestamps
 - [x] 1.4 Create `kitchen_stations` table (optional): id, name, type (GRILL, FRY, STEAM, DESSERT), isActive
@@ -30,6 +30,7 @@
 - [x] 2.2.4 Status transitions: PENDING → CONFIRMED → PREPARING → READY → SERVING → COMPLETED
 - [x] 2.2.5 Cancel logic: Check if can cancel based on status, notify kitchen if needed
 - [x] 2.2.6 Permission checks: Waiters can only edit own orders (unless admin/manager)
+- [x] 2.2.7 Reservation linking: Validate reservation exists, matches table, auto-fill customer info from reservation
 
 ### 2.3 Order Reports API
 - [x] 2.3.1 GET `/api/v1/orders/reports/by-table` - Sales by table

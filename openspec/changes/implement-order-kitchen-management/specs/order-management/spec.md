@@ -25,6 +25,20 @@ The system SHALL allow waiters to create new orders by selecting a table, adding
 - **THEN** system saves customer information
 - **AND** enables lookup of customer order history
 
+#### Scenario: Create order from reservation
+- **WHEN** customer with reservation arrives and is seated
+- **AND** waiter creates order for that table
+- **THEN** system detects active reservation for the table
+- **AND** suggests linking order to reservation
+- **AND** auto-fills customer name, phone, and head count from reservation
+- **AND** saves reservation link with order
+
+#### Scenario: Create order without reservation
+- **WHEN** walk-in customer (no reservation) is seated
+- **AND** waiter creates order for that table
+- **THEN** system creates order without reservation link
+- **AND** waiter manually enters customer info if needed
+
 #### Scenario: Validation failure - empty order
 - **WHEN** waiter tries to create order without items
 - **THEN** system prevents order creation
@@ -53,6 +67,11 @@ The system SHALL provide a searchable and filterable list of orders for waiters 
 - **THEN** system filters list to show orders for that customer
 - **AND** displays customer contact information
 
+#### Scenario: Search by reservation
+- **WHEN** waiter enters reservation code
+- **THEN** system filters list to show orders linked to that reservation
+- **AND** displays reservation details
+
 #### Scenario: Filter by status
 - **WHEN** waiter selects status filter (e.g., "PREPARING")
 - **THEN** system displays only orders with that status
@@ -76,6 +95,7 @@ The system SHALL display comprehensive order information including items, status
 - **THEN** system displays order header with number, table, status, timestamps
 - **AND** shows list of items with quantities, prices, special requests
 - **AND** displays customer information (name, phone, head count)
+- **AND** shows reservation info if order linked to reservation (reservation code, time)
 - **AND** shows order totals (subtotal, discount, tax, final amount)
 - **AND** displays status timeline with timestamps
 

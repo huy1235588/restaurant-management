@@ -133,6 +133,7 @@ model Order {
   id            String   @id @default(uuid())
   orderNumber   String   @unique  // e.g., "#001"
   tableId       String
+  reservationId String?  // Link to reservation if customer had one
   staffId       String   // Waiter who created the order
   customerName  String?
   customerPhone String?
@@ -152,6 +153,7 @@ model Order {
   cancellationReason String?
   
   table         Table    @relation(fields: [tableId], references: [id])
+  reservation   Reservation? @relation(fields: [reservationId], references: [id])
   staff         User     @relation("OrderStaff", fields: [staffId], references: [id])
   items         OrderItem[]
   kitchenOrder  KitchenOrder?
@@ -250,6 +252,7 @@ enum StationType {
 
 ### Relationships
 - `Order` ↔ `Table` (many-to-one)
+- `Order` ↔ `Reservation` (many-to-one, optional) - Link order to reservation if customer had one
 - `Order` ↔ `User` (waiter) (many-to-one)
 - `Order` ↔ `OrderItem` (one-to-many)
 - `Order` ↔ `KitchenOrder` (one-to-one)

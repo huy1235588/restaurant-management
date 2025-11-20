@@ -10,9 +10,59 @@ import {
     OrderReportByTable,
     OrderReportPopularItems,
     OrderReportByWaiter,
-    OrderReportCustomerHistory
+    OrderReportCustomerHistory,
+    OrderItem
 } from '@/types/order';
 import { ApiResponse, PaginatedResponse } from '@/types';
+
+// Helper function to convert string prices to numbers in OrderItem
+const normalizeOrderItem = (item: any): OrderItem => ({
+    ...item,
+    unitPrice: typeof item.unitPrice === 'string' ? parseFloat(item.unitPrice) : item.unitPrice,
+    totalPrice: typeof item.totalPrice === 'string' ? parseFloat(item.totalPrice) : item.totalPrice,
+    menuItem: item.menuItem ? {
+        ...item.menuItem,
+        price: typeof item.menuItem.price === 'string' ? parseFloat(item.menuItem.price) : item.menuItem.price,
+    } : item.menuItem,
+});
+
+// Helper function to convert string prices to numbers in Order
+const normalizeOrder = (order: any): Order => ({
+    ...order,
+    totalAmount: typeof order.totalAmount === 'string' ? parseFloat(order.totalAmount) : order.totalAmount,
+    discountAmount: typeof order.discountAmount === 'string' ? parseFloat(order.discountAmount) : order.discountAmount,
+    taxAmount: typeof order.taxAmount === 'string' ? parseFloat(order.taxAmount) : order.taxAmount,
+    finalAmount: typeof order.finalAmount === 'string' ? parseFloat(order.finalAmount) : order.finalAmount,
+    orderItems: order.orderItems?.map(normalizeOrderItem) || [],
+});
+
+// Helper function to normalize array of orders
+const normalizeOrders = (orders: any[]): Order[] => orders.map(normalizeOrder);
+
+// Helper function to convert prices in report data
+const normalizeOrderReportByTable = (report: any): OrderReportByTable => ({
+    ...report,
+    totalRevenue: typeof report.totalRevenue === 'string' ? parseFloat(report.totalRevenue) : report.totalRevenue,
+    averageOrderValue: typeof report.averageOrderValue === 'string' ? parseFloat(report.averageOrderValue) : report.averageOrderValue,
+});
+
+const normalizeOrderReportPopularItems = (report: any): OrderReportPopularItems => ({
+    ...report,
+    totalRevenue: typeof report.totalRevenue === 'string' ? parseFloat(report.totalRevenue) : report.totalRevenue,
+});
+
+const normalizeOrderReportByWaiter = (report: any): OrderReportByWaiter => ({
+    ...report,
+    totalRevenue: typeof report.totalRevenue === 'string' ? parseFloat(report.totalRevenue) : report.totalRevenue,
+    averageOrderValue: typeof report.averageOrderValue === 'string' ? parseFloat(report.averageOrderValue) : report.averageOrderValue,
+});
+
+const normalizeOrderReportCustomerHistory = (report: any): OrderReportCustomerHistory => ({
+    ...report,
+    totalSpent: typeof report.totalSpent === 'string' ? parseFloat(report.totalSpent) : report.totalSpent,
+    averageOrderValue: typeof report.averageOrderValue === 'string' ? parseFloat(report.averageOrderValue) : report.averageOrderValue,
+    orders: report.orders?.map(normalizeOrder) || [],
+});
 
 /**
  * Order API Service - Synced with Backend API
@@ -37,7 +87,10 @@ export const orderApi = {
             '/orders',
             { params }
         );
-        return response.data.data;
+        return {
+            ...response.data.data,
+            items: normalizeOrders(response.data.data.items),
+        };
     },
 
     /**
@@ -45,7 +98,7 @@ export const orderApi = {
      */
     getById: async (id: number): Promise<Order> => {
         const response = await axiosInstance.get<ApiResponse<Order>>(`/orders/${id}`);
-        return response.data.data;
+        return normalizeOrder(response.data.data);
     },
 
     /**
@@ -53,7 +106,7 @@ export const orderApi = {
      */
     create: async (data: CreateOrderDto): Promise<Order> => {
         const response = await axiosInstance.post<ApiResponse<Order>>('/orders', data);
-        return response.data.data;
+        return normalizeOrder(response.data.data);
     },
 
     /**
@@ -61,7 +114,7 @@ export const orderApi = {
      */
     update: async (id: number, data: UpdateOrderDto): Promise<Order> => {
         const response = await axiosInstance.put<ApiResponse<Order>>(`/orders/${id}`, data);
-        return response.data.data;
+        return normalizeOrder(response.data.data);
     },
 
     /**
@@ -72,7 +125,7 @@ export const orderApi = {
             `/orders/${id}/status`,
             { status }
         );
-        return response.data.data;
+        return normalizeOrder(response.data.data);
     },
 
     /**
@@ -92,7 +145,7 @@ export const orderApi = {
             `/orders/${id}/items`,
             data
         );
-        return response.data.data;
+        return normalizeOrder(response.data.data);
     },
 
     /**
@@ -103,7 +156,7 @@ export const orderApi = {
             `/orders/${orderId}/items/${itemId}/status`,
             { status }
         );
-        return response.data.data;
+        return normalizeOrder(response.data.data);
     },
 
     /**
@@ -114,7 +167,7 @@ export const orderApi = {
             `/orders/${id}/cancel`,
             { reason }
         );
-        return response.data.data;
+        return normalizeOrder(response.data.data);
     },
 
     // ========== Reports ==========
@@ -130,7 +183,7 @@ export const orderApi = {
             '/orders/reports/by-table',
             { params }
         );
-        return response.data.data;
+        return response.data.data.map(normalizeOrderReportByTable);
     },
 
     /**
@@ -145,7 +198,7 @@ export const orderApi = {
             '/orders/reports/popular-items',
             { params }
         );
-        return response.data.data;
+        return response.data.data.map(normalizeOrderReportPopularItems);
     },
 
     /**
@@ -160,7 +213,7 @@ export const orderApi = {
             '/orders/reports/by-waiter',
             { params }
         );
-        return response.data.data;
+        return response.data.data.map(normalizeOrderReportByWaiter);
     },
 
     /**
@@ -170,6 +223,6 @@ export const orderApi = {
         const response = await axiosInstance.get<ApiResponse<OrderReportCustomerHistory>>(
             `/orders/reports/customer-history/${phone}`
         );
-        return response.data.data;
+        return normalizeOrderReportCustomerHistory(response.data.data);
     },
 };
