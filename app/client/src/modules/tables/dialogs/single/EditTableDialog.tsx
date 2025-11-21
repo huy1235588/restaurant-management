@@ -13,13 +13,14 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 
+// Schema for editing table - all fields optional in DTO but some required in form
 const tableSchema = z.object({
-    tableNumber: z.string().min(1, 'Table number is required'),
-    tableName: z.string().optional(),
-    capacity: z.number().min(1, 'Capacity must be at least 1'),
-    minCapacity: z.number().min(0).optional(),
+    tableNumber: z.string().min(1, 'Table number is required').max(20),
+    tableName: z.string().max(50).optional(),
+    capacity: z.number().min(1).max(50, 'Capacity must be between 1 and 50'),
+    minCapacity: z.number().min(1).optional(),
     floor: z.number().min(1).optional(),
-    section: z.string().optional(),
+    section: z.string().max(50).optional(),
 });
 
 type TableFormData = z.infer<typeof tableSchema>;

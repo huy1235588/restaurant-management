@@ -25,6 +25,7 @@ import {
     CreateTableDto,
     UpdateTableDto,
     UpdateTableStatusDto,
+    BulkUpdateStatusDto,
 } from '@/modules/table/dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { TableStatus } from '@prisma/generated/client';
@@ -215,6 +216,24 @@ export class TableController {
         return {
             message: 'Table updated successfully',
             data: table,
+        };
+    }
+
+    @Patch('bulk-status')
+    @ApiOperation({ summary: 'Bulk update table status' })
+    @ApiResponse({
+        status: 200,
+        description: 'Tables status updated successfully',
+    })
+    @ApiResponse({ status: 400, description: 'Bad request' })
+    async bulkUpdateStatus(@Body() bulkUpdateDto: BulkUpdateStatusDto) {
+        const result = await this.tableService.bulkUpdateStatus(
+            bulkUpdateDto.tableIds,
+            bulkUpdateDto.status,
+        );
+        return {
+            message: 'Tables status updated successfully',
+            data: result,
         };
     }
 

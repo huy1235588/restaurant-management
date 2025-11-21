@@ -164,19 +164,22 @@ export class TableService {
     async getTableStats() {
         const tables = await this.tableRepository.findAll();
         const total = tables.length;
-        const available = tables.filter(t => t.status === 'available').length;
-        const occupied = tables.filter(t => t.status === 'occupied').length;
-        const reserved = tables.filter(t => t.status === 'reserved').length;
-        const maintenance = tables.filter(t => t.status === 'maintenance').length;
-        const active = tables.filter(t => t.isActive).length;
+        const available = tables.filter((t) => t.status === 'available').length;
+        const occupied = tables.filter((t) => t.status === 'occupied').length;
+        const reserved = tables.filter((t) => t.status === 'reserved').length;
+        const maintenance = tables.filter(
+            (t) => t.status === 'maintenance',
+        ).length;
+        const active = tables.filter((t) => t.isActive).length;
         const inactive = total - active;
         const totalCapacity = tables.reduce((sum, t) => sum + t.capacity, 0);
         const occupiedCapacity = tables
-            .filter(t => t.status === 'occupied')
+            .filter((t) => t.status === 'occupied')
             .reduce((sum, t) => sum + t.capacity, 0);
-        const occupancyRate = totalCapacity > 0 
-            ? ((occupiedCapacity / totalCapacity) * 100).toFixed(2) + '%'
-            : '0%';
+        const occupancyRate =
+            totalCapacity > 0
+                ? ((occupiedCapacity / totalCapacity) * 100).toFixed(2) + '%'
+                : '0%';
 
         return {
             total,
@@ -188,6 +191,37 @@ export class TableService {
             inactive,
             totalCapacity,
             occupancyRate,
+        };
+    }
+
+    /**
+     * Bulk update table status
+     */
+    async bulkUpdateStatus(tableIds: number[], status: TableStatus) {
+        // Validate all tables exist
+        const tables = await Promise.all(
+            tableIds.map((id) => this.getTableById(id)),
+        );
+
+        // If any table is not found, getTableById will throw NotFoundException
+        if (tables.length !== tableIds.length) {
+            throw new NotFoundException('One or more tables not found');
+        }
+
+        // Update status for all tables
+        const updated = await this.tableRepository.bulkUpdateStatus(
+            tableIds,
+            status,
+        );
+
+        this.logger.log(
+            `Bulk status update: ${tableIds.length} tables -> ${status}`,
+        );
+
+        return {
+            updatedCount: updated.count,
+            tableIds,
+            status,
         };
     }
 }

@@ -8,6 +8,7 @@ import {
     TableStatus,
     TableFilters,
     TableStats,
+    TableQueryOptions,
 } from '@/types';
 
 /**
@@ -18,10 +19,18 @@ export const tableApi = {
     /**
      * Get all tables with pagination and filters
      */
-    getAll: async (filters?: TableFilters): Promise<PaginatedResponse<Table>> => {
+    getAll: async (options?: TableQueryOptions): Promise<PaginatedResponse<Table>> => {
+        const params: any = {
+            ...options?.filters,
+            page: options?.page,
+            limit: options?.limit,
+            sortBy: options?.sortBy,
+            sortOrder: options?.sortOrder,
+        };
+        
         const response = await axiosInstance.get<ApiResponse<PaginatedResponse<Table>>>(
             '/table',
-            { params: filters }
+            { params }
         );
         return response.data.data;
     },

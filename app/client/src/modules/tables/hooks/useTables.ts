@@ -8,7 +8,7 @@ import { TableQueryOptions } from '@/types';
 export const useTables = (options?: TableQueryOptions) => {
     return useQuery({
         queryKey: ['tables', options],
-        queryFn: () => tableApi.getAll(options?.filters),
+        queryFn: () => tableApi.getAll(options),
         staleTime: 30000, // 30 seconds
     });
 };

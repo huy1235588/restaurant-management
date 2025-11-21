@@ -16,7 +16,6 @@ import {
     BulkDeleteDialog,
     BulkExportDialog,
     BulkActivateDeactivateDialog,
-    BulkQRCodeGenerator,
     TableHistoryDialog,
     KeyboardShortcutsDialog,
 } from '@/modules/tables/dialogs';
@@ -45,7 +44,6 @@ export default function TablesPage() {
     const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
     const [showBulkExportDialog, setShowBulkExportDialog] = useState(false);
     const [showBulkActivateDialog, setShowBulkActivateDialog] = useState(false);
-    const [showBulkQRCodeDialog, setShowBulkQRCodeDialog] = useState(false);
     const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
     const [showHistoryDialog, setShowHistoryDialog] = useState(false);
     const [selectedTable, setSelectedTable] = useState<Table | null>(null);
@@ -55,7 +53,6 @@ export default function TablesPage() {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showStatusDialog, setShowStatusDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [showQRDialog, setShowQRDialog] = useState(false);
 
     // Get all filter values from URL
     const filters = useMemo(() => ({
@@ -81,6 +78,10 @@ export default function TablesPage() {
     // Fetch data using hooks
     const { data: tablesData, isLoading, refetch: refetchTables } = useTables({
         filters,
+        page: currentPage,
+        limit: itemsPerPage,
+        sortBy: sortField,
+        sortOrder: sortOrder,
     });
     const { data: stats, refetch: refetchStats } = useTableStats();
     const { deleteTable, bulkUpdateStatus } = useTableMutations();
@@ -198,11 +199,6 @@ export default function TablesPage() {
         setShowDeleteDialog(true);
     }, []);
 
-    const handleViewQR = useCallback((table: Table) => {
-        setSelectedTable(table);
-        setShowQRDialog(true);
-    }, []);
-
     const handleAssignOrder = useCallback((table: Table) => {
         // Navigate to orders page with table pre-selected
         router.push(`/orders/create?tableId=${table.tableId}`);
@@ -274,7 +270,6 @@ export default function TablesPage() {
         setShowEditDialog(false);
         setShowStatusDialog(false);
         setShowDeleteDialog(false);
-        setShowQRDialog(false);
         setSelectedTable(null);
     }, []);
 
@@ -345,13 +340,6 @@ export default function TablesPage() {
                                     </Button>
                                     <Button
                                         size="sm"
-                                        variant="outline"
-                                        onClick={() => setShowBulkQRCodeDialog(true)}
-                                    >
-                                        {t('tables.bulkQRCode', 'Generate QR Codes')}
-                                    </Button>
-                                    <Button
-                                        size="sm"
                                         variant="destructive"
                                         onClick={() => setShowBulkDeleteDialog(true)}
                                     >
@@ -377,7 +365,6 @@ export default function TablesPage() {
                             onEdit={handleEditTable}
                             onChangeStatus={handleChangeStatus}
                             onDelete={handleDeleteTable}
-                            onViewQR={handleViewQR}
                             onAssignOrder={handleAssignOrder}
                             onSelectionChange={handleSelectionChange}
                             onRowClick={setSelectedTable}
@@ -397,7 +384,6 @@ export default function TablesPage() {
                 showEditDialog={showEditDialog}
                 showStatusDialog={showStatusDialog}
                 showDeleteDialog={showDeleteDialog}
-                showQRDialog={showQRDialog}
                 selectedTable={selectedTable}
                 onClose={handleCloseDialogs}
                 onSuccess={handleRefresh}
@@ -431,11 +417,6 @@ export default function TablesPage() {
                 onConfirm={handleBulkActivateDeactivate}
             />
 
-            <BulkQRCodeGenerator
-                open={showBulkQRCodeDialog}
-                tables={tables.filter(t => selectedTableIds.includes(t.tableId))}
-                onClose={() => setShowBulkQRCodeDialog(false)}
-            />
             <KeyboardShortcutsDialog
                 open={showKeyboardShortcuts}
                 onClose={() => setShowKeyboardShortcuts(false)}

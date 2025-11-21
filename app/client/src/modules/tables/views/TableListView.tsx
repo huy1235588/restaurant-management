@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TableStatusBadge } from '../components/TableStatusBadge';
-import { MoreHorizontal, Edit, Trash2, QrCode, ArrowUpDown, CircleDot, ArrowRightLeft } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, ArrowUpDown, CircleDot, ArrowRightLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface TableListViewProps {
@@ -20,8 +20,7 @@ interface TableListViewProps {
     onEdit: (table: TableType) => void;
     onChangeStatus: (table: TableType) => void;
     onDelete: (table: TableType) => void;
-    onViewQR: (table: TableType) => void;
-    onAssignOrder?: (table: TableType) => void;
+    onAssignOrder: (table: TableType) => void;
     onSelectionChange?: (selectedIds: number[]) => void;
     onRowClick?: (table: TableType) => void;
 }
@@ -36,7 +35,6 @@ export function TableListView({
     onEdit,
     onChangeStatus,
     onDelete,
-    onViewQR,
     onAssignOrder,
     onSelectionChange,
     onRowClick,
@@ -171,9 +169,6 @@ export function TableListView({
                             {t('tables.status', 'Status')}
                             <SortIcon field="status" />
                         </TableHead>
-                        <TableHead role="columnheader">
-                            {t('tables.qrCode', 'QR Code')}
-                        </TableHead>
                         <TableHead className="text-right" role="columnheader">
                             {t('common.actions', 'Actions')}
                         </TableHead>
@@ -220,19 +215,6 @@ export function TableListView({
                             <TableCell>
                                 <TableStatusBadge status={table.status} />
                             </TableCell>
-                            <TableCell>
-                                {table.qrCode ? (
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => onViewQR(table)}
-                                    >
-                                        <QrCode className="h-4 w-4" />
-                                    </Button>
-                                ) : (
-                                    '-'
-                                )}
-                            </TableCell>
                             <TableCell className="text-right">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
@@ -255,10 +237,6 @@ export function TableListView({
                                                 {t('tables.assignOrder', 'Assign to Order')}
                                             </DropdownMenuItem>
                                         )}
-                                        <DropdownMenuItem onClick={() => onViewQR(table)}>
-                                            <QrCode className="mr-2 h-4 w-4" />
-                                            {t('tables.viewQR', 'View QR Code')}
-                                        </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onClick={() => onDelete(table)}
                                             className="text-destructive"

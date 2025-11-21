@@ -12,14 +12,14 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 
+// Schema matching CreateTableDto from backend
 const tableSchema = z.object({
-    tableNumber: z.string().min(1, 'Table number is required'),
-    tableName: z.string().optional(),
-    capacity: z.number().min(1, 'Capacity must be at least 1'),
-    minCapacity: z.number().min(0).optional(),
+    tableNumber: z.string().min(1, 'Table number is required').max(20),
+    tableName: z.string().max(50).optional(),
+    capacity: z.number().min(1).max(50, 'Capacity must be between 1 and 50'),
+    minCapacity: z.number().min(1).optional(),
     floor: z.number().min(1).optional(),
-    section: z.string().optional(),
-    status: z.enum(['available', 'occupied', 'reserved', 'maintenance']),
+    section: z.string().max(50).optional(),
 });
 
 type TableFormData = z.infer<typeof tableSchema>;
@@ -40,10 +40,9 @@ export function CreateTableDialog({ open, onClose, onSuccess }: CreateTableDialo
             tableNumber: '',
             tableName: '',
             capacity: 4,
-            minCapacity: undefined,
+            minCapacity: 1,
             floor: 1,
             section: '',
-            status: 'available',
         },
     });
 
@@ -113,10 +112,10 @@ export function CreateTableDialog({ open, onClose, onSuccess }: CreateTableDialo
                                     <FormItem>
                                         <FormLabel>{t('tables.capacity', 'Capacity')} *</FormLabel>
                                         <FormControl>
-                                            <Input 
-                                                type="number" 
-                                                min="1" 
-                                                placeholder="4" 
+                                            <Input
+                                                type="number"
+                                                min="1"
+                                                placeholder="4"
                                                 {...field}
                                                 onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                                             />
@@ -133,10 +132,10 @@ export function CreateTableDialog({ open, onClose, onSuccess }: CreateTableDialo
                                     <FormItem>
                                         <FormLabel>{t('tables.minCapacity', 'Min Capacity')}</FormLabel>
                                         <FormControl>
-                                            <Input 
-                                                type="number" 
-                                                min="0" 
-                                                placeholder="2" 
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                placeholder="2"
                                                 {...field}
                                                 onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
                                                 value={field.value || ''}
@@ -200,30 +199,6 @@ export function CreateTableDialog({ open, onClose, onSuccess }: CreateTableDialo
                                 )}
                             />
                         </div>
-
-                        <FormField
-                            control={form.control}
-                            name="status"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>{t('tables.status', 'Status')}</FormLabel>
-                                    <Select onValueChange={field.onChange} value={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select status" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="available">Available</SelectItem>
-                                            <SelectItem value="occupied">Occupied</SelectItem>
-                                            <SelectItem value="reserved">Reserved</SelectItem>
-                                            <SelectItem value="maintenance">Maintenance</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
 
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={onClose}>
