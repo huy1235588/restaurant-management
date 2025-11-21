@@ -11,6 +11,7 @@ import {
 } from '@/modules/menu/menu-item.repository';
 import { CreateMenuItemDto, UpdateMenuItemDto } from '@/modules/menu/dto';
 import { PrismaService } from '@/database/prisma.service';
+import { StorageService } from '@/modules/storage/storage.service';
 
 @Injectable()
 export class MenuService {
@@ -19,6 +20,7 @@ export class MenuService {
     constructor(
         private readonly menuItemRepository: MenuItemRepository,
         private readonly prisma: PrismaService,
+        private readonly storageService: StorageService,
     ) {}
 
     /**
@@ -135,6 +137,27 @@ export class MenuService {
             }
         }
 
+        // Delete old image if a new imagePath is provided
+        if (
+            data.imagePath &&
+            menuItem.imagePath &&
+            data.imagePath !== menuItem.imagePath
+        ) {
+            try {
+                await this.storageService.deleteFile(menuItem.imagePath);
+                this.logger.log(
+                    `Deleted old image for menu item: ${menuItem.imagePath}`,
+                );
+            } catch (error) {
+                const errorMessage =
+                    error instanceof Error ? error.message : 'Unknown error';
+                this.logger.warn(
+                    `Failed to delete old image for menu item ${itemId}: ${errorMessage}`,
+                );
+                // Continue with update even if old image deletion fails
+            }
+        }
+
         const { categoryId, ...rest } = data;
         type UpdateData = Omit<UpdateMenuItemDto, 'categoryId'> & {
             category?: { connect: { categoryId: number } };
@@ -159,7 +182,24 @@ export class MenuService {
      * Delete menu item
      */
     async deleteMenuItem(itemId: number) {
-        await this.getMenuItemById(itemId);
+        const menuItem = await this.getMenuItemById(itemId);
+
+        // Delete the associated image file if exists
+        if (menuItem.imagePath) {
+            try {
+                await this.storageService.deleteFile(menuItem.imagePath);
+                this.logger.log(
+                    `Deleted image for menu item: ${menuItem.imagePath}`,
+                );
+            } catch (error) {
+                const errorMessage =
+                    error instanceof Error ? error.message : 'Unknown error';
+                this.logger.warn(
+                    `Failed to delete image for menu item ${itemId}: ${errorMessage}`,
+                );
+                // Continue with deletion even if image deletion fails
+            }
+        }
 
         await this.menuItemRepository.delete(itemId);
 
