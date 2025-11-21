@@ -207,21 +207,71 @@ client/
 │   │   ├── not-found.tsx    # 404 Page
 │   │   └── providers.tsx    # Global Providers
 │   │
-│   ├── components/          # React Components
-│   │   ├── feautures/      # Feature-specific Components
-│   │   │   └── menu/       # Menu Feature Components
+│   ├── modules/            # 🎯 Feature Modules (NEW MODULAR ARCHITECTURE)
 │   │   │
-│   │   ├── layouts/        # Layout Components
-│   │   │   ├── Header.tsx
-│   │   │   ├── Sidebar.tsx
-│   │   │   └── Footer.tsx
+│   │   ├── menu/          # 🍽️ Menu Management Module
+│   │   │   ├── components/   # Reusable menu components
+│   │   │   ├── views/        # Page-level views (ListView, GridView)
+│   │   │   ├── dialogs/      # Modal dialogs
+│   │   │   │   ├── single/   # CRUD dialogs (Create, Edit, Delete)
+│   │   │   │   └── bulk/     # Bulk operation dialogs
+│   │   │   ├── services/     # Menu API service
+│   │   │   ├── hooks/        # Custom menu hooks
+│   │   │   ├── types/        # Menu TypeScript types
+│   │   │   ├── utils/        # Menu utilities
+│   │   │   ├── README.md     # Module documentation
+│   │   │   └── index.ts      # Barrel exports
 │   │   │
-│   │   ├── shared/         # Shared Components
-│   │   │   ├── DataTable.tsx
-│   │   │   ├── SearchBar.tsx
-│   │   │   └── Pagination.tsx
+│   │   ├── categories/    # 📂 Categories Management Module
+│   │   │   ├── components/   # Category components
+│   │   │   ├── views/        # Category views
+│   │   │   ├── dialogs/      # Category dialogs
+│   │   │   │   ├── single/   # CRUD operations
+│   │   │   │   └── bulk/     # Bulk operations
+│   │   │   ├── services/     # Category API service
+│   │   │   ├── hooks/        # Category hooks
+│   │   │   ├── types/        # Category types
+│   │   │   ├── utils/        # Category utilities
+│   │   │   ├── README.md     # Module documentation
+│   │   │   └── index.ts      # Barrel exports
 │   │   │
-│   │   ├── ui/             # UI Components (Radix UI)
+│   │   ├── reservations/  # 📅 Reservations Management Module
+│   │   │   ├── components/   # Reservation components
+│   │   │   ├── views/        # Reservation views
+│   │   │   ├── dialogs/      # Reservation dialogs
+│   │   │   │   ├── single/   # CRUD operations
+│   │   │   │   └── bulk/     # Bulk operations
+│   │   │   ├── services/     # Reservation API service
+│   │   │   ├── hooks/        # Reservation hooks
+│   │   │   ├── types/        # Reservation types
+│   │   │   ├── utils/        # Reservation utilities
+│   │   │   ├── README.md     # Module documentation
+│   │   │   └── index.ts      # Barrel exports
+│   │   │
+│   │   └── tables/        # 🪑 Tables & Visual Floor Plan Module
+│   │       ├── components/   # Table components + Visual Editor
+│   │       ├── views/        # TableListView, VisualFloorPlanView
+│   │       ├── dialogs/      # Table operation dialogs
+│   │       │   ├── single/   # CRUD operations
+│   │       │   └── bulk/     # Bulk operations
+│   │       ├── services/     # Table API service
+│   │       ├── stores/       # Visual editor state (Zustand)
+│   │       ├── hooks/        # Custom table hooks
+│   │       ├── types/        # Table types
+│   │       ├── utils/        # Geometry utilities
+│   │       ├── README.md     # Module documentation
+│   │       ├── TableDialogs.tsx # Dialog orchestrator
+│   │       └── index.ts      # Barrel exports
+│   │
+│   ├── components/          # 🧩 Shared Components (Cross-Module)
+│   │   ├── shared/         # Truly shared components
+│   │   │   ├── EmptyState.tsx
+│   │   │   ├── LoadingSpinner.tsx
+│   │   │   ├── PageHeader.tsx
+│   │   │   ├── ImageUploadField.tsx
+│   │   │   └── index.ts
+│   │   │
+│   │   ├── ui/             # 🎨 UI Components (Radix UI)
 │   │   │   ├── button.tsx
 │   │   │   ├── dialog.tsx
 │   │   │   ├── dropdown-menu.tsx
@@ -231,47 +281,55 @@ client/
 │   │   │   ├── table.tsx
 │   │   │   └── ...
 │   │   │
-│   │   ├── error-pages/    # Error Page Components
-│   │   ├── providers/      # Provider Components
-│   │   └── theme-toggle.tsx# Theme Switcher
+│   │   ├── layouts/        # 📐 Layout Components
+│   │   │   ├── DashboardSidebar.tsx
+│   │   │   ├── MobileSidebar.tsx
+│   │   │   ├── NavigationItem.tsx
+│   │   │   ├── TopBar.tsx
+│   │   │   ├── UserMenu.tsx
+│   │   │   └── index.ts
+│   │   │
+│   │   ├── providers/      # 🔌 Provider Components
+│   │   │   ├── AuthProvider.tsx
+│   │   │   ├── ProtectedRoute.tsx
+│   │   │   └── index.ts
+│   │   │
+│   │   ├── error-pages/    # ⚠️ Error Page Components
+│   │   └── theme-toggle.tsx# 🌓 Theme Switcher
 │   │
-│   ├── contexts/           # React Contexts
-│   │   └── SocketContext.tsx
+│   ├── hooks/              # 🪝 Global Custom Hooks
+│   │   ├── useAuth.ts      # Authentication hook
+│   │   ├── useSidebarResponsive.ts # Sidebar responsive hook
+│   │   └── commons/        # Common utility hooks
 │   │
-│   ├── hooks/              # Custom Hooks
-│   │   ├── useAuth.ts
-│   │   ├── useSidebarResponsive.ts
-│   │   └── commons/        # Common Hooks
-│   │
-│   ├── lib/                # Utility Libraries
+│   ├── lib/                # 📚 Utility Libraries
 │   │   ├── axios.ts        # Axios Configuration
 │   │   ├── i18n.ts         # i18n Configuration
 │   │   ├── socket.ts       # Socket.IO Configuration
 │   │   └── utils.ts        # Utility Functions
 │   │
-│   ├── services/           # API Services
-│   │   ├── auth.service.ts
-│   │   ├── menu.service.ts
-│   │   ├── order.service.ts
-│   │   ├── inventory.service.ts
-│   │   ├── staff.service.ts
-│   │   ├── reservation.service.ts
-│   │   └── bill.service.ts
+│   ├── services/           # 🌐 Cross-Cutting Services
+│   │   ├── auth.service.ts    # Authentication service (used across all modules)
+│   │   └── upload.service.ts  # File upload service (shared utility)
+│   │   # Note: Feature-specific services are now in modules/*/services/
 │   │
-│   ├── stores/             # Zustand Stores
-│   │   ├── authStore.ts
-│   │   ├── menuStore.ts
-│   │   ├── orderStore.ts
-│   │   └── ...
+│   ├── stores/             # 🗄️ Global Zustand Stores
+│   │   ├── authStore.ts    # Authentication state
+│   │   ├── uiStore.ts      # UI state (modals, sidebar, etc.)
+│   │   └── ...             # Other global stores
+│   │   # Note: Feature-specific stores moved to modules/*/stores/
 │   │
-│   ├── types/              # TypeScript Types
-│   │   ├── index.ts
-│   │   ├── auth.types.ts
-│   │   ├── menu.types.ts
-│   │   ├── order.types.ts
-│   │   └── ...
+│   ├── types/              # 📝 Global TypeScript Types
+│   │   ├── index.ts        # Type exports
+│   │   ├── auth.types.ts   # Auth types
+│   │   ├── common.types.ts # Common types
+│   │   └── ...             # Other global types
+│   │   # Note: Feature-specific types moved to modules/*/types/
 │   │
-│   └── proxy.ts            # Proxy Configuration
+│   ├── utils/              # 🛠️ Global Utilities
+│   │   └── ...             # Shared utility functions
+│   │
+│   └── proxy.ts            # 🔄 Proxy Configuration
 │
 ├── components.json          # Shadcn/UI Configuration
 ├── next.config.ts          # Next.js Configuration
@@ -281,6 +339,125 @@ client/
 ├── package.json            # Dependencies
 └── pnpm-lock.yaml         # Lock File
 ```
+
+### 📦 Module Structure Convention
+
+**Kiến Trúc Module Mới** - Dự án đã được tái cấu trúc theo mô hình **Feature-Based Modular Architecture**, nơi mỗi feature là một module độc lập, tự quản lý.
+
+#### Cấu Trúc Chuẩn Của Mỗi Module
+
+```
+src/modules/[feature]/
+├── components/              # 🧩 Reusable UI components
+│   ├── index.ts            # Barrel exports
+│   ├── [Feature]Card.tsx   # Card displays
+│   ├── [Feature]List.tsx   # List displays
+│   ├── [Feature]Filters.tsx # Filter controls
+│   └── [Feature]Search.tsx  # Search components
+│
+├── views/                   # 📄 Page-level views (Smart Components)
+│   ├── index.ts            # Barrel exports
+│   ├── [Feature]ListView.tsx    # List/Table view
+│   ├── [Feature]GridView.tsx    # Grid/Card view
+│   └── [Feature]DetailView.tsx  # Detail view
+│
+├── dialogs/                 # 💬 Modal dialogs
+│   ├── index.ts            # Barrel exports
+│   ├── single/             # Single item operations
+│   │   ├── index.ts
+│   │   ├── Create[Feature]Dialog.tsx  # Create dialog
+│   │   ├── Edit[Feature]Dialog.tsx    # Edit dialog
+│   │   └── Delete[Feature]Dialog.tsx  # Delete confirmation
+│   └── bulk/               # Bulk operations
+│       ├── index.ts
+│       ├── BulkDelete[Feature]Dialog.tsx
+│       ├── BulkUpdate[Feature]Dialog.tsx
+│       └── BulkImport[Feature]Dialog.tsx
+│
+├── services/               # 🌐 API service layer
+│   ├── index.ts
+│   └── [feature].service.ts   # All API calls for this feature
+│
+├── hooks/                  # 🪝 Custom React hooks
+│   ├── index.ts
+│   ├── use[Feature]s.ts       # List/collection operations
+│   ├── use[Feature].ts        # Single item operations
+│   └── use[Feature]Form.ts    # Form management hooks
+│
+├── types/                  # 📝 TypeScript types & interfaces
+│   └── index.ts               # All types for this feature
+│
+├── utils/                  # 🛠️ Helper functions
+│   └── index.ts               # Utility functions specific to feature
+│
+├── stores/                 # 🗄️ Feature-specific Zustand stores (optional)
+│   └── [feature]Store.ts      # Only for complex state management
+│
+├── README.md              # 📚 Module documentation
+└── index.ts               # 🎯 Module barrel export (main entry point)
+```
+
+#### Import Patterns
+
+```typescript
+// ✅ RECOMMENDED: Module-level imports (clean & maintainable)
+import { MenuItemCard, MenuItemList, MenuItemFilters } from '@/modules/menu';
+import { CreateMenuItemDialog, EditMenuItemDialog } from '@/modules/menu';
+import { menuApi } from '@/modules/menu';
+import { useMenuItems, useMenuItem } from '@/modules/menu';
+import type { MenuItem, MenuItemFormData } from '@/modules/menu';
+
+// ✅ ACCEPTABLE: Specific imports when barrel export is too heavy
+import { MenuItemCard } from '@/modules/menu/components/MenuItemCard';
+import { menuApi } from '@/modules/menu/services';
+
+// ❌ AVOID: Deep nested imports
+import { MenuItemCard } from '@/modules/menu/components/cards/MenuItemCard';
+```
+
+#### Nguyên Tắc Module
+
+1. **Single Responsibility** - Mỗi module chỉ quản lý một feature duy nhất
+2. **Self-Contained** - Module có đầy đủ components, logic, và types riêng
+3. **Loose Coupling** - Module độc lập, ít phụ thuộc vào module khác
+4. **High Cohesion** - Tất cả code liên quan đến feature ở cùng một nơi
+5. **Consistent Structure** - Tất cả modules tuân theo cấu trúc giống nhau
+
+#### Benefits của Kiến Trúc Module Mới
+
+- ✅ **Code Organization** - Dễ tìm và quản lý code theo feature
+- ✅ **Scalability** - Dễ thêm features mới mà không ảnh hưởng code cũ
+- ✅ **Maintainability** - Sửa lỗi/cập nhật feature chỉ cần vào 1 folder
+- ✅ **Team Collaboration** - Nhiều người làm nhiều features không conflict
+- ✅ **Code Reusability** - Components trong module có thể reuse dễ dàng
+- ✅ **Testing** - Dễ viết unit test và integration test cho từng module
+- ✅ **Bundle Optimization** - Tree-shaking hiệu quả hơn với barrel exports
+
+#### Các Modules Hiện Có
+
+| Module | Mô Tả | Độ Phức Tạp | Status |
+|--------|-------|-------------|--------|
+| **menu/** | Quản lý thực đơn món ăn | Medium | ✅ Complete |
+| **categories/** | Quản lý danh mục món ăn | Low | ✅ Complete |
+| **reservations/** | Quản lý đặt bàn | Medium | ✅ Complete |
+| **tables/** | Quản lý bàn + Visual Editor | High | ✅ Complete |
+
+#### Reference Implementations
+
+1. **menu/** - Module hoàn chỉnh với đầy đủ CRUD, dialogs, filters, search
+2. **categories/** - Module đơn giản, cấu trúc rõ ràng, dễ hiểu
+3. **reservations/** - Good example của hooks và service patterns
+4. **tables/** - Module phức tạp với visual editor, stores, geometry utils
+
+#### Migration Plan (Planned Modules)
+
+Các features sau sẽ được migrate sang module structure:
+- `orders/` - Order Management
+- `inventory/` - Inventory Management
+- `staff/` - Staff Management
+- `bills/` - Bill & Payment Management
+- `kitchen/` - Kitchen Management
+- `customers/` - Customer Management
 
 ---
 
@@ -672,22 +849,26 @@ axiosInstance.interceptors.response.use(
 );
 ```
 
-### Service Pattern
+### Service Pattern (Module-Based)
+
+Services giờ được tổ chức trong từng module thay vì folder `services/` tập trung.
 
 ```typescript
-// services/menu.service.ts
+// modules/menu/services/menu.service.ts
 import { axiosInstance } from '@/lib/axios';
-import { MenuItem, CreateMenuItemDTO, UpdateMenuItemDTO } from '@/types';
+import type { MenuItem, CreateMenuItemDTO, UpdateMenuItemDTO } from '../types';
 
 export class MenuService {
     private static BASE_URL = '/menu';
 
-    // Get all menu items
+    // Get all menu items with filters
     static async getMenuItems(params?: {
         category?: string;
         search?: string;
         page?: number;
         limit?: number;
+        sortBy?: string;
+        sortOrder?: 'asc' | 'desc';
     }) {
         const response = await axiosInstance.get<MenuItem[]>(
             this.BASE_URL,
@@ -730,6 +911,15 @@ export class MenuService {
         return response.data;
     }
 
+    // Bulk delete menu items
+    static async bulkDeleteMenuItems(ids: string[]) {
+        const response = await axiosInstance.post(
+            `${this.BASE_URL}/bulk-delete`,
+            { ids }
+        );
+        return response.data;
+    }
+
     // Upload menu item image
     static async uploadImage(id: string, file: File) {
         const formData = new FormData();
@@ -746,6 +936,29 @@ export class MenuService {
         );
         return response.data;
     }
+}
+
+// Export as default and named export
+export const menuApi = MenuService;
+export default MenuService;
+```
+
+#### Cross-Cutting Services
+
+Chỉ các services **dùng chung** giữa nhiều modules mới ở `src/services/`:
+
+```typescript
+// services/auth.service.ts - Used across all modules
+export class AuthService {
+    static async login(email: string, password: string) { ... }
+    static async logout() { ... }
+    static async refreshToken() { ... }
+}
+
+// services/upload.service.ts - Shared file upload utility
+export class UploadService {
+    static async uploadFile(file: File, path: string) { ... }
+    static async deleteFile(url: string) { ... }
 }
 ```
 
@@ -1768,7 +1981,19 @@ pnpm build
 
 ## 📝 Changelog
 
-### Version 0.1.0 (Current)
+### Version 1.0.0 (Current - November 21, 2025)
+- ✨ **Major Architecture Refactoring** - Feature-Based Modular Architecture
+- 📦 Migrated to module structure: `menu/`, `categories/`, `reservations/`, `tables/`
+- 🎯 Implemented standardized module pattern across all features
+- 🗄️ Moved feature-specific services to module-level
+- 📝 Moved feature-specific types to module-level
+- 🧩 Created consistent dialogs structure (single/bulk operations)
+- 🪝 Organized hooks at module level
+- 🎨 Separated shared components from feature components
+- 📚 Added comprehensive module documentation
+- ✅ Better code organization and maintainability
+
+### Version 0.1.0 (Initial Release)
 - Initial release
 - Next.js 16 setup
 - React 19 integration
@@ -1776,9 +2001,10 @@ pnpm build
 - Menu management
 - Real-time updates
 - Internationalization
+- Tailwind CSS 4 + Radix UI
 
 ---
 
 **Tài liệu được tạo bởi:** Restaurant Management Development Team  
-**Ngày cập nhật:** October 29, 2025  
-**Version:** 0.1.0
+**Ngày cập nhật:** November 21, 2025  
+**Version:** 1.0.0

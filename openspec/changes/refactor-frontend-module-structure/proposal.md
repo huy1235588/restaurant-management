@@ -26,12 +26,16 @@ Chuẩn hóa cấu trúc tất cả các modules trong `src/modules/` theo mẫu
 - ✅ Layouts và providers ở `src/components/layouts` và `src/components/providers`
 
 ### Modules to Refactor:
-1. **Menu Module** - Tách MenuItemForm, thêm views/dialogs structure
-2. **Categories Module** - Thêm views/dialogs, tổ chức lại components
-3. **Orders Module** - Tạo cấu trúc hoàn chỉnh
-4. **Reservations Module** - Tạo cấu trúc hoàn chỉnh
-5. **Kitchen Module** - Tạo cấu trúc hoàn chỉnh
-6. **Visual Editor Module** - Đã tốt, chỉ cần validate
+1. **Menu Module** - ✅ DONE - Tách MenuItemForm, thêm views/dialogs structure
+2. **Categories Module** - ✅ DONE - Thêm views/dialogs, tổ chức lại components
+3. **Reservations Module** - ✅ DONE - Tạo cấu trúc hoàn chỉnh
+4. **Tables Module** - ✅ DONE - Đã tốt, đã merge visual editor
+
+### Modules Excluded (Implement Fresh):
+5. **Orders Module** - ❌ Sẽ triển khai mới từ đầu (không refactor)
+6. **Kitchen Module** - ❌ Sẽ triển khai mới từ đầu (không refactor)
+
+> **Lưu ý**: Đây là dự án cá nhân, không cần sidebar trong scope này
 
 ### Services Migration:
 - Di chuyển từ `src/services/*.service.ts` vào từng module tương ứng
@@ -68,9 +72,13 @@ Chuẩn hóa cấu trúc tất cả các modules trong `src/modules/` theo mẫu
 
 ## Timeline
 
-- **Phase 1**: Setup cấu trúc mới và migrate Menu module (2-3 giờ)
-- **Phase 2**: Migrate Categories, Orders modules (2-3 giờ)
-- **Phase 3**: Migrate Reservations, Kitchen modules (2-3 giờ)
-- **Phase 4**: Cleanup và documentation (1 giờ)
+- **Phase 1**: ✅ DONE - Setup cấu trúc mới và migrate Menu module (2-3 giờ)
+- **Phase 2**: ✅ DONE - Migrate Categories module (1-2 giờ)
+- **Phase 3**: ✅ DONE - Migrate Reservations module (2-3 giờ)
+- **Phase 4**: ✅ DONE - Merge Visual Editor into Tables module (1-2 giờ)
+- **Phase 5**: Cleanup và documentation (1 giờ)
 
-**Total Estimated Time**: 7-10 giờ
+**Total Completed**: ~8 giờ
+**Remaining**: ~1 giờ
+
+**Orders & Kitchen Modules**: Sẽ được triển khai hoàn toàn mới trong một change riêng biệt

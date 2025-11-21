@@ -2,6 +2,16 @@
 
 ## 📋 Standard Module Template
 
+> **Reference Implementations**: 
+> - ✅ `menu` - Complete with all features
+> - ✅ `categories` - Simple, clean structure
+> - ✅ `reservations` - Good hooks and services examples
+> - ✅ `tables` - Complex with visual editor integration
+> 
+> **Future Implementations**:
+> - 🚧 `orders` - To be built from scratch following this template
+> - 🚧 `kitchen` - To be built from scratch following this template
+
 ```
 src/modules/[feature-name]/
 ├── components/              # Reusable UI components

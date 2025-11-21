@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { tableApi } from '@/modules/tables/services/table.service';
 import { Table, TableStatus } from '@/types';
-import { useTableStore } from '@/stores/tableStore';
+import { useTableStore } from '@/modules/tables/stores/tableStore';
 import { Button } from '@/components/ui/button';
 import { TableHeader, TableStats, TableFilters, TablePagination, QuickViewPanel } from '@/modules/tables/components';
 import { TableListView } from '@/modules/tables/views';

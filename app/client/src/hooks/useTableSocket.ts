@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { useTableStore } from '@/stores/tableStore';
+import { useTableStore } from '@/modules/tables/stores/tableStore';
 import { Table, TableStatus } from '@/types';
 import { toast } from 'sonner';
 

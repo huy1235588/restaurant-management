@@ -77,22 +77,60 @@
 ### Architecture Patterns
 
 #### Frontend Architecture
-- **Pattern**: Feature-based architecture with App Router (Next.js 16)
+- **Pattern**: Feature-based module architecture with App Router (Next.js 16)
 - **Directory Structure**:
   - `/src/app` - Next.js App Router pages and layouts
-  - `/src/components` - Reusable UI components
-  - `/src/contexts` - React Context providers
-  - `/src/hooks` - Custom React hooks
+  - `/src/modules` - **Feature modules** (menu, categories, reservations, tables)
+    - Each module contains: components, views, dialogs, services, hooks, types, utils
+    - Standardized structure for consistency and maintainability
+    - Colocated feature code for better organization
+  - `/src/components` - Shared components only
+    - `shared/` - Truly shared components (LoadingSpinner, EmptyState, etc.)
+    - `ui/` - Radix UI primitives (Button, Dialog, Input, etc.)
+    - `layouts/` - Layout components (Sidebar, TopBar, etc.)
+    - `providers/` - Context providers (Auth, Theme, etc.)
+  - `/src/contexts` - React Context providers (deprecated, moved to components/providers)
+  - `/src/hooks` - Custom React hooks (global hooks only, feature hooks in modules)
   - `/locales` - i18n translation files (en.json, vi.json)
   - `/public` - Static assets (images, videos)
+- **Module Structure Convention**: All feature modules follow the same pattern:
+  ```
+  modules/[feature]/
+  ├── components/    # Reusable UI components
+  ├── views/         # Page-level views
+  ├── dialogs/       # Modal dialogs (single/bulk operations)
+  ├── services/      # API calls
+  ├── hooks/         # Custom hooks
+  ├── types/         # TypeScript types
+  ├── utils/         # Helper functions
+  ├── README.md      # Module documentation
+  └── index.ts       # Barrel exports
+  ```
+- **Reference Modules**:
+  - `menu/` - Complete implementation with all features
+  - `categories/` - Simple, clean structure example
+  - `reservations/` - Good hooks and services patterns
+  - `tables/` - Complex module with visual editor integration
 - **State Management**: 
   - Local state: React hooks (useState, useReducer)
-  - Global state: Zustand stores
+  - Global state: Zustand stores (e.g., tables module uses editorStore, layoutStore, historyStore)
   - Server state: React Query or SWR patterns (via hooks)
 - **API Integration**: 
-  - Centralized API client using Axios
+  - Feature-specific services in modules (e.g., `modules/menu/services/menu.service.ts`)
+  - Shared services in `src/services/` (auth, upload, bill, supplier)
+  - Centralized Axios client in `src/lib/axios.ts`
   - API proxy configuration via `src/proxy.ts`
 - **Real-time**: Socket.io connection for live kitchen orders and table status
+- **Import Pattern**: 
+  ```typescript
+  // Module-level imports (recommended)
+  import { MenuItemCard } from '@/modules/menu';
+  import { menuApi } from '@/modules/menu/services';
+  
+  // Shared component imports
+  import { LoadingSpinner } from '@/components/shared';
+  import { Button } from '@/components/ui/button';
+  ```
 
 #### Backend Architecture
 - **Pattern**: Feature-based modular architecture

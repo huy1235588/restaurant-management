@@ -8,13 +8,20 @@ The frontend application SHALL organize code into feature-based modules with a s
 - **THEN** all menu code is in `src/modules/menu/` with clear subfolders (components, views, dialogs, services, hooks, types, utils)
 
 #### Scenario: Developer creates new feature module
-- **WHEN** a developer creates a new feature
+- **WHEN** a developer creates a new feature (e.g., orders, kitchen)
 - **THEN** they follow the standard structure pattern with components/, views/, dialogs/, services/, hooks/, types/, utils/ folders
+- **AND** they refer to existing modules (menu, categories, reservations, tables) as reference implementations
 
 #### Scenario: Module independence
 - **WHEN** examining a feature module
 - **THEN** all feature-specific code is colocated within that module
 - **AND** the module only imports from shared components or other modules via barrel exports
+
+#### Scenario: Refactoring scope exclusions
+- **WHEN** implementing new major features (orders, kitchen)
+- **THEN** they are built from scratch following the standard structure
+- **AND** they are NOT part of the refactoring change scope
+- **NOTE** This is a personal project; sidebar is excluded from this refactoring scope
 
 ### Requirement: Component Organization Pattern
 Each module SHALL organize components into three distinct categories: components, views, and dialogs.

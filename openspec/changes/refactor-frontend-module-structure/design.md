@@ -190,12 +190,12 @@ src/components/
 **Chosen**: Incremental module-by-module migration
 
 **Order**:
-1. Menu (medium complexity, good starting point)
-2. Categories (simple, can validate pattern)
-3. Orders (complex, stress test pattern)
-4. Reservations (medium complexity)
-5. Kitchen (medium complexity)
-6. Visual Editor (validation only, already good)
+1. ✅ Menu (medium complexity, good starting point)
+2. ✅ Categories (simple, can validate pattern)
+3. ✅ Reservations (medium complexity)
+4. ✅ Tables/Visual Editor (validation and merge)
+5. ❌ Orders - EXCLUDED (sẽ triển khai mới)
+6. ❌ Kitchen - EXCLUDED (sẽ triển khai mới)
 
 **Per-Module Steps**:
 1. Create new folder structure
@@ -306,17 +306,7 @@ No changes needed to tsconfig.json. Existing path mapping works:
 5. Update imports
 6. Test and document
 
-### Phase 4: Orders Module (2-3 hours)
-
-1. Create complete structure
-2. Move order.service.ts and order-management.service.ts
-3. Organize components into structure
-4. Create views for different order displays
-5. Create dialogs for order operations
-6. Update imports
-7. Test and document
-
-### Phase 5: Reservations Module (2-3 hours)
+### Phase 4: Reservations Module (2-3 hours) ✅ DONE
 
 1. Create complete structure
 2. Move reservation.service.ts
@@ -325,16 +315,28 @@ No changes needed to tsconfig.json. Existing path mapping works:
 5. Update imports
 6. Test and document
 
-### Phase 6: Kitchen Module (2-3 hours)
+### Phase 5: Tables/Visual Editor Integration (1-2 hours) ✅ DONE
 
-1. Create complete structure
-2. Move kitchen-management.service.ts
-3. Organize components
-4. Create views and dialogs
-5. Update imports
-6. Test and document
+1. Merge visual editor into tables module
+2. Update all imports
+3. Test and validate
+4. Update documentation
 
-### Phase 7: Cleanup & Documentation (1-2 hours)
+### Phase 6: Cleanup & Documentation (1-2 hours)
+
+1. Final cleanup of migrated modules
+2. Update FRONTEND_DOCUMENTATION.md
+3. Create architecture diagram
+4. Update openspec/project.md
+5. Team review
+
+### Orders & Kitchen Modules - OUT OF SCOPE
+
+These modules will be implemented from scratch in separate changes:
+- **Orders Module**: Complete order management implementation
+- **Kitchen Module**: Complete kitchen display system implementation
+
+Both will follow the standardized structure established by this refactoring.
 
 1. Remove old service files
 2. Update FRONTEND_DOCUMENTATION.md
@@ -343,7 +345,8 @@ No changes needed to tsconfig.json. Existing path mapping works:
 5. Final testing
 6. Team review
 
-**Total Estimated Time**: 11-17 hours
+**Total Estimated Time**: 8-10 hours (excluding Orders & Kitchen)
+**Actual Progress**: ~8 hours completed
 
 ## Risks / Trade-offs
 
