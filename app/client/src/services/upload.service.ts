@@ -17,7 +17,6 @@ export interface UploadedFileInfo {
 }
 
 export type UploadFolder = 'temp' | 'menu' | "categories" | 'staff' | 'documents' | 'images' | 'others';
-export type UploadCategory = 'image' | 'document' | 'video';
 
 /**
  * Upload service for handling file uploads to the server
@@ -29,18 +28,15 @@ export const uploadApi = {
      * Upload a single file
      * @param file - File to upload
      * @param folder - Target folder (default: 'temp')
-     * @param category - File category (default: 'image')
      * @returns UploadedFileInfo with file details and URL
      */
     uploadSingle: async (
         file: File,
-        folder: UploadFolder = 'temp',
-        category: UploadCategory = 'image'
+        folder: UploadFolder = 'temp'
     ): Promise<UploadedFileInfo> => {
         const formData = new FormData();
         formData.append('file', file);
         formData.append('folder', folder);
-        formData.append('category', category);
 
         try {
             const response = await axiosInstance.post<ApiResponse<UploadedFileInfo>>(
@@ -64,13 +60,11 @@ export const uploadApi = {
      * Upload multiple files
      * @param files - Files to upload (max 10 files)
      * @param folder - Target folder (default: 'temp')
-     * @param category - File category (default: 'image')
      * @returns Array of UploadedFileInfo for each uploaded file
      */
     uploadMultiple: async (
         files: File[],
-        folder: UploadFolder = 'temp',
-        category: UploadCategory = 'image'
+        folder: UploadFolder = 'temp'
     ): Promise<UploadedFileInfo[]> => {
         if (files.length === 0) {
             throw new Error('No files provided');
@@ -85,7 +79,6 @@ export const uploadApi = {
             formData.append('files', file);
         });
         formData.append('folder', folder);
-        formData.append('category', category);
 
         try {
             const response = await axiosInstance.post<ApiResponse<UploadedFileInfo[]>>(

@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
-import { toast } from 'sonner';
-import { uploadApi, UploadFolder } from '@/services/upload.service';
+import { useCallback } from "react";
+import { toast } from "sonner";
+import { uploadApi, UploadFolder } from "@/services/upload.service";
 
 export interface UseResourceHandlersProps {
     uploadFolder: UploadFolder;
@@ -27,9 +27,9 @@ export function useResourceHandlers({
     onDeleteSuccess,
     successMessages = {},
 }: UseResourceHandlersProps) {
-    const createMsg = successMessages.create ?? 'Created successfully';
-    const updateMsg = successMessages.update ?? 'Updated successfully';
-    const deleteMsg = successMessages.delete ?? 'Deleted successfully';
+    const createMsg = successMessages.create ?? "Created successfully";
+    const updateMsg = successMessages.update ?? "Updated successfully";
+    const deleteMsg = successMessages.delete ?? "Deleted successfully";
 
     const handleCreate = useCallback(
         async (data: any, imageFile?: File | null) => {
@@ -38,7 +38,10 @@ export function useResourceHandlers({
                 let imagePath = data.imagePath;
 
                 if (imageFile) {
-                    const uploadedFile = await uploadApi.uploadSingle(imageFile, uploadFolder, 'image');
+                    const uploadedFile = await uploadApi.uploadSingle(
+                        imageFile,
+                        uploadFolder
+                    );
                     imageUrl = uploadedFile.url;
                     imagePath = uploadedFile.path;
                 }
@@ -52,7 +55,7 @@ export function useResourceHandlers({
                 toast.success(createMsg);
                 onCreateSuccess?.();
             } catch (error: any) {
-                toast.error(error?.message || 'Failed to create');
+                toast.error(error?.message || "Failed to create");
                 throw error;
             }
         },
@@ -60,21 +63,34 @@ export function useResourceHandlers({
     );
 
     const handleUpdate = useCallback(
-        async (id: number, currentResource: any, data: any, imageFile?: File | null) => {
+        async (
+            id: number,
+            currentResource: any,
+            data: any,
+            imageFile?: File | null
+        ) => {
             try {
                 let imageUrl = data.imageUrl;
                 let imagePath = data.imagePath;
 
                 if (imageFile) {
-                    const uploadedFile = await uploadApi.uploadSingle(imageFile, uploadFolder, 'image');
+                    const uploadedFile = await uploadApi.uploadSingle(
+                        imageFile,
+                        uploadFolder
+                    );
                     imageUrl = uploadedFile.url;
                     imagePath = uploadedFile.path;
 
                     if (currentResource?.imagePath) {
                         try {
-                            await uploadApi.deleteFile(currentResource.imagePath);
+                            await uploadApi.deleteFile(
+                                currentResource.imagePath
+                            );
                         } catch (deleteError) {
-                            console.warn('Failed to delete old image:', deleteError);
+                            console.warn(
+                                "Failed to delete old image:",
+                                deleteError
+                            );
                         }
                     }
                 }
@@ -88,7 +104,7 @@ export function useResourceHandlers({
                 toast.success(updateMsg);
                 onUpdateSuccess?.();
             } catch (error: any) {
-                toast.error(error?.message || 'Failed to update');
+                toast.error(error?.message || "Failed to update");
                 throw error;
             }
         },
@@ -102,7 +118,7 @@ export function useResourceHandlers({
                     try {
                         await uploadApi.deleteFile(resource.imagePath);
                     } catch (deleteError) {
-                        console.warn('Failed to delete image:', deleteError);
+                        console.warn("Failed to delete image:", deleteError);
                     }
                 }
 
@@ -110,7 +126,7 @@ export function useResourceHandlers({
                 toast.success(deleteMsg);
                 onDeleteSuccess?.();
             } catch (error: any) {
-                toast.error(error?.message || 'Failed to delete');
+                toast.error(error?.message || "Failed to delete");
                 throw error;
             }
         },

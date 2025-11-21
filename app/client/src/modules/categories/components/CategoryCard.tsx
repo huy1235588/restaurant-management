@@ -25,14 +25,14 @@ export function CategoryCard({ category, onEdit, onDelete, onViewDetails }: Cate
     const itemCount = category.menuItems?.length || 0;
 
     return (
-        <Card className="py-0 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group hover:scale-105">
+        <Card className="py-0 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
             <div className="relative aspect-video bg-muted transition-all duration-300 group-hover:brightness-110" onClick={() => onViewDetails(category)}>
                 {category.imageUrl ? (
                     <Image
                         src={category.imageUrl}
                         alt={category.categoryName}
                         fill
-                        className="object-cover"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                 ) : (
@@ -50,7 +50,7 @@ export function CategoryCard({ category, onEdit, onDelete, onViewDetails }: Cate
             </div>
 
             <CardContent className="px-4 py-0" onClick={() => onViewDetails(category)}>
-                <h3 className="font-semibold text-lg mb-1 line-clamp-1">
+                <h3 className="font-semibold text-lg mb-1 line-clamp-1 group-hover:text-primary">
                     {category.categoryName}
                 </h3>
                 <div className="min-h-10 mb-2">

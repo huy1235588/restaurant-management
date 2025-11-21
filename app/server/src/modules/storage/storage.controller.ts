@@ -6,7 +6,7 @@ import {
     UploadedFile,
     UploadedFiles,
     UseInterceptors,
-    Query,
+    Body,
     BadRequestException,
     HttpCode,
     HttpStatus,
@@ -52,7 +52,7 @@ export class StorageController {
     @ApiResponse({ status: 400, description: 'Bad request' })
     async uploadFile(
         @UploadedFile() file: Express.Multer.File,
-        @Query('folder') folder?: string,
+        @Body('folder') folder?: string,
     ) {
         if (!file) {
             throw new BadRequestException('No file provided');
@@ -93,7 +93,7 @@ export class StorageController {
     @ApiResponse({ status: 400, description: 'Bad request' })
     async uploadFiles(
         @UploadedFiles() files: Express.Multer.File[],
-        @Query('folder') folder?: string,
+        @Body('folder') folder?: string,
     ) {
         if (!files || files.length === 0) {
             throw new BadRequestException('No files provided');

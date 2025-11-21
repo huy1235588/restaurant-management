@@ -1,7 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useCallback } from 'react';
-import { uploadApi, UploadedFileInfo, UploadFolder, UploadCategory } from '@/services/upload.service';
+import { useState, useCallback } from "react";
+import {
+    uploadApi,
+    UploadedFileInfo,
+    UploadFolder,
+} from "@/services/upload.service";
 
 interface UseFileUploadOptions {
     onSuccess?: (file: UploadedFileInfo) => void;
@@ -15,24 +19,26 @@ interface UseFileUploadOptions {
 export function useFileUpload(options?: UseFileUploadOptions) {
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
-    const [uploadedFile, setUploadedFile] = useState<UploadedFileInfo | null>(null);
+    const [uploadedFile, setUploadedFile] = useState<UploadedFileInfo | null>(
+        null
+    );
 
     const upload = useCallback(
         async (
             file: File,
-            folder: UploadFolder = 'temp',
-            category: UploadCategory = 'image'
+            folder: UploadFolder = "temp"
         ): Promise<UploadedFileInfo | null> => {
             setUploading(true);
             setError(null);
 
             try {
-                const result = await uploadApi.uploadSingle(file, folder, category);
+                const result = await uploadApi.uploadSingle(file, folder);
                 setUploadedFile(result);
                 options?.onSuccess?.(result);
                 return result;
             } catch (err) {
-                const error = err instanceof Error ? err : new Error('Upload failed');
+                const error =
+                    err instanceof Error ? err : new Error("Upload failed");
                 setError(error);
                 options?.onError?.(error);
                 return null;
@@ -69,19 +75,19 @@ export function useMultipleFileUpload(options?: UseFileUploadOptions) {
     const upload = useCallback(
         async (
             files: File[],
-            folder: UploadFolder = 'temp',
-            category: UploadCategory = 'image'
+            folder: UploadFolder = "temp"
         ): Promise<UploadedFileInfo[] | null> => {
             setUploading(true);
             setError(null);
 
             try {
-                const results = await uploadApi.uploadMultiple(files, folder, category);
+                const results = await uploadApi.uploadMultiple(files, folder);
                 setUploadedFiles(results);
                 results.forEach((file) => options?.onSuccess?.(file));
                 return results;
             } catch (err) {
-                const error = err instanceof Error ? err : new Error('Upload failed');
+                const error =
+                    err instanceof Error ? err : new Error("Upload failed");
                 setError(error);
                 options?.onError?.(error);
                 return null;
@@ -97,7 +103,8 @@ export function useMultipleFileUpload(options?: UseFileUploadOptions) {
             await uploadApi.deleteFile(filePath);
             setUploadedFiles((prev) => prev.filter((f) => f.path !== filePath));
         } catch (err) {
-            const error = err instanceof Error ? err : new Error('Delete failed');
+            const error =
+                err instanceof Error ? err : new Error("Delete failed");
             setError(error);
             throw error;
         }
