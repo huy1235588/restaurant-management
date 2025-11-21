@@ -1,8 +1,8 @@
 import { Table } from '@/types';
-import { CreateTableDialog } from './dialogs/single/CreateTableDialog';
-import { EditTableDialog } from './dialogs/single/EditTableDialog';
-import { StatusChangeDialog } from './dialogs/single/StatusChangeDialog';
-import { DeleteTableDialog } from './dialogs/single/DeleteTableDialog';
+import { CreateTableDialog } from './single/CreateTableDialog';
+import { EditTableDialog } from './single/EditTableDialog';
+import { StatusChangeDialog } from './single/StatusChangeDialog';
+import { DeleteTableDialog } from './single/DeleteTableDialog';
 
 interface TableDialogsProps {
     showCreateDialog: boolean;

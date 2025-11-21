@@ -10,7 +10,7 @@ import { useTables, useTableStats, useTableMutations } from '@/modules/tables/ho
 import { Button } from '@/components/ui/button';
 import { TableHeader, TableStats, TableFilters, TablePagination, QuickViewPanel } from '@/modules/tables/components';
 import { TableListView } from '@/modules/tables/views';
-import { TableDialogs } from '@/modules/tables/TableDialogs';
+import { TableDialogs } from '@/modules/tables/dialogs/TableDialogs';
 import {
     BulkStatusChangeDialog,
     BulkDeleteDialog,

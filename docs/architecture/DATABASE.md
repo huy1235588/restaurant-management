@@ -273,7 +273,6 @@ Quản lý bàn ăn.
 | floor       | INT               | DEFAULT 1         | Tầng                     |
 | section     | VARCHAR(50)       | NULL              | Khu vực (VIP, Garden...) |
 | status      | ENUM(TableStatus) | DEFAULT available | Trạng thái               |
-| qrCode      | VARCHAR(255)      | UNIQUE, NULL      | Mã QR                    |
 | isActive    | BOOLEAN           | DEFAULT true      | Đang sử dụng             |
 | createdAt   | TIMESTAMP         | DEFAULT now()     | Ngày tạo                 |
 | updatedAt   | TIMESTAMP         | AUTO UPDATE       | Ngày cập nhật            |
@@ -613,7 +612,7 @@ categories: categoryName
 menu_items: itemCode
 customers: phoneNumber, email
 reservations: reservationCode
-restaurant_tables: tableNumber, qrCode
+restaurant_tables: tableNumber
 orders: orderNumber
 bills: billNumber, orderId
 kitchen_orders: orderId

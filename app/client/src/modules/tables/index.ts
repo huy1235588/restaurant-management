@@ -20,4 +20,4 @@ export * from './views';
 export * from './dialogs';
 
 // Table Dialogs Orchestrator
-export { TableDialogs } from './TableDialogs';
+export { TableDialogs } from './dialogs/TableDialogs';
