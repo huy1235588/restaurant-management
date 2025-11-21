@@ -157,4 +157,37 @@ export class TableService {
         this.logger.log(`Table status updated: ${tableId} -> ${status}`);
         return updated;
     }
+
+    /**
+     * Get table statistics
+     */
+    async getTableStats() {
+        const tables = await this.tableRepository.findAll();
+        const total = tables.length;
+        const available = tables.filter(t => t.status === 'available').length;
+        const occupied = tables.filter(t => t.status === 'occupied').length;
+        const reserved = tables.filter(t => t.status === 'reserved').length;
+        const maintenance = tables.filter(t => t.status === 'maintenance').length;
+        const active = tables.filter(t => t.isActive).length;
+        const inactive = total - active;
+        const totalCapacity = tables.reduce((sum, t) => sum + t.capacity, 0);
+        const occupiedCapacity = tables
+            .filter(t => t.status === 'occupied')
+            .reduce((sum, t) => sum + t.capacity, 0);
+        const occupancyRate = totalCapacity > 0 
+            ? ((occupiedCapacity / totalCapacity) * 100).toFixed(2) + '%'
+            : '0%';
+
+        return {
+            total,
+            available,
+            occupied,
+            reserved,
+            maintenance,
+            active,
+            inactive,
+            totalCapacity,
+            occupancyRate,
+        };
+    }
 }

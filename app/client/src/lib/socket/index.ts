@@ -4,7 +4,6 @@
  */
 
 export { baseSocketService, BaseSocketService } from './base';
-export { tableSocketService } from './table.socket';
 
 // Re-export types
 export type { SocketEventCallback } from './base';

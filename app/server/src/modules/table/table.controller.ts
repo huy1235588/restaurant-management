@@ -36,6 +36,17 @@ import { TableStatus } from '@prisma/generated/client';
 export class TableController {
     constructor(private readonly tableService: TableService) {}
 
+    @Get('stats')
+    @ApiOperation({ summary: 'Get table statistics' })
+    @ApiResponse({ status: 200, description: 'Table statistics retrieved' })
+    async getStats() {
+        const stats = await this.tableService.getTableStats();
+        return {
+            message: 'Table statistics retrieved successfully',
+            data: stats,
+        };
+    }
+
     @Get('count')
     @ApiOperation({ summary: 'Count tables' })
     @ApiQuery({ name: 'floor', required: false, type: Number })

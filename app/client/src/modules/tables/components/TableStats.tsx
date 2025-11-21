@@ -16,7 +16,7 @@ export function TableStats({ stats }: TableStatsProps) {
     const { t } = useTranslation();
 
     // Calculate occupancy rate (occupied + reserved) / total
-    const occupancyRate = stats.total > 0 
+    const occupancyRate = stats.total > 0
         ? Math.round(((stats.occupied + stats.reserved) / stats.total) * 100)
         : 0;
 
@@ -95,13 +95,12 @@ export function TableStats({ stats }: TableStatsProps) {
                         <div className="text-2xl font-bold">{occupancyRate}%</div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
-                                className={`h-2 rounded-full transition-all ${
-                                    occupancyRate <= 30
+                                className={`h-2 rounded-full transition-all ${occupancyRate <= 30
                                         ? 'bg-green-600'
                                         : occupancyRate <= 70
-                                        ? 'bg-yellow-600'
-                                        : 'bg-red-600'
-                                }`}
+                                            ? 'bg-yellow-600'
+                                            : 'bg-red-600'
+                                    }`}
                                 style={{ width: `${occupancyRate}%` }}
                             />
                         </div>

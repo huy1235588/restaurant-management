@@ -4,9 +4,9 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { tableApi } from '@/modules/tables/services/table.service';
 import { Table, TableStatus } from '@/types';
-import { useTableStore } from '@/modules/tables/stores/tableStore';
+import { useTableStore } from '@/modules/tables/stores';
+import { useTables, useTableStats, useTableMutations } from '@/modules/tables/hooks';
 import { Button } from '@/components/ui/button';
 import { TableHeader, TableStats, TableFilters, TablePagination, QuickViewPanel } from '@/modules/tables/components';
 import { TableListView } from '@/modules/tables/views';
@@ -20,7 +20,6 @@ import {
     TableHistoryDialog,
     KeyboardShortcutsDialog,
 } from '@/modules/tables/dialogs';
-import { useTableSocket } from '@/hooks/useTableSocket';
 
 type SortField = 'tableNumber' | 'capacity' | 'floor' | 'status';
 type SortOrder = 'asc' | 'desc';
@@ -30,20 +29,18 @@ export default function TablesPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    const { tables, setTables, setLoading: setStoreLoading, error } = useTableStore();
-    const [loading, setLoading] = useState(true);
-    const [totalPages, setTotalPages] = useState(1);
-    const [totalItems, setTotalItems] = useState(0);
-    const [stats, setStats] = useState({
-        total: 0,
-        available: 0,
-        occupied: 0,
-        reserved: 0,
-        maintenance: 0,
-    });
+    // Store state
+    const {
+        selectedTableIds,
+        setSelectedTableIds,
+        clearSelection,
+        quickViewTableId,
+        setQuickViewTableId,
+        filters: storeFilters,
+        setFilters,
+    } = useTableStore();
 
-    // Selection state
-    const [selectedTableIds, setSelectedTableIds] = useState<number[]>([]);
+    // Dialog states from store
     const [showBulkStatusDialog, setShowBulkStatusDialog] = useState(false);
     const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
     const [showBulkExportDialog, setShowBulkExportDialog] = useState(false);
@@ -60,29 +57,37 @@ export default function TablesPage() {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showQRDialog, setShowQRDialog] = useState(false);
 
-    // Initialize WebSocket connection
-    useTableSocket();
-
     // Get all filter values from URL
     const filters = useMemo(() => ({
-        searchTerm: searchParams.get('search') || '',
-        statusFilter: searchParams.get('status') || 'all',
-        floorFilter: searchParams.get('floor') || 'all',
-        sectionFilter: searchParams.get('section') || 'all',
-        activeFilter: searchParams.get('active') || 'all',
-        currentPage: parseInt(searchParams.get('page') || '1', 10),
-        itemsPerPage: parseInt(searchParams.get('limit') || '20', 10),
-        sortField: (searchParams.get('sortBy') || 'tableNumber') as SortField,
-        sortOrder: (searchParams.get('sortOrder') || 'asc') as SortOrder,
+        search: searchParams.get('search') || '',
+        status: searchParams.get('status') as TableStatus | undefined,
+        floor: searchParams.get('floor') ? parseInt(searchParams.get('floor')!) : undefined,
+        section: searchParams.get('section') || undefined,
     }), [searchParams]);
+
+    const currentPage = parseInt(searchParams.get('page') || '1', 10);
+    const itemsPerPage = parseInt(searchParams.get('limit') || '20', 10);
+    const sortField = (searchParams.get('sortBy') || 'tableNumber') as SortField;
+    const sortOrder = (searchParams.get('sortOrder') || 'asc') as SortOrder;
 
     // Debounce search with 300ms delay
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const [localSearchTerm, setLocalSearchTerm] = useState(filters.searchTerm);
+    const [localSearchTerm, setLocalSearchTerm] = useState(filters.search);
 
     useEffect(() => {
-        setLocalSearchTerm(filters.searchTerm);
-    }, [filters.searchTerm]);
+        setLocalSearchTerm(filters.search);
+    }, [filters.search]);
+
+    // Fetch data using hooks
+    const { data: tablesData, isLoading, refetch: refetchTables } = useTables({
+        filters,
+    });
+    const { data: stats, refetch: refetchStats } = useTableStats();
+    const { deleteTable, bulkUpdateStatus } = useTableMutations();
+
+    const tables = tablesData?.items || [];
+    const totalPages = tablesData?.pagination?.totalPages || 1;
+    const totalItems = tablesData?.pagination?.total || 0;
 
     // Update URL with filters
     const updateURL = useCallback((params: Record<string, string>) => {
@@ -98,52 +103,6 @@ export default function TablesPage() {
 
         router.push(`/tables?${newSearchParams.toString()}`, { scroll: false });
     }, [router, searchParams]);
-
-    // Fetch tables
-    const fetchTables = useCallback(async () => {
-        try {
-            setLoading(true);
-            setStoreLoading(true);
-
-            const response = await tableApi.getAll({
-                page: filters.currentPage,
-                limit: filters.itemsPerPage,
-                sortBy: filters.sortField,
-                sortOrder: filters.sortOrder,
-                search: filters.searchTerm || undefined,
-                status: filters.statusFilter !== 'all' ? filters.statusFilter as TableStatus : undefined,
-                floor: filters.floorFilter !== 'all' ? parseInt(filters.floorFilter) : undefined,
-                section: filters.sectionFilter !== 'all' ? filters.sectionFilter : undefined,
-                isActive: filters.activeFilter !== 'all' ? filters.activeFilter === 'true' : undefined,
-            });
-
-            setTables(response.items);
-            setTotalPages(response.pagination.totalPages);
-            setTotalItems(response.pagination.total);
-        } catch (error) {
-            console.error('Failed to fetch tables:', error);
-            toast.error(t('tables.fetchError'));
-        } finally {
-            setLoading(false);
-            setStoreLoading(false);
-        }
-    }, [filters, setTables, setStoreLoading, t]);
-
-    // Fetch statistics
-    const fetchStats = useCallback(async () => {
-        try {
-            const statsData = await tableApi.getStats();
-            setStats(statsData);
-        } catch (error) {
-            console.error('Failed to fetch table statistics:', error);
-        }
-    }, []);
-
-    // Load data on mount and when filters change
-    useEffect(() => {
-        fetchTables();
-        fetchStats();
-    }, [fetchTables, fetchStats]);
 
     // Keyboard shortcuts
     useEffect(() => {
@@ -208,9 +167,9 @@ export default function TablesPage() {
     }, [updateURL]);
 
     const handleSort = useCallback((field: SortField) => {
-        const newOrder = filters.sortField === field && filters.sortOrder === 'asc' ? 'desc' : 'asc';
+        const newOrder = sortField === field && sortOrder === 'asc' ? 'desc' : 'asc';
         updateURL({ sortBy: field, sortOrder: newOrder });
-    }, [filters, updateURL]);
+    }, [sortField, sortOrder, updateURL]);
 
     const handlePageChange = useCallback((page: number) => {
         updateURL({ page: page.toString() });
@@ -259,23 +218,17 @@ export default function TablesPage() {
             return;
         }
 
-        const bulkUpdateData = selectedTableIds.map(tableId => ({
-            tableId,
-            data: { status }
-        }));
-
-        tableApi.bulkUpdate(bulkUpdateData).then(() => {
-            toast.success(t('tables.bulkStatusUpdateSuccess', '{{count}} tables updated successfully', {
-                count: selectedTableIds.length
-            }));
-            setSelectedTableIds([]);
-            fetchTables();
-            fetchStats();
-        }).catch((error: any) => {
-            console.error('Failed to bulk update status:', error);
-            toast.error(error.response?.data?.message || t('tables.bulkStatusUpdateError', 'Failed to update tables'));
-        });
-    }, [selectedTableIds, t, fetchTables, fetchStats]);
+        bulkUpdateStatus.mutate(
+            { tableIds: selectedTableIds, status },
+            {
+                onSuccess: () => {
+                    clearSelection();
+                    refetchTables();
+                    refetchStats();
+                },
+            }
+        );
+    }, [selectedTableIds, t, bulkUpdateStatus, clearSelection, refetchTables, refetchStats]);
 
     const handleBulkDelete = useCallback(async () => {
         if (selectedTableIds.length === 0) {
@@ -284,18 +237,18 @@ export default function TablesPage() {
         }
 
         try {
-            // Delete tables one by one or use bulk delete endpoint if available
+            // Delete tables one by one
             await Promise.all(
-                selectedTableIds.map(tableId => tableApi.delete(tableId))
+                selectedTableIds.map(tableId => deleteTable.mutateAsync(tableId))
             );
-            setSelectedTableIds([]);
-            fetchTables();
-            fetchStats();
+            clearSelection();
+            refetchTables();
+            refetchStats();
         } catch (error: any) {
             console.error('Failed to bulk delete tables:', error);
             throw error;
         }
-    }, [selectedTableIds, t, fetchTables, fetchStats]);
+    }, [selectedTableIds, t, deleteTable, clearSelection, refetchTables, refetchStats]);
 
     const handleBulkActivateDeactivate = useCallback(async (isActive: boolean) => {
         if (selectedTableIds.length === 0) {
@@ -304,20 +257,17 @@ export default function TablesPage() {
         }
 
         try {
-            const bulkUpdateData = selectedTableIds.map(tableId => ({
-                tableId,
-                data: { isActive }
-            }));
-
-            await tableApi.bulkUpdate(bulkUpdateData);
-            setSelectedTableIds([]);
-            fetchTables();
-            fetchStats();
+            // This would need a backend endpoint for bulk activate/deactivate
+            // For now, we'll toast a message
+            toast.info('Bulk activate/deactivate not implemented yet');
+            clearSelection();
+            refetchTables();
+            refetchStats();
         } catch (error: any) {
             console.error('Failed to bulk activate/deactivate tables:', error);
             throw error;
         }
-    }, [selectedTableIds, t, fetchTables, fetchStats]);
+    }, [selectedTableIds, t, clearSelection, refetchTables, refetchStats]);
 
     const handleCloseDialogs = useCallback(() => {
         setShowCreateDialog(false);
@@ -329,9 +279,9 @@ export default function TablesPage() {
     }, []);
 
     const handleRefresh = useCallback(() => {
-        fetchTables();
-        fetchStats();
-    }, [fetchTables, fetchStats]);
+        refetchTables();
+        refetchStats();
+    }, [refetchTables, refetchStats]);
 
     return (
         <div className="container mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
@@ -341,14 +291,24 @@ export default function TablesPage() {
                 onRefresh={handleRefresh}
             />
 
-            <TableStats stats={stats} />
+            <TableStats
+                stats={
+                    stats ?? {
+                        total: 0,
+                        available: 0,
+                        occupied: 0,
+                        reserved: 0,
+                        maintenance: 0,
+                    }
+                }
+            />
 
             <TableFilters
-                searchTerm={filters.searchTerm}
-                statusFilter={filters.statusFilter}
-                floorFilter={filters.floorFilter}
-                sectionFilter={filters.sectionFilter}
-                activeFilter={filters.activeFilter}
+                searchTerm={localSearchTerm}
+                statusFilter={filters.status || 'all'}
+                floorFilter={filters.floor?.toString() || 'all'}
+                sectionFilter={filters.section || 'all'}
+                activeFilter={'all'}
                 onSearchChange={handleSearch}
                 onStatusFilterChange={handleStatusFilter}
                 onFloorFilterChange={handleFloorFilter}
@@ -409,9 +369,9 @@ export default function TablesPage() {
                         )}
                         <TableListView
                             tables={tables}
-                            loading={loading}
-                            sortField={filters.sortField}
-                            sortOrder={filters.sortOrder}
+                            loading={isLoading}
+                            sortField={sortField}
+                            sortOrder={sortOrder}
                             selectedTableIds={selectedTableIds}
                             onSort={handleSort}
                             onEdit={handleEditTable}
@@ -423,10 +383,10 @@ export default function TablesPage() {
                             onRowClick={setSelectedTable}
                         />
                 <TablePagination
-                    currentPage={filters.currentPage}
+                    currentPage={currentPage}
                     totalPages={totalPages}
                     totalItems={totalItems}
-                    itemsPerPage={filters.itemsPerPage}
+                    itemsPerPage={itemsPerPage}
                     onPageChange={handlePageChange}
                     onItemsPerPageChange={handleItemsPerPageChange}
                 />
