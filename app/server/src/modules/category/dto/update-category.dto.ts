@@ -40,6 +40,14 @@ export class UpdateCategoryDto {
     @IsOptional()
     imageUrl?: string;
 
+    @ApiPropertyOptional({
+        example: 'categories/image.jpg',
+        description: 'Category image path (relative or storage identifier)',
+    })
+    @IsString()
+    @IsOptional()
+    imagePath?: string;
+
     @ApiPropertyOptional({ example: true, description: 'Is category active' })
     @IsBoolean()
     @IsOptional()
