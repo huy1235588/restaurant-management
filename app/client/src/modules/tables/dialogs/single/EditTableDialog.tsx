@@ -126,7 +126,14 @@ export function EditTableDialog({ open, table, onClose, onSuccess }: EditTableDi
                                     <FormItem>
                                         <FormLabel>{t('tables.capacity', 'Capacity')} *</FormLabel>
                                         <FormControl>
-                                            <Input type="number" min="1" placeholder="4" {...field} />
+                                            <Input 
+                                                type="number" 
+                                                min="1" 
+                                                max="50"
+                                                placeholder="4" 
+                                                {...field}
+                                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -140,7 +147,14 @@ export function EditTableDialog({ open, table, onClose, onSuccess }: EditTableDi
                                     <FormItem>
                                         <FormLabel>{t('tables.minCapacity', 'Min Capacity')}</FormLabel>
                                         <FormControl>
-                                            <Input type="number" min="0" placeholder="2" {...field} />
+                                            <Input 
+                                                type="number" 
+                                                min="1" 
+                                                placeholder="2" 
+                                                {...field}
+                                                onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
+                                                value={field.value || ''}
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -156,7 +170,7 @@ export function EditTableDialog({ open, table, onClose, onSuccess }: EditTableDi
                                     <FormItem>
                                         <FormLabel>{t('tables.floor', 'Floor')}</FormLabel>
                                         <Select
-                                            onValueChange={field.onChange}
+                                            onValueChange={(value) => field.onChange(parseInt(value))}
                                             value={field.value?.toString()}
                                         >
                                             <FormControl>
