@@ -1,1 +1,1 @@
-export { useFloorPlanData } from './useFloorPlanData';
+// Visual editor hooks removed

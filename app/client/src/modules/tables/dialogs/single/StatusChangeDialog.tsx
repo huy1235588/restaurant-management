@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { tableApi } from '@/services/table.service';
+import { tableApi } from '@/modules/tables/services/table.service';
 import { Table, TableStatus } from '@/types';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';

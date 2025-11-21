@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { tableApi } from '@/services/table.service';
+import { tableApi } from '@/modules/tables/services/table.service';
 
 interface BulkActivateDeactivateDialogProps {
     open: boolean;

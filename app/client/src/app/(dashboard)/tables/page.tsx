@@ -4,13 +4,12 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { tableApi } from '@/services/table.service';
+import { tableApi } from '@/modules/tables/services/table.service';
 import { Table, TableStatus } from '@/types';
 import { useTableStore } from '@/stores/tableStore';
 import { Button } from '@/components/ui/button';
 import { TableHeader, TableStats, TableFilters, TablePagination, QuickViewPanel } from '@/modules/tables/components';
 import { TableListView } from '@/modules/tables/views';
-import { VisualFloorPlanView } from '@/modules/tables/views';
 import { TableDialogs } from '@/modules/tables/TableDialogs';
 import {
     BulkStatusChangeDialog,
@@ -23,7 +22,6 @@ import {
 } from '@/modules/tables/dialogs';
 import { useTableSocket } from '@/hooks/useTableSocket';
 
-type ViewMode = 'list' | 'visual';
 type SortField = 'tableNumber' | 'capacity' | 'floor' | 'status';
 type SortOrder = 'asc' | 'desc';
 
@@ -42,15 +40,6 @@ export default function TablesPage() {
         occupied: 0,
         reserved: 0,
         maintenance: 0,
-    });
-
-    // View mode state with localStorage persistence
-    const [viewMode, setViewMode] = useState<ViewMode>(() => {
-        if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem('tables-view-mode');
-            return (saved as ViewMode) || 'list';
-        }
-        return 'list';
     });
 
     // Selection state
@@ -231,13 +220,6 @@ export default function TablesPage() {
         updateURL({ limit: limit.toString(), page: '1' });
     }, [updateURL]);
 
-    const handleViewModeChange = useCallback((mode: ViewMode) => {
-        setViewMode(mode);
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('tables-view-mode', mode);
-        }
-    }, []);
-
     const handleCreateTable = useCallback(() => {
         setShowCreateDialog(true);
     }, []);
@@ -357,38 +339,34 @@ export default function TablesPage() {
                 tables={tables}
                 onCreateTable={handleCreateTable}
                 onRefresh={handleRefresh}
-                viewMode={viewMode}
-                onViewModeChange={handleViewModeChange}
             />
 
-            {viewMode === 'list' ? (
-                <>
-                    <TableStats stats={stats} />
+            <TableStats stats={stats} />
 
-                    <TableFilters
-                        searchTerm={filters.searchTerm}
-                        statusFilter={filters.statusFilter}
-                        floorFilter={filters.floorFilter}
-                        sectionFilter={filters.sectionFilter}
-                        activeFilter={filters.activeFilter}
-                        onSearchChange={handleSearch}
-                        onStatusFilterChange={handleStatusFilter}
-                        onFloorFilterChange={handleFloorFilter}
-                        onSectionFilterChange={handleSectionFilter}
-                        onActiveFilterChange={handleActiveFilter}
-                    />
-                    <div className="animate-in fade-in duration-500">
-                        {selectedTableIds.length > 0 && (
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-blue-100 border border-blue-200 rounded-lg p-4 animate-in slide-in-from-top-2 duration-300">
-                                <span className="text-sm font-medium text-blue-900">
-                                    {t('tables.selectedCount', '{{count}} tables selected', { count: selectedTableIds.length })}
-                                </span>
-                                <div className="flex flex-wrap gap-2">
-                                    <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => setShowBulkStatusDialog(true)}
-                                    >
+            <TableFilters
+                searchTerm={filters.searchTerm}
+                statusFilter={filters.statusFilter}
+                floorFilter={filters.floorFilter}
+                sectionFilter={filters.sectionFilter}
+                activeFilter={filters.activeFilter}
+                onSearchChange={handleSearch}
+                onStatusFilterChange={handleStatusFilter}
+                onFloorFilterChange={handleFloorFilter}
+                onSectionFilterChange={handleSectionFilter}
+                onActiveFilterChange={handleActiveFilter}
+            />
+            <div className="animate-in fade-in duration-500">
+                {selectedTableIds.length > 0 && (
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-blue-100 border border-blue-200 rounded-lg p-4 animate-in slide-in-from-top-2 duration-300">
+                        <span className="text-sm font-medium text-blue-900">
+                            {t('tables.selectedCount', '{{count}} tables selected', { count: selectedTableIds.length })}
+                        </span>
+                        <div className="flex flex-wrap gap-2">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setShowBulkStatusDialog(true)}
+                            >
                                         {t('tables.changeBulkStatus', 'Change Status')}
                                     </Button>
                                     <Button
@@ -444,19 +422,15 @@ export default function TablesPage() {
                             onSelectionChange={handleSelectionChange}
                             onRowClick={setSelectedTable}
                         />
-                        <TablePagination
-                            currentPage={filters.currentPage}
-                            totalPages={totalPages}
-                            totalItems={totalItems}
-                            itemsPerPage={filters.itemsPerPage}
-                            onPageChange={handlePageChange}
-                            onItemsPerPageChange={handleItemsPerPageChange}
-                        />
-                    </div>
-                </>
-            ) : (
-                <VisualFloorPlanView />
-            )}
+                <TablePagination
+                    currentPage={filters.currentPage}
+                    totalPages={totalPages}
+                    totalItems={totalItems}
+                    itemsPerPage={filters.itemsPerPage}
+                    onPageChange={handlePageChange}
+                    onItemsPerPageChange={handleItemsPerPageChange}
+                />
+            </div>
 
             <TableDialogs
                 showCreateDialog={showCreateDialog}
