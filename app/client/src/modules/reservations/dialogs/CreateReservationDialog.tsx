@@ -1,0 +1,326 @@
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { useReservationActions } from '@/modules/reservations/hooks/useReservationActions';
+import { useTableAvailability } from '@/modules/reservations/hooks/useTableAvailability';
+import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+
+const reservationSchema = z.object({
+    customerName: z.string().min(1, 'Name is required').max(100),
+    phoneNumber: z.string().min(10, 'Valid phone number required'),
+    email: z.string().email('Valid email required').optional().or(z.literal('')),
+    partySize: z.number().min(1, 'At least 1 guest').max(50),
+    reservationDate: z.string().min(1, 'Date is required'),
+    duration: z.number().min(30, 'Minimum 30 minutes').max(480),
+    specialRequests: z.string().max(500).optional(),
+    tableId: z.number().optional(),
+});
+
+type ReservationFormData = z.infer<typeof reservationSchema>;
+
+interface CreateReservationDialogProps {
+    open: boolean;
+    onClose: () => void;
+    onSuccess: () => void;
+}
+
+export function CreateReservationDialog({
+    open,
+    onClose,
+    onSuccess,
+}: CreateReservationDialogProps) {
+    const { createReservation, loading } = useReservationActions();
+    const [availabilityParams, setAvailabilityParams] = useState<any>(null);
+    const { tables, loading: loadingTables } = useTableAvailability(availabilityParams);
+
+    const form = useForm<ReservationFormData>({
+        resolver: zodResolver(reservationSchema),
+        defaultValues: {
+            customerName: '',
+            phoneNumber: '',
+            email: '',
+            partySize: 2,
+            reservationDate: '',
+            duration: 120,
+            specialRequests: '',
+            tableId: undefined,
+        },
+    });
+
+    // Watch date and party size to check availability
+    const watchDate = form.watch('reservationDate');
+    const watchPartySize = form.watch('partySize');
+    const watchDuration = form.watch('duration');
+
+    useEffect(() => {
+        if (watchDate && watchPartySize) {
+            // Convert datetime-local to ISO format for API
+            const isoDate = new Date(watchDate).toISOString();
+            setAvailabilityParams({
+                date: isoDate,
+                partySize: watchPartySize,
+                duration: watchDuration,
+            });
+        }
+    }, [watchDate, watchPartySize, watchDuration]);
+
+    const onSubmit = async (data: ReservationFormData) => {
+        try {
+            // Parse datetime-local input (format: "2024-12-25T19:00")
+            const [dateStr, timeStr] = data.reservationDate.split('T');
+            
+            await createReservation({
+                customerName: data.customerName,
+                phoneNumber: data.phoneNumber,
+                email: data.email || undefined,
+                partySize: data.partySize,
+                reservationDate: dateStr, // "2024-12-25"
+                reservationTime: timeStr || '12:00', // "19:00"
+                duration: data.duration,
+                specialRequest: data.specialRequests || undefined,
+                tableId: data.tableId,
+            });
+            form.reset();
+            onSuccess();
+            onClose();
+        } catch (error) {
+            // Error already handled by hook
+        }
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={onClose}>
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle>Create New Reservation</DialogTitle>
+                    <DialogDescription>
+                        Fill in the details to create a new reservation
+                    </DialogDescription>
+                </DialogHeader>
+
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        {/* Customer Information */}
+                        <div className="space-y-3">
+                            <h3 className="font-medium text-sm text-gray-700">
+                                Customer Information
+                            </h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="customerName"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Name *</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="John Doe" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="phoneNumber"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Phone *</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    placeholder="(555) 123-4567"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Email</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="email"
+                                                placeholder="john@example.com"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        {/* Reservation Details */}
+                        <div className="space-y-3">
+                            <h3 className="font-medium text-sm text-gray-700">
+                                Reservation Details
+                            </h3>
+                            <div className="grid grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="partySize"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Party Size *</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    min="1"
+                                                    {...field}
+                                                    onChange={(e) =>
+                                                        field.onChange(parseInt(e.target.value) || 1)
+                                                    }
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="duration"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Duration (min) *</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    min="30"
+                                                    step="30"
+                                                    {...field}
+                                                    onChange={(e) =>
+                                                        field.onChange(parseInt(e.target.value) || 120)
+                                                    }
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <FormField
+                                control={form.control}
+                                name="reservationDate"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Date & Time *</FormLabel>
+                                        <FormControl>
+                                            <Input type="datetime-local" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        {/* Table Selection */}
+                        {tables.length > 0 && (
+                            <div className="space-y-2">
+                                <h3 className="font-medium text-sm text-gray-700">
+                                    Available Tables
+                                </h3>
+                                <FormField
+                                    control={form.control}
+                                    name="tableId"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <div className="grid grid-cols-3 gap-2">
+                                                    {tables.map((table: any) => (
+                                                        <button
+                                                            key={table.id}
+                                                            type="button"
+                                                            onClick={() => field.onChange(table.id)}
+                                                            className={`p-3 border rounded-lg text-sm font-medium transition-colors ${
+                                                                field.value === table.id
+                                                                    ? 'bg-blue-50 border-blue-500 text-blue-700'
+                                                                    : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                                                            }`}
+                                                        >
+                                                            Table {table.tableNumber}
+                                                            <br />
+                                                            <span className="text-xs text-gray-500">
+                                                                {table.capacity} seats
+                                                            </span>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                {loadingTables && (
+                                    <p className="text-sm text-gray-500">
+                                        Checking availability...
+                                    </p>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Special Requests */}
+                        <FormField
+                            control={form.control}
+                            name="specialRequests"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Special Requests</FormLabel>
+                                    <FormControl>
+                                        <Textarea
+                                            placeholder="Any special requests or dietary restrictions..."
+                                            className="resize-none"
+                                            rows={3}
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <DialogFooter>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={onClose}
+                                disabled={loading}
+                            >
+                                Cancel
+                            </Button>
+                            <Button type="submit" disabled={loading}>
+                                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Create Reservation
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </Form>
+            </DialogContent>
+        </Dialog>
+    );
+}

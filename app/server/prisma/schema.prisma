@@ -272,7 +272,7 @@ model Reservation {
     reservationDate    DateTime          @db.Date
     reservationTime    DateTime          @db.Time(0)
     duration           Int               @default(120) // minutes
-    headCount          Int
+    partySize          Int
     specialRequest     String?           @db.Text
     depositAmount      Decimal?          @db.Decimal(10, 2)
     status             ReservationStatus @default(pending)
@@ -330,7 +330,7 @@ model Order {
     reservationId      Int?
     customerName       String?     @db.VarChar(255)
     customerPhone      String?     @db.VarChar(20)
-    headCount          Int         @default(1)
+    partySize          Int         @default(1)
     status             OrderStatus @default(pending)
     notes              String?     @db.Text
     // Financial fields

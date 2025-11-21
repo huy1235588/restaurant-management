@@ -2,32 +2,32 @@
 
 ## 1. Backend Setup (Express + Prisma)
 
-- [ ] 1.1 Verify database schema
+- [x] 1.1 Verify database schema
   - Confirm `reservations`, `reservation_audits`, `customers`, `restaurant_tables` tables exist
   - Review indexes and relationships in schema.prisma
   - No migrations needed (schema already exists)
 
-- [ ] 1.2 Create reservations feature module structure
+- [x] 1.2 Create reservations feature module structure
   - Create `app/server/src/features/reservations/` directory
   - Create `reservations.types.ts` with TypeScript interfaces
   - Create `reservations.validation.ts` with Zod schemas
   - Create `reservations.service.ts` with business logic
   - Create `reservations.controller.ts` with HTTP handlers
 
-- [ ] 1.3 Define TypeScript types and DTOs
+- [x] 1.3 Define TypeScript types and DTOs
   - CreateReservationDto with all required/optional fields
   - UpdateReservationDto as Partial<CreateReservationDto>
   - ReservationQueryDto for filtering/pagination
   - ReservationResponseDto with nested relations
   - Enum types for ReservationStatus
 
-- [ ] 1.4 Create Zod validation schemas
+- [x] 1.4 Create Zod validation schemas
   - createReservationSchema with field validations
   - updateReservationSchema (all fields optional)
   - queryReservationSchema for GET parameters
-  - Validate: phone format, email format, date/time ranges, headCount 1-50, duration 30-480
+  - Validate: phone format, email format, date/time ranges, partySize 1-50, duration 30-480
 
-- [ ] 1.5 Set up reservation routes
+- [x] 1.5 Set up reservation routes
   - Add routes in `app/server/src/routes/index.ts`
   - Mount `/api/reservations` router
   - Apply authentication middleware
@@ -35,7 +35,7 @@
 
 ## 2. Backend Business Logic
 
-- [ ] 2.1 Implement Create Reservation service
+- [x] 2.1 Implement Create Reservation service
   - Validate customer inputs with Zod
   - Check if customer exists by phoneNumber, create if not
   - If tableId not provided, auto-assign suitable table
@@ -45,14 +45,14 @@
   - Create audit log entry
   - Return reservation with nested table and customer
 
-- [ ] 2.2 Implement table availability check logic
+- [x] 2.2 Implement table availability check logic
   - Query reservations for given date and time range
   - Calculate overlap: (start1 < end2) AND (start2 < end1)
   - Filter tables by capacity, minCapacity, isActive
   - Optionally filter by floor/section
   - Return list of available tables
 
-- [ ] 2.3 Implement Get Reservations service (with filters)
+- [x] 2.3 Implement Get Reservations service (with filters)
   - Support pagination (page, limit)
   - Filter by status, date, dateRange, tableId
   - Search by customerName, phoneNumber, reservationCode (case-insensitive)
@@ -60,12 +60,12 @@
   - Include related table and customer data
   - Return paginated response with metadata
 
-- [ ] 2.4 Implement Get Reservation by ID/Code
+- [x] 2.4 Implement Get Reservation by ID/Code
   - Query by reservationId or reservationCode
   - Include related table, customer, audits
   - Return 404 if not found
 
-- [ ] 2.5 Implement Update Reservation service
+- [x] 2.5 Implement Update Reservation service
   - Validate status (cannot update completed/cancelled)
   - If date/time changed, re-check table availability
   - If tableId changed, validate new table availability and capacity
@@ -73,14 +73,14 @@
   - Create audit log entry with changes JSON
   - Return updated reservation
 
-- [ ] 2.6 Implement Confirm Reservation service
+- [x] 2.6 Implement Confirm Reservation service
   - Validate current status is "pending"
   - Update status to "confirmed"
   - Set confirmedAt timestamp
   - Create audit log
   - Return updated reservation
 
-- [ ] 2.7 Implement Check-in (Seat) service
+- [x] 2.7 Implement Check-in (Seat) service
   - Validate current status is "confirmed" (or "pending" if early)
   - Update status to "seated"
   - Set seatedAt timestamp
@@ -88,7 +88,7 @@
   - Create audit log
   - Return updated reservation
 
-- [ ] 2.8 Implement Complete Reservation service
+- [x] 2.8 Implement Complete Reservation service
   - Validate current status is "seated"
   - Update status to "completed"
   - Set completedAt timestamp
@@ -96,7 +96,7 @@
   - Create audit log
   - Return updated reservation
 
-- [ ] 2.9 Implement Cancel Reservation service
+- [x] 2.9 Implement Cancel Reservation service
   - Validate status is not "completed"
   - Update status to "cancelled"
   - Set cancelledAt timestamp
@@ -105,7 +105,7 @@
   - Create audit log
   - Return updated reservation
 
-- [ ] 2.10 Implement Mark No-Show service
+- [x] 2.10 Implement Mark No-Show service
   - Validate status is "pending" or "confirmed"
   - Update status to "no_show"
   - Set cancelledAt timestamp
@@ -114,20 +114,20 @@
   - Create audit log
   - Return updated reservation
 
-- [ ] 2.11 Implement Get Reservations by Phone
+- [x] 2.11 Implement Get Reservations by Phone
   - Query reservations by phoneNumber
   - Include all statuses
   - Sort by reservationDate DESC
   - Return array of reservations
 
-- [ ] 2.12 Implement audit logging helper
+- [x] 2.12 Implement audit logging helper
   - Auto-create ReservationAudit on all changes
   - Capture action type (create, update, confirm, seat, complete, cancel, no_show)
   - Capture userId from JWT token
   - Capture changes as JSON (before/after values)
   - Store timestamp
 
-- [ ] 2.13 Implement customer auto-management
+- [x] 2.13 Implement customer auto-management
   - Check if customer exists by phoneNumber
   - If exists, link reservation to existing customerId
   - If not, create new Customer with name + phone
@@ -135,65 +135,65 @@
 
 ## 3. Backend API Endpoints
 
-- [ ] 3.1 POST /api/reservations - Create reservation
+- [x] 3.1 POST /api/reservations - Create reservation
   - Validate request body with Zod
   - Call createReservation service
   - Return 201 with created reservation
   - Handle errors: 400 validation, 409 table conflict, 404 table not found
 
-- [ ] 3.2 GET /api/reservations - List reservations (paginated)
+- [x] 3.2 GET /api/reservations - List reservations (paginated)
   - Parse query parameters (page, limit, status, date, search, sort)
   - Call getReservations service
   - Return 200 with paginated data
 
-- [ ] 3.3 GET /api/reservations/:id - Get reservation by ID
+- [x] 3.3 GET /api/reservations/:id - Get reservation by ID
   - Parse reservationId from URL
   - Call getReservationById service
   - Return 200 with reservation or 404 if not found
 
-- [ ] 3.4 GET /api/reservations/code/:code - Get by code
+- [x] 3.4 GET /api/reservations/code/:code - Get by code
   - Parse reservationCode from URL
   - Call getReservationByCode service
   - Return 200 or 404
 
-- [ ] 3.5 PUT /api/reservations/:id - Update reservation
+- [x] 3.5 PUT /api/reservations/:id - Update reservation
   - Validate request body
   - Call updateReservation service
   - Return 200 with updated reservation
   - Handle errors: 400, 404, 409
 
-- [ ] 3.6 PATCH /api/reservations/:id/confirm - Confirm
+- [x] 3.6 PATCH /api/reservations/:id/confirm - Confirm
   - Call confirmReservation service
   - Return 200 or 400 if invalid status
 
-- [ ] 3.7 PATCH /api/reservations/:id/seated - Check-in
+- [x] 3.7 PATCH /api/reservations/:id/seated - Check-in
   - Call seatReservation service
   - Return 200 or 400
 
-- [ ] 3.8 PATCH /api/reservations/:id/complete - Complete
+- [x] 3.8 PATCH /api/reservations/:id/complete - Complete
   - Call completeReservation service
   - Return 200 or 400
 
-- [ ] 3.9 PATCH /api/reservations/:id/cancel - Cancel
+- [x] 3.9 PATCH /api/reservations/:id/cancel - Cancel
   - Parse optional reason from body
   - Call cancelReservation service
   - Return 200 or 400/404
 
-- [ ] 3.10 PATCH /api/reservations/:id/no-show - Mark no-show
+- [x] 3.10 PATCH /api/reservations/:id/no-show - Mark no-show
   - Call markNoShow service
   - Return 200 or 400/404
 
-- [ ] 3.11 GET /api/reservations/check-availability - Check tables
+- [x] 3.11 GET /api/reservations/check-availability - Check tables
   - Parse date, partySize, duration from query
   - Call checkAvailability service
   - Return 200 with array of available tables
 
-- [ ] 3.12 GET /api/reservations/phone/:phone - Get by phone
+- [x] 3.12 GET /api/reservations/phone/:phone - Get by phone
   - Parse phone from URL
   - Call getReservationsByPhone service
   - Return 200 with array
 
-- [ ] 3.13 Add role-based access control middleware
+- [x] 3.13 Add role-based access control middleware
   - Admin/Manager: full access to all endpoints
   - Waiter: read, create, confirm, seat, complete (no cancel)
   - Chef/Cashier: read-only
@@ -242,19 +242,19 @@
 
 ## 5. Frontend Module Setup
 
-- [ ] 5.1 Create reservations module structure
+- [x] 5.1 Create reservations module structure
   - Create `app/client/src/modules/reservations/` directory
   - Create subdirectories: components, views, dialogs, services, hooks, types, utils
   - Create `index.ts` barrel export
 
-- [ ] 5.2 Define TypeScript types
+- [x] 5.2 Define TypeScript types
   - Create `types/reservation.types.ts`
   - Define Reservation interface matching backend
   - Define ReservationStatus enum
   - Define CreateReservationDto, UpdateReservationDto
   - Define PaginatedResponse<Reservation>
 
-- [ ] 5.3 Create API service
+- [x] 5.3 Create API service
   - Create `services/reservation.service.ts`
   - Implement all API calls using axios
   - getReservations(params) - GET /api/reservations
@@ -270,7 +270,7 @@
   - checkAvailability(date, partySize, duration) - GET /api/reservations/check-availability
   - getReservationsByPhone(phone) - GET /api/reservations/phone/:phone
 
-- [ ] 5.4 Create custom React hooks
+- [x] 5.4 Create custom React hooks
   - Create `hooks/useReservations.ts` - Fetch paginated list
   - Create `hooks/useReservationDetail.ts` - Fetch single reservation
   - Create `hooks/useReservationActions.ts` - Mutations (create, update, cancel)
@@ -337,9 +337,9 @@
 
 ## 7. Frontend Dialogs
 
-- [ ] 7.1 Create CreateReservationDialog
+- [x] 7.1 Create CreateReservationDialog
   - Form with React Hook Form + Zod validation
-  - Fields: customerName*, phoneNumber*, email, reservationDate*, reservationTime*, headCount*, specialRequest, notes
+  - Fields: customerName*, phoneNumber*, email, reservationDate*, reservationTime*, partySize*, specialRequest, notes
   - Auto-assign table button (opens TableAvailabilityList)
   - Manual table selection (dropdown with search)
   - Duration input (default 120 minutes)
