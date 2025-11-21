@@ -90,6 +90,7 @@ export class MenuService {
             cost: data.cost,
             description: data.description,
             imageUrl: data.imageUrl,
+            imagePath: data.imagePath,
             isAvailable: data.isAvailable,
             isActive: data.isActive,
             preparationTime: data.preparationTime,

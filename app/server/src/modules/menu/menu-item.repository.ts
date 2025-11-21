@@ -79,14 +79,18 @@ export class MenuItemRepository {
     async findAllPaginated(options?: FindOptions) {
         const items = await this.findAll(options);
         const total = await this.count(options?.filters);
+        const limit = options?.take || 20;
+        const page = options?.skip ? Math.floor(options.skip / limit) + 1 : 1;
+        const totalPages = Math.ceil(total / limit);
 
         return {
             items,
-            total,
-            page: options?.skip
-                ? Math.floor(options.skip / (options.take || 10)) + 1
-                : 1,
-            limit: options?.take || 10,
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages,
+            },
         };
     }
 

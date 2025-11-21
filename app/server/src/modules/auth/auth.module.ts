@@ -14,7 +14,7 @@ import { StaffRepository } from '@/modules/staff/staff.repository';
         PassportModule.register({ defaultStrategy: 'jwt' }),
         JwtModule.registerAsync({
             useFactory: (configService: ConfigService) => {
-                const secret = configService.get<string>('JWT_SECRET');
+                const secret = configService.get<string>('jwtSecret');
                 if (!secret) {
                     throw new Error('JWT secret is not configured');
                 }

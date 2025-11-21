@@ -41,11 +41,16 @@ export class LocalStorageService implements IStorageService {
 
             this.logger.log(`File uploaded to local storage: ${filename}`);
 
+            const relativePath = `${folder}/${filename}`;
+
             return {
-                url: `${this.baseUrl}/uploads/${folder}/${filename}`,
                 filename,
+                originalName: file.originalname,
+                path: relativePath,
                 size: file.size,
                 mimetype: file.mimetype,
+                url: `${this.baseUrl}/uploads/${relativePath}`,
+                uploadedAt: new Date().toISOString(),
             };
         } catch (error) {
             this.logger.error('Failed to upload file to local storage', error);

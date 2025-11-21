@@ -92,7 +92,7 @@ export class MenuController {
         @Query('sortOrder') sortOrder?: 'asc' | 'desc',
     ) {
         const pageNum = page ? parseInt(page) : 1;
-        const limitNum = limit ? parseInt(limit) : 10;
+        const limitNum = limit ? parseInt(limit) : 20;
 
         const result = await this.menuService.getAllMenuItems({
             filters: {

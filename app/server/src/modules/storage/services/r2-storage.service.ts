@@ -64,11 +64,14 @@ export class R2StorageService implements IStorageService {
             this.logger.log(`File uploaded to R2: ${filename}`);
 
             return {
-                url: `${this.publicUrl}/${key}`,
-                publicId: key,
                 filename,
+                originalName: file.originalname,
+                path: key,
                 size: file.size,
                 mimetype: file.mimetype,
+                url: `${this.publicUrl}/${key}`,
+                uploadedAt: new Date().toISOString(),
+                publicId: key,
             };
         } catch (error) {
             this.logger.error('Failed to upload file to R2', error);

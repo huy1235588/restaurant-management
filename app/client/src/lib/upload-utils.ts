@@ -200,26 +200,6 @@ export function getFileInfo(uploadedFileInfo: any) {
 }
 
 /**
- * Check storage status
- */
-export async function checkStorageHealth() {
-    try {
-        const status = await uploadApi.getStatus();
-        console.log('Storage Status:', {
-            primary: status.primary,
-            primaryAvailable: status.primaryAvailable,
-            fallback: status.fallback,
-            fallbackAvailable: status.fallbackAvailable,
-            currentType: status.currentType,
-        });
-        return status;
-    } catch (error) {
-        console.error('Failed to check storage status:', error);
-        throw error;
-    }
-}
-
-/**
  * Type for upload result
  */
 export type UploadResult = {

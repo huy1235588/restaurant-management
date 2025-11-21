@@ -23,8 +23,8 @@ export class StorageService {
     ) {
         this.provider =
             (this.configService.get<string>(
-                'storage.provider',
-            ) as StorageProvider) || StorageProvider.LOCAL;
+                'STORAGE_TYPE',
+            ) as StorageProvider) || StorageProvider.R2;
 
         // Select storage service based on provider
         switch (this.provider) {

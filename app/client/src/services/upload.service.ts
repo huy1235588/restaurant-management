@@ -1,20 +1,19 @@
 import axiosInstance from '@/lib/axios';
 import { ApiResponse } from '@/types';
 
+/**
+ * Upload result interface - matches backend UploadResult
+ * Contains all information about an uploaded file
+ */
 export interface UploadedFileInfo {
-    filename: string;
-    originalName: string;
-    path: string;
-    size: number;
-    mimetype: string;
-    url: string;
-    uploadedAt: string;
-}
-
-export interface UploadResponse {
-    success: boolean;
-    message: string;
-    data: UploadedFileInfo | { files: UploadedFileInfo[]; count: number };
+    filename: string;        // Generated unique filename
+    originalName: string;    // Original filename from user
+    path: string;           // Relative path or cloud storage identifier
+    size: number;           // File size in bytes
+    mimetype: string;       // MIME type (e.g., 'image/jpeg')
+    url: string;            // Full URL to access the file
+    uploadedAt: string;     // ISO timestamp of upload
+    publicId?: string;      // Cloud storage public ID (Cloudinary/R2)
 }
 
 export type UploadFolder = 'temp' | 'menu' | "categories" | 'staff' | 'documents' | 'images' | 'others';
@@ -44,8 +43,8 @@ export const uploadApi = {
         formData.append('category', category);
 
         try {
-            const response = await axiosInstance.post<UploadResponse>(
-                '/storage/upload/single',
+            const response = await axiosInstance.post<ApiResponse<UploadedFileInfo>>(
+                '/storage/upload',
                 formData,
                 {
                     headers: {
@@ -54,11 +53,7 @@ export const uploadApi = {
                 }
             );
 
-            if (!response.data.success) {
-                throw new Error(response.data.message || 'Upload failed');
-            }
-
-            return response.data.data as UploadedFileInfo;
+            return response.data.data;
         } catch (error: any) {
             const errorMessage = error.response?.data?.error || error.message || 'Upload failed';
             throw new Error(errorMessage);
@@ -93,8 +88,8 @@ export const uploadApi = {
         formData.append('category', category);
 
         try {
-            const response = await axiosInstance.post<UploadResponse>(
-                '/storage/upload/multiple',
+            const response = await axiosInstance.post<ApiResponse<UploadedFileInfo[]>>(
+                '/storage/upload-multiple',
                 formData,
                 {
                     headers: {
@@ -103,12 +98,7 @@ export const uploadApi = {
                 }
             );
 
-            if (!response.data.success) {
-                throw new Error(response.data.message || 'Upload failed');
-            }
-
-            const data = response.data.data as { files: UploadedFileInfo[]; count: number };
-            return data.files;
+            return response.data.data;
         } catch (error: any) {
             const errorMessage = error.response?.data?.error || error.message || 'Upload failed';
             throw new Error(errorMessage);
@@ -119,50 +109,15 @@ export const uploadApi = {
      * Delete a file
      * @param filePath - File path to delete (e.g., 'uploads/menu/file.jpg')
      */
-    deleteFile: async (filePath: string): Promise<void> => {
+    deleteFile: async (identifier: string): Promise<void> => {
         try {
+            // URL encode the identifier to handle special characters
+            const encodedIdentifier = encodeURIComponent(identifier);
             const response = await axiosInstance.delete<ApiResponse<null>>(
-                '/storage/upload',
-                {
-                    data: { filePath },
-                }
+                `/storage/${encodedIdentifier}`
             );
-
-            if (!response.data.success) {
-                throw new Error(response.data.message || 'Delete failed');
-            }
         } catch (error: any) {
             const errorMessage = error.response?.data?.error || error.message || 'Delete failed';
-            throw new Error(errorMessage);
-        }
-    },
-
-    /**
-     * Get current storage status
-     */
-    getStatus: async () => {
-        try {
-            const response = await axiosInstance.get<ApiResponse<any>>(
-                '/storage/status'
-            );
-            return response.data.data;
-        } catch (error: any) {
-            const errorMessage = error.response?.data?.error || error.message;
-            throw new Error(errorMessage);
-        }
-    },
-
-    /**
-     * Get current storage type (local or cloudinary)
-     */
-    getCurrentType: async () => {
-        try {
-            const response = await axiosInstance.get<ApiResponse<{ storageType: string }>>(
-                '/storage/current'
-            );
-            return response.data.data.storageType;
-        } catch (error: any) {
-            const errorMessage = error.response?.data?.error || error.message;
             throw new Error(errorMessage);
         }
     },

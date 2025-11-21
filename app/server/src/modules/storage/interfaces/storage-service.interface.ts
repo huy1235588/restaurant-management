@@ -1,9 +1,12 @@
 export interface UploadResult {
-    url: string;
-    publicId?: string;
     filename: string;
+    originalName: string;
+    path: string;
     size: number;
     mimetype: string;
+    url: string;
+    uploadedAt: string;
+    publicId?: string; // For cloud storage providers
 }
 
 export interface IStorageService {

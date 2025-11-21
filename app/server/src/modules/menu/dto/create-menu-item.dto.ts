@@ -4,7 +4,6 @@ import {
     IsNumber,
     IsOptional,
     IsBoolean,
-    IsUrl,
     Min,
     Max,
     MaxLength,
@@ -54,9 +53,17 @@ export class CreateMenuItemDto {
         example: 'https://example.com/image.jpg',
         description: 'Item image URL',
     })
-    @IsUrl()
+    @IsString()
     @IsOptional()
     imageUrl?: string;
+
+    @ApiPropertyOptional({
+        example: 'menu/image.jpg',
+        description: 'Item image path (relative or storage identifier)',
+    })
+    @IsString()
+    @IsOptional()
+    imagePath?: string;
 
     @ApiPropertyOptional({ example: true, description: 'Is item available' })
     @IsBoolean()

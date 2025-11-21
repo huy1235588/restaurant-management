@@ -38,7 +38,7 @@ export class AuthController {
 
     private getCookieOptions(maxAge: number) {
         const isProduction =
-            this.configService.get<string>('NODE_ENV') === 'production';
+            this.configService.get<string>('nodeEnv') === 'production';
         return {
             httpOnly: true,
             secure: isProduction,

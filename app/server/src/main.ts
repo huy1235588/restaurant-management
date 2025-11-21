@@ -18,11 +18,11 @@ async function bootstrap() {
     });
 
     const configService = app.get(ConfigService);
-    const port = configService.get<number>('PORT') || 8000;
-    const apiVersion = configService.get<string>('API_VERSION') || 'v1';
-    const nodeEnv = configService.get<string>('NODE_ENV') || 'development';
+    const port = configService.get<number>('port') || 8000;
+    const apiVersion = configService.get<string>('apiVersion') || 'v1';
+    const nodeEnv = configService.get<string>('nodeEnv') || 'development';
     const corsOriginString =
-        configService.get<string>('CLIENT_URL') || 'http://localhost:3000';
+        configService.get<string>('corsOrigin') || 'http://localhost:3000';
 
     // Parse CORS origins (supports comma-separated list)
     const corsOrigins = corsOriginString

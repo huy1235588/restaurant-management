@@ -57,6 +57,14 @@ export class UpdateMenuItemDto {
     @IsOptional()
     imageUrl?: string;
 
+    @ApiPropertyOptional({
+        example: 'menu/image.jpg',
+        description: 'Item image path (relative or storage identifier)',
+    })
+    @IsString()
+    @IsOptional()
+    imagePath?: string;
+
     @ApiPropertyOptional({ example: true, description: 'Is item available' })
     @IsBoolean()
     @IsOptional()

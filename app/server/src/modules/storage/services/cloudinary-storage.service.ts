@@ -53,11 +53,14 @@ export class CloudinaryStorageService implements IStorageService {
                     );
 
                     resolve({
-                        url: result.secure_url,
-                        publicId: result.public_id,
                         filename: result.original_filename || file.originalname,
+                        originalName: file.originalname,
+                        path: result.public_id,
                         size: result.bytes,
                         mimetype: file.mimetype,
+                        url: result.secure_url,
+                        uploadedAt: new Date().toISOString(),
+                        publicId: result.public_id,
                     });
                 },
             );

@@ -1,16 +1,19 @@
 import { MenuItem, Category } from '@/types';
 
 // Filter types
+// NOTE: Backend only supports categoryId, isAvailable, isActive, search
+// Other filters (minPrice, maxPrice, isVegetarian, spicyLevel) are defined
+// for future implementation but not yet supported by backend
 export interface MenuFilters {
     categoryId?: number;
     isAvailable?: boolean;
     isActive?: boolean;
     search?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    isVegetarian?: boolean;
-    spicyLevel?: number;
-    preparationTime?: 'quick' | 'normal' | 'long';
+    // Future filters (not yet implemented in backend):
+    // minPrice?: number;
+    // maxPrice?: number;
+    // isVegetarian?: boolean;
+    // spicyLevel?: number;
 }
 
 // Form data types

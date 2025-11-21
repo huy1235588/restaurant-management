@@ -52,14 +52,6 @@ export function MenuItemFilters({
                 return value === true ? 'Available' : 'Out of Stock';
             case 'isActive':
                 return value === true ? 'Active' : 'Inactive';
-            case 'isVegetarian':
-                return 'Vegetarian';
-            case 'spicyLevel':
-                return `Spicy Level: ${value}`;
-            case 'minPrice':
-                return `Min Price: ${value}`;
-            case 'maxPrice':
-                return `Max Price: ${value}`;
             default:
                 return '';
         }
@@ -100,7 +92,7 @@ export function MenuItemFilters({
                 </div>
 
                 <CollapsibleContent className="space-y-4 pt-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
                             <Label>Category</Label>
                             <Select
@@ -180,68 +172,6 @@ export function MenuItemFilters({
                                     <SelectItem value="inactive">Inactive</SelectItem>
                                 </SelectContent>
                             </Select>
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label>Spicy Level</Label>
-                            <Select
-                                value={filters.spicyLevel?.toString() || 'all'}
-                                onValueChange={(value) =>
-                                    updateFilter('spicyLevel', value === 'all' ? undefined : Number(value))
-                                }
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="All" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All</SelectItem>
-                                    <SelectItem value="0">Not spicy</SelectItem>
-                                    <SelectItem value="1">🌶️ Mild</SelectItem>
-                                    <SelectItem value="2">🌶️🌶️ Medium</SelectItem>
-                                    <SelectItem value="3">🌶️🌶️🌶️ Hot</SelectItem>
-                                    <SelectItem value="4">🌶️🌶️🌶️🌶️ Very hot</SelectItem>
-                                    <SelectItem value="5">🌶️🌶️🌶️🌶️🌶️ Extremely hot</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label>Min Price</Label>
-                            <Input
-                                type="number"
-                                min={0}
-                                placeholder="0"
-                                value={filters.minPrice || ''}
-                                onChange={(e) =>
-                                    updateFilter('minPrice', e.target.value ? Number(e.target.value) : undefined)
-                                }
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label>Max Price</Label>
-                            <Input
-                                type="number"
-                                min={0}
-                                placeholder="No limit"
-                                value={filters.maxPrice || ''}
-                                onChange={(e) =>
-                                    updateFilter('maxPrice', e.target.value ? Number(e.target.value) : undefined)
-                                }
-                            />
-                        </div>
-
-                        <div className="flex items-center space-x-2 pt-7">
-                            <Switch
-                                id="vegetarian"
-                                checked={filters.isVegetarian || false}
-                                onCheckedChange={(checked) =>
-                                    updateFilter('isVegetarian', checked || undefined)
-                                }
-                            />
-                            <Label htmlFor="vegetarian" className="cursor-pointer">
-                                🌱 Vegetarian Only
-                            </Label>
                         </div>
                     </div>
                 </CollapsibleContent>
