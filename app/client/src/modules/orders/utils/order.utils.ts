@@ -1,3 +1,4 @@
+import { MenuItem } from '@/types';
 import { OrderStatus, OrderItemStatus, KitchenOrderStatus } from '../types';
 
 // Format currency (VND)
@@ -89,11 +90,11 @@ export const calculateOrderTotal = (items: Array<{ price: number; quantity: numb
 };
 
 // Group items by category
-export const groupItemsByCategory = <T extends { menuItemId: number; menuItem: any }>(
+export const groupItemsByCategory = <T extends { menuItemId: number; menuItem: MenuItem }>(
     items: T[]
 ): Record<string, T[]> => {
     return items.reduce((groups, item) => {
-        const categoryName = item.menuItem?.category?.name || 'Khác';
+        const categoryName = item.menuItem?.category?.categoryName || 'Khác';
         if (!groups[categoryName]) {
             groups[categoryName] = [];
         }

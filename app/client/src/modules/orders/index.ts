@@ -1,20 +1,20 @@
 // Types
-export * from './types';
+export * from "./types";
 
 // Services
-export * from './services';
+export * from "./services";
 
 // Hooks
-export * from './hooks';
+export * from "./hooks";
 
 // Utils
-export * from './utils';
+export * from "./utils";
 
 // Components
-export * from './components';
+export * from "./components";
 
 // Views
-export * from './views';
+export * from "./views";
 
-// Dialogs (to be exported as they are created)
-// export * from './dialogs';
+// Dialogs
+export * from "./dialogs";

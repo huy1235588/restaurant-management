@@ -1,6 +1,6 @@
 'use client';
 
-import { useKitchenQueue, useMarkKitchenOrderReady } from '../hooks';
+import { useKitchenQueue, useMarkKitchenOrderReady, useOrderSocket } from '../hooks';
 import { KitchenOrderCard } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -12,6 +12,8 @@ export function KitchenQueueView() {
     const { t } = useTranslation();
     const { data: kitchenOrders, isLoading, error, refetch } = useKitchenQueue();
     const markReadyMutation = useMarkKitchenOrderReady();
+
+    useOrderSocket();
 
     const handleMarkReady = (kitchenOrderId: number) => {
         markReadyMutation.mutate(kitchenOrderId);
