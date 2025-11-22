@@ -1,5 +1,19 @@
 import { MenuItem } from '@/types';
 import { OrderStatus, OrderItemStatus, KitchenOrderStatus } from '../types';
+import {
+    ORDER_STATUS_COLORS,
+    ORDER_ITEM_STATUS_COLORS,
+    KITCHEN_ORDER_STATUS_COLORS,
+    WAITING_TIME_THRESHOLDS,
+    WAITING_TIME_COLORS,
+    EDITABLE_ORDER_STATUSES,
+    CANCELLABLE_ORDER_STATUSES,
+    CANCELLABLE_ITEM_STATUSES,
+    SERVABLE_ITEM_STATUSES,
+    ORDER_STATUS_LABELS,
+    ORDER_ITEM_STATUS_LABELS,
+    KITCHEN_ORDER_STATUS_LABELS,
+} from '../constants';
 
 // Format currency (VND)
 export const formatCurrency = (amount: number): string => {
@@ -28,60 +42,32 @@ export const formatElapsedTime = (minutes: number): string => {
 
 // Get order status color
 export const getOrderStatusColor = (status: OrderStatus): string => {
-    const colors: Record<OrderStatus, string> = {
-        pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-        confirmed: 'bg-blue-100 text-blue-800 border-blue-300',
-        preparing: 'bg-orange-100 text-orange-800 border-orange-300',
-        ready: 'bg-green-100 text-green-800 border-green-300',
-        served: 'bg-purple-100 text-purple-800 border-purple-300',
-        completed: 'bg-gray-100 text-gray-800 border-gray-300',
-        cancelled: 'bg-red-100 text-red-800 border-red-300',
-        paid: 'bg-emerald-100 text-emerald-800 border-emerald-300',
-    };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return ORDER_STATUS_COLORS[status] || 'bg-gray-100 text-gray-800';
 };
 
 // Get order item status color
 export const getOrderItemStatusColor = (status: OrderItemStatus): string => {
-    const colors: Record<OrderItemStatus, string> = {
-        pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-        preparing: 'bg-orange-100 text-orange-800 border-orange-300',
-        ready: 'bg-green-100 text-green-800 border-green-300',
-        served: 'bg-purple-100 text-purple-800 border-purple-300',
-        cancelled: 'bg-red-100 text-red-800 border-red-300',
-    };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return ORDER_ITEM_STATUS_COLORS[status] || 'bg-gray-100 text-gray-800';
 };
 
 // Get kitchen order status color
 export const getKitchenOrderStatusColor = (status: KitchenOrderStatus): string => {
-    const colors: Record<KitchenOrderStatus, string> = {
-        pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-        preparing: 'bg-orange-100 text-orange-800 border-orange-300',
-        ready: 'bg-green-100 text-green-800 border-green-300',
-        cancelled: 'bg-red-100 text-red-800 border-red-300',
-    };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return KITCHEN_ORDER_STATUS_COLORS[status] || 'bg-gray-100 text-gray-800';
 };
 
 // Get waiting time alert level (for kitchen queue)
 export const getWaitingTimeAlertLevel = (
     minutes: number
 ): 'normal' | 'warning' | 'critical' => {
-    if (minutes < 15) return 'normal';
-    if (minutes < 30) return 'warning';
+    if (minutes < WAITING_TIME_THRESHOLDS.NORMAL) return 'normal';
+    if (minutes < WAITING_TIME_THRESHOLDS.WARNING) return 'warning';
     return 'critical';
 };
 
 // Get alert color based on waiting time
 export const getWaitingTimeColor = (minutes: number): string => {
     const level = getWaitingTimeAlertLevel(minutes);
-    const colors = {
-        normal: 'text-green-600',
-        warning: 'text-yellow-600',
-        critical: 'text-red-600',
-    };
-    return colors[level];
+    return WAITING_TIME_COLORS[level.toUpperCase() as keyof typeof WAITING_TIME_COLORS];
 };
 
 // Calculate order total
@@ -105,22 +91,22 @@ export const groupItemsByCategory = <T extends { menuItemId: number; menuItem: M
 
 // Check if order can be cancelled
 export const canCancelOrder = (status: OrderStatus): boolean => {
-    return status === 'pending' || status === 'confirmed';
+    return CANCELLABLE_ORDER_STATUSES.includes(status as any);
 };
 
 // Check if item can be cancelled
 export const canCancelItem = (itemStatus: OrderItemStatus): boolean => {
-    return itemStatus === 'pending';
+    return CANCELLABLE_ITEM_STATUSES.includes(itemStatus as any);
 };
 
 // Check if item can be marked as served
 export const canMarkItemAsServed = (itemStatus: OrderItemStatus): boolean => {
-    return itemStatus === 'ready';
+    return SERVABLE_ITEM_STATUSES.includes(itemStatus as any);
 };
 
 // Check if order is editable
 export const isOrderEditable = (status: OrderStatus): boolean => {
-    return status === 'pending' || status === 'confirmed';
+    return EDITABLE_ORDER_STATUSES.includes(status as any);
 };
 
 // Format date/time
@@ -149,4 +135,149 @@ export const formatTime = (date: Date | string): string => {
         hour: '2-digit',
         minute: '2-digit',
     }).format(new Date(date));
+};
+
+/**
+ * New utility functions
+ */
+
+// Get status label (Vietnamese)
+export const getOrderStatusLabel = (status: OrderStatus): string => {
+    return ORDER_STATUS_LABELS[status] || status;
+};
+
+export const getOrderItemStatusLabel = (status: OrderItemStatus): string => {
+    return ORDER_ITEM_STATUS_LABELS[status] || status;
+};
+
+export const getKitchenOrderStatusLabel = (status: KitchenOrderStatus): string => {
+    return KITCHEN_ORDER_STATUS_LABELS[status] || status;
+};
+
+// Check if order is in progress
+export const isOrderInProgress = (status: OrderStatus): boolean => {
+    return [
+        OrderStatus.PENDING,
+        OrderStatus.CONFIRMED,
+        OrderStatus.PREPARING,
+        OrderStatus.READY,
+        OrderStatus.SERVED,
+    ].includes(status);
+};
+
+// Check if order is finalized
+export const isOrderFinalized = (status: OrderStatus): boolean => {
+    return [
+        OrderStatus.COMPLETED,
+        OrderStatus.CANCELLED,
+        OrderStatus.PAID,
+    ].includes(status);
+};
+
+// Get next possible statuses for transition
+export const getNextPossibleStatuses = (currentStatus: OrderStatus): OrderStatus[] => {
+    const transitions: Record<OrderStatus, OrderStatus[]> = {
+        [OrderStatus.PENDING]: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
+        [OrderStatus.CONFIRMED]: [OrderStatus.PREPARING, OrderStatus.CANCELLED],
+        [OrderStatus.PREPARING]: [OrderStatus.READY],
+        [OrderStatus.READY]: [OrderStatus.SERVED],
+        [OrderStatus.SERVED]: [OrderStatus.COMPLETED],
+        [OrderStatus.COMPLETED]: [OrderStatus.PAID],
+        [OrderStatus.CANCELLED]: [],
+        [OrderStatus.PAID]: [],
+    };
+    return transitions[currentStatus] || [];
+};
+
+// Calculate discount amount
+export const calculateDiscount = (
+    totalAmount: number,
+    discountPercent?: number,
+    discountAmount?: number
+): number => {
+    if (discountAmount) return discountAmount;
+    if (discountPercent) return (totalAmount * discountPercent) / 100;
+    return 0;
+};
+
+// Calculate final amount after discount
+export const calculateFinalAmount = (
+    totalAmount: number,
+    discountPercent?: number,
+    discountAmount?: number
+): number => {
+    const discount = calculateDiscount(totalAmount, discountPercent, discountAmount);
+    return Math.max(0, totalAmount - discount);
+};
+
+// Format order number
+export const formatOrderNumber = (orderNumber: string | number): string => {
+    if (typeof orderNumber === 'string') return orderNumber;
+    return `#${String(orderNumber).padStart(6, '0')}`;
+};
+
+// Get time range label
+export const getTimeRangeLabel = (startDate?: string, endDate?: string): string => {
+    if (!startDate && !endDate) return 'Tất cả';
+    if (startDate && !endDate) return `Từ ${formatDate(startDate)}`;
+    if (!startDate && endDate) return `Đến ${formatDate(endDate)}`;
+    return `${formatDate(startDate!)} - ${formatDate(endDate!)}`;
+};
+
+// Sort orders by priority and time
+export const sortOrdersByPriority = <T extends { createdAt: Date | string; status: OrderStatus }>(
+    orders: T[]
+): T[] => {
+    return [...orders].sort((a, b) => {
+        // First by status (in-progress orders first)
+        const aInProgress = isOrderInProgress(a.status);
+        const bInProgress = isOrderInProgress(b.status);
+        if (aInProgress !== bInProgress) {
+            return aInProgress ? -1 : 1;
+        }
+        
+        // Then by creation time (oldest first for in-progress)
+        const aTime = new Date(a.createdAt).getTime();
+        const bTime = new Date(b.createdAt).getTime();
+        return aTime - bTime;
+    });
+};
+
+// Get waiting time badge variant
+export const getWaitingTimeBadgeVariant = (
+    minutes: number
+): 'default' | 'secondary' | 'destructive' => {
+    const level = getWaitingTimeAlertLevel(minutes);
+    if (level === 'critical') return 'destructive';
+    if (level === 'warning') return 'secondary';
+    return 'default';
+};
+
+// Validate order items
+export const validateOrderItems = (items: Array<{ itemId: number; quantity: number }>): {
+    valid: boolean;
+    errors: string[];
+} => {
+    const errors: string[] = [];
+    
+    if (!items || items.length === 0) {
+        errors.push('Vui lòng chọn ít nhất một món');
+    }
+    
+    items.forEach((item, index) => {
+        if (!item.itemId) {
+            errors.push(`Món thứ ${index + 1}: Thiếu thông tin món ăn`);
+        }
+        if (!item.quantity || item.quantity < 1) {
+            errors.push(`Món thứ ${index + 1}: Số lượng không hợp lệ`);
+        }
+        if (item.quantity > 99) {
+            errors.push(`Món thứ ${index + 1}: Số lượng tối đa là 99`);
+        }
+    });
+    
+    return {
+        valid: errors.length === 0,
+        errors,
+    };
 };

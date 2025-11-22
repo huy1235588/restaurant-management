@@ -4,8 +4,10 @@ import {
     getOrderStatusColor,
     getOrderItemStatusColor,
     getKitchenOrderStatusColor,
+    getOrderStatusLabel,
+    getOrderItemStatusLabel,
+    getKitchenOrderStatusLabel,
 } from '../utils';
-import { useTranslation } from 'react-i18next';
 
 interface OrderStatusBadgeProps {
     status: OrderStatus;
@@ -13,14 +15,12 @@ interface OrderStatusBadgeProps {
 }
 
 export function OrderStatusBadge({ status, className }: OrderStatusBadgeProps) {
-    const { t } = useTranslation();
-
     return (
         <Badge
             variant="outline"
             className={`${getOrderStatusColor(status)} ${className || ''}`}
         >
-            {t(`orders.status.${status}`)}
+            {getOrderStatusLabel(status)}
         </Badge>
     );
 }
@@ -31,14 +31,12 @@ interface OrderItemStatusBadgeProps {
 }
 
 export function OrderItemStatusBadge({ status, className }: OrderItemStatusBadgeProps) {
-    const { t } = useTranslation();
-
     return (
         <Badge
             variant="outline"
             className={`${getOrderItemStatusColor(status)} ${className || ''}`}
         >
-            {t(`orders.itemStatus.${status}`)}
+            {getOrderItemStatusLabel(status)}
         </Badge>
     );
 }
@@ -49,14 +47,12 @@ interface KitchenOrderStatusBadgeProps {
 }
 
 export function KitchenOrderStatusBadge({ status, className }: KitchenOrderStatusBadgeProps) {
-    const { t } = useTranslation();
-
     return (
         <Badge
             variant="outline"
             className={`${getKitchenOrderStatusColor(status)} ${className || ''}`}
         >
-            {t(`orders.itemStatus.${status}`)}
+            {getKitchenOrderStatusLabel(status)}
         </Badge>
     );
 }
