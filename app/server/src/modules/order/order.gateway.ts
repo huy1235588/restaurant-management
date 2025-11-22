@@ -116,4 +116,31 @@ export class OrderGateway implements OnGatewayConnection, OnGatewayDisconnect {
     emitOrderCancelled(order: OrderEventData): void {
         this.socketEmitter.emitOrderCancelled(order);
     }
+
+    /**
+     * Emit items added to order event
+     */
+    emitOrderItemsAdded(order: OrderEventData): void {
+        this.socketEmitter.emitOrderItemsAdded(order);
+    }
+
+    /**
+     * Emit order item cancelled event
+     */
+    emitOrderItemCancelled(data: {
+        order: OrderEventData;
+        itemId: number;
+    }): void {
+        this.socketEmitter.emitOrderItemCancelled(data);
+    }
+
+    /**
+     * Emit order item served event
+     */
+    emitOrderItemServed(data: {
+        order: OrderEventData;
+        itemId: number;
+    }): void {
+        this.socketEmitter.emitOrderItemServed(data);
+    }
 }

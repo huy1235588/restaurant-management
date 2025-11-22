@@ -13,6 +13,9 @@ export const SOCKET_EVENTS = {
     ORDER_STATUS_CHANGED: 'order:status-changed' as const,
     ORDER_CANCELLED: 'order:cancelled' as const,
     ORDER_UPDATED: 'order:updated' as const,
+    ORDER_ITEMS_ADDED: 'order:items-added' as const,
+    ORDER_ITEM_CANCELLED: 'order:item-cancelled' as const,
+    ORDER_ITEM_SERVED: 'order:item-served' as const,
 
     // Kitchen Events
     KITCHEN_ORDER_DONE: 'kitchen:order-done' as const,

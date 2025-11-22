@@ -38,10 +38,10 @@ export function InvoicePreviewDialog({ open, onClose, order }: InvoicePreviewDia
 
     // Calculate subtotal and items count
     const invoiceStats = useMemo(() => {
-        if (!order?.items) return { itemCount: 0, subtotal: 0 };
+        if (!order?.orderItems) return { itemCount: 0, subtotal: 0 };
 
         return {
-            itemCount: order.items.reduce((sum, item) => sum + item.quantity, 0),
+            itemCount: order.orderItems.reduce((sum, item) => sum + item.quantity, 0),
             subtotal: order.totalAmount,
         };
     }, [order]);
@@ -139,7 +139,7 @@ export function InvoicePreviewDialog({ open, onClose, order }: InvoicePreviewDia
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y">
-                                        {order.items?.map((item, index) => (
+                                        {order.orderItems?.map((item, index) => (
                                             <tr key={item.id} className="hover:bg-muted/50 transition-colors">
                                                 <td className="py-3 px-4">
                                                     <div>

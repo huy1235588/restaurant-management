@@ -273,7 +273,7 @@ export class OrderService {
         );
 
         // Emit WebSocket event to kitchen
-        this.orderGateway.emitOrderCreated(updatedOrder);
+        this.orderGateway.emitOrderItemsAdded(updatedOrder);
 
         return updatedOrder;
     }
@@ -373,6 +373,12 @@ export class OrderService {
         this.logger.log(
             `Item ${orderItemId} cancelled in order ${order.orderNumber}. Reason: ${data.reason}`,
         );
+
+        // Emit WebSocket event
+        this.orderGateway.emitOrderItemCancelled({
+            order: updatedOrder,
+            itemId: orderItemId,
+        });
 
         return updatedOrder;
     }
@@ -539,7 +545,16 @@ export class OrderService {
         this.logger.log(
             `Item ${orderItemId} marked as served in order ${order.orderNumber}`,
         );
-        return this.getOrderById(orderId);
+
+        const updatedOrder = await this.getOrderById(orderId);
+
+        // Emit WebSocket event
+        this.orderGateway.emitOrderItemServed({
+            order: updatedOrder,
+            itemId: orderItemId,
+        });
+
+        return updatedOrder;
     }
 
     /**

@@ -29,6 +29,10 @@ export function KitchenOrderCard({ kitchenOrder, onMarkReady }: KitchenOrderCard
         [elapsedMinutes]
     );
 
+    // Get order items to display
+    const orderItems = kitchenOrder.order?.orderItems || [];
+    const totalItems = orderItems.reduce((sum, item) => sum + item.quantity, 0);
+
     return (
         <Card className="hover:shadow-md transition-shadow">
             <CardContent className="p-4">
@@ -40,24 +44,34 @@ export function KitchenOrderCard({ kitchenOrder, onMarkReady }: KitchenOrderCard
                                 {t('orders.table')} {kitchenOrder.order?.table?.tableNumber || 'N/A'}
                             </h3>
                             <p className="text-sm text-muted-foreground">
-                                {t('orders.orderNumber')}: #{kitchenOrder.orderId}
+                                {t('orders.orderNumber')}: {kitchenOrder.order?.orderNumber || `#${kitchenOrder.orderId}`}
                             </p>
                         </div>
                         <KitchenOrderStatusBadge status={kitchenOrder.status} />
                     </div>
 
-                    {/* Item details */}
-                    <div className="space-y-1">
-                        <p className="font-medium">
-                            {kitchenOrder.orderItem?.menuItem?.name || 'Unknown Item'}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                            {t('orders.quantity')}: {kitchenOrder.quantity}
-                        </p>
-                        {kitchenOrder.orderItem?.note && (
-                            <p className="text-sm text-amber-600">
-                                <span className="font-medium">{t('orders.note')}:</span>{' '}
-                                {kitchenOrder.orderItem.note}
+                    {/* Order items */}
+                    <div className="space-y-2">
+                        {orderItems.length > 0 ? (
+                            orderItems.map((item) => (
+                                <div key={item.orderItemId} className="space-y-1">
+                                    <p className="font-medium">
+                                        {item.menuItem?.itemName || 'Unknown Item'}
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">
+                                        {t('orders.quantity')}: {item.quantity}
+                                    </p>
+                                    {item.specialRequest && (
+                                        <p className="text-sm text-amber-600">
+                                            <span className="font-medium">{t('orders.note')}:</span>{' '}
+                                            {item.specialRequest}
+                                        </p>
+                                    )}
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-sm text-muted-foreground">
+                                {t('orders.noItems')}
                             </p>
                         )}
                     </div>
@@ -72,7 +86,7 @@ export function KitchenOrderCard({ kitchenOrder, onMarkReady }: KitchenOrderCard
                             <Button
                                 size="sm"
                                 variant="default"
-                                onClick={() => onMarkReady(kitchenOrder.id)}
+                                onClick={() => onMarkReady(kitchenOrder.kitchenOrderId)}
                                 className="bg-green-600 hover:bg-green-700"
                             >
                                 <Check className="h-4 w-4 mr-1" />

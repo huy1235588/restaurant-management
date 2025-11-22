@@ -134,6 +134,50 @@ export class SocketEmitterService {
         this.emitToAll(SOCKET_EVENTS.ORDER_UPDATED, order);
     }
 
+    /**
+     * Emit when items are added to order
+     */
+    emitOrderItemsAdded(order: OrderEventData): void {
+        this.logger.log(`Items added to order: ${order.orderNumber}`);
+        this.emitToRoom(
+            SOCKET_ROOMS.KITCHEN,
+            SOCKET_EVENTS.ORDER_ITEMS_ADDED,
+            order,
+        );
+        this.emitToAll(SOCKET_EVENTS.ORDER_UPDATED, order);
+    }
+
+    /**
+     * Emit when order item is cancelled
+     */
+    emitOrderItemCancelled(data: {
+        order: OrderEventData;
+        itemId: number;
+    }): void {
+        this.logger.log(
+            `Item ${data.itemId} cancelled in order: ${data.order.orderNumber}`,
+        );
+        this.emitToRoom(
+            SOCKET_ROOMS.KITCHEN,
+            SOCKET_EVENTS.ORDER_ITEM_CANCELLED,
+            data,
+        );
+        this.emitToAll(SOCKET_EVENTS.ORDER_UPDATED, data.order);
+    }
+
+    /**
+     * Emit when order item is marked as served
+     */
+    emitOrderItemServed(data: {
+        order: OrderEventData;
+        itemId: number;
+    }): void {
+        this.logger.log(
+            `Item ${data.itemId} served in order: ${data.order.orderNumber}`,
+        );
+        this.emitToAll(SOCKET_EVENTS.ORDER_ITEM_SERVED, data);
+    }
+
     // ============================================
     // Kitchen Events
     // ============================================

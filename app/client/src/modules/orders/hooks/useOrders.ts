@@ -86,7 +86,7 @@ export const useAddItems = () => {
         mutationFn: ({ orderId, data }: { orderId: number; data: AddItemsDto }) =>
             orderApi.addItems(orderId, data),
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.orderId || data.id) });
+            queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.orderId) });
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
             queryClient.invalidateQueries({ queryKey: orderKeys.kitchenQueue() });
             toast.success('Đã thêm món vào đơn hàng');
@@ -112,7 +112,7 @@ export const useCancelItem = () => {
             data: CancelItemDto;
         }) => orderApi.cancelItem(orderId, itemId, data),
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.orderId || data.id) });
+            queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.orderId) });
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
             queryClient.invalidateQueries({ queryKey: orderKeys.kitchenQueue() });
             toast.success('Đã hủy món');
@@ -131,7 +131,7 @@ export const useCancelOrder = () => {
         mutationFn: ({ orderId, data }: { orderId: number; data: CancelOrderDto }) =>
             orderApi.cancel(orderId, data),
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.orderId || data.id) });
+            queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.orderId) });
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
             queryClient.invalidateQueries({ queryKey: orderKeys.count() });
             queryClient.invalidateQueries({ queryKey: orderKeys.kitchenQueue() });
@@ -151,7 +151,7 @@ export const useUpdateOrderStatus = () => {
         mutationFn: ({ orderId, data }: { orderId: number; data: UpdateOrderStatusDto }) =>
             orderApi.updateStatus(orderId, data),
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.orderId || data.id) });
+            queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.orderId) });
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
             toast.success('Đã cập nhật trạng thái đơn hàng');
         },
@@ -169,7 +169,7 @@ export const useMarkItemAsServed = () => {
         mutationFn: ({ orderId, itemId }: { orderId: number; itemId: number }) =>
             orderApi.markItemAsServed(orderId, itemId),
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.orderId || data.id) });
+            queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.orderId) });
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
             toast.success('Đã đánh dấu món đã phục vụ');
         },
@@ -188,6 +188,24 @@ export const useKitchenQueue = () => {
     });
 };
 
+// Hook to fetch all kitchen orders
+export const useKitchenOrders = () => {
+    return useQuery<KitchenOrder[]>({
+        queryKey: [...orderKeys.kitchen(), 'all'],
+        queryFn: () => kitchenApi.getAll(),
+        refetchInterval: 5000,
+    });
+};
+
+// Hook to fetch kitchen order by ID
+export const useKitchenOrder = (id: number, enabled = true) => {
+    return useQuery<KitchenOrder>({
+        queryKey: [...orderKeys.kitchen(), id],
+        queryFn: () => kitchenApi.getById(id),
+        enabled,
+    });
+};
+
 // Hook to mark kitchen order as ready
 export const useMarkKitchenOrderReady = () => {
     const queryClient = useQueryClient();
@@ -196,11 +214,30 @@ export const useMarkKitchenOrderReady = () => {
         mutationFn: (kitchenOrderId: number) => kitchenApi.markAsReady(kitchenOrderId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: orderKeys.kitchenQueue() });
+            queryClient.invalidateQueries({ queryKey: [...orderKeys.kitchen(), 'all'] });
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
             toast.success('Món đã sẵn sàng phục vụ');
         },
         onError: (error: any) => {
             toast.error(error.response?.data?.message || 'Đánh dấu sẵn sàng thất bại');
+        },
+    });
+};
+
+// Hook to mark kitchen order as completed
+export const useMarkKitchenOrderCompleted = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (kitchenOrderId: number) => kitchenApi.markAsCompleted(kitchenOrderId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: orderKeys.kitchenQueue() });
+            queryClient.invalidateQueries({ queryKey: [...orderKeys.kitchen(), 'all'] });
+            queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+            toast.success('Món đã được lấy đi phục vụ');
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.message || 'Đánh dấu hoàn thành thất bại');
         },
     });
 };

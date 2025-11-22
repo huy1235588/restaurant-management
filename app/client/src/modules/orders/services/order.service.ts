@@ -104,7 +104,23 @@ export const kitchenApi = {
     // Get kitchen queue (pending orders)
     getQueue: async (): Promise<KitchenOrder[]> => {
         const response = await axiosInstance.get<KitchenQueueResponse>(
-            '/orders/kitchen/queue'
+            '/kitchen/queue'
+        );
+        return response.data.data;
+    },
+
+    // Get all kitchen orders
+    getAll: async (): Promise<KitchenOrder[]> => {
+        const response = await axiosInstance.get<{ message: string; data: KitchenOrder[] }>(
+            '/kitchen/orders'
+        );
+        return response.data.data;
+    },
+
+    // Get kitchen order by ID
+    getById: async (id: number): Promise<KitchenOrder> => {
+        const response = await axiosInstance.get<{ message: string; data: KitchenOrder }>(
+            `/kitchen/orders/${id}`
         );
         return response.data.data;
     },
@@ -112,7 +128,15 @@ export const kitchenApi = {
     // Mark kitchen order as ready (done)
     markAsReady: async (kitchenOrderId: number): Promise<KitchenOrder> => {
         const response = await axiosInstance.patch<{ message: string; data: KitchenOrder }>(
-            `/orders/kitchen/${kitchenOrderId}/complete`
+            `/kitchen/orders/${kitchenOrderId}/ready`
+        );
+        return response.data.data;
+    },
+
+    // Mark kitchen order as completed (picked up by waiter)
+    markAsCompleted: async (kitchenOrderId: number): Promise<KitchenOrder> => {
+        const response = await axiosInstance.patch<{ message: string; data: KitchenOrder }>(
+            `/kitchen/orders/${kitchenOrderId}/complete`
         );
         return response.data.data;
     },

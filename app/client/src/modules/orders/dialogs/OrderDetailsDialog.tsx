@@ -62,7 +62,7 @@ export function OrderDetailsDialog({
     const handleMarkServed = useMemo(
         () => async (itemId: number) => {
             if (!order) return;
-            await markServedMutation.mutateAsync({ orderId: order.id, itemId });
+            await markServedMutation.mutateAsync({ orderId: order.orderId, itemId });
         },
         [order, markServedMutation]
     );
@@ -193,7 +193,7 @@ export function OrderDetailsDialog({
                                     <h4 className="text-lg font-semibold flex items-center gap-2">
                                         {t('orders.items')}
                                         <span className="text-sm font-normal text-muted-foreground">
-                                            ({order.items?.length || 0})
+                                            ({order.orderItems?.length || 0})
                                         </span>
                                     </h4>
                                     {isEditable && onAddItems && (
@@ -209,11 +209,11 @@ export function OrderDetailsDialog({
                                     )}
                                 </div>
 
-                                {order.items && order.items.length > 0 ? (
+                                {order.orderItems && order.orderItems.length > 0 ? (
                                     <div className="space-y-3">
-                                        {order.items.map((item) => (
+                                        {order.orderItems.map((item) => (
                                             <OrderItemCard
-                                                key={item.id}
+                                                key={item.orderItemId}
                                                 item={item}
                                                 onCancelItem={
                                                     onCancelItem ? () => handleCancelItem(item) : undefined

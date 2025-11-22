@@ -28,61 +28,51 @@ export enum OrderPriority {
 }
 
 export interface OrderItem {
-    id: number;
     orderItemId: number;
     orderId: number;
     itemId: number;
-    menuItemId: number;
     quantity: number;
     unitPrice: number;
     totalPrice: number;
-    price: number;
-    specialRequest?: string;
-    note?: string;
+    specialRequest?: string | null;
     status: OrderItemStatus;
     createdAt: Date | string;
     updatedAt: Date | string;
     menuItem?: {
         itemId: number;
-        id: number;
         itemName: string;
-        name: string;
         code: string;
         price: number;
-        imageUrl?: string;
+        imageUrl?: string | null;
     };
 }
 
 export interface Order {
-    id: number;
     orderId: number;
     orderNumber: string;
     tableId: number;
-    staffId?: number;
-    reservationId?: number;
-    customerName?: string;
-    customerPhone?: string;
-    partySize?: number;
+    staffId?: number | null;
+    reservationId?: number | null;
+    customerName?: string | null;
+    customerPhone?: string | null;
+    partySize: number;
     status: OrderStatus;
-    notes?: string;
-    note?: string;
+    notes?: string | null;
     totalAmount: number;
     finalAmount: number;
-    cancelledAt?: Date | string;
-    cancellationReason?: string;
-    confirmedAt?: Date | string;
-    completedAt?: Date | string;
+    cancelledAt?: Date | string | null;
+    cancellationReason?: string | null;
+    confirmedAt?: Date | string | null;
+    completedAt?: Date | string | null;
     createdAt: Date | string;
     updatedAt: Date | string;
     table?: {
         tableId: number;
-        id: number;
         tableNumber: string;
         capacity: number;
     };
     staff?: {
         staffId: number;
-        id: number;
         fullName: string;
     };
     reservation?: {
@@ -91,19 +81,18 @@ export interface Order {
         customerName: string;
     };
     orderItems?: OrderItem[];
-    items?: OrderItem[];
 }
 
 export interface KitchenOrder {
-    id: number;
+    kitchenOrderId: number;
     orderId: number;
-    orderItemId: number;
-    quantity: number;
     status: KitchenOrderStatus;
+    preparedBy?: number | null;
+    preparedAt?: Date | string | null;
+    completedAt?: Date | string | null;
     createdAt: Date | string;
     updatedAt: Date | string;
     order?: Order;
-    orderItem?: OrderItem;
 }
 
 export interface CreateOrderItemDto {
