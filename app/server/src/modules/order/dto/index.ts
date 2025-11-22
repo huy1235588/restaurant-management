@@ -1,3 +1,4 @@
+export * from './base.dto';
 export * from './create-order.dto';
 export * from './add-items.dto';
 export * from './cancel-item.dto';

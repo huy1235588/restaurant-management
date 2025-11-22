@@ -1,10 +1,4 @@
-import {
-    Injectable,
-    NotFoundException,
-    BadRequestException,
-    Logger,
-    ConflictException,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '@/database/prisma.service';
 import { OrderRepository, FindOrdersOptions } from './order.repository';
 import { KitchenRepository } from './kitchen.repository';
@@ -22,7 +16,25 @@ import {
     TableStatus,
     KitchenOrderStatus,
 } from '@prisma/generated/client';
+import {
+    OrderNotFoundException,
+    OrderItemNotFoundException,
+    TableNotFoundException,
+    TableOccupiedException,
+    MenuItemNotFoundException,
+    MenuItemNotAvailableException,
+    MenuItemNotActiveException,
+    CannotModifyCompletedOrderException,
+    CannotModifyCancelledOrderException,
+    OrderAlreadyCancelledException,
+    BillAlreadyCreatedException,
+} from './exceptions/order.exceptions';
+import { OrderHelper } from './helpers/order.helper';
 
+/**
+ * Order Service
+ * Handles all order business logic and orchestrates database operations
+ */
 @Injectable()
 export class OrderService {
     private readonly logger = new Logger(OrderService.name);
@@ -59,7 +71,7 @@ export class OrderService {
 
         if (!order) {
             this.logger.warn(`Order not found: ${orderId}`);
-            throw new NotFoundException('Order not found');
+            throw new OrderNotFoundException(orderId);
         }
 
         return order;
@@ -73,7 +85,7 @@ export class OrderService {
 
         if (!order) {
             this.logger.warn(`Order not found by number: ${orderNumber}`);
-            throw new NotFoundException('Order not found');
+            throw new OrderNotFoundException(orderNumber);
         }
 
         return order;
@@ -97,7 +109,7 @@ export class OrderService {
 
         if (!table) {
             this.logger.warn(`Table not found: ${data.tableId}`);
-            throw new NotFoundException('Table not found');
+            throw new TableNotFoundException(data.tableId);
         }
 
         // Check if table already has an active order
@@ -109,8 +121,9 @@ export class OrderService {
             this.logger.warn(
                 `Table ${data.tableId} already has active order ${existingOrder.orderNumber}`,
             );
-            throw new ConflictException(
-                'Table already has an active order. Please add items to the existing order.',
+            throw new TableOccupiedException(
+                data.tableId,
+                existingOrder.orderNumber,
             );
         }
 
@@ -190,12 +203,12 @@ export class OrderService {
         // Check if order can be modified
         if (order.status === OrderStatus.completed) {
             this.logger.warn(`Cannot add items to completed order: ${orderId}`);
-            throw new BadRequestException('Cannot modify completed order');
+            throw new CannotModifyCompletedOrderException('add items to');
         }
 
         if (order.status === OrderStatus.cancelled) {
             this.logger.warn(`Cannot add items to cancelled order: ${orderId}`);
-            throw new BadRequestException('Cannot modify cancelled order');
+            throw new CannotModifyCancelledOrderException('add items to');
         }
 
         // Check if bill exists
@@ -207,9 +220,7 @@ export class OrderService {
             this.logger.warn(
                 `Cannot add items - bill already created for order: ${orderId}`,
             );
-            throw new BadRequestException(
-                'Cannot add items after bill creation',
-            );
+            throw new BillAlreadyCreatedException('add items');
         }
 
         // Validate menu items and calculate prices
@@ -289,7 +300,7 @@ export class OrderService {
             this.logger.warn(
                 `Order item not found: ${orderItemId} in order ${orderId}`,
             );
-            throw new NotFoundException('Order item not found');
+            throw new OrderItemNotFoundException(orderItemId, orderId);
         }
 
         // Check if order can be modified
@@ -297,14 +308,12 @@ export class OrderService {
             this.logger.warn(
                 `Cannot cancel items in completed order: ${orderId}`,
             );
-            throw new BadRequestException(
-                'Cannot cancel items in completed order',
-            );
+            throw new CannotModifyCompletedOrderException('cancel items in');
         }
 
         if (order.status === OrderStatus.cancelled) {
             this.logger.warn(`Order already cancelled: ${orderId}`);
-            throw new BadRequestException('Order already cancelled');
+            throw new OrderAlreadyCancelledException(orderId);
         }
 
         // Check if bill exists
@@ -316,9 +325,7 @@ export class OrderService {
             this.logger.warn(
                 `Cannot cancel items - bill already created for order: ${orderId}`,
             );
-            throw new BadRequestException(
-                'Cannot cancel items after bill creation',
-            );
+            throw new BillAlreadyCreatedException('cancel items');
         }
 
         // Cancel item and update totals
@@ -379,12 +386,12 @@ export class OrderService {
         // Check if order can be cancelled
         if (order.status === OrderStatus.completed) {
             this.logger.warn(`Cannot cancel completed order: ${orderId}`);
-            throw new BadRequestException('Cannot cancel completed order');
+            throw new CannotModifyCompletedOrderException('cancel');
         }
 
         if (order.status === OrderStatus.cancelled) {
             this.logger.warn(`Order already cancelled: ${orderId}`);
-            throw new BadRequestException('Order already cancelled');
+            throw new OrderAlreadyCancelledException(orderId);
         }
 
         // Check if bill exists
@@ -396,9 +403,7 @@ export class OrderService {
             this.logger.warn(
                 `Cannot cancel order - bill already created: ${orderId}`,
             );
-            throw new BadRequestException(
-                'Cannot cancel order after bill creation',
-            );
+            throw new BillAlreadyCreatedException('cancel order');
         }
 
         // Cancel order in transaction
@@ -499,7 +504,7 @@ export class OrderService {
             this.logger.warn(
                 `Order item not found: ${orderItemId} in order ${orderId}`,
             );
-            throw new NotFoundException('Order item not found');
+            throw new OrderItemNotFoundException(orderItemId, orderId);
         }
 
         // Update item status
@@ -564,25 +569,19 @@ export class OrderService {
 
             if (!menuItem) {
                 this.logger.warn(`Menu item not found: ${item.itemId}`);
-                throw new NotFoundException(
-                    `Menu item with ID ${item.itemId} not found`,
-                );
+                throw new MenuItemNotFoundException(item.itemId);
             }
 
             if (!menuItem.isAvailable) {
                 this.logger.warn(
                     `Menu item not available: ${menuItem.itemName}`,
                 );
-                throw new BadRequestException(
-                    `Menu item "${menuItem.itemName}" is not available`,
-                );
+                throw new MenuItemNotAvailableException(menuItem.itemName);
             }
 
             if (!menuItem.isActive) {
                 this.logger.warn(`Menu item not active: ${menuItem.itemName}`);
-                throw new BadRequestException(
-                    `Menu item "${menuItem.itemName}" is not active`,
-                );
+                throw new MenuItemNotActiveException(menuItem.itemName);
             }
 
             const unitPrice = Number(menuItem.price);

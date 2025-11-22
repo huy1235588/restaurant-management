@@ -7,77 +7,126 @@ import {
     ValidateNested,
     Min,
     MaxLength,
+    IsInt,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ORDER_CONSTANTS } from '../constants/order.constants';
 
+/**
+ * DTO for creating an order item
+ */
 export class CreateOrderItemDto {
-    @ApiProperty({ example: 1, description: 'Menu item ID' })
-    @IsNumber()
-    @IsNotEmpty()
+    @ApiProperty({
+        description: 'Menu item ID',
+        example: 1,
+    })
+    @IsInt()
+    @IsNotEmpty({ message: 'Item ID is required' })
     itemId: number;
 
-    @ApiProperty({ example: 2, description: 'Quantity' })
-    @IsNumber()
-    @IsNotEmpty()
-    @Min(1)
+    @ApiProperty({
+        description: 'Quantity of the item',
+        example: 2,
+        minimum: 1,
+    })
+    @IsInt()
+    @IsNotEmpty({ message: 'Quantity is required' })
+    @Min(1, { message: 'Quantity must be at least 1' })
     quantity: number;
 
     @ApiPropertyOptional({
-        example: 'No onions',
-        description: 'Special request',
+        description: 'Special request for the item',
+        example: 'No onions, extra sauce',
+        maxLength: ORDER_CONSTANTS.MAX_SPECIAL_REQUEST_LENGTH,
     })
-    @IsString()
     @IsOptional()
-    @MaxLength(500)
+    @IsString()
+    @MaxLength(ORDER_CONSTANTS.MAX_SPECIAL_REQUEST_LENGTH, {
+        message: `Special request cannot exceed ${ORDER_CONSTANTS.MAX_SPECIAL_REQUEST_LENGTH} characters`,
+    })
     specialRequest?: string;
 }
 
+/**
+ * DTO for creating a new order
+ */
 export class CreateOrderDto {
-    @ApiProperty({ example: 1, description: 'Table ID' })
-    @IsNumber()
-    @IsNotEmpty()
+    @ApiProperty({
+        description: 'Table ID',
+        example: 1,
+    })
+    @IsInt()
+    @IsNotEmpty({ message: 'Table ID is required' })
     tableId: number;
 
-    @ApiPropertyOptional({ example: 1, description: 'Reservation ID' })
-    @IsNumber()
+    @ApiPropertyOptional({
+        description: 'Reservation ID (if order is linked to a reservation)',
+        example: 1,
+    })
     @IsOptional()
+    @IsInt()
     reservationId?: number;
 
     @ApiPropertyOptional({
-        example: 'John Doe',
         description: 'Customer name',
+        example: 'John Doe',
+        maxLength: 255,
     })
-    @IsString()
     @IsOptional()
-    @MaxLength(255)
+    @IsString()
+    @MaxLength(255, {
+        message: 'Customer name cannot exceed 255 characters',
+    })
     customerName?: string;
 
     @ApiPropertyOptional({
+        description: 'Customer phone number',
         example: '0901234567',
-        description: 'Customer phone',
+        maxLength: 20,
     })
-    @IsString()
     @IsOptional()
-    @MaxLength(20)
+    @IsString()
+    @MaxLength(20, {
+        message: 'Customer phone cannot exceed 20 characters',
+    })
     customerPhone?: string;
 
-    @ApiProperty({ example: 4, description: 'Party size' })
-    @IsNumber()
-    @IsNotEmpty()
-    @Min(1)
+    @ApiProperty({
+        description: 'Number of people in the party',
+        example: 4,
+        minimum: 1,
+    })
+    @IsInt()
+    @IsNotEmpty({ message: 'Party size is required' })
+    @Min(1, { message: 'Party size must be at least 1' })
     partySize: number;
 
-    @ApiPropertyOptional({ example: 'VIP customer', description: 'Notes' })
-    @IsString()
+    @ApiPropertyOptional({
+        description: 'Additional notes for the order',
+        example: 'Birthday celebration, please bring cake after main course',
+        maxLength: ORDER_CONSTANTS.MAX_NOTES_LENGTH,
+    })
     @IsOptional()
+    @IsString()
+    @MaxLength(ORDER_CONSTANTS.MAX_NOTES_LENGTH, {
+        message: `Notes cannot exceed ${ORDER_CONSTANTS.MAX_NOTES_LENGTH} characters`,
+    })
     notes?: string;
 
     @ApiProperty({
         type: [CreateOrderItemDto],
-        description: 'Order items',
+        description: 'Order items (at least one item required)',
+        example: [
+            {
+                itemId: 1,
+                quantity: 2,
+                specialRequest: 'No onions',
+            },
+        ],
     })
-    @IsArray()
+    @IsArray({ message: 'Items must be an array' })
+    @IsNotEmpty({ message: 'At least one item is required' })
     @ValidateNested({ each: true })
     @Type(() => CreateOrderItemDto)
     items: CreateOrderItemDto[];

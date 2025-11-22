@@ -1,9 +1,4 @@
-import {
-    Injectable,
-    NotFoundException,
-    BadRequestException,
-    Logger,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { KitchenRepository } from './kitchen.repository';
 import { OrderRepository } from './order.repository';
 import { OrderGateway } from './order.gateway';
@@ -13,7 +8,15 @@ import {
     OrderStatus,
     OrderItemStatus,
 } from '@prisma/generated/client';
+import {
+    KitchenOrderNotFoundException,
+    CannotCompleteKitchenOrderException,
+} from './exceptions/order.exceptions';
 
+/**
+ * Kitchen Service
+ * Handles kitchen-specific business logic
+ */
 @Injectable()
 export class KitchenService {
     private readonly logger = new Logger(KitchenService.name);
@@ -52,7 +55,7 @@ export class KitchenService {
 
         if (!kitchenOrder) {
             this.logger.warn(`Kitchen order not found: ${kitchenOrderId}`);
-            throw new NotFoundException('Kitchen order not found');
+            throw new KitchenOrderNotFoundException(kitchenOrderId);
         }
 
         return kitchenOrder;
@@ -68,14 +71,18 @@ export class KitchenService {
             this.logger.warn(
                 `Cannot complete cancelled kitchen order: ${kitchenOrderId}`,
             );
-            throw new BadRequestException('Cannot complete cancelled order');
+            throw new CannotCompleteKitchenOrderException(
+                'order is cancelled',
+            );
         }
 
         if (kitchenOrder.status === KitchenOrderStatus.completed) {
             this.logger.warn(
                 `Kitchen order already completed: ${kitchenOrderId}`,
             );
-            throw new BadRequestException('Order already completed');
+            throw new CannotCompleteKitchenOrderException(
+                'order already completed',
+            );
         }
 
         // Update kitchen order and order items in transaction
@@ -151,8 +158,8 @@ export class KitchenService {
             this.logger.warn(
                 `Kitchen order not ready for completion: ${kitchenOrderId}`,
             );
-            throw new BadRequestException(
-                'Can only mark ready orders as completed',
+            throw new CannotCompleteKitchenOrderException(
+                'only ready orders can be marked as completed',
             );
         }
 
