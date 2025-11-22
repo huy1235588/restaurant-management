@@ -71,9 +71,7 @@ export class KitchenService {
             this.logger.warn(
                 `Cannot complete cancelled kitchen order: ${kitchenOrderId}`,
             );
-            throw new CannotCompleteKitchenOrderException(
-                'order is cancelled',
-            );
+            throw new CannotCompleteKitchenOrderException('order is cancelled');
         }
 
         if (kitchenOrder.status === KitchenOrderStatus.completed) {

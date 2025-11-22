@@ -122,7 +122,9 @@ export class OrderController {
         @Query('sortOrder') sortOrder?: 'asc' | 'desc',
     ) {
         const pageNum = page ? parseInt(page) : ORDER_CONSTANTS.DEFAULT_PAGE;
-        const limitNum = limit ? parseInt(limit) : ORDER_CONSTANTS.DEFAULT_LIMIT;
+        const limitNum = limit
+            ? parseInt(limit)
+            : ORDER_CONSTANTS.DEFAULT_LIMIT;
 
         const result = await this.orderService.getAllOrders({
             filters: {
