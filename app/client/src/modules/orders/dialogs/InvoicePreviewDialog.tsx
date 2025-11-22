@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -14,7 +14,8 @@ import { Separator } from '@/components/ui/separator';
 import { Order } from '../types';
 import { formatCurrency, formatDateTime } from '../utils';
 import { useTranslation } from 'react-i18next';
-import { Printer, Download } from 'lucide-react';
+import { Printer, Download, Receipt, Store } from 'lucide-react';
+import Image from 'next/image';
 
 interface InvoicePreviewDialogProps {
     open: boolean;
@@ -35,133 +36,189 @@ export function InvoicePreviewDialog({ open, onClose, order }: InvoicePreviewDia
         window.print();
     };
 
+    // Calculate subtotal and items count
+    const invoiceStats = useMemo(() => {
+        if (!order?.items) return { itemCount: 0, subtotal: 0 };
+
+        return {
+            itemCount: order.items.reduce((sum, item) => sum + item.quantity, 0),
+            subtotal: order.totalAmount,
+        };
+    }, [order]);
+
     if (!order) return null;
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden">
-                <DialogHeader>
-                    <DialogTitle>{t('orders.previewInvoice')}</DialogTitle>
-                    <DialogDescription>
-                        Hóa đơn đơn hàng #{order.id}
-                    </DialogDescription>
+            <DialogContent className="sm:max-w-3xl max-h-[90vh] p-0 gap-0 print:max-h-none">
+                <DialogHeader className="px-6 pt-6 pb-4 border-b print:hidden">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                            <Receipt className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                            <DialogTitle className="text-xl">
+                                {t('orders.previewInvoice')}
+                            </DialogTitle>
+                            <DialogDescription>
+                                Hóa đơn đơn hàng #{order.id}
+                            </DialogDescription>
+                        </div>
+                    </div>
                 </DialogHeader>
 
-                <div className="overflow-y-auto max-h-[60vh]">
-                    <div ref={invoiceRef} className="bg-white p-8 space-y-6">
-                        {/* Header */}
-                        <div className="text-center space-y-2">
-                            <h1 className="text-2xl font-bold">NHÀ HÀNG ABC</h1>
-                            <p className="text-sm text-muted-foreground">
-                                Địa chỉ: 123 Đường ABC, Quận XYZ, TP.HCM
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                                Điện thoại: (028) 1234 5678
-                            </p>
-                        </div>
-
-                        <Separator />
-
-                        {/* Invoice Info */}
-                        <div className="space-y-2">
-                            <h2 className="text-xl font-bold text-center">HÓA ĐƠN THANH TOÁN</h2>
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                                <div>
-                                    <p className="text-muted-foreground">Số hóa đơn:</p>
-                                    <p className="font-medium">#{order.orderNumber || order.orderId || order.id}</p>
+                {/* Invoice Content */}
+                <div className="overflow-y-auto max-h-[calc(90vh-180px)] bg-linear-to-b from-background to-muted/30 print:max-h-none print:bg-transparent">
+                    <div ref={invoiceRef} className="max-w-2xl mx-auto bg-white dark:bg-gray-900 m-6 p-8 rounded-lg shadow-lg print:shadow-none print:m-0">
+                        {/* Header with Logo */}
+                        <div className="text-center space-y-3 mb-8">
+                            <div className="flex justify-center mb-4">
+                                <div className="p-4 rounded-2xl bg-linear-to-br from-primary/20 to-primary/10 ring-4 ring-primary/10">
+                                    <Image
+                                        src="/images/logo/logo.png"
+                                        alt="Restaurant Logo"
+                                        width={80}
+                                        height={80}
+                                        className="object-contain"
+                                    />
                                 </div>
-                                <div>
-                                    <p className="text-muted-foreground">Ngày giờ:</p>
-                                    <p className="font-medium">{formatDateTime(order.createdAt)}</p>
-                                </div>
-                                <div>
-                                    <p className="text-muted-foreground">Bàn:</p>
-                                    <p className="font-medium">{order.table?.tableNumber || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <p className="text-muted-foreground">Nhân viên:</p>
-                                    <p className="font-medium">{order.staff?.fullName || 'N/A'}</p>
-                                </div>
+                            </div>
+                            <h1 className="text-3xl font-bold bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                                NHÀ HÀNG ABC
+                            </h1>
+                            <div className="text-sm text-muted-foreground space-y-1">
+                                <p>Địa chỉ: 123 Đường ABC, Quận XYZ, TP.HCM</p>
+                                <p>Điện thoại: (028) 1234 5678</p>
                             </div>
                         </div>
 
-                        <Separator />
+                        <Separator className="my-6" />
 
-                        {/* Items */}
-                        <div>
-                            <table className="w-full">
-                                <thead>
-                                    <tr className="border-b">
-                                        <th className="text-left py-2">Món</th>
-                                        <th className="text-center py-2">SL</th>
-                                        <th className="text-right py-2">Đơn giá</th>
-                                        <th className="text-right py-2">Thành tiền</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {(order.orderItems || order.items)?.map((item, index) => (
-                                        <tr key={item.orderItemId || item.id} className="border-b">
-                                            <td className="py-2">
-                                                <div>
-                                                    <p className="font-medium">
-                                                        {item.menuItem?.itemName || item.menuItem?.name || 'Unknown'}
-                                                    </p>
-                                                    {(item.specialRequest || item.note) && (
-                                                        <p className="text-xs text-muted-foreground italic">
-                                                            Ghi chú: {item.specialRequest || item.note}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="text-center py-2">{item.quantity}</td>
-                                            <td className="text-right py-2">
-                                                {formatCurrency(item.unitPrice || item.menuItem?.price || 0)}
-                                            </td>
-                                            <td className="text-right py-2 font-medium">
-                                                {formatCurrency(item.totalPrice || (item.unitPrice || item.menuItem?.price || 0) * item.quantity)}
-                                            </td>
+                        {/* Invoice Title */}
+                        <div className="text-center mb-6">
+                            <h2 className="text-2xl font-bold mb-2">HÓA ĐƠN THANH TOÁN</h2>
+                            <div className="inline-block px-4 py-2 rounded-lg bg-primary/10 border border-primary/20">
+                                <p className="text-sm font-medium text-primary">
+                                    Số hóa đơn: #{order.id}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Invoice Info Grid */}
+                        <div className="grid grid-cols-2 gap-4 mb-6 p-4 rounded-lg bg-muted/50">
+                            <div>
+                                <p className="text-xs text-muted-foreground mb-1">Ngày giờ</p>
+                                <p className="font-semibold">{formatDateTime(order.createdAt)}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-muted-foreground mb-1">Bàn</p>
+                                <p className="font-semibold">{order.table?.tableNumber || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-muted-foreground mb-1">Nhân viên</p>
+                                <p className="font-semibold">{order.staff?.fullName || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-muted-foreground mb-1">Tổng món</p>
+                                <p className="font-semibold">{invoiceStats.itemCount} món</p>
+                            </div>
+                        </div>
+
+                        <Separator className="my-6" />
+
+                        {/* Items Table */}
+                        <div className="mb-6">
+                            <div className="overflow-hidden rounded-lg border">
+                                <table className="w-full">
+                                    <thead className="bg-muted">
+                                        <tr>
+                                            <th className="text-left py-3 px-4 font-semibold text-sm">Món</th>
+                                            <th className="text-center py-3 px-4 font-semibold text-sm w-20">SL</th>
+                                            <th className="text-right py-3 px-4 font-semibold text-sm w-28">Đơn giá</th>
+                                            <th className="text-right py-3 px-4 font-semibold text-sm w-32">Thành tiền</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="divide-y">
+                                        {order.items?.map((item, index) => (
+                                            <tr key={item.id} className="hover:bg-muted/50 transition-colors">
+                                                <td className="py-3 px-4">
+                                                    <div>
+                                                        <p className="font-medium">
+                                                            {item.menuItem?.name || 'Unknown'}
+                                                        </p>
+                                                        {item.note && (
+                                                            <p className="text-xs text-muted-foreground italic mt-1">
+                                                                ↳ {item.note}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="text-center py-3 px-4 font-medium">
+                                                    {item.quantity}
+                                                </td>
+                                                <td className="text-right py-3 px-4">
+                                                    {formatCurrency(item.menuItem?.price || 0)}
+                                                </td>
+                                                <td className="text-right py-3 px-4 font-semibold">
+                                                    {formatCurrency((item.menuItem?.price || 0) * item.quantity)}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
-                        <Separator />
+                        <Separator className="my-6" />
 
-                        {/* Total */}
-                        <div className="space-y-2">
-                            <div className="flex justify-between text-lg font-semibold">
-                                <span>TỔNG CỘNG:</span>
-                                <span>{formatCurrency(order.finalAmount || order.totalAmount)}</span>
+                        {/* Total Section */}
+                        <div className="space-y-3 mb-6">
+                            <div className="p-5 rounded-xl bg-linear-to-br from-primary/15 via-primary/10 to-primary/5 border-2 border-primary/20">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-lg font-semibold">TỔNG CỘNG</span>
+                                    <span className="text-3xl font-bold text-primary">
+                                        {formatCurrency(order.totalAmount)}
+                                    </span>
+                                </div>
                             </div>
-                            {(order.notes || order.note) && (
-                                <div className="text-sm">
-                                    <p className="text-muted-foreground">Ghi chú:</p>
-                                    <p>{order.notes || order.note}</p>
+
+                            {order.note && (
+                                <div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900">
+                                    <p className="text-xs font-semibold text-amber-900 dark:text-amber-200 mb-1">
+                                        Ghi chú đơn hàng
+                                    </p>
+                                    <p className="text-sm text-amber-800 dark:text-amber-300">
+                                        {order.note}
+                                    </p>
                                 </div>
                             )}
                         </div>
 
-                        <Separator />
+                        <Separator className="my-6" />
 
                         {/* Footer */}
-                        <div className="text-center space-y-2 text-sm">
-                            <p className="font-medium">Cảm ơn quý khách!</p>
-                            <p className="text-muted-foreground">Hẹn gặp lại quý khách</p>
+                        <div className="text-center space-y-3">
+                            <div className="inline-block px-6 py-3 rounded-lg bg-linear-to-r from-primary/10 to-primary/5">
+                                <p className="font-bold text-lg mb-1">Cảm ơn quý khách!</p>
+                                <p className="text-sm text-muted-foreground">Hẹn gặp lại quý khách</p>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                                Hóa đơn này được tạo tự động bởi hệ thống
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                <DialogFooter className="gap-2">
+                <DialogFooter className="px-6 py-4 border-t bg-muted/30 gap-2 print:hidden">
                     <Button variant="outline" onClick={onClose}>
                         {t('common.close')}
                     </Button>
-                    <Button variant="outline" onClick={handlePrint}>
-                        <Printer className="h-4 w-4 mr-2" />
+                    <Button variant="outline" onClick={handlePrint} className="gap-2">
+                        <Printer className="h-4 w-4" />
                         {t('orders.printInvoice')}
                     </Button>
-                    <Button onClick={handleExportPDF}>
-                        <Download className="h-4 w-4 mr-2" />
+                    <Button onClick={handleExportPDF} className="gap-2">
+                        <Download className="h-4 w-4" />
                         {t('orders.exportPDF')}
                     </Button>
                 </DialogFooter>
