@@ -374,11 +374,11 @@
 - [ ] 2.7.10 Create `dialogs/single/CancelOrderDialog.tsx` (cancellation reason required)
 
 ### 2.8 Routing & Navigation
-- [ ] 2.8.1 Add `/orders` route in app router (orders list)
-- [ ] 2.8.2 Add `/orders/:id` route (order details)
-- [ ] 2.8.3 Add navigation item in main sidebar/menu
-- [ ] 2.8.4 Implement breadcrumbs: Orders > Order #12345
-- [ ] 2.8.5 Implement deep linking to order details from other modules
+- [x] 2.8.1 Add `/orders` route in app router (orders list)
+- [x] 2.8.2 Add `/orders/:id` route (order details)
+- [x] 2.8.3 Add navigation item in main sidebar/menu
+- [x] 2.8.4 Implement breadcrumbs: Orders > Order #12345
+- [x] 2.8.5 Implement deep linking to order details from other modules
 
 ### 2.9 Permissions & Access Control
 - [ ] 2.9.1 Check user role before showing Create Order button
@@ -405,77 +405,77 @@
 ## 3. Frontend: Reservation Management Module
 
 ### 3.1 Module Structure Setup
-- [ ] 3.1.1 Create `app/client/src/modules/reservations/` directory
-- [ ] 3.1.2 Create subdirectories: components/, views/, dialogs/single/, services/, hooks/, types/, utils/
-- [ ] 3.1.3 Create barrel export index.ts
-- [ ] 3.1.4 Create README.md documenting module structure (follow menu README pattern)
+- [x] 3.1.1 Create `app/client/src/modules/reservations/` directory
+- [x] 3.1.2 Create subdirectories: components/, views/, dialogs/single/, services/, hooks/, types/, utils/
+- [x] 3.1.3 Create barrel export index.ts
+- [x] 3.1.4 Create README.md documenting module structure (follow menu README pattern)
 
 ### 3.2 API Service Layer
-- [ ] 3.2.1 Create `services/reservation.service.ts` using centralized Axios client from `@/lib/axios`
-- [ ] 3.2.2 Implement createReservation(data)
-- [ ] 3.2.3 Implement getReservations(filters)
-- [ ] 3.2.4 Implement getReservationById(id)
-- [ ] 3.2.5 Implement updateReservation(id, data)
-- [ ] 3.2.6 Implement cancelReservation(id, reason)
-- [ ] 3.2.7 Implement confirmReservation(id)
-- [ ] 3.2.8 Implement seatCustomer(id)
-- [ ] 3.2.9 Implement markNoShow(id)
-- [ ] 3.2.10 Implement getAvailableTables(date, time, duration, partySize)
-- [ ] 3.2.11 Export via `services/index.ts`
+- [x] 3.2.1 Create `services/reservation.service.ts` using centralized Axios client from `@/lib/axios`
+- [x] 3.2.2 Implement createReservation(data)
+- [x] 3.2.3 Implement getReservations(filters)
+- [x] 3.2.4 Implement getReservationById(id)
+- [x] 3.2.5 Implement updateReservation(id, data)
+- [x] 3.2.6 Implement cancelReservation(id, reason)
+- [x] 3.2.7 Implement confirmReservation(id)
+- [x] 3.2.8 Implement seatCustomer(id)
+- [x] 3.2.9 Implement markNoShow(id)
+- [x] 3.2.10 Implement getAvailableTables(date, time, duration, partySize)
+- [x] 3.2.11 Export via `services/index.ts`
 
 ### 3.3 TypeScript Types
-- [ ] 3.3.1 Create `types/index.ts` (barrel export)
-- [ ] 3.3.2 Define Reservation interface matching backend schema
-- [ ] 3.3.3 Define CreateReservationDto, UpdateReservationDto
-- [ ] 3.3.4 Define AvailableTable type
-- [ ] 3.3.5 Define ReservationStatus enum
+- [x] 3.3.1 Create `types/index.ts` (barrel export)
+- [x] 3.3.2 Define Reservation interface matching backend schema
+- [x] 3.3.3 Define CreateReservationDto, UpdateReservationDto
+- [x] 3.3.4 Define AvailableTable type
+- [x] 3.3.5 Define ReservationStatus enum
 
 ### 3.4 Custom Hooks
-- [ ] 3.4.1 Create `hooks/useReservations.ts` (fetch list with filters)
-- [ ] 3.4.2 Create `hooks/useReservationDetails.ts` (fetch single reservation)
-- [ ] 3.4.3 Create `hooks/useAvailableTables.ts` (fetch available tables)
-- [ ] 3.4.4 Create `hooks/useCreateReservation.ts` (mutation hook)
-- [ ] 3.4.5 Create `hooks/useUpdateReservation.ts` (mutation hook)
-- [ ] 3.4.6 Use React Query or SWR for caching and optimistic updates
-- [ ] 3.4.7 Export via `hooks/index.ts`
+- [x] 3.4.1 Create `hooks/useReservations.ts` (fetch list with filters)
+- [x] 3.4.2 Create `hooks/useReservationDetails.ts` (fetch single reservation)
+- [x] 3.4.3 Create `hooks/useAvailableTables.ts` (fetch available tables)
+- [x] 3.4.4 Create `hooks/useCreateReservation.ts` (mutation hook)
+- [x] 3.4.5 Create `hooks/useUpdateReservation.ts` (mutation hook)
+- [x] 3.4.6 Use React Query or SWR for caching and optimistic updates
+- [x] 3.4.7 Export via `hooks/index.ts`
 
 ### 3.5 UI Components
-- [ ] 3.5.1 Create `components/ReservationCard.tsx` (display single reservation in list)
-- [ ] 3.5.2 Create `components/ReservationStatusBadge.tsx` (color-coded status using shadcn/ui Badge)
-- [ ] 3.5.3 Create `components/TablePicker.tsx` (select from available tables)
-- [ ] 3.5.4 Create `components/ReservationFilters.tsx` (status, date range filters)
-- [ ] 3.5.5 Create `components/ReservationSearchBar.tsx` (search by code/phone)
-- [ ] 3.5.6 Create `components/index.ts` barrel export
+- [x] 3.5.1 Create `components/ReservationCard.tsx` (display single reservation in list)
+- [x] 3.5.2 Create `components/ReservationStatusBadge.tsx` (color-coded status using shadcn/ui Badge)
+- [x] 3.5.3 Create `components/TablePicker.tsx` (select from available tables)
+- [x] 3.5.4 Create `components/ReservationFilters.tsx` (status, date range filters)
+- [x] 3.5.5 Create `components/ReservationSearchBar.tsx` (search by code/phone)
+- [x] 3.5.6 Create `components/index.ts` barrel export
 
 ### 3.6 Dialogs
-- [ ] 3.6.1 Create `dialogs/single/` directory
-- [ ] 3.6.2 Create `dialogs/single/CreateReservationDialog.tsx`
-- [ ] 3.6.3 Use Dialog component from `@/components/ui/dialog`
-- [ ] 3.6.4 Implement form with React Hook Form + Zod validation
-- [ ] 3.6.5 Include date/time picker (use existing date-picker component if available)
-- [ ] 3.6.6 Fetch and display available tables on date/time change
-- [ ] 3.6.7 Submit and show toast notifications (use `@/components/ui/toast`)
-- [ ] 3.6.8 Create `dialogs/single/EditReservationDialog.tsx` (similar to create)
-- [ ] 3.6.9 Create `dialogs/single/CancelReservationDialog.tsx` (reason input)
-- [ ] 3.6.10 Create `dialogs/single/ConfirmNoShowDialog.tsx`
-- [ ] 3.6.11 Create `dialogs/single/index.ts` barrel export
+- [x] 3.6.1 Create `dialogs/single/` directory
+- [x] 3.6.2 Create `dialogs/single/CreateReservationDialog.tsx`
+- [x] 3.6.3 Use Dialog component from `@/components/ui/dialog`
+- [x] 3.6.4 Implement form with React Hook Form + Zod validation
+- [x] 3.6.5 Include date/time picker (use existing date-picker component if available)
+- [x] 3.6.6 Fetch and display available tables on date/time change
+- [x] 3.6.7 Submit and show toast notifications (use `@/components/ui/toast`)
+- [x] 3.6.8 Create `dialogs/single/EditReservationDialog.tsx` (similar to create)
+- [x] 3.6.9 Create `dialogs/single/CancelReservationDialog.tsx` (reason input)
+- [x] 3.6.10 Create `dialogs/single/ConfirmNoShowDialog.tsx`
+- [x] 3.6.11 Create `dialogs/single/index.ts` barrel export
 
 ### 3.7 Views
-- [ ] 3.7.1 Create `views/ReservationListView.tsx`
-- [ ] 3.7.2 Display reservations with filters and search
-- [ ] 3.7.3 Show "Create Reservation" button (opens dialog)
-- [ ] 3.7.4 Show action buttons per reservation (Confirm, Seat, No-Show, Edit, Cancel)
-- [ ] 3.7.5 Create `views/ReservationDetailsView.tsx`
-- [ ] 3.7.6 Display full reservation info with audit trail
-- [ ] 3.7.7 Show status transition buttons
-- [ ] 3.7.8 Export via `views/index.ts`
+- [x] 3.7.1 Create `views/ReservationListView.tsx`
+- [x] 3.7.2 Display reservations with filters and search
+- [x] 3.7.3 Show "Create Reservation" button (opens dialog)
+- [x] 3.7.4 Show action buttons per reservation (Confirm, Seat, No-Show, Edit, Cancel)
+- [x] 3.7.5 Create `views/ReservationDetailsView.tsx`
+- [x] 3.7.6 Display full reservation info with audit trail
+- [x] 3.7.7 Show status transition buttons
+- [x] 3.7.8 Export via `views/index.ts`
 
 ### 3.8 Routing
-- [ ] 3.8.1 Create `app/client/src/app/(dashboard)/reservations/page.tsx` → ReservationListView
-- [ ] 3.8.2 Create `app/client/src/app/(dashboard)/reservations/[id]/page.tsx` → ReservationDetailsView
-- [ ] 3.8.3 Add sidebar navigation link in `@/components/layouts/Sidebar.tsx` or similar
-- [ ] 3.8.4 Add icon and label for Reservations
-- [ ] 3.8.5 Check role-based visibility (waiter, manager, admin can see)
+- [x] 3.8.1 Create `app/client/src/app/(dashboard)/reservations/page.tsx` → ReservationListView
+- [x] 3.8.2 Create `app/client/src/app/(dashboard)/reservations/[id]/page.tsx` → ReservationDetailsView
+- [x] 3.8.3 Add sidebar navigation link in `@/components/layouts/Sidebar.tsx` or similar
+- [x] 3.8.4 Add icon and label for Reservations
+- [x] 3.8.5 Check role-based visibility (waiter, manager, admin can see)
 
 ### 3.9 Testing
 - [ ] 3.9.1 Manual test: Create reservation via UI
@@ -490,74 +490,74 @@
 ## 3. Frontend: Kitchen Operations Module
 
 ### 4.1 Module Structure Setup
-- [ ] 4.1.1 Create `app/client/src/modules/kitchen/` directory
-- [ ] 4.1.2 Create subdirectories: components/, views/, services/, hooks/, types/, utils/
-- [ ] 4.1.3 Create barrel export index.ts
-- [ ] 4.1.4 Create README.md documenting module structure
+- [x] 4.1.1 Create `app/client/src/modules/kitchen/` directory
+- [x] 4.1.2 Create subdirectories: components/, views/, services/, hooks/, types/, utils/
+- [x] 4.1.3 Create barrel export index.ts
+- [x] 4.1.4 Create README.md documenting module structure
 
 ### 4.2 API Service Layer
-- [ ] 4.2.1 Create `services/kitchen.service.ts` using `@/lib/axios`
-- [ ] 4.2.2 Implement getKitchenOrders(statusFilter)
-- [ ] 4.2.3 Implement startOrder(id)
-- [ ] 4.2.4 Implement markReady(id)
-- [ ] 4.2.5 Implement markCompleted(id)
-- [ ] 4.2.6 Implement cancelOrder(id)
-- [ ] 4.2.7 Export via `services/index.ts`
+- [x] 4.2.1 Create `services/kitchen.service.ts` using `@/lib/axios`
+- [x] 4.2.2 Implement getKitchenOrders(statusFilter)
+- [x] 4.2.3 Implement startOrder(id)
+- [x] 4.2.4 Implement markReady(id)
+- [x] 4.2.5 Implement markCompleted(id)
+- [x] 4.2.6 Implement cancelOrder(id)
+- [x] 4.2.7 Export via `services/index.ts`
 
 ### 4.3 WebSocket Hook
-- [ ] 4.3.1 Create `hooks/useKitchenSocket.ts`
-- [ ] 4.3.2 Import socket.io-client (already in package.json)
-- [ ] 4.3.3 Connect to Socket.io namespace '/kitchen' using NEXT_PUBLIC_SOCKET_URL env var
-- [ ] 4.3.4 Listen for 'order:new', 'order:update', 'order:cancelled' events
-- [ ] 4.3.5 Update local state (consider Zustand store in `@/stores/` if needed)
-- [ ] 4.3.6 Play notification sound on 'order:new'
-- [ ] 4.3.7 Cleanup connection on unmount
-- [ ] 4.3.8 Export via `hooks/index.ts`
+- [x] 4.3.1 Create `hooks/useKitchenSocket.ts`
+- [x] 4.3.2 Import socket.io-client (already in package.json)
+- [x] 4.3.3 Connect to Socket.io namespace '/kitchen' using NEXT_PUBLIC_SOCKET_URL env var
+- [x] 4.3.4 Listen for 'order:new', 'order:update', 'order:cancelled' events
+- [x] 4.3.5 Update local state (consider Zustand store in `@/stores/` if needed)
+- [x] 4.3.6 Play notification sound on 'order:new'
+- [x] 4.3.7 Cleanup connection on unmount
+- [x] 4.3.8 Export via `hooks/index.ts`
 
 ### 4.4 TypeScript Types
-- [ ] 4.4.1 Create `types/index.ts` (barrel export)
-- [ ] 4.4.2 Define KitchenOrder interface
-- [ ] 4.4.3 Define KitchenOrderStatus enum
-- [ ] 4.4.4 Define OrderItem type
+- [x] 4.4.1 Create `types/index.ts` (barrel export)
+- [x] 4.4.2 Define KitchenOrder interface
+- [x] 4.4.3 Define KitchenOrderStatus enum
+- [x] 4.4.4 Define OrderItem type
 
 ### 4.5 Custom Hooks
-- [ ] 4.5.1 Create `hooks/useKitchenOrders.ts` (fetch and subscribe to updates)
-- [ ] 4.5.2 Combine API fetch + WebSocket updates
-- [ ] 4.5.3 Filter orders by status (pending, preparing, ready)
-- [ ] 4.5.4 Export via `hooks/index.ts`
+- [x] 4.5.1 Create `hooks/useKitchenOrders.ts` (fetch and subscribe to updates)
+- [x] 4.5.2 Combine API fetch + WebSocket updates
+- [x] 4.5.3 Filter orders by status (pending, preparing, ready)
+- [x] 4.5.4 Export via `hooks/index.ts`
 
 ### 4.6 UI Components
-- [ ] 4.6.1 Create `components/KitchenOrderCard.tsx` (display single order)
-- [ ] 4.6.2 Show order number, table, items, special requests
-- [ ] 4.6.3 Show elapsed time since createdAt (live counter)
-- [ ] 4.6.4 Show action buttons: Start, Done, based on status
-- [ ] 4.6.5 Create `components/OrderStatusBadge.tsx` (color-coded status using shadcn/ui)
-- [ ] 4.6.6 Create `components/KitchenOrderList.tsx` (grouped by status)
-- [ ] 4.6.7 Export via `components/index.ts`
+- [x] 4.6.1 Create `components/KitchenOrderCard.tsx` (display single order)
+- [x] 4.6.2 Show order number, table, items, special requests
+- [x] 4.6.3 Show elapsed time since createdAt (live counter)
+- [x] 4.6.4 Show action buttons: Start, Done, based on status
+- [x] 4.6.5 Create `components/OrderStatusBadge.tsx` (color-coded status using shadcn/ui)
+- [x] 4.6.6 Create `components/KitchenOrderList.tsx` (grouped by status)
+- [x] 4.6.7 Export via `components/index.ts`
 
 ### 4.7 Views
-- [ ] 4.7.1 Create `views/KitchenDashboardView.tsx`
-- [ ] 4.7.2 Display three sections: Pending, Preparing, Ready
-- [ ] 4.7.3 Each section shows count and list of orders
-- [ ] 4.7.4 Auto-refresh via WebSocket (no manual refresh needed)
-- [ ] 4.7.5 Export via `views/index.ts`
+- [x] 4.7.1 Create `views/KitchenDashboardView.tsx`
+- [x] 4.7.2 Display three sections: Pending, Preparing, Ready
+- [x] 4.7.3 Each section shows count and list of orders
+- [x] 4.7.4 Auto-refresh via WebSocket (no manual refresh needed)
+- [x] 4.7.5 Export via `views/index.ts`
+
+### 4.7 Views
+- [x] 4.7.1 Create `views/KitchenDashboardView.tsx`
+- [x] 4.7.2 Display three sections: Pending, Preparing, Ready
+- [x] 4.7.3 Each section shows count and list of orders
+- [x] 4.7.4 Auto-refresh via WebSocket (no manual refresh needed)
+- [x] 4.7.5 Export via `views/index.ts`
 
 ### 4.8 Routing
-- [ ] 4.8.1 Create `app/client/src/app/(dashboard)/kitchen/page.tsx` → KitchenDashboardView
-- [ ] 4.8.2 Add sidebar navigation link to Kitchen in layout
-- [ ] 4.8.3 Restrict visibility to chef role only (role-based UI rendering)
-- [ ] 4.8.4 Add kitchen icon (ChefHat or similar from lucide-react)
-- [ ] 4.7.5 Export via `views/index.ts`
-
-### 4.8 Routing
-- [ ] 4.8.1 Create `app/client/src/app/(dashboard)/kitchen/page.tsx` → KitchenDashboardView
-- [ ] 4.8.2 Add sidebar navigation link to Kitchen in layout
-- [ ] 4.8.3 Restrict visibility to chef role only (role-based UI rendering)
-- [ ] 4.8.4 Add kitchen icon (ChefHat or similar from lucide-react)
+- [x] 4.8.1 Create `app/client/src/app/(dashboard)/kitchen/page.tsx` → KitchenDashboardView
+- [x] 4.8.2 Add sidebar navigation link to Kitchen in layout
+- [x] 4.8.3 Restrict visibility to chef role only (role-based UI rendering)
+- [x] 4.8.4 Add kitchen icon (ChefHat or similar from lucide-react)
 
 ### 4.9 Notification Sound
-- [ ] 4.9.1 Add notification.mp3 to public/sounds/
-- [ ] 4.9.2 Play sound when 'order:new' event received
+- [x] 4.9.1 Add notification.mp3 to public/sounds/
+- [x] 4.9.2 Play sound when 'order:new' event received
 - [ ] 4.9.3 Add mute toggle in kitchen UI
 
 ### 4.10 Testing
@@ -573,66 +573,66 @@
 ## 4. Frontend: Billing & Payment Module
 
 ### 5.1 Module Structure Setup
-- [ ] 5.1.1 Create `app/client/src/modules/billing/` directory
-- [ ] 5.1.2 Create subdirectories: components/, views/, dialogs/single/, services/, hooks/, types/, utils/
-- [ ] 5.1.3 Create barrel export index.ts
-- [ ] 5.1.4 Create README.md documenting module structure
+- [x] 5.1.1 Create `app/client/src/modules/billing/` directory
+- [x] 5.1.2 Create subdirectories: components/, views/, dialogs/single/, services/, hooks/, types/, utils/
+- [x] 5.1.3 Create barrel export index.ts
+- [x] 5.1.4 Create README.md documenting module structure
 
 ### 5.2 API Service Layer
-- [ ] 5.2.1 Create `services/billing.service.ts` using `@/lib/axios`
-- [ ] 5.2.2 Implement createBill(orderId)
-- [ ] 5.2.3 Implement getBills(filters)
-- [ ] 5.2.4 Implement getBillById(id)
-- [ ] 5.2.5 Implement applyDiscount(billId, discount)
-- [ ] 5.2.6 Implement processPayment(billId, payment)
-- [ ] 5.2.7 Implement voidBill(billId, reason) (admin only)
-- [ ] 5.2.8 Export via `services/index.ts`
+- [x] 5.2.1 Create `services/billing.service.ts` using `@/lib/axios`
+- [x] 5.2.2 Implement createBill(orderId)
+- [x] 5.2.3 Implement getBills(filters)
+- [x] 5.2.4 Implement getBillById(id)
+- [x] 5.2.5 Implement applyDiscount(billId, discount)
+- [x] 5.2.6 Implement processPayment(billId, payment)
+- [x] 5.2.7 Implement voidBill(billId, reason) (admin only)
+- [x] 5.2.8 Export via `services/index.ts`
 
 ### 5.3 TypeScript Types
-- [ ] 5.3.1 Create `types/index.ts` (barrel export)
-- [ ] 5.3.2 Define Bill, BillItem, Payment interfaces
-- [ ] 5.3.3 Define PaymentMethod, PaymentStatus enums
-- [ ] 5.3.4 Define CreateBillDto, ApplyDiscountDto, ProcessPaymentDto
+- [x] 5.3.1 Create `types/index.ts` (barrel export)
+- [x] 5.3.2 Define Bill, BillItem, Payment interfaces
+- [x] 5.3.3 Define PaymentMethod, PaymentStatus enums
+- [x] 5.3.4 Define CreateBillDto, ApplyDiscountDto, ProcessPaymentDto
 
 ### 5.4 Custom Hooks
-- [ ] 5.4.1 Create `hooks/useBills.ts` (fetch list with filters)
-- [ ] 5.4.2 Create `hooks/useBillDetails.ts` (fetch single bill)
-- [ ] 5.4.3 Create `hooks/useCreateBill.ts` (mutation)
-- [ ] 5.4.4 Create `hooks/useProcessPayment.ts` (mutation)
-- [ ] 5.4.5 Export via `hooks/index.ts`
+- [x] 5.4.1 Create `hooks/useBills.ts` (fetch list with filters)
+- [x] 5.4.2 Create `hooks/useBillDetails.ts` (fetch single bill)
+- [x] 5.4.3 Create `hooks/useCreateBill.ts` (mutation)
+- [x] 5.4.4 Create `hooks/useProcessPayment.ts` (mutation)
+- [x] 5.4.5 Export via `hooks/index.ts`
 
 ### 5.5 UI Components
-- [ ] 5.5.1 Create `components/BillSummary.tsx` (display bill details)
-- [ ] 5.5.2 Show itemized list, subtotal, tax, service, discount, total
-- [ ] 5.5.3 Format currency as VND with thousand separators
-- [ ] 5.5.4 Create `components/PaymentMethodPicker.tsx` (radio buttons: cash, card, momo, bank)
-- [ ] 5.5.5 Create `components/BillStatusBadge.tsx` using shadcn/ui Badge
-- [ ] 5.5.6 Export via `components/index.ts`
+- [x] 5.5.1 Create `components/BillSummary.tsx` (display bill details)
+- [x] 5.5.2 Show itemized list, subtotal, tax, service, discount, total
+- [x] 5.5.3 Format currency as VND with thousand separators
+- [x] 5.5.4 Create `components/PaymentMethodPicker.tsx` (radio buttons: cash, card, momo, bank)
+- [x] 5.5.5 Create `components/BillStatusBadge.tsx` using shadcn/ui Badge
+- [x] 5.5.6 Export via `components/index.ts`
 
 ### 5.6 Dialogs
-- [ ] 5.6.1 Create `dialogs/single/` directory
-- [ ] 5.6.2 Create `dialogs/single/CreateBillDialog.tsx` using `@/components/ui/dialog`
-- [ ] 5.6.3 Show order summary, confirm create bill
-- [ ] 5.6.4 Create `dialogs/single/ApplyDiscountDialog.tsx`
-- [ ] 5.6.5 Input percentage or fixed amount, reason
-- [ ] 5.6.6 Show manager approval prompt if discount > 10%
-- [ ] 5.6.7 Create `dialogs/single/ProcessPaymentDialog.tsx`
-- [ ] 5.6.8 Select payment method, enter amount (pre-filled with total)
-- [ ] 5.6.9 For cash: calculate change if receivedAmount > totalAmount
-- [ ] 5.6.10 For card: input last 4 digits, transaction ID
-- [ ] 5.6.11 Confirm payment, show toast success message
-- [ ] 5.6.12 Create `dialogs/single/VoidBillDialog.tsx` (admin only, reason input)
-- [ ] 5.6.13 Export via `dialogs/single/index.ts`
+- [x] 5.6.1 Create `dialogs/single/` directory
+- [x] 5.6.2 Create `dialogs/single/CreateBillDialog.tsx` using `@/components/ui/dialog`
+- [x] 5.6.3 Show order summary, confirm create bill
+- [x] 5.6.4 Create `dialogs/single/ApplyDiscountDialog.tsx`
+- [x] 5.6.5 Input percentage or fixed amount, reason
+- [x] 5.6.6 Show manager approval prompt if discount > 10%
+- [x] 5.6.7 Create `dialogs/single/ProcessPaymentDialog.tsx`
+- [x] 5.6.8 Select payment method, enter amount (pre-filled with total)
+- [x] 5.6.9 For cash: calculate change if receivedAmount > totalAmount
+- [x] 5.6.10 For card: input last 4 digits, transaction ID
+- [x] 5.6.11 Confirm payment, show toast success message
+- [x] 5.6.12 Create `dialogs/single/VoidBillDialog.tsx` (admin only, reason input)
+- [x] 5.6.13 Export via `dialogs/single/index.ts`
 
 ### 5.7 Views
-- [ ] 5.7.1 Create `views/BillingListView.tsx`
-- [ ] 5.7.2 Display bills with filters (status, date, method)
-- [ ] 5.7.3 Search by bill number or table
-- [ ] 5.7.4 Show "Create Bill from Order" flow
-- [ ] 5.7.5 Create `views/BillDetailsView.tsx`
-- [ ] 5.7.6 Display full bill with payment history
-- [ ] 5.7.7 Show "Apply Discount", "Pay", "Void" buttons (role-based)
-- [ ] 5.7.8 Export via `views/index.ts`
+- [x] 5.7.1 Create `views/BillingListView.tsx`
+- [x] 5.7.2 Display bills with filters (status, date, method)
+- [x] 5.7.3 Search by bill number or table
+- [x] 5.7.4 Show "Create Bill from Order" flow
+- [x] 5.7.5 Create `views/BillDetailsView.tsx`
+- [x] 5.7.6 Display full bill with payment history
+- [x] 5.7.7 Show "Apply Discount", "Pay", "Void" buttons (role-based)
+- [x] 5.7.8 Export via `views/index.ts`
 
 ### 5.8 Print Bill Functionality
 - [ ] 5.8.1 Create `utils/printBill.ts` helper function
@@ -641,11 +641,11 @@
 - [ ] 5.8.4 Trigger browser print dialog or send to network printer (if configured)
 
 ### 5.9 Routing
-- [ ] 5.9.1 Create `app/client/src/app/(dashboard)/billing/page.tsx` → BillingListView
-- [ ] 5.9.2 Create `app/client/src/app/(dashboard)/billing/[id]/page.tsx` → BillDetailsView
-- [ ] 5.9.3 Add sidebar navigation link to Billing in layout
-- [ ] 5.9.4 Restrict visibility to cashier, manager, admin roles
-- [ ] 5.9.5 Add billing icon (Receipt or similar from lucide-react)
+- [x] 5.9.1 Create `app/client/src/app/(dashboard)/billing/page.tsx` → BillingListView
+- [x] 5.9.2 Create `app/client/src/app/(dashboard)/billing/[id]/page.tsx` → BillDetailsView
+- [x] 5.9.3 Add sidebar navigation link to Billing in layout
+- [x] 5.9.4 Restrict visibility to cashier, manager, admin roles
+- [x] 5.9.5 Add billing icon (Receipt or similar from lucide-react)
 
 ### 5.10 Testing
 - [ ] 5.10.1 Manual test: Create bill from completed order
