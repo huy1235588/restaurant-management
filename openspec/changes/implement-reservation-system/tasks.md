@@ -278,58 +278,58 @@
   - Implement loading, error, and data states
   - Implement refetch functionality
 
-- [ ] 5.5 Create utility functions
+- [x] 5.5 Create utility functions
   - Create `utils/date-helpers.ts` - Format date/time for display
   - Create `utils/status-helpers.ts` - Get status color, label, icon
   - Create `utils/validation-helpers.ts` - Client-side validation
 
 ## 6. Frontend Components
 
-- [ ] 6.1 Create ReservationCard component
+- [x] 6.1 Create ReservationCard component
   - Display reservation summary: code, customer, date/time, table, status
   - Show status badge with color coding
   - Display action buttons based on status and user role
   - Support compact and expanded views
 
-- [ ] 6.2 Create ReservationList component
+- [x] 6.2 Create ReservationList component
   - Render list of ReservationCard components
   - Handle empty state with illustration and message
   - Support loading state with skeletons
   - Support error state with retry button
 
-- [ ] 6.3 Create ReservationTable component (alternative to list)
+- [x] 6.3 Create ReservationTable component (alternative to list)
   - Tabular display with sortable columns
   - Columns: Code, Customer, Phone, Date, Time, Table, Status, Actions
   - Row actions dropdown menu
   - Pagination controls
 
-- [ ] 6.4 Create ReservationFilters component
+- [x] 6.4 Create ReservationFilters component
   - Status filter dropdown (all, pending, confirmed, seated, etc.)
   - Date filter: today, tomorrow, this week, custom range
   - Table filter dropdown
   - Search input for name/phone/code
   - Clear all filters button
 
-- [ ] 6.5 Create ReservationStatusBadge component
+- [x] 6.5 Create ReservationStatusBadge component
   - Display status with color coding
   - pending: yellow, confirmed: blue, seated: green, completed: gray, cancelled: red, no_show: red
   - Show icon + label
   - Support tooltip with status description
 
-- [ ] 6.6 Create TableAvailabilityList component
+- [x] 6.6 Create TableAvailabilityList component
   - Display available tables as cards or list
   - Show table number, capacity, floor, section
   - Highlight preferred table if provided
   - Support table selection
   - Handle empty state (no tables available)
 
-- [ ] 6.7 Create ReservationTimeline component (for detail view)
+- [x] 6.7 Create ReservationTimeline component (for detail view)
   - Visual timeline of reservation status changes
   - Show: created → confirmed → seated → completed
   - Display timestamps for each status change
   - Highlight current status
 
-- [ ] 6.8 Create ReservationAuditLog component
+- [x] 6.8 Create ReservationAuditLog component
   - Display list of audit entries
   - Show action, user, changes, timestamp
   - Format changes JSON as readable diff
@@ -347,42 +347,42 @@
   - Display validation errors inline
   - On success: show toast, close dialog, refresh list
 
-- [ ] 7.2 Create EditReservationDialog
+- [x] 7.2 Create EditReservationDialog
   - Reuse form from CreateReservationDialog
   - Pre-fill with existing reservation data
   - Disable editing of completed/cancelled reservations
   - Warning when changing date/time (re-check availability)
   - On success: update local state, show toast
 
-- [ ] 7.3 Create ConfirmReservationDialog
+- [x] 7.3 Create ConfirmReservationDialog
   - Simple confirmation dialog
   - Show reservation details (customer, date, time, table)
   - Confirm button to change status to "confirmed"
   - Cancel button
   - On success: update status, show toast
 
-- [ ] 7.4 Create CheckInDialog
+- [x] 7.4 Create CheckInDialog
   - Display reservation details
   - Show customer info, table number
   - Check-in button to mark as "seated"
   - Handle early/late arrival scenarios
   - On success: update status, navigate to order creation (optional)
 
-- [ ] 7.5 Create CancelReservationDialog
+- [x] 7.5 Create CancelReservationDialog
   - Confirmation dialog with reason input
   - Reason textarea (optional)
   - Warning message about cancellation
   - Cancel and Confirm buttons
   - On success: update status, show toast
 
-- [ ] 7.6 Create NoShowDialog
+- [x] 7.6 Create NoShowDialog
   - Confirmation dialog
   - Warning about marking customer as no-show
   - Display customer's no-show history if available
   - Confirm button
   - On success: update status, release table
 
-- [ ] 7.7 Create CompleteReservationDialog
+- [x] 7.7 Create CompleteReservationDialog
   - Simple confirmation dialog
   - Show billing summary if order exists
   - Complete button to mark as "completed"
@@ -390,7 +390,7 @@
 
 ## 8. Frontend Views
 
-- [ ] 8.1 Create ReservationListView
+- [x] 8.1 Create ReservationListView
   - Main page for reservations at `/dashboard/reservations`
   - Header with title, create button, filters toggle
   - ReservationFilters component (collapsible)
@@ -399,7 +399,7 @@
   - Loading and error states
   - Empty state with call-to-action button
 
-- [ ] 8.2 Create ReservationDetailView
+- [x] 8.2 Create ReservationDetailView
   - Detail page at `/dashboard/reservations/[id]`
   - Display full reservation information
   - ReservationTimeline component
@@ -417,23 +417,23 @@
 
 ## 9. Frontend App Router Integration
 
-- [ ] 9.1 Create reservation pages in App Router
+- [x] 9.1 Create reservation pages in App Router
   - Create `app/client/src/app/dashboard/reservations/page.tsx` - List view
   - Create `app/client/src/app/dashboard/reservations/[id]/page.tsx` - Detail view
   - Create `app/client/src/app/dashboard/reservations/layout.tsx` - Shared layout (if needed)
 
-- [ ] 9.2 Add navigation links
+- [x] 9.2 Add navigation links
   - Update sidebar navigation to include "Reservations" menu item
   - Add icon (Calendar or BookOpen)
   - Highlight active when on reservations route
 
-- [ ] 9.3 Add breadcrumbs
+- [x] 9.3 Add breadcrumbs
   - Dashboard > Reservations (list)
   - Dashboard > Reservations > [Code] (detail)
 
 ## 10. Localization (i18n)
 
-- [ ] 10.1 Add English translations
+- [x] 10.1 Add English translations
   - Create keys in `app/client/locales/en.json`
   - reservation.title, reservation.create, reservation.edit, etc.
   - Status labels: pending, confirmed, seated, completed, cancelled, no_show
@@ -441,32 +441,32 @@
   - Error messages
   - Success messages
 
-- [ ] 10.2 Add Vietnamese translations
+- [x] 10.2 Add Vietnamese translations
   - Create keys in `app/client/locales/vi.json`
   - Match all keys from English
   - Translate status labels: "Chờ xác nhận", "Đã xác nhận", etc.
 
-- [ ] 10.3 Use translations in components
+- [x] 10.3 Use translations in components
   - Replace hardcoded strings with `t('reservation.key')`
   - Format dates with locale-aware formatters
   - Test language switching
 
 ## 11. Validation & Error Handling
 
-- [ ] 11.1 Implement client-side validation
+- [x] 11.1 Implement client-side validation
   - Zod schemas matching backend
   - Validate on form submit
   - Display inline errors under fields
   - Highlight invalid fields with red border
 
-- [ ] 11.2 Implement API error handling
+- [x] 11.2 Implement API error handling
   - Catch 400 validation errors, display field-level errors
   - Catch 404 not found, show user-friendly message
   - Catch 409 conflict, show alternatives if available
   - Catch 500 server error, show generic error with retry
   - Display error toasts for all failed operations
 
-- [ ] 11.3 Implement success feedback
+- [x] 11.3 Implement success feedback
   - Show success toast on create, update, cancel, confirm, etc.
   - Include reservation code in success message
   - Auto-close toasts after 5 seconds
@@ -474,7 +474,7 @@
 
 ## 12. Dashboard & Reports
 
-- [ ] 12.1 Create reservation stats widget for dashboard
+- [x] 12.1 Create reservation stats widget for dashboard
   - Display total reservations today
   - Display count by status (pending, confirmed, seated)
   - Display no-show count and rate
@@ -494,13 +494,13 @@
 
 ## 13. Role-Based UI
 
-- [ ] 13.1 Implement role-based action buttons
+- [x] 13.1 Implement role-based action buttons
   - Show "Create" button only for admin, manager, waiter
   - Show "Cancel" button only for admin, manager
   - Show "Confirm", "Check-in", "Complete" for admin, manager, waiter
   - Hide write operations for chef, cashier (read-only)
 
-- [ ] 13.2 Implement role-based navigation
+- [x] 13.2 Implement role-based navigation
   - Show "Reservations" menu item for all roles
   - Disable create dialog for read-only roles
 
