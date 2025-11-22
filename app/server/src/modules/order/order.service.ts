@@ -29,7 +29,6 @@ import {
     OrderAlreadyCancelledException,
     BillAlreadyCreatedException,
 } from './exceptions/order.exceptions';
-import { OrderHelper } from './helpers/order.helper';
 
 /**
  * Order Service
