@@ -159,9 +159,8 @@ export const isOrderInProgress = (status: OrderStatus): boolean => {
     return [
         OrderStatus.PENDING,
         OrderStatus.CONFIRMED,
-        OrderStatus.PREPARING,
         OrderStatus.READY,
-        OrderStatus.SERVED,
+        OrderStatus.SERVING,
     ].includes(status);
 };
 
@@ -170,21 +169,19 @@ export const isOrderFinalized = (status: OrderStatus): boolean => {
     return [
         OrderStatus.COMPLETED,
         OrderStatus.CANCELLED,
-        OrderStatus.PAID,
     ].includes(status);
 };
 
 // Get next possible statuses for transition
+// Based on database enum: pending -> confirmed -> ready -> serving -> completed
 export const getNextPossibleStatuses = (currentStatus: OrderStatus): OrderStatus[] => {
     const transitions: Record<OrderStatus, OrderStatus[]> = {
         [OrderStatus.PENDING]: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
-        [OrderStatus.CONFIRMED]: [OrderStatus.PREPARING, OrderStatus.CANCELLED],
-        [OrderStatus.PREPARING]: [OrderStatus.READY],
-        [OrderStatus.READY]: [OrderStatus.SERVED],
-        [OrderStatus.SERVED]: [OrderStatus.COMPLETED],
-        [OrderStatus.COMPLETED]: [OrderStatus.PAID],
+        [OrderStatus.CONFIRMED]: [OrderStatus.READY, OrderStatus.CANCELLED],
+        [OrderStatus.READY]: [OrderStatus.SERVING, OrderStatus.COMPLETED, OrderStatus.CANCELLED],
+        [OrderStatus.SERVING]: [OrderStatus.COMPLETED],
+        [OrderStatus.COMPLETED]: [],
         [OrderStatus.CANCELLED]: [],
-        [OrderStatus.PAID]: [],
     };
     return transitions[currentStatus] || [];
 };

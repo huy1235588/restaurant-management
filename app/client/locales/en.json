@@ -99,9 +99,9 @@
         "status": {
             "pending": "Pending",
             "confirmed": "Confirmed",
-            "preparing": "Preparing",
             "ready": "Ready",
-            "served": "Served",
+            "serving": "Serving",
+            "completed": "Completed",
             "cancelled": "Cancelled"
         },
         "type": {
@@ -404,12 +404,10 @@
         "kitchen": "Kitchen",
         "kitchenQueue": "Kitchen Queue",
         "pending": "Pending",
-        "preparing": "Preparing",
         "ready": "Ready",
-        "served": "Served",
+        "serving": "Serving",
         "cancelled": "Cancelled",
         "completed": "Completed",
-        "paid": "Paid",
         "markReady": "Mark Ready",
         "elapsedTime": "Elapsed Time",
         "waitingTime": "Waiting Time",
@@ -434,16 +432,13 @@
         "status": {
             "pending": "Pending",
             "confirmed": "Confirmed",
-            "preparing": "Preparing",
             "ready": "Ready",
-            "served": "Serving",
+            "serving": "Serving",
             "completed": "Completed",
-            "cancelled": "Cancelled",
-            "paid": "Paid"
+            "cancelled": "Cancelled"
         },
         "itemStatus": {
             "pending": "Pending",
-            "preparing": "Preparing",
             "ready": "Ready",
             "served": "Served",
             "cancelled": "Cancelled"

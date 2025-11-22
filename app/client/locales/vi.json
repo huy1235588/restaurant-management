@@ -99,9 +99,9 @@
         "status": {
             "pending": "Chờ xử lý",
             "confirmed": "Đã xác nhận",
-            "preparing": "Đang chuẩn bị",
             "ready": "Sẵn sàng",
-            "served": "Đã phục vụ",
+            "serving": "Đang phục vụ",
+            "completed": "Hoàn thành",
             "cancelled": "Đã hủy"
         },
         "type": {
@@ -404,12 +404,10 @@
         "kitchen": "Bếp",
         "kitchenQueue": "Hàng Đợi Bếp",
         "pending": "Chờ Làm",
-        "preparing": "Đang Làm",
         "ready": "Sẵn Sàng",
-        "served": "Đã Phục Vụ",
+        "serving": "Đang Phục Vụ",
         "cancelled": "Đã Hủy",
         "completed": "Hoàn Thành",
-        "paid": "Đã Thanh Toán",
         "markReady": "Đánh Dấu Sẵn Sàng",
         "elapsedTime": "Thời Gian Đã Qua",
         "waitingTime": "Thời Gian Chờ",
@@ -434,16 +432,13 @@
         "status": {
             "pending": "Chờ Xác Nhận",
             "confirmed": "Đã Xác Nhận",
-            "preparing": "Đang Làm",
             "ready": "Sẵn Sàng",
-            "served": "Đang Phục Vụ",
+            "serving": "Đang Phục Vụ",
             "completed": "Hoàn Thành",
-            "cancelled": "Đã Hủy",
-            "paid": "Đã Thanh Toán"
+            "cancelled": "Đã Hủy"
         },
         "itemStatus": {
             "pending": "Chờ Làm",
-            "preparing": "Đang Làm",
             "ready": "Sẵn Sàng",
             "served": "Đã Phục Vụ",
             "cancelled": "Đã Hủy"

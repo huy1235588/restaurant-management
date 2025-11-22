@@ -1,17 +1,14 @@
 export enum OrderStatus {
     PENDING = "pending",
     CONFIRMED = "confirmed",
-    PREPARING = "preparing",
     READY = "ready",
-    SERVED = "served",
+    SERVING = "serving",
     COMPLETED = "completed",
     CANCELLED = "cancelled",
-    PAID = "paid",
 }
 
 export enum OrderItemStatus {
     PENDING = "pending",
-    PREPARING = "preparing",
     READY = "ready",
     SERVED = "served",
     CANCELLED = "cancelled",
@@ -19,8 +16,8 @@ export enum OrderItemStatus {
 
 export enum KitchenOrderStatus {
     PENDING = "pending",
-    PREPARING = "preparing",
     READY = "ready",
+    COMPLETED = "completed",
     CANCELLED = "cancelled",
 }
 

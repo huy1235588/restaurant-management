@@ -67,18 +67,19 @@ export class OrderHelper {
         currentStatus: OrderStatus,
         newStatus: OrderStatus,
     ): boolean {
-        // Define allowed transitions
+        // Define allowed transitions based on actual database enum
+        // OrderStatus: pending -> confirmed -> ready -> serving -> completed
         const transitions: Record<OrderStatus, OrderStatus[]> = {
             [OrderStatus.pending]: [
                 OrderStatus.confirmed,
                 OrderStatus.cancelled,
             ],
-            [OrderStatus.confirmed]: [
-                OrderStatus.preparing,
+            [OrderStatus.confirmed]: [OrderStatus.ready, OrderStatus.cancelled],
+            [OrderStatus.ready]: [
+                OrderStatus.serving,
+                OrderStatus.completed,
                 OrderStatus.cancelled,
             ],
-            [OrderStatus.preparing]: [OrderStatus.ready, OrderStatus.cancelled],
-            [OrderStatus.ready]: [OrderStatus.serving, OrderStatus.completed],
             [OrderStatus.serving]: [OrderStatus.completed],
             [OrderStatus.completed]: [], // Cannot transition from completed
             [OrderStatus.cancelled]: [], // Cannot transition from cancelled
@@ -112,16 +113,16 @@ export class OrderHelper {
 
     /**
      * Get order status priority for sorting
+     * Based on actual database enum: pending -> confirmed -> ready -> serving -> completed -> cancelled
      */
     static getStatusPriority(status: OrderStatus): number {
         const priorities: Record<OrderStatus, number> = {
             [OrderStatus.pending]: 1,
             [OrderStatus.confirmed]: 2,
-            [OrderStatus.preparing]: 3,
-            [OrderStatus.ready]: 4,
-            [OrderStatus.serving]: 5,
-            [OrderStatus.completed]: 6,
-            [OrderStatus.cancelled]: 7,
+            [OrderStatus.ready]: 3,
+            [OrderStatus.serving]: 4,
+            [OrderStatus.completed]: 5,
+            [OrderStatus.cancelled]: 6,
         };
         return priorities[status] ?? 99;
     }

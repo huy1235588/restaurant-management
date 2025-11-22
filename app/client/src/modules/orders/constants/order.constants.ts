@@ -11,12 +11,10 @@ import { OrderStatus, OrderItemStatus, KitchenOrderStatus, OrderPriority } from 
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
     [OrderStatus.PENDING]: 'Chờ xác nhận',
     [OrderStatus.CONFIRMED]: 'Đã xác nhận',
-    [OrderStatus.PREPARING]: 'Đang chuẩn bị',
     [OrderStatus.READY]: 'Sẵn sàng',
-    [OrderStatus.SERVED]: 'Đã phục vụ',
+    [OrderStatus.SERVING]: 'Đang phục vụ',
     [OrderStatus.COMPLETED]: 'Hoàn thành',
     [OrderStatus.CANCELLED]: 'Đã hủy',
-    [OrderStatus.PAID]: 'Đã thanh toán',
 };
 
 /**
@@ -24,7 +22,6 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
  */
 export const ORDER_ITEM_STATUS_LABELS: Record<OrderItemStatus, string> = {
     [OrderItemStatus.PENDING]: 'Chờ xử lý',
-    [OrderItemStatus.PREPARING]: 'Đang chuẩn bị',
     [OrderItemStatus.READY]: 'Sẵn sàng',
     [OrderItemStatus.SERVED]: 'Đã phục vụ',
     [OrderItemStatus.CANCELLED]: 'Đã hủy',
@@ -35,8 +32,8 @@ export const ORDER_ITEM_STATUS_LABELS: Record<OrderItemStatus, string> = {
  */
 export const KITCHEN_ORDER_STATUS_LABELS: Record<KitchenOrderStatus, string> = {
     [KitchenOrderStatus.PENDING]: 'Chờ làm',
-    [KitchenOrderStatus.PREPARING]: 'Đang làm',
-    [KitchenOrderStatus.READY]: 'Hoàn thành',
+    [KitchenOrderStatus.READY]: 'Sẵn sàng',
+    [KitchenOrderStatus.COMPLETED]: 'Hoàn thành',
     [KitchenOrderStatus.CANCELLED]: 'Đã hủy',
 };
 
@@ -55,17 +52,14 @@ export const ORDER_PRIORITY_LABELS: Record<OrderPriority, string> = {
 export const ORDER_STATUS_COLORS: Record<OrderStatus, string> = {
     [OrderStatus.PENDING]: 'bg-yellow-100 text-yellow-800 border-yellow-300',
     [OrderStatus.CONFIRMED]: 'bg-blue-100 text-blue-800 border-blue-300',
-    [OrderStatus.PREPARING]: 'bg-orange-100 text-orange-800 border-orange-300',
     [OrderStatus.READY]: 'bg-green-100 text-green-800 border-green-300',
-    [OrderStatus.SERVED]: 'bg-purple-100 text-purple-800 border-purple-300',
+    [OrderStatus.SERVING]: 'bg-purple-100 text-purple-800 border-purple-300',
     [OrderStatus.COMPLETED]: 'bg-gray-100 text-gray-800 border-gray-300',
     [OrderStatus.CANCELLED]: 'bg-red-100 text-red-800 border-red-300',
-    [OrderStatus.PAID]: 'bg-emerald-100 text-emerald-800 border-emerald-300',
 };
 
 export const ORDER_ITEM_STATUS_COLORS: Record<OrderItemStatus, string> = {
     [OrderItemStatus.PENDING]: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-    [OrderItemStatus.PREPARING]: 'bg-orange-100 text-orange-800 border-orange-300',
     [OrderItemStatus.READY]: 'bg-green-100 text-green-800 border-green-300',
     [OrderItemStatus.SERVED]: 'bg-purple-100 text-purple-800 border-purple-300',
     [OrderItemStatus.CANCELLED]: 'bg-red-100 text-red-800 border-red-300',
@@ -73,8 +67,8 @@ export const ORDER_ITEM_STATUS_COLORS: Record<OrderItemStatus, string> = {
 
 export const KITCHEN_ORDER_STATUS_COLORS: Record<KitchenOrderStatus, string> = {
     [KitchenOrderStatus.PENDING]: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-    [KitchenOrderStatus.PREPARING]: 'bg-orange-100 text-orange-800 border-orange-300',
     [KitchenOrderStatus.READY]: 'bg-green-100 text-green-800 border-green-300',
+    [KitchenOrderStatus.COMPLETED]: 'bg-gray-100 text-gray-800 border-gray-300',
     [KitchenOrderStatus.CANCELLED]: 'bg-red-100 text-red-800 border-red-300',
 };
 
@@ -161,13 +155,11 @@ export const ORDER_MESSAGES = {
  */
 export const ORDER_STATUS_DESCRIPTIONS: Record<OrderStatus, string> = {
     [OrderStatus.PENDING]: 'Đơn hàng mới tạo, chờ xác nhận',
-    [OrderStatus.CONFIRMED]: 'Đơn hàng đã được xác nhận bởi nhân viên',
-    [OrderStatus.PREPARING]: 'Bếp đang chuẩn bị món ăn',
+    [OrderStatus.CONFIRMED]: 'Đơn hàng đã được xác nhận, gửi vào bếp',
     [OrderStatus.READY]: 'Món ăn đã sẵn sàng, chờ phục vụ',
-    [OrderStatus.SERVED]: 'Đã phục vụ món ăn cho khách',
-    [OrderStatus.COMPLETED]: 'Khách đã dùng xong, chờ thanh toán',
+    [OrderStatus.SERVING]: 'Đang phục vụ món ăn cho khách',
+    [OrderStatus.COMPLETED]: 'Khách đã dùng xong, đơn hàng hoàn thành',
     [OrderStatus.CANCELLED]: 'Đơn hàng đã bị hủy',
-    [OrderStatus.PAID]: 'Đã thanh toán xong',
 };
 
 /**
@@ -217,12 +209,10 @@ export const ORDER_FILTER_OPTIONS = {
     statuses: [
         { value: OrderStatus.PENDING, label: ORDER_STATUS_LABELS[OrderStatus.PENDING] },
         { value: OrderStatus.CONFIRMED, label: ORDER_STATUS_LABELS[OrderStatus.CONFIRMED] },
-        { value: OrderStatus.PREPARING, label: ORDER_STATUS_LABELS[OrderStatus.PREPARING] },
         { value: OrderStatus.READY, label: ORDER_STATUS_LABELS[OrderStatus.READY] },
-        { value: OrderStatus.SERVED, label: ORDER_STATUS_LABELS[OrderStatus.SERVED] },
+        { value: OrderStatus.SERVING, label: ORDER_STATUS_LABELS[OrderStatus.SERVING] },
         { value: OrderStatus.COMPLETED, label: ORDER_STATUS_LABELS[OrderStatus.COMPLETED] },
         { value: OrderStatus.CANCELLED, label: ORDER_STATUS_LABELS[OrderStatus.CANCELLED] },
-        { value: OrderStatus.PAID, label: ORDER_STATUS_LABELS[OrderStatus.PAID] },
     ],
 } as const;
 

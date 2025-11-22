@@ -113,11 +113,10 @@ export function OrderListView({
                             <SelectItem value="all">{t('orders.filter.all')}</SelectItem>
                             <SelectItem value="pending">{t('orders.status.pending')}</SelectItem>
                             <SelectItem value="confirmed">{t('orders.status.confirmed')}</SelectItem>
-                            <SelectItem value="preparing">{t('orders.status.preparing')}</SelectItem>
                             <SelectItem value="ready">{t('orders.status.ready')}</SelectItem>
-                            <SelectItem value="served">{t('orders.status.served')}</SelectItem>
+                            <SelectItem value="serving">{t('orders.status.serving')}</SelectItem>
                             <SelectItem value="completed">{t('orders.status.completed')}</SelectItem>
-                            <SelectItem value="paid">{t('orders.status.paid')}</SelectItem>
+                            <SelectItem value="cancelled">{t('orders.status.cancelled')}</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
