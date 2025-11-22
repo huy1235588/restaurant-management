@@ -36,6 +36,7 @@ import {
     CheckAvailabilityDto,
 } from './dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RESERVATION_MESSAGES } from './constants/reservation.constants';
 
 @ApiTags('reservations')
 @Controller('reservations')
@@ -56,7 +57,7 @@ export class ReservationController {
         const result = await this.reservationService.findAll(query);
         return {
             success: true,
-            message: 'Reservations retrieved successfully',
+            message: RESERVATION_MESSAGES.SUCCESS.RETRIEVED,
             data: result,
         };
     }
@@ -70,7 +71,7 @@ export class ReservationController {
         const tables = await this.reservationService.checkAvailability(query);
         return {
             success: true,
-            message: 'Available tables retrieved successfully',
+            message: RESERVATION_MESSAGES.SUCCESS.AVAILABILITY_CHECKED,
             data: tables,
         };
     }
@@ -83,7 +84,7 @@ export class ReservationController {
         const reservations = await this.reservationService.findByPhone(phone);
         return {
             success: true,
-            message: 'Reservations retrieved successfully',
+            message: RESERVATION_MESSAGES.SUCCESS.RETRIEVED,
             data: reservations,
         };
     }
@@ -97,7 +98,7 @@ export class ReservationController {
         const reservation = await this.reservationService.findByCode(code);
         return {
             success: true,
-            message: 'Reservation retrieved successfully',
+            message: RESERVATION_MESSAGES.SUCCESS.RETRIEVED,
             data: reservation,
         };
     }
@@ -111,7 +112,7 @@ export class ReservationController {
         const reservation = await this.reservationService.findById(id);
         return {
             success: true,
-            message: 'Reservation retrieved successfully',
+            message: RESERVATION_MESSAGES.SUCCESS.RETRIEVED,
             data: reservation,
         };
     }
@@ -133,7 +134,7 @@ export class ReservationController {
         const reservation = await this.reservationService.create(dto, userId);
         return {
             success: true,
-            message: 'Reservation created successfully',
+            message: RESERVATION_MESSAGES.SUCCESS.CREATED,
             data: reservation,
         };
     }
@@ -157,7 +158,7 @@ export class ReservationController {
         );
         return {
             success: true,
-            message: 'Reservation updated successfully',
+            message: RESERVATION_MESSAGES.SUCCESS.UPDATED,
             data: reservation,
         };
     }
@@ -175,7 +176,7 @@ export class ReservationController {
         const reservation = await this.reservationService.confirm(id, userId);
         return {
             success: true,
-            message: 'Reservation confirmed successfully',
+            message: RESERVATION_MESSAGES.SUCCESS.CONFIRMED,
             data: reservation,
         };
     }
@@ -199,8 +200,7 @@ export class ReservationController {
         const result = await this.reservationService.seat(id, userId);
         return {
             success: true,
-            message:
-                'Reservation marked as seated and order created successfully',
+            message: RESERVATION_MESSAGES.SUCCESS.SEATED,
             data: result,
         };
     }
@@ -217,7 +217,7 @@ export class ReservationController {
         const reservation = await this.reservationService.complete(id, userId);
         return {
             success: true,
-            message: 'Reservation completed successfully',
+            message: RESERVATION_MESSAGES.SUCCESS.COMPLETED,
             data: reservation,
         };
     }
@@ -239,7 +239,7 @@ export class ReservationController {
         );
         return {
             success: true,
-            message: 'Reservation cancelled successfully',
+            message: RESERVATION_MESSAGES.SUCCESS.CANCELLED,
             data: reservation,
         };
     }
@@ -259,7 +259,7 @@ export class ReservationController {
         );
         return {
             success: true,
-            message: 'Reservation marked as no-show',
+            message: RESERVATION_MESSAGES.SUCCESS.MARKED_NO_SHOW,
             data: reservation,
         };
     }

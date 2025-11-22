@@ -1,10 +1,4 @@
-import {
-    Injectable,
-    NotFoundException,
-    BadRequestException,
-    ConflictException,
-    Logger,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ReservationRepository } from './reservation.repository';
 import { PrismaService } from '@/database/prisma.service';
 import { ReservationAuditService } from '../reservation-audit';
@@ -23,7 +17,32 @@ import {
     TableStatus,
     OrderStatus,
 } from '@prisma/generated/client';
+import {
+    ReservationNotFoundException,
+    TableNotAvailableException,
+    TablesNotAvailableException,
+    InvalidReservationDateException,
+    ReservationTooEarlyException,
+    ReservationTooFarException,
+    InvalidPartySizeException,
+    ReservationAlreadyConfirmedException,
+    ReservationAlreadyCancelledException,
+    ReservationAlreadyCompletedException,
+    CannotModifyReservationException,
+    CannotCancelReservationException,
+    OrderAlreadyExistsException,
+    ReservationNotConfirmedException,
+    ReservationNotSeatedException,
+    TableOccupiedException,
+    InvalidStatusTransitionException,
+} from './exceptions/reservation.exceptions';
+import { ReservationHelper } from './helpers/reservation.helper';
+import { RESERVATION_CONSTANTS } from './constants/reservation.constants';
 
+/**
+ * Reservation Service
+ * Handles reservation business logic with support for reservation-to-order workflow
+ */
 @Injectable()
 export class ReservationService {
     private readonly logger = new Logger(ReservationService.name);
@@ -71,7 +90,7 @@ export class ReservationService {
     async findById(id: number): Promise<Reservation> {
         const reservation = await this.reservationRepository.findById(id);
         if (!reservation) {
-            throw new NotFoundException('Reservation not found');
+            throw new ReservationNotFoundException(id);
         }
         return reservation;
     }
@@ -79,7 +98,7 @@ export class ReservationService {
     async findByCode(code: string): Promise<Reservation> {
         const reservation = await this.reservationRepository.findByCode(code);
         if (!reservation) {
-            throw new NotFoundException('Reservation not found');
+            throw new ReservationNotFoundException(code);
         }
         return reservation;
     }
@@ -92,16 +111,27 @@ export class ReservationService {
         dto: CreateReservationDto,
         userId?: number,
     ): Promise<Reservation> {
-        // Validate reservation date is not in the past
-        const reservationDateTime = this.combineDateTime(
+        // Validate reservation date and time
+        if (!ReservationHelper.isFutureDateTime(dto.reservationDate, dto.reservationTime)) {
+            throw new InvalidReservationDateException();
+        }
+
+        if (!ReservationHelper.isWithinMinAdvanceTime(dto.reservationDate, dto.reservationTime)) {
+            throw new ReservationTooEarlyException(RESERVATION_CONSTANTS.MIN_ADVANCE_BOOKING_MINUTES);
+        }
+
+        if (!ReservationHelper.isWithinMaxAdvanceTime(dto.reservationDate, dto.reservationTime)) {
+            throw new ReservationTooFarException(RESERVATION_CONSTANTS.MAX_ADVANCE_BOOKING_DAYS);
+        }
+
+        if (!ReservationHelper.isValidPartySize(dto.partySize)) {
+            throw new InvalidPartySizeException(dto.partySize);
+        }
+
+        const reservationDateTime = ReservationHelper.combineDateTime(
             dto.reservationDate,
             dto.reservationTime,
         );
-        if (reservationDateTime < new Date()) {
-            throw new BadRequestException(
-                'Reservation date must be in the future',
-            );
-        }
 
         // Find or create customer
         const customer = await this.findOrCreateCustomer(
@@ -122,8 +152,10 @@ export class ReservationService {
             });
 
             if (availableTables.length === 0) {
-                throw new ConflictException(
-                    'No tables available for selected time',
+                throw new TablesNotAvailableException(
+                    dto.reservationDate,
+                    dto.reservationTime,
+                    dto.partySize,
                 );
             }
 
@@ -153,17 +185,15 @@ export class ReservationService {
             });
 
             if (!table) {
-                throw new NotFoundException('Table not found');
+                throw new TableNotAvailableException(tableId);
             }
 
             if (!table.isActive) {
-                throw new BadRequestException('Table is not active');
+                throw new TableNotAvailableException(tableId);
             }
 
             if (table.capacity < dto.partySize) {
-                throw new BadRequestException(
-                    'Table capacity insufficient for party size',
-                );
+                throw new TableNotAvailableException(tableId);
             }
 
             // Check availability
@@ -179,9 +209,7 @@ export class ReservationService {
                 );
 
             if (overlapping.length > 0) {
-                throw new ConflictException(
-                    'Table not available for selected time',
-                );
+                throw new TableNotAvailableException(tableId);
             }
         }
 
@@ -193,8 +221,8 @@ export class ReservationService {
             customer: { connect: { customerId: customer.customerId } },
             table: { connect: { tableId } },
             reservationDate: new Date(dto.reservationDate),
-            reservationTime: this.parseTime(dto.reservationTime),
-            duration: dto.duration || 120,
+            reservationTime: ReservationHelper.parseTime(dto.reservationTime),
+            duration: dto.duration || RESERVATION_CONSTANTS.DEFAULT_RESERVATION_DURATION,
             partySize: dto.partySize,
             specialRequest: dto.specialRequest,
             depositAmount: dto.depositAmount,
@@ -225,13 +253,8 @@ export class ReservationService {
         const existing = await this.findById(id);
 
         // Cannot update completed or cancelled reservations
-        if (
-            existing.status === ReservationStatus.completed ||
-            existing.status === ReservationStatus.cancelled
-        ) {
-            throw new BadRequestException(
-                'Cannot update completed or cancelled reservation',
-            );
+        if (!ReservationHelper.canModifyReservation(existing.status)) {
+            throw new CannotModifyReservationException(existing.status);
         }
 
         const changes: Record<string, unknown> = {};
@@ -243,15 +266,13 @@ export class ReservationService {
                 existing.reservationDate.toISOString().split('T')[0];
             const newTime =
                 dto.reservationTime ||
-                this.formatTime(existing.reservationTime);
-            const reservationDateTime = this.combineDateTime(newDate, newTime);
+                ReservationHelper.formatTime(existing.reservationTime);
 
-            if (reservationDateTime < new Date()) {
-                throw new BadRequestException(
-                    'Reservation date must be in the future',
-                );
+            if (!ReservationHelper.isFutureDateTime(newDate, newTime)) {
+                throw new InvalidReservationDateException();
             }
 
+            const reservationDateTime = ReservationHelper.combineDateTime(newDate, newTime);
             const duration = dto.duration || existing.duration;
             const endTime = new Date(
                 reservationDateTime.getTime() + duration * 60000,
@@ -267,14 +288,14 @@ export class ReservationService {
                 );
 
             if (overlapping.length > 0) {
-                throw new ConflictException('Table not available for new time');
+                throw new TableNotAvailableException(tableId);
             }
 
             if (dto.reservationDate) {
                 changes.reservationDate = new Date(dto.reservationDate);
             }
             if (dto.reservationTime) {
-                changes.reservationTime = this.parseTime(dto.reservationTime);
+                changes.reservationTime = ReservationHelper.parseTime(dto.reservationTime);
             }
         }
 
@@ -285,16 +306,14 @@ export class ReservationService {
             });
 
             if (!table) {
-                throw new NotFoundException('Table not found');
+                throw new TableNotAvailableException(dto.tableId);
             }
 
             // Access partySize safely from the existing reservation
             const existingPartySize = existing.partySize as number;
             const partySize = dto.partySize ?? existingPartySize;
             if (table.capacity < partySize) {
-                throw new BadRequestException(
-                    'New table capacity insufficient',
-                );
+                throw new TableNotAvailableException(dto.tableId);
             }
 
             changes.tableId = dto.tableId;
@@ -333,9 +352,13 @@ export class ReservationService {
     async confirm(id: number, userId?: number): Promise<Reservation> {
         const reservation = await this.findById(id);
 
-        if (reservation.status !== ReservationStatus.pending) {
-            throw new BadRequestException(
-                'Only pending reservations can be confirmed',
+        if (!ReservationHelper.canConfirmReservation(reservation.status)) {
+            if (reservation.status === ReservationStatus.confirmed) {
+                throw new ReservationAlreadyConfirmedException(id);
+            }
+            throw new InvalidStatusTransitionException(
+                reservation.status,
+                ReservationStatus.confirmed,
             );
         }
 
@@ -358,13 +381,18 @@ export class ReservationService {
     ): Promise<{ reservation: Reservation; order: any }> {
         const reservation = await this.findById(id);
 
-        if (
-            reservation.status !== ReservationStatus.confirmed &&
-            reservation.status !== ReservationStatus.pending
-        ) {
-            throw new BadRequestException(
-                'Only confirmed or pending reservations can be seated',
+        if (!ReservationHelper.canSeatReservation(reservation.status)) {
+            throw new InvalidStatusTransitionException(
+                reservation.status,
+                ReservationStatus.seated,
             );
+        }
+
+        // Check if reservation time has passed grace period
+        const reservationDate = reservation.reservationDate.toISOString().split('T')[0];
+        const reservationTime = ReservationHelper.formatTime(reservation.reservationTime);
+        if (ReservationHelper.isExpired(reservationDate, reservationTime)) {
+            throw new ReservationExpiredException(id);
         }
 
         // Use Prisma transaction to atomically:
@@ -437,17 +465,22 @@ export class ReservationService {
     async complete(id: number, userId?: number): Promise<Reservation> {
         const reservation = await this.findById(id);
 
-        if (reservation.status !== ReservationStatus.seated) {
-            throw new BadRequestException(
-                'Only seated reservations can be completed',
+        if (!ReservationHelper.canCompleteReservation(reservation.status)) {
+            if (reservation.status === ReservationStatus.completed) {
+                throw new ReservationAlreadyCompletedException(id);
+            }
+            throw new InvalidStatusTransitionException(
+                reservation.status,
+                ReservationStatus.completed,
             );
         }
 
         // Check if there's a linked order
         const order = await this.orderService.getOrderByReservation(id);
         if (order && order.status !== OrderStatus.completed) {
-            throw new BadRequestException(
-                'Cannot complete reservation while order is still active. Please complete or cancel the order first.',
+            throw new CannotModifyReservationException(
+                reservation.status,
+                'Cannot complete reservation while order is still active',
             );
         }
 
@@ -477,10 +510,14 @@ export class ReservationService {
     ): Promise<Reservation> {
         const reservation = await this.findById(id);
 
-        if (reservation.status === ReservationStatus.completed) {
-            throw new BadRequestException(
-                'Cannot cancel completed reservation',
-            );
+        if (!ReservationHelper.canCancelReservation(reservation.status)) {
+            if (reservation.status === ReservationStatus.cancelled) {
+                throw new ReservationAlreadyCancelledException(id);
+            }
+            if (reservation.status === ReservationStatus.completed) {
+                throw new ReservationAlreadyCompletedException(id);
+            }
+            throw new CannotCancelReservationException(reservation.status);
         }
 
         // Check if there's a linked order
@@ -490,8 +527,9 @@ export class ReservationService {
             order.status !== OrderStatus.cancelled &&
             order.status !== OrderStatus.completed
         ) {
-            throw new BadRequestException(
-                'Cannot cancel reservation while order is still active. Please cancel the order first.',
+            throw new CannotCancelReservationException(
+                reservation.status,
+                'Cannot cancel reservation while order is still active',
             );
         }
 
@@ -521,12 +559,10 @@ export class ReservationService {
     async markNoShow(id: number, userId?: number): Promise<Reservation> {
         const reservation = await this.findById(id);
 
-        if (
-            reservation.status !== ReservationStatus.pending &&
-            reservation.status !== ReservationStatus.confirmed
-        ) {
-            throw new BadRequestException(
-                'Only pending or confirmed reservations can be marked as no-show',
+        if (!ReservationHelper.canMarkNoShow(reservation.status)) {
+            throw new InvalidStatusTransitionException(
+                reservation.status,
+                ReservationStatus.no_show,
             );
         }
 
@@ -634,23 +670,5 @@ export class ReservationService {
         return customer;
     }
 
-    private combineDateTime(date: string, time: string): Date {
-        const [hours, minutes] = time.split(':').map(Number);
-        const dateTime = new Date(date);
-        dateTime.setHours(hours, minutes, 0, 0);
-        return dateTime;
-    }
-
-    private parseTime(timeString: string): Date {
-        const [hours, minutes] = timeString.split(':').map(Number);
-        const date = new Date();
-        date.setHours(hours, minutes, 0, 0);
-        return date;
-    }
-
-    private formatTime(date: Date): string {
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        return `${hours}:${minutes}`;
-    }
+    // Helper methods removed - now using ReservationHelper static methods
 }

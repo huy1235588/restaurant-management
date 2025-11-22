@@ -1,13 +1,20 @@
-import { IsOptional, IsString, MaxLength } from 'class-validator';
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { RESERVATION_CONSTANTS } from '../constants/reservation.constants';
 
+/**
+ * DTO for cancelling a reservation
+ */
 export class CancelReservationDto {
-    @ApiPropertyOptional({
-        description: 'Reason for cancellation',
-        example: 'Customer requested',
+    @ApiProperty({
+        description: 'Reason for cancellation (required)',
+        example: 'Customer requested cancellation',
+        maxLength: RESERVATION_CONSTANTS.MAX_CANCELLATION_REASON_LENGTH,
     })
-    @IsOptional()
     @IsString()
-    @MaxLength(500)
-    reason?: string;
+    @IsNotEmpty({ message: 'Cancellation reason is required' })
+    @MaxLength(RESERVATION_CONSTANTS.MAX_CANCELLATION_REASON_LENGTH, {
+        message: `Cancellation reason cannot exceed ${RESERVATION_CONSTANTS.MAX_CANCELLATION_REASON_LENGTH} characters`,
+    })
+    reason: string;
 }
