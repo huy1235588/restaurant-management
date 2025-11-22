@@ -126,7 +126,7 @@ export function OrderDetailsDialog({
                                 <div className="flex items-center gap-2 text-muted-foreground">
                                     <Hash className="h-4 w-4" />
                                     <span className="text-2xl font-bold text-foreground">
-                                        {order.id}
+                                        {order.orderId}
                                     </span>
                                     <span className="text-sm">•</span>
                                     <Clock className="h-4 w-4" />
@@ -148,13 +148,13 @@ export function OrderDetailsDialog({
                                     />
                                 </div>
 
-                                {order.note && (
+                                {order.notes && (
                                     <div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900">
                                         <p className="text-xs font-medium text-amber-900 dark:text-amber-200 mb-1">
                                             Ghi chú
                                         </p>
                                         <p className="text-sm text-amber-800 dark:text-amber-300">
-                                            {order.note}
+                                            {order.notes}
                                         </p>
                                     </div>
                                 )}
@@ -175,12 +175,12 @@ export function OrderDetailsDialog({
                                     </>
                                 )}
 
-                                {(order.notes || order.note) && (
+                                {(order.notes || order.notes) && (
                                     <div>
                                         <span className="text-sm text-muted-foreground">
                                             Ghi chú:
                                         </span>
-                                        <p className="text-sm mt-1">{order.notes || order.note}</p>
+                                        <p className="text-sm mt-1">{order.notes || order.notes}</p>
                                     </div>
                                 )}
                             </div>

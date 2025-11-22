@@ -27,45 +27,45 @@ export const useOrderSocket = (options?: { autoConnect?: boolean }) => {
                 queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
                 queryClient.invalidateQueries({ queryKey: orderKeys.count() });
                 
-                toast.success(`Đơn hàng mới #${data.order.id} đã được tạo`);
+                toast.success(`Đơn hàng mới #${data.order.orderId} đã được tạo`);
             },
 
             onStatusChanged: (data) => {
                 // Invalidate specific order and lists
-                queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.order.id) });
+                queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.order.orderId) });
                 queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
                 
                 toast.info(
-                    `Đơn hàng #${data.order.id} đã chuyển sang ${t(`orders.status.${data.newStatus}`)}`
+                    `Đơn hàng #${data.order.orderId} đã chuyển sang ${t(`orders.status.${data.newStatus}`)}`
                 );
             },
 
             onItemsAdded: (data) => {
                 // Invalidate specific order and kitchen queue
-                queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.order.id) });
+                queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.order.orderId) });
                 queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
                 queryClient.invalidateQueries({ queryKey: orderKeys.kitchenQueue() });
                 
-                toast.success(`Đã thêm món vào đơn hàng #${data.order.id}`);
+                toast.success(`Đã thêm món vào đơn hàng #${data.order.orderId}`);
             },
 
             onItemCancelled: (data) => {
                 // Invalidate specific order and kitchen queue
-                queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.order.id) });
+                queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.order.orderId) });
                 queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
                 queryClient.invalidateQueries({ queryKey: orderKeys.kitchenQueue() });
                 
-                toast.info(`Đã hủy món trong đơn hàng #${data.order.id}`);
+                toast.info(`Đã hủy món trong đơn hàng #${data.order.orderId}`);
             },
 
             onOrderCancelled: (data) => {
                 // Invalidate all order queries
-                queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.order.id) });
+                queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.order.orderId) });
                 queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
                 queryClient.invalidateQueries({ queryKey: orderKeys.count() });
                 queryClient.invalidateQueries({ queryKey: orderKeys.kitchenQueue() });
                 
-                toast.warning(`Đơn hàng #${data.order.id} đã bị hủy`);
+                toast.warning(`Đơn hàng #${data.order.orderId} đã bị hủy`);
             },
 
             onKitchenOrderDone: (data) => {
@@ -83,10 +83,10 @@ export const useOrderSocket = (options?: { autoConnect?: boolean }) => {
 
             onItemServed: (data) => {
                 // Invalidate specific order
-                queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.order.id) });
+                queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.order.orderId) });
                 queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
                 
-                toast.success(`Đã phục vụ món trong đơn hàng #${data.order.id}`);
+                toast.success(`Đã phục vụ món trong đơn hàng #${data.order.orderId}`);
             },
         });
 

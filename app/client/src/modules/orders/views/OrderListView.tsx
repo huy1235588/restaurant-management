@@ -146,8 +146,8 @@ export function OrderListView({
                         </TableHeader>
                         <TableBody>
                             {data.data.map((order) => (
-                                <TableRow key={order.orderId || order.id}>
-                                    <TableCell className="font-medium">#{order.orderNumber || order.orderId || order.id}</TableCell>
+                                <TableRow key={order.orderId || order.orderId}>
+                                    <TableCell className="font-medium">#{order.orderNumber || order.orderId}</TableCell>
                                     <TableCell>
                                         {order.table?.tableNumber || 'N/A'}
                                     </TableCell>
@@ -165,7 +165,7 @@ export function OrderListView({
                                     <TableCell>
                                         <OrderStatusBadge status={order.status} />
                                     </TableCell>
-                                    <TableCell>{(order.orderItems || order.items)?.length || 0}</TableCell>
+                                    <TableCell>{(order.orderItems)?.length || 0}</TableCell>
                                     <TableCell className="font-semibold">
                                         {formatCurrency(order.finalAmount || order.totalAmount)}
                                     </TableCell>

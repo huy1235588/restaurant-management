@@ -61,7 +61,7 @@ export function InvoicePreviewDialog({ open, onClose, order }: InvoicePreviewDia
                                 {t('orders.previewInvoice')}
                             </DialogTitle>
                             <DialogDescription>
-                                Hóa đơn đơn hàng #{order.id}
+                                Hóa đơn đơn hàng #{order.orderId}
                             </DialogDescription>
                         </div>
                     </div>
@@ -99,7 +99,7 @@ export function InvoicePreviewDialog({ open, onClose, order }: InvoicePreviewDia
                             <h2 className="text-2xl font-bold mb-2">HÓA ĐƠN THANH TOÁN</h2>
                             <div className="inline-block px-4 py-2 rounded-lg bg-primary/10 border border-primary/20">
                                 <p className="text-sm font-medium text-primary">
-                                    Số hóa đơn: #{order.id}
+                                    Số hóa đơn: #{order.orderId}
                                 </p>
                             </div>
                         </div>
@@ -140,15 +140,15 @@ export function InvoicePreviewDialog({ open, onClose, order }: InvoicePreviewDia
                                     </thead>
                                     <tbody className="divide-y">
                                         {order.orderItems?.map((item, index) => (
-                                            <tr key={item.id} className="hover:bg-muted/50 transition-colors">
+                                            <tr key={item.orderId} className="hover:bg-muted/50 transition-colors">
                                                 <td className="py-3 px-4">
                                                     <div>
                                                         <p className="font-medium">
-                                                            {item.menuItem?.name || 'Unknown'}
+                                                            {item.menuItem?.itemName || 'Unknown'}
                                                         </p>
-                                                        {item.note && (
+                                                        {item.specialRequest && (
                                                             <p className="text-xs text-muted-foreground italic mt-1">
-                                                                ↳ {item.note}
+                                                                ↳ {item.specialRequest}
                                                             </p>
                                                         )}
                                                     </div>
@@ -182,13 +182,13 @@ export function InvoicePreviewDialog({ open, onClose, order }: InvoicePreviewDia
                                 </div>
                             </div>
 
-                            {order.note && (
+                            {order.notes && (
                                 <div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900">
                                     <p className="text-xs font-semibold text-amber-900 dark:text-amber-200 mb-1">
                                         Ghi chú đơn hàng
                                     </p>
                                     <p className="text-sm text-amber-800 dark:text-amber-300">
-                                        {order.note}
+                                        {order.notes}
                                     </p>
                                 </div>
                             )}
