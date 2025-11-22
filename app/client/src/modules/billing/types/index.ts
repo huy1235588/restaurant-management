@@ -1,17 +1,17 @@
 // Billing types based on backend schema
 
 export enum PaymentMethod {
-    CASH = 'cash',
-    CARD = 'card',
-    MOMO = 'momo',
-    BANK_TRANSFER = 'bank-transfer',
+    CASH = "cash",
+    CARD = "card",
+    MOMO = "momo",
+    BANK_TRANSFER = "bank-transfer",
 }
 
 export enum PaymentStatus {
-    PENDING = 'pending',
-    PAID = 'paid',
-    PARTIAL = 'partial',
-    REFUNDED = 'refunded',
+    PENDING = "pending",
+    PAID = "paid",
+    PARTIAL = "partial",
+    REFUNDED = "refunded",
 }
 
 export interface BillItem {

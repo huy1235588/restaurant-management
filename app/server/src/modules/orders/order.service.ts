@@ -17,6 +17,31 @@ import {
 } from './dto';
 import { OrderStatus, TableStatus, Prisma } from '@prisma/generated/client';
 import { v4 as uuidv4 } from 'uuid';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - uuid types are available but TypeScript may not resolve them correctly
+const generateUuid = uuidv4 as () => string;
+
+// Type for Order with all necessary includes
+type OrderWithRelations = Prisma.OrderGetPayload<{
+    include: {
+        table: true;
+        staff: {
+            select: {
+                staffId: true;
+                fullName: true;
+                role: true;
+            };
+        };
+        orderItems: {
+            include: {
+                menuItem: true;
+            };
+        };
+        reservation: true;
+        kitchenOrders: true;
+        bill: true;
+    };
+}>;
 
 @Injectable()
 export class OrderService {
@@ -117,7 +142,7 @@ export class OrderService {
             // Create the order
             const newOrder = await tx.order.create({
                 data: {
-                    orderNumber: uuidv4(),
+                    orderNumber: generateUuid(),
                     tableId: data.tableId,
                     staffId,
                     reservationId: data.reservationId,
@@ -157,7 +182,9 @@ export class OrderService {
             return newOrder;
         });
 
-        this.logger.log(`Order created: ${order.orderNumber} for table ${table.tableNumber}`);
+        this.logger.log(
+            `Order created: ${order.orderNumber} for table ${table.tableNumber}`,
+        );
 
         return order;
     }
@@ -165,10 +192,7 @@ export class OrderService {
     /**
      * Add item to order
      */
-    async addItemToOrder(
-        orderId: number,
-        data: AddOrderItemDto,
-    ) {
+    async addItemToOrder(orderId: number, data: AddOrderItemDto) {
         // Get order and validate status
         const order = await this.getOrderById(orderId);
 
@@ -194,8 +218,8 @@ export class OrderService {
         // Create order item and update order totals in transaction
         const result = await this.prisma.$transaction(async (tx) => {
             // Calculate prices
-            const unitPrice = menuItem.price;
-            const totalPrice = Number(unitPrice) * data.quantity;
+            const unitPrice = Number(menuItem.price);
+            const totalPrice = unitPrice * data.quantity;
 
             // Create order item
             const orderItem = await tx.orderItem.create({
@@ -232,7 +256,9 @@ export class OrderService {
             return { orderItem, order: updatedOrder };
         });
 
-        this.logger.log(`Item added to order ${order.orderNumber}: ${menuItem.itemName} x${data.quantity}`);
+        this.logger.log(
+            `Item added to order ${order.orderNumber}: ${menuItem.itemName} x${data.quantity}`,
+        );
 
         return result;
     }
@@ -262,7 +288,9 @@ export class OrderService {
         }
 
         if (orderItem.orderId !== orderId) {
-            throw new BadRequestException('Order item does not belong to this order');
+            throw new BadRequestException(
+                'Order item does not belong to this order',
+            );
         }
 
         // Update in transaction
@@ -271,7 +299,8 @@ export class OrderService {
 
             if (data.quantity !== undefined) {
                 updateData.quantity = data.quantity;
-                updateData.totalPrice = Number(orderItem.unitPrice) * data.quantity;
+                updateData.totalPrice =
+                    Number(orderItem.unitPrice) * data.quantity;
             }
 
             if (data.specialRequest !== undefined) {
@@ -332,7 +361,9 @@ export class OrderService {
         }
 
         if (orderItem.orderId !== orderId) {
-            throw new BadRequestException('Order item does not belong to this order');
+            throw new BadRequestException(
+                'Order item does not belong to this order',
+            );
         }
 
         // Delete in transaction
@@ -368,7 +399,7 @@ export class OrderService {
      * Confirm order and send to kitchen
      */
     async confirmOrder(orderId: number) {
-        const order = await this.getOrderById(orderId);
+        const order = (await this.getOrderById(orderId)) as OrderWithRelations;
 
         if (order.status !== OrderStatus.pending) {
             throw new BadRequestException('Can only confirm pending orders');
@@ -388,7 +419,9 @@ export class OrderService {
         try {
             await this.kitchenService.createKitchenOrder(orderId);
         } catch (error) {
-            this.logger.error(`Failed to create kitchen order: ${error.message}`);
+            this.logger.error(
+                `Failed to create kitchen order: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            );
             // Continue anyway - order is still confirmed
         }
 
@@ -401,7 +434,7 @@ export class OrderService {
      * Cancel order
      */
     async cancelOrder(orderId: number, cancelData: CancelOrderDto) {
-        const order = await this.getOrderById(orderId);
+        const order = (await this.getOrderById(orderId)) as OrderWithRelations;
 
         // Check if order can be cancelled
         if (order.status === OrderStatus.completed) {
@@ -415,7 +448,7 @@ export class OrderService {
         // Check if kitchen has started preparing
         if (order.kitchenOrders && order.kitchenOrders.length > 0) {
             const kitchenOrder = order.kitchenOrders[0];
-            if (kitchenOrder.status !== 'pending') {
+            if (kitchenOrder && kitchenOrder.status !== 'pending') {
                 throw new BadRequestException(
                     'Cannot cancel order - kitchen has already started preparing',
                 );
@@ -450,16 +483,23 @@ export class OrderService {
 
             // Cancel kitchen order if exists
             if (order.kitchenOrders && order.kitchenOrders.length > 0) {
-                await tx.kitchenOrder.update({
-                    where: { kitchenOrderId: order.kitchenOrders[0].kitchenOrderId },
-                    data: { status: 'cancelled' },
-                });
+                const firstKitchenOrder = order.kitchenOrders[0];
+                if (firstKitchenOrder) {
+                    await tx.kitchenOrder.update({
+                        where: {
+                            kitchenOrderId: firstKitchenOrder.kitchenOrderId,
+                        },
+                        data: { status: 'cancelled' },
+                    });
+                }
             }
 
             return cancelledOrder;
         });
 
-        this.logger.log(`Order cancelled: ${order.orderNumber} - ${cancelData.cancellationReason}`);
+        this.logger.log(
+            `Order cancelled: ${order.orderNumber} - ${cancelData.cancellationReason}`,
+        );
 
         return result;
     }

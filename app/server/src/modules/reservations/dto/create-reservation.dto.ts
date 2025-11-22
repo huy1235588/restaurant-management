@@ -18,7 +18,10 @@ export class CreateReservationDto {
     @MaxLength(255)
     customerName: string;
 
-    @ApiProperty({ example: '0123456789', description: 'Customer phone number' })
+    @ApiProperty({
+        example: '0123456789',
+        description: 'Customer phone number',
+    })
     @IsString()
     @IsNotEmpty()
     @MaxLength(20)

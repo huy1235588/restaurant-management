@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/database/prisma.service';
-import { Prisma, Reservation, ReservationStatus } from '@prisma/generated/client';
+import {
+    Prisma,
+    Reservation,
+    ReservationStatus,
+} from '@prisma/generated/client';
 
 export interface ReservationFilters {
     status?: ReservationStatus;
@@ -240,6 +244,7 @@ export class ReservationRepository {
                 reservationId,
                 action,
                 userId,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 changes,
             },
         });

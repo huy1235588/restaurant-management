@@ -1,6 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { orderApi } from '../services';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { orderApi } from "../services";
 import type {
     Order,
     OrderItem,
@@ -9,15 +9,15 @@ import type {
     UpdateOrderItemDto,
     CancelOrderDto,
     OrderFilters,
-} from '../types';
+} from "../types";
 
 // Query keys
 export const orderKeys = {
-    all: ['orders'] as const,
-    lists: () => [...orderKeys.all, 'list'] as const,
+    all: ["orders"] as const,
+    lists: () => [...orderKeys.all, "list"] as const,
     list: (filters: OrderFilters & { page?: number; limit?: number }) =>
         [...orderKeys.lists(), filters] as const,
-    details: () => [...orderKeys.all, 'detail'] as const,
+    details: () => [...orderKeys.all, "detail"] as const,
     detail: (id: number) => [...orderKeys.details(), id] as const,
 };
 
@@ -50,10 +50,12 @@ export function useCreateOrder() {
         mutationFn: (data: CreateOrderDto) => orderApi.create(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
-            toast.success('Order created successfully');
+            toast.success("Order created successfully");
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Failed to create order');
+            toast.error(
+                error.response?.data?.message || "Failed to create order"
+            );
         },
     });
 }
@@ -63,15 +65,24 @@ export function useUpdateOrder() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ id, data }: { id: number; data: Partial<CreateOrderDto> }) =>
-            orderApi.update(id, data),
+        mutationFn: ({
+            id,
+            data,
+        }: {
+            id: number;
+            data: Partial<CreateOrderDto>;
+        }) => orderApi.update(id, data),
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: orderKeys.detail(variables.id) });
+            queryClient.invalidateQueries({
+                queryKey: orderKeys.detail(variables.id),
+            });
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
-            toast.success('Order updated successfully');
+            toast.success("Order updated successfully");
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Failed to update order');
+            toast.error(
+                error.response?.data?.message || "Failed to update order"
+            );
         },
     });
 }
@@ -85,11 +96,11 @@ export function useConfirmOrder() {
         onSuccess: (_, id) => {
             queryClient.invalidateQueries({ queryKey: orderKeys.detail(id) });
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
-            toast.success('Order confirmed and sent to kitchen');
+            toast.success("Order confirmed and sent to kitchen");
         },
         onError: (error: any) => {
             toast.error(
-                error.response?.data?.message || 'Failed to confirm order'
+                error.response?.data?.message || "Failed to confirm order"
             );
         },
     });
@@ -103,12 +114,16 @@ export function useCancelOrder() {
         mutationFn: ({ id, data }: { id: number; data: CancelOrderDto }) =>
             orderApi.cancel(id, data),
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: orderKeys.detail(variables.id) });
+            queryClient.invalidateQueries({
+                queryKey: orderKeys.detail(variables.id),
+            });
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
-            toast.success('Order cancelled successfully');
+            toast.success("Order cancelled successfully");
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Failed to cancel order');
+            toast.error(
+                error.response?.data?.message || "Failed to cancel order"
+            );
         },
     });
 }
@@ -120,12 +135,14 @@ export function useAddOrderItem(orderId: number) {
     return useMutation({
         mutationFn: (data: AddOrderItemDto) => orderApi.addItem(orderId, data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: orderKeys.detail(orderId) });
+            queryClient.invalidateQueries({
+                queryKey: orderKeys.detail(orderId),
+            });
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
-            toast.success('Item added to order');
+            toast.success("Item added to order");
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Failed to add item');
+            toast.error(error.response?.data?.message || "Failed to add item");
         },
     });
 }
@@ -135,15 +152,24 @@ export function useUpdateOrderItem(orderId: number) {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ itemId, data }: { itemId: number; data: UpdateOrderItemDto }) =>
-            orderApi.updateItem(orderId, itemId, data),
+        mutationFn: ({
+            itemId,
+            data,
+        }: {
+            itemId: number;
+            data: UpdateOrderItemDto;
+        }) => orderApi.updateItem(orderId, itemId, data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: orderKeys.detail(orderId) });
+            queryClient.invalidateQueries({
+                queryKey: orderKeys.detail(orderId),
+            });
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
-            toast.success('Item updated');
+            toast.success("Item updated");
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Failed to update item');
+            toast.error(
+                error.response?.data?.message || "Failed to update item"
+            );
         },
     });
 }
@@ -155,12 +181,16 @@ export function useRemoveOrderItem(orderId: number) {
     return useMutation({
         mutationFn: (itemId: number) => orderApi.removeItem(orderId, itemId),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: orderKeys.detail(orderId) });
+            queryClient.invalidateQueries({
+                queryKey: orderKeys.detail(orderId),
+            });
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
-            toast.success('Item removed from order');
+            toast.success("Item removed from order");
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Failed to remove item');
+            toast.error(
+                error.response?.data?.message || "Failed to remove item"
+            );
         },
     });
 }

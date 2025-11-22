@@ -30,7 +30,8 @@ export class KitchenService {
      * Get kitchen order by ID
      */
     async getKitchenOrderById(kitchenOrderId: number) {
-        const kitchenOrder = await this.kitchenRepository.findById(kitchenOrderId);
+        const kitchenOrder =
+            await this.kitchenRepository.findById(kitchenOrderId);
 
         if (!kitchenOrder) {
             throw new NotFoundException('Kitchen order not found');
@@ -63,7 +64,9 @@ export class KitchenService {
         const existing = await this.kitchenRepository.findByOrderId(orderId);
 
         if (existing) {
-            throw new BadRequestException('Kitchen order already exists for this order');
+            throw new BadRequestException(
+                'Kitchen order already exists for this order',
+            );
         }
 
         // Create kitchen order
@@ -75,7 +78,9 @@ export class KitchenService {
             priority: 'normal', // Default priority
         });
 
-        this.logger.log(`Kitchen order created for order #${order.orderNumber}`);
+        this.logger.log(
+            `Kitchen order created for order #${order.orderNumber}`,
+        );
 
         // Emit WebSocket event for new order
         const kitchenOrderWithDetails = await this.getKitchenOrderById(
@@ -93,7 +98,9 @@ export class KitchenService {
         const kitchenOrder = await this.getKitchenOrderById(kitchenOrderId);
 
         if (kitchenOrder.status !== KitchenOrderStatus.pending) {
-            throw new BadRequestException('Can only start preparing pending orders');
+            throw new BadRequestException(
+                'Can only start preparing pending orders',
+            );
         }
 
         const updated = await this.kitchenRepository.update(kitchenOrderId, {
@@ -106,7 +113,9 @@ export class KitchenService {
             }),
         });
 
-        this.logger.log(`Kitchen order #${kitchenOrderId} started by chef ${staffId}`);
+        this.logger.log(
+            `Kitchen order #${kitchenOrderId} started by chef ${staffId}`,
+        );
 
         // Emit WebSocket event
         this.kitchenGateway.emitOrderUpdate(updated);
@@ -125,13 +134,16 @@ export class KitchenService {
         }
 
         if (kitchenOrder.status === KitchenOrderStatus.cancelled) {
-            throw new BadRequestException('Cannot mark cancelled order as ready');
+            throw new BadRequestException(
+                'Cannot mark cancelled order as ready',
+            );
         }
 
         const completedAt = new Date();
         const prepTimeActual = kitchenOrder.startedAt
             ? Math.floor(
-                  (completedAt.getTime() - kitchenOrder.startedAt.getTime()) / 60000,
+                  (completedAt.getTime() - kitchenOrder.startedAt.getTime()) /
+                      60000,
               )
             : null;
 
@@ -215,7 +227,9 @@ export class KitchenService {
             return updatedKitchen;
         });
 
-        this.logger.log(`Kitchen order #${kitchenOrderId} completed (picked up by waiter)`);
+        this.logger.log(
+            `Kitchen order #${kitchenOrderId} completed (picked up by waiter)`,
+        );
 
         // Emit WebSocket event
         this.kitchenGateway.emitOrderCompleted(updated);
@@ -230,7 +244,9 @@ export class KitchenService {
         const kitchenOrder = await this.getKitchenOrderById(kitchenOrderId);
 
         if (kitchenOrder.status === KitchenOrderStatus.completed) {
-            throw new BadRequestException('Cannot cancel completed kitchen order');
+            throw new BadRequestException(
+                'Cannot cancel completed kitchen order',
+            );
         }
 
         if (kitchenOrder.status === KitchenOrderStatus.cancelled) {

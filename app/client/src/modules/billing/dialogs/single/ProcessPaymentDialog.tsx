@@ -50,16 +50,17 @@ export function ProcessPaymentDialog({
         formState: { errors },
     } = useForm<ProcessPaymentDto>({
         defaultValues: {
-            amountPaid: totalAmount,
+            method: PaymentMethod.CASH,
+            amount: totalAmount,
         },
     });
 
-    const amountPaid = watch('amountPaid');
-    const change = calculateChange(amountPaid, totalAmount);
+    const amount = watch('amount');
+    const change = calculateChange(amount || 0, totalAmount);
 
     const onSubmit = (data: ProcessPaymentDto) => {
         processPayment(
-            { billId, data: { ...data, paymentMethod } },
+            { id: billId, data },
             {
                 onSuccess: () => {
                     reset();
@@ -109,7 +110,10 @@ export function ProcessPaymentDialog({
                             <Button
                                 type="button"
                                 variant={paymentMethod === PaymentMethod.CASH ? 'default' : 'outline'}
-                                onClick={() => setPaymentMethod(PaymentMethod.CASH)}
+                                onClick={() => {
+                                    setPaymentMethod(PaymentMethod.CASH);
+                                    setValue('method', PaymentMethod.CASH);
+                                }}
                                 className="justify-start"
                             >
                                 <Banknote className="w-4 h-4 mr-2" />
@@ -122,7 +126,8 @@ export function ProcessPaymentDialog({
                                 }
                                 onClick={() => {
                                     setPaymentMethod(PaymentMethod.CARD);
-                                    setValue('amountPaid', totalAmount);
+                                    setValue('method', PaymentMethod.CARD);
+                                    setValue('amount', totalAmount);
                                 }}
                                 className="justify-start"
                             >
@@ -138,7 +143,8 @@ export function ProcessPaymentDialog({
                                 }
                                 onClick={() => {
                                     setPaymentMethod(PaymentMethod.BANK_TRANSFER);
-                                    setValue('amountPaid', totalAmount);
+                                    setValue('method', PaymentMethod.BANK_TRANSFER);
+                                    setValue('amount', totalAmount);
                                 }}
                                 className="justify-start"
                             >
@@ -148,28 +154,29 @@ export function ProcessPaymentDialog({
                             <Button
                                 type="button"
                                 variant={
-                                    paymentMethod === PaymentMethod.E_WALLET ? 'default' : 'outline'
+                                    paymentMethod === PaymentMethod.MOMO ? 'default' : 'outline'
                                 }
                                 onClick={() => {
-                                    setPaymentMethod(PaymentMethod.E_WALLET);
-                                    setValue('amountPaid', totalAmount);
+                                    setPaymentMethod(PaymentMethod.MOMO);
+                                    setValue('method', PaymentMethod.MOMO);
+                                    setValue('amount', totalAmount);
                                 }}
                                 className="justify-start"
                             >
                                 <Smartphone className="w-4 h-4 mr-2" />
-                                E-Wallet
+                                MoMo
                             </Button>
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="amountPaid">Amount Paid *</Label>
+                        <Label htmlFor="amount">Amount Paid *</Label>
                         <Input
-                            id="amountPaid"
+                            id="amount"
                             type="number"
                             min={totalAmount}
                             step="1000"
-                            {...register('amountPaid', {
+                            {...register('amount', {
                                 required: 'Amount is required',
                                 valueAsNumber: true,
                                 min: {
@@ -178,9 +185,9 @@ export function ProcessPaymentDialog({
                                 },
                             })}
                         />
-                        {errors.amountPaid && (
+                        {errors.amount && (
                             <p className="text-sm text-destructive">
-                                {errors.amountPaid.message}
+                                {errors.amount.message}
                             </p>
                         )}
                     </div>

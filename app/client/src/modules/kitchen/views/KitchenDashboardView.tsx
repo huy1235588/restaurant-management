@@ -2,23 +2,25 @@
 
 import { useKitchenOrders, useStartOrder, useMarkReady, useKitchenSocket } from '../hooks';
 import { KitchenOrderCard } from '../components';
-import { KitchenOrderStatus } from '../types';
+import { KitchenOrder, KitchenOrderStatus } from '../types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Clock, CheckCircle, Timer, Wifi, WifiOff } from 'lucide-react';
 
 export function KitchenDashboardView() {
-    const { data: orders = [], isLoading } = useKitchenOrders();
+    const { data: orders, isLoading } = useKitchenOrders();
     const { mutate: startOrder } = useStartOrder();
     const { mutate: markReady } = useMarkReady();
     const { isConnected } = useKitchenSocket();
 
-    const pendingOrders = orders.filter(
+    const orderItems = orders?.items || [];
+
+    const pendingOrders = orderItems.filter(
         (o: KitchenOrder) => o.status === KitchenOrderStatus.PENDING
     );
-    const readyOrders = orders.filter(
+    const readyOrders = orderItems.filter(
         (o: KitchenOrder) => o.status === KitchenOrderStatus.READY
     );
-    const completedOrders = orders.filter(
+    const completedOrders = orderItems.filter(
         (o: KitchenOrder) => o.status === KitchenOrderStatus.COMPLETED
     ).slice(0, 10); // Show only last 10 completed
 

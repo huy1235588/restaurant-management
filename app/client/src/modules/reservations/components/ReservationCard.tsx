@@ -21,16 +21,16 @@ export function ReservationCard({ reservation, onClick }: ReservationCardProps) 
                 <div className="flex items-start justify-between">
                     <div className="space-y-1">
                         <h3 className="font-semibold text-lg">
-                            {reservation.customer.customerName}
+                            {reservation.customerName}
                         </h3>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <Phone className="w-3 h-3" />
-                            <span>{reservation.customer.phoneNumber}</span>
+                            <span>{reservation.phoneNumber}</span>
                         </div>
-                        {reservation.customer.email && (
+                        {reservation.email && (
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <Mail className="w-3 h-3" />
-                                <span>{reservation.customer.email}</span>
+                                <span>{reservation.email}</span>
                             </div>
                         )}
                     </div>

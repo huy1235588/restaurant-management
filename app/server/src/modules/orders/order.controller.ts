@@ -40,10 +40,26 @@ export class OrderController {
 
     @Get()
     @ApiOperation({ summary: 'Get all orders with filters' })
-    @ApiQuery({ name: 'status', required: false, enum: ['pending', 'confirmed', 'ready', 'serving', 'completed', 'cancelled'] })
+    @ApiQuery({
+        name: 'status',
+        required: false,
+        enum: [
+            'pending',
+            'confirmed',
+            'ready',
+            'serving',
+            'completed',
+            'cancelled',
+        ],
+    })
     @ApiQuery({ name: 'tableId', required: false, type: Number })
     @ApiQuery({ name: 'staffId', required: false, type: Number })
-    @ApiQuery({ name: 'date', required: false, type: String, description: 'Date in ISO format' })
+    @ApiQuery({
+        name: 'date',
+        required: false,
+        type: String,
+        description: 'Date in ISO format',
+    })
     @ApiQuery({ name: 'page', required: false, type: Number })
     @ApiQuery({ name: 'limit', required: false, type: Number })
     @ApiResponse({ status: 200, description: 'Orders retrieved successfully' })
@@ -81,7 +97,10 @@ export class OrderController {
     @ApiResponse({ status: 201, description: 'Order created successfully' })
     @ApiResponse({ status: 400, description: 'Bad request' })
     @ApiResponse({ status: 404, description: 'Table not found' })
-    async createOrder(@Body() createOrderDto: CreateOrderDto, @Request() req) {
+    async createOrder(
+        @Body() createOrderDto: CreateOrderDto,
+        @Request() req: { user?: { staffId: number } },
+    ) {
         const staffId = req.user?.staffId;
         return this.orderService.createOrder(createOrderDto, staffId);
     }

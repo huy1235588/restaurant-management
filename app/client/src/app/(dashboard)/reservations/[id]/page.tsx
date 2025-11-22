@@ -99,17 +99,17 @@ export default function ReservationDetailsPage() {
                         <CardContent className="space-y-4">
                             <div>
                                 <h3 className="font-semibold text-lg">
-                                    {reservation.customer.customerName}
+                                    {reservation.customerName}
                                 </h3>
                             </div>
                             <div className="flex items-center gap-2 text-muted-foreground">
                                 <Phone className="w-4 h-4" />
-                                <span>{reservation.customer.phoneNumber}</span>
+                                <span>{reservation.phoneNumber}</span>
                             </div>
-                            {reservation.customer.email && (
+                            {reservation.email && (
                                 <div className="flex items-center gap-2 text-muted-foreground">
                                     <Mail className="w-4 h-4" />
-                                    <span>{reservation.customer.email}</span>
+                                    <span>{reservation.email}</span>
                                 </div>
                             )}
                         </CardContent>

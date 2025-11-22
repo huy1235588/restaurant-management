@@ -12,7 +12,11 @@ import {
     UpdateReservationDto,
     AvailableTablesQueryDto,
 } from './dto';
-import { ReservationStatus, TableStatus } from '@prisma/generated/client';
+import {
+    ReservationStatus,
+    RestaurantTable,
+    TableStatus,
+} from '@prisma/generated/client';
 
 @Injectable()
 export class ReservationService {
@@ -34,9 +38,8 @@ export class ReservationService {
      * Get reservation by ID
      */
     async getReservationById(reservationId: number) {
-        const reservation = await this.reservationRepository.findById(
-            reservationId,
-        );
+        const reservation =
+            await this.reservationRepository.findById(reservationId);
 
         if (!reservation) {
             throw new NotFoundException('Reservation not found');
@@ -84,14 +87,15 @@ export class ReservationService {
         });
 
         // Filter out tables with overlapping reservations
-        const availableTables = [];
+        const availableTables: RestaurantTable[] = [];
 
         for (const table of allTables) {
-            const overlapping = await this.reservationRepository.findOverlapping(
-                table.tableId,
-                startTime,
-                endTime,
-            );
+            const overlapping =
+                await this.reservationRepository.findOverlapping(
+                    table.tableId,
+                    startTime,
+                    endTime,
+                );
 
             if (overlapping.length === 0) {
                 availableTables.push(table);
@@ -104,13 +108,12 @@ export class ReservationService {
     /**
      * Create new reservation
      */
-    async createReservation(
-        data: CreateReservationDto,
-        createdBy?: number,
-    ) {
+    async createReservation(data: CreateReservationDto, createdBy?: number) {
         // Parse date and time
         const reservationDate = new Date(data.reservationDate);
-        const [hours, minutes, seconds = 0] = data.reservationTime.split(':').map(Number);
+        const [hours, minutes, seconds = 0] = data.reservationTime
+            .split(':')
+            .map(Number);
         const startTime = new Date(reservationDate);
         startTime.setHours(hours, minutes, seconds, 0);
 
@@ -158,7 +161,7 @@ export class ReservationService {
         // Create reservation in transaction
         const reservation = await this.prisma.$transaction(async (tx) => {
             // Find or create customer if email provided
-            let customerId = null;
+            let customerId: number | null = null;
             if (data.email) {
                 const customer = await tx.customer.upsert({
                     where: { email: data.email },
@@ -269,7 +272,10 @@ export class ReservationService {
             const newPartySize = data.partySize || reservation.partySize;
             const duration = data.duration || reservation.duration;
 
-            const [hours, minutes, seconds = 0] = newTime.toString().split(':').map(Number);
+            const [hours, minutes, seconds = 0] = newTime
+                .toString()
+                .split(':')
+                .map(Number);
             const startTime = new Date(newDate);
             startTime.setHours(hours, minutes, seconds, 0);
 
@@ -292,12 +298,13 @@ export class ReservationService {
             }
 
             // Check for double booking
-            const overlapping = await this.reservationRepository.findOverlapping(
-                newTableId,
-                startTime,
-                endTime,
-                reservationId,
-            );
+            const overlapping =
+                await this.reservationRepository.findOverlapping(
+                    newTableId,
+                    startTime,
+                    endTime,
+                    reservationId,
+                );
 
             if (overlapping.length > 0) {
                 throw new ConflictException(
@@ -308,10 +315,10 @@ export class ReservationService {
 
         // Update in transaction
         const updated = await this.prisma.$transaction(async (tx) => {
-            const updateData: any = { ...data };
+            const updateData: UpdateReservationDto = { ...data };
 
             if (data.reservationDate) {
-                updateData.reservationDate = new Date(data.reservationDate);
+                updateData.reservationDate = data.reservationDate;
             }
 
             const updatedReservation = await tx.reservation.update({
@@ -329,13 +336,15 @@ export class ReservationService {
                 },
             });
 
-            // Create audit log
+            // Create audit log (use a typed shallow clone to avoid unsafe any)
+            const changes: Partial<UpdateReservationDto> = { ...data };
+
             await tx.reservationAudit.create({
                 data: {
                     reservationId,
                     action: 'updated',
                     userId: updatedBy,
-                    changes: data,
+                    changes,
                 },
             });
 
@@ -367,7 +376,9 @@ export class ReservationService {
         const reservation = await this.getReservationById(reservationId);
 
         if (reservation.status !== ReservationStatus.pending) {
-            throw new BadRequestException('Can only confirm pending reservations');
+            throw new BadRequestException(
+                'Can only confirm pending reservations',
+            );
         }
 
         const confirmed = await this.prisma.$transaction(async (tx) => {
@@ -394,7 +405,9 @@ export class ReservationService {
             return updated;
         });
 
-        this.logger.log(`Reservation confirmed: ${reservation.reservationCode}`);
+        this.logger.log(
+            `Reservation confirmed: ${reservation.reservationCode}`,
+        );
 
         return confirmed;
     }
@@ -406,7 +419,9 @@ export class ReservationService {
         const reservation = await this.getReservationById(reservationId);
 
         if (reservation.status !== ReservationStatus.confirmed) {
-            throw new BadRequestException('Can only seat confirmed reservations');
+            throw new BadRequestException(
+                'Can only seat confirmed reservations',
+            );
         }
 
         const seated = await this.prisma.$transaction(async (tx) => {
@@ -489,7 +504,9 @@ export class ReservationService {
             return updated;
         });
 
-        this.logger.log(`Reservation marked as no-show: ${reservation.reservationCode}`);
+        this.logger.log(
+            `Reservation marked as no-show: ${reservation.reservationCode}`,
+        );
 
         return noShow;
     }
@@ -501,7 +518,9 @@ export class ReservationService {
         const reservation = await this.getReservationById(reservationId);
 
         if (reservation.status !== ReservationStatus.seated) {
-            throw new BadRequestException('Can only complete seated reservations');
+            throw new BadRequestException(
+                'Can only complete seated reservations',
+            );
         }
 
         const completed = await this.prisma.$transaction(async (tx) => {
@@ -528,7 +547,9 @@ export class ReservationService {
             return updated;
         });
 
-        this.logger.log(`Reservation completed: ${reservation.reservationCode}`);
+        this.logger.log(
+            `Reservation completed: ${reservation.reservationCode}`,
+        );
 
         return completed;
     }

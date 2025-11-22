@@ -20,7 +20,9 @@ import Link from 'next/link';
 
 export function ReservationListView() {
     const [filters, setFilters] = useState<ReservationFilters>({});
-    const { data: reservations = [], isLoading } = useReservations(filters);
+    const { data: reservations, isLoading } = useReservations(filters);
+
+    const reservationItems = reservations?.items || [];
 
     return (
         <div className="container mx-auto p-6 space-y-6">
@@ -39,12 +41,12 @@ export function ReservationListView() {
                 <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Customer Name</label>
+                            <label className="text-sm font-medium">Search</label>
                             <Input
                                 placeholder="Search by name..."
-                                value={filters.customerName || ''}
+                                value={filters.search || ''}
                                 onChange={(e) =>
-                                    setFilters({ ...filters, customerName: e.target.value })
+                                    setFilters({ ...filters, search: e.target.value })
                                 }
                             />
                         </div>
@@ -80,22 +82,22 @@ export function ReservationListView() {
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">From Date</label>
+                            <label className="text-sm font-medium">Start Date</label>
                             <Input
                                 type="date"
-                                value={filters.fromDate || ''}
+                                value={filters.startDate || ''}
                                 onChange={(e) =>
-                                    setFilters({ ...filters, fromDate: e.target.value })
+                                    setFilters({ ...filters, startDate: e.target.value })
                                 }
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">To Date</label>
+                            <label className="text-sm font-medium">End Date</label>
                             <Input
                                 type="date"
-                                value={filters.toDate || ''}
+                                value={filters.endDate || ''}
                                 onChange={(e) =>
-                                    setFilters({ ...filters, toDate: e.target.value })
+                                    setFilters({ ...filters, endDate: e.target.value })
                                 }
                             />
                         </div>
@@ -105,7 +107,7 @@ export function ReservationListView() {
 
             {isLoading ? (
                 <div className="text-center py-8">Loading reservations...</div>
-            ) : reservations.length === 0 ? (
+            ) : reservationItems.length === 0 ? (
                 <Card>
                     <CardContent className="py-12 text-center text-muted-foreground">
                         <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -114,7 +116,7 @@ export function ReservationListView() {
                 </Card>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {reservations.map((reservation) => (
+                    {reservationItems.map((reservation) => (
                         <Link
                             key={reservation.reservationId}
                             href={`/reservations/${reservation.reservationId}`}
@@ -124,10 +126,10 @@ export function ReservationListView() {
                                     <div className="flex items-start justify-between">
                                         <div className="space-y-1">
                                             <h3 className="font-semibold text-lg">
-                                                {reservation.customer.customerName}
+                                                {reservation.customerName}
                                             </h3>
                                             <p className="text-sm text-muted-foreground">
-                                                {reservation.customer.phoneNumber}
+                                                {reservation.phoneNumber}
                                             </p>
                                         </div>
                                         <ReservationStatusBadge status={reservation.status} />

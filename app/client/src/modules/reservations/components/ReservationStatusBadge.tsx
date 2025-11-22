@@ -7,8 +7,13 @@ interface ReservationStatusBadgeProps {
 }
 
 export function ReservationStatusBadge({ status }: ReservationStatusBadgeProps) {
+    const rawVariant = RESERVATION_STATUS_COLORS[status];
+    const variant =
+        rawVariant === 'success' || rawVariant === 'warning'
+            ? 'secondary'
+            : (rawVariant as 'default' | 'secondary' | 'destructive' | 'outline' | undefined);
     return (
-        <Badge variant={RESERVATION_STATUS_COLORS[status]}>
+        <Badge variant={variant} >
             {RESERVATION_STATUS_LABELS[status]}
         </Badge>
     );

@@ -20,7 +20,7 @@ import Link from 'next/link';
 
 export function BillListView() {
     const [filters, setFilters] = useState<BillFilters>({});
-    const { data: bills = [], isLoading } = useBills(filters);
+    const { data: bills, isLoading } = useBills(filters);
 
     return (
         <div className="container mx-auto p-6 space-y-6">
@@ -37,17 +37,7 @@ export function BillListView() {
                     <CardTitle>Filter Bills</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">Table Number</label>
-                            <Input
-                                placeholder="Search by table..."
-                                value={filters.tableNumber || ''}
-                                onChange={(e) =>
-                                    setFilters({ ...filters, tableNumber: e.target.value })
-                                }
-                            />
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Status</label>
                             <Select
@@ -64,12 +54,12 @@ export function BillListView() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="">All statuses</SelectItem>
-                                    <SelectItem value={PaymentStatus.UNPAID}>Unpaid</SelectItem>
+                                    <SelectItem value={PaymentStatus.PENDING}>Pending</SelectItem>
                                     <SelectItem value={PaymentStatus.PAID}>Paid</SelectItem>
-                                    <SelectItem value={PaymentStatus.PARTIALLY_PAID}>
-                                        Partially Paid
+                                    <SelectItem value={PaymentStatus.PARTIAL}>
+                                        Partial
                                     </SelectItem>
-                                    <SelectItem value={PaymentStatus.VOIDED}>Voided</SelectItem>
+                                    <SelectItem value={PaymentStatus.REFUNDED}>Refunded</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -77,9 +67,9 @@ export function BillListView() {
                             <label className="text-sm font-medium">From Date</label>
                             <Input
                                 type="date"
-                                value={filters.fromDate || ''}
+                                value={filters.startDate || ''}
                                 onChange={(e) =>
-                                    setFilters({ ...filters, fromDate: e.target.value })
+                                    setFilters({ ...filters, startDate: e.target.value })
                                 }
                             />
                         </div>
@@ -87,9 +77,9 @@ export function BillListView() {
                             <label className="text-sm font-medium">To Date</label>
                             <Input
                                 type="date"
-                                value={filters.toDate || ''}
+                                value={filters.endDate || ''}
                                 onChange={(e) =>
-                                    setFilters({ ...filters, toDate: e.target.value })
+                                    setFilters({ ...filters, endDate: e.target.value })
                                 }
                             />
                         </div>
@@ -99,7 +89,7 @@ export function BillListView() {
 
             {isLoading ? (
                 <div className="text-center py-8">Loading bills...</div>
-            ) : bills.length === 0 ? (
+            ) : !bills?.items || bills.items.length === 0 ? (
                 <Card>
                     <CardContent className="py-12 text-center text-muted-foreground">
                         <Receipt className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -108,7 +98,7 @@ export function BillListView() {
                 </Card>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {bills.map((bill) => (
+                    {bills.items.map((bill) => (
                         <Link key={bill.billId} href={`/billing/${bill.billId}`}>
                             <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
                                 <CardHeader>
@@ -118,7 +108,7 @@ export function BillListView() {
                                                 {bill.billNumber}
                                             </h3>
                                             <p className="text-sm text-muted-foreground">
-                                                Table {bill.order.table.tableNumber}
+                                                Table {bill.order?.table.tableNumber}
                                             </p>
                                         </div>
                                         <PaymentStatusBadge status={bill.paymentStatus} />

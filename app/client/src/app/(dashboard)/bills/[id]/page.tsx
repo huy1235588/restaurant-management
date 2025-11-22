@@ -49,8 +49,8 @@ export default function BillDetailsPage() {
         );
     }
 
-    const canApplyDiscount = bill.paymentStatus === PaymentStatus.UNPAID;
-    const canProcessPayment = bill.paymentStatus === PaymentStatus.UNPAID;
+    const canApplyDiscount = bill.paymentStatus === PaymentStatus.PENDING;
+    const canProcessPayment = bill.paymentStatus === PaymentStatus.PENDING;
 
     return (
         <div className="container mx-auto p-6 space-y-6">
@@ -64,7 +64,7 @@ export default function BillDetailsPage() {
                     <div>
                         <h1 className="text-3xl font-bold">{bill.billNumber}</h1>
                         <p className="text-muted-foreground">
-                            Table {bill.order.table.tableNumber}
+                            Table {bill.order?.table.tableNumber}
                         </p>
                     </div>
                 </div>
@@ -83,7 +83,7 @@ export default function BillDetailsPage() {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-3">
-                                {bill.billItems.map((item) => (
+                                {bill.billItems?.map((item) => (
                                     <div
                                         key={item.billItemId}
                                         className="flex justify-between items-center"
@@ -95,7 +95,7 @@ export default function BillDetailsPage() {
                                             </p>
                                         </div>
                                         <p className="font-semibold">
-                                            {formatCurrency(item.totalPrice)}
+                                            {formatCurrency(item.subtotal)}
                                         </p>
                                     </div>
                                 ))}
@@ -103,7 +103,7 @@ export default function BillDetailsPage() {
                         </CardContent>
                     </Card>
 
-                    {bill.payments.length > 0 && (
+                    {bill.payments && bill.payments.length > 0 && (
                         <Card>
                             <CardHeader>
                                 <CardTitle>Payment History</CardTitle>
@@ -117,10 +117,10 @@ export default function BillDetailsPage() {
                                         >
                                             <div>
                                                 <p className="font-medium">
-                                                    {PAYMENT_METHOD_LABELS[payment.paymentMethod]}
+                                                    {PAYMENT_METHOD_LABELS[payment.method]}
                                                 </p>
                                                 <p className="text-sm text-muted-foreground">
-                                                    {new Date(payment.paymentDate).toLocaleString()}
+                                                    {new Date(payment.paidAt).toLocaleString()}
                                                 </p>
                                             </div>
                                             <p className="font-semibold">
@@ -183,7 +183,7 @@ export default function BillDetailsPage() {
                         <CardContent className="space-y-2 text-sm">
                             <div>
                                 <span className="text-muted-foreground">Order:</span>
-                                <p className="font-medium">{bill.order.orderNumber}</p>
+                                <p className="font-medium">{bill.order?.orderNumber}</p>
                             </div>
                             <div>
                                 <span className="text-muted-foreground">Created:</span>

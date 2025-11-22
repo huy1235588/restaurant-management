@@ -1,12 +1,12 @@
 // Order types based on backend schema
 
 export enum OrderStatus {
-    PENDING = 'pending',
-    CONFIRMED = 'confirmed',
-    READY = 'ready',
-    SERVING = 'serving',
-    COMPLETED = 'completed',
-    CANCELLED = 'cancelled',
+    PENDING = "pending",
+    CONFIRMED = "confirmed",
+    READY = "ready",
+    SERVING = "serving",
+    COMPLETED = "completed",
+    CANCELLED = "cancelled",
 }
 
 export interface OrderItem {

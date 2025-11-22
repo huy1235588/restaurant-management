@@ -21,9 +21,7 @@ export interface FindOptions {
 export class OrderRepository {
     constructor(private readonly prisma: PrismaService) {}
 
-    private buildWhereClause(
-        filters?: OrderFilters,
-    ): Prisma.OrderWhereInput {
+    private buildWhereClause(filters?: OrderFilters): Prisma.OrderWhereInput {
         if (!filters) return {};
 
         const where: Prisma.OrderWhereInput = {};
@@ -164,7 +162,12 @@ export class OrderRepository {
             where: {
                 tableId,
                 status: {
-                    in: [OrderStatus.pending, OrderStatus.confirmed, OrderStatus.ready, OrderStatus.serving],
+                    in: [
+                        OrderStatus.pending,
+                        OrderStatus.confirmed,
+                        OrderStatus.ready,
+                        OrderStatus.serving,
+                    ],
                 },
             },
             include: {
@@ -191,7 +194,10 @@ export class OrderRepository {
         });
     }
 
-    async update(orderId: number, data: Prisma.OrderUpdateInput): Promise<Order> {
+    async update(
+        orderId: number,
+        data: Prisma.OrderUpdateInput,
+    ): Promise<Order> {
         return this.prisma.order.update({
             where: { orderId },
             data,

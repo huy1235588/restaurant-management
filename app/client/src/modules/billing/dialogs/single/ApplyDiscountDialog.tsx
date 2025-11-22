@@ -45,11 +45,11 @@ export function ApplyDiscountDialog({
         formState: { errors },
     } = useForm<ApplyDiscountDto>();
 
-    const discountPercentage = watch('discountPercentage');
+    const amount = watch('amount');
 
     const onSubmit = (data: ApplyDiscountDto) => {
         applyDiscount(
-            { billId, data },
+            { id: billId, data },
             {
                 onSuccess: () => {
                     reset();
@@ -59,7 +59,7 @@ export function ApplyDiscountDialog({
         );
     };
 
-    if (currentStatus !== PaymentStatus.UNPAID) {
+    if (currentStatus !== PaymentStatus.PENDING) {
         return (
             <Dialog open={open} onOpenChange={onOpenChange}>
                 <DialogContent>
@@ -67,7 +67,7 @@ export function ApplyDiscountDialog({
                         <DialogTitle>Cannot Apply Discount</DialogTitle>
                     </DialogHeader>
                     <p className="text-sm text-muted-foreground">
-                        Discounts can only be applied to unpaid bills.
+                        Discounts can only be applied to pending bills.
                     </p>
                     <DialogFooter>
                         <Button onClick={() => onOpenChange(false)}>Close</Button>
@@ -84,61 +84,40 @@ export function ApplyDiscountDialog({
                     <DialogTitle>Apply Discount</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    {discountPercentage > 10 && (
-                        <Alert variant="destructive">
-                            <AlertCircle className="h-4 w-4" />
-                            <AlertDescription>
-                                Discount exceeds 10% - Manager approval required
-                            </AlertDescription>
-                        </Alert>
-                    )}
-
                     <div className="space-y-2">
-                        <Label htmlFor="discountPercentage">Discount Percentage *</Label>
+                        <Label htmlFor="amount">Discount Amount *</Label>
                         <Input
-                            id="discountPercentage"
+                            id="amount"
                             type="number"
                             min="0"
-                            max="100"
-                            step="0.01"
-                            {...register('discountPercentage', {
-                                required: 'Discount percentage is required',
+                            step="1000"
+                            {...register('amount', {
+                                required: 'Discount amount is required',
                                 valueAsNumber: true,
-                                min: { value: 0, message: 'Must be at least 0%' },
-                                max: { value: 100, message: 'Cannot exceed 100%' },
+                                min: { value: 0, message: 'Must be at least 0' },
                             })}
-                            placeholder="10"
+                            placeholder="10000"
                         />
-                        {errors.discountPercentage && (
+                        {errors.amount && (
                             <p className="text-sm text-destructive">
-                                {errors.discountPercentage.message}
+                                {errors.amount.message}
                             </p>
                         )}
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="discountReason">Reason *</Label>
-                        <Select
-                            onValueChange={(value) =>
-                                register('discountReason').onChange({
-                                    target: { value },
-                                })
-                            }
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select reason" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="loyalty">Loyalty Customer</SelectItem>
-                                <SelectItem value="promotion">Promotion</SelectItem>
-                                <SelectItem value="complaint">Service Recovery</SelectItem>
-                                <SelectItem value="staff">Staff Discount</SelectItem>
-                                <SelectItem value="other">Other</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <input type="hidden" {...register('discountReason', { required: true })} />
-                        {errors.discountReason && (
-                            <p className="text-sm text-destructive">Reason is required</p>
+                        <Label htmlFor="reason">Reason *</Label>
+                        <Input
+                            id="reason"
+                            {...register('reason', {
+                                required: 'Reason is required',
+                            })}
+                            placeholder="Enter discount reason"
+                        />
+                        {errors.reason && (
+                            <p className="text-sm text-destructive">
+                                {errors.reason.message}
+                            </p>
                         )}
                     </div>
 

@@ -7,7 +7,7 @@ import {
     ParseIntPipe,
     UseGuards,
     Request,
-} from '@nestjs/swagger';
+} from '@nestjs/common';
 import {
     ApiTags,
     ApiOperation,
@@ -62,7 +62,7 @@ export class KitchenController {
     @ApiResponse({ status: 404, description: 'Kitchen order not found' })
     async startPreparing(
         @Param('id', ParseIntPipe) id: number,
-        @Request() req,
+        @Request() req: { user?: { staffId: number } },
     ) {
         const staffId = req.user?.staffId;
         return this.kitchenService.startPreparing(id, staffId);

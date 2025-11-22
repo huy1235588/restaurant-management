@@ -1,13 +1,14 @@
-import { useQuery, useMutation, useQueryClient } from '@tantml:parameter/react-query';
-import { toast } from 'sonner';
-import { kitchenApi } from '../services';
-import type { KitchenOrder, KitchenFilters } from '../types';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { kitchenApi } from "../services";
+import type { KitchenOrder, KitchenFilters } from "../types";
 
 export const kitchenKeys = {
-    all: ['kitchen-orders'] as const,
-    lists: () => [...kitchenKeys.all, 'list'] as const,
-    list: (filters: KitchenFilters) => [...kitchenKeys.lists(), filters] as const,
-    details: () => [...kitchenKeys.all, 'detail'] as const,
+    all: ["kitchen-orders"] as const,
+    lists: () => [...kitchenKeys.all, "list"] as const,
+    list: (filters: KitchenFilters) =>
+        [...kitchenKeys.lists(), filters] as const,
+    details: () => [...kitchenKeys.all, "detail"] as const,
     detail: (id: number) => [...kitchenKeys.details(), id] as const,
 };
 
@@ -34,10 +35,12 @@ export function useStartOrder() {
         mutationFn: (id: number) => kitchenApi.start(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: kitchenKeys.lists() });
-            toast.success('Order started');
+            toast.success("Order started");
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Failed to start order');
+            toast.error(
+                error.response?.data?.message || "Failed to start order"
+            );
         },
     });
 }
@@ -48,10 +51,12 @@ export function useMarkReady() {
         mutationFn: (id: number) => kitchenApi.markReady(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: kitchenKeys.lists() });
-            toast.success('Order marked as ready');
+            toast.success("Order marked as ready");
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Failed to mark order ready');
+            toast.error(
+                error.response?.data?.message || "Failed to mark order ready"
+            );
         },
     });
 }
@@ -62,10 +67,12 @@ export function useMarkCompleted() {
         mutationFn: (id: number) => kitchenApi.markCompleted(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: kitchenKeys.lists() });
-            toast.success('Order completed');
+            toast.success("Order completed");
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Failed to complete order');
+            toast.error(
+                error.response?.data?.message || "Failed to complete order"
+            );
         },
     });
 }

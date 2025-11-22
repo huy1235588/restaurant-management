@@ -39,11 +39,12 @@ export function CreateReservationDialog({
     const reservationTime = watch('reservationTime');
     const partySize = watch('partySize');
 
-    const { data: availableTables = [] } = useAvailableTables(
-        reservationDate,
-        reservationTime,
+    const { data: availableTables = [] } = useAvailableTables({
+        date: reservationDate,
+        time: reservationTime,
+        duration: 60, // default duration
         partySize
-    );
+    });
 
     const onSubmit = (data: CreateReservationDto) => {
         createReservation(data, {

@@ -1,12 +1,12 @@
 // Reservation types based on backend schema
 
 export enum ReservationStatus {
-    PENDING = 'pending',
-    CONFIRMED = 'confirmed',
-    SEATED = 'seated',
-    COMPLETED = 'completed',
-    CANCELLED = 'cancelled',
-    NO_SHOW = 'no-show',
+    PENDING = "pending",
+    CONFIRMED = "confirmed",
+    SEATED = "seated",
+    COMPLETED = "completed",
+    CANCELLED = "cancelled",
+    NO_SHOW = "no-show",
 }
 
 export interface Reservation {

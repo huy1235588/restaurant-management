@@ -1,4 +1,4 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { KitchenController } from './kitchen.controller';
 import { KitchenService } from './kitchen.service';
 import { KitchenRepository } from './kitchen.repository';
