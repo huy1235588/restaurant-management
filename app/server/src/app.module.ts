@@ -12,12 +12,8 @@ import { CategoryModule } from '@/modules/category/category.module';
 import { MenuModule } from '@/modules/menu/menu.module';
 import { StorageModule } from '@/modules/storage/storage.module';
 import { TableModule } from '@/modules/table/table.module';
-import { ReservationModule } from '@/modules/reservation/reservation.module';
-import { ReservationAuditModule } from '@/modules/reservation-audit';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import configuration from '@/config/configuration';
-import { OrderModule } from '@/modules/order/order.module';
-import { ReportModule } from '@/modules/report/report.module';
 
 @Module({
     imports: [
@@ -50,14 +46,6 @@ import { ReportModule } from '@/modules/report/report.module';
         StorageModule,
         // Table
         TableModule,
-        // Reservation
-        ReservationModule,
-        // Reservation Audit
-        ReservationAuditModule,
-        // Order
-        OrderModule,
-        // Report
-        ReportModule,
     ],
     controllers: [AppController],
     providers: [
