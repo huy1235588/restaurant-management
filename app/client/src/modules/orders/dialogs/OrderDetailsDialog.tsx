@@ -157,23 +157,23 @@ export function OrderDetailsDialog({
                                             {order.note}
                                         </p>
                                     </div>
-                                    {order.reservationId && (
-                                        <>
-                                            <div>
-                                                <span className="text-muted-foreground">Reservation:</span>
-                                                <p className="font-medium text-blue-700">
-                                                    {order.reservation?.reservationCode || `#${order.reservationId}`}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <span className="text-muted-foreground">Khách hàng:</span>
-                                                <p className="font-medium">
-                                                    {order.customerName || order.reservation?.customerName || 'N/A'}
-                                                </p>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
+                                )}
+                                {order.reservationId && (
+                                    <>
+                                        <div>
+                                            <span className="text-muted-foreground">Reservation:</span>
+                                            <p className="font-medium text-blue-700">
+                                                {order.reservation?.reservationCode || `#${order.reservationId}`}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <span className="text-muted-foreground">Khách hàng:</span>
+                                            <p className="font-medium">
+                                                {order.customerName || order.reservation?.customerName || 'N/A'}
+                                            </p>
+                                        </div>
+                                    </>
+                                )}
 
                                 {(order.notes || order.note) && (
                                     <div>
@@ -272,6 +272,6 @@ export function OrderDetailsDialog({
                     </ScrollArea>
                 ) : null}
             </DialogContent>
-        </Dialog>
+        </Dialog >
     );
 }
