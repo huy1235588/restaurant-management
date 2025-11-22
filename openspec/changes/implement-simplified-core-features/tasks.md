@@ -303,75 +303,75 @@
 ## 2. Frontend: Order Management Module
 
 ### 2.1 Module Structure Setup
-- [ ] 2.1.1 Create `app/client/src/modules/orders/` directory
-- [ ] 2.1.2 Create subdirectories: components/, views/, dialogs/single/, services/, hooks/, types/, utils/
-- [ ] 2.1.3 Create barrel export index.ts
-- [ ] 2.1.4 Create README.md documenting module structure
+- [x] 2.1.1 Create `app/client/src/modules/orders/` directory
+- [x] 2.1.2 Create subdirectories: components/, views/, dialogs/single/, services/, hooks/, types/, utils/
+- [x] 2.1.3 Create barrel export index.ts
+- [x] 2.1.4 Create README.md documenting module structure
 
 ### 2.2 API Service Integration
-- [ ] 2.2.1 Create `services/order.service.ts`
-- [ ] 2.2.2 Implement createOrder(tableId, customerName?, partySize?) → Promise<Order>
-- [ ] 2.2.3 Implement getOrders(filters: {status?, tableId?, date?}) → Promise<Order[]>
-- [ ] 2.2.4 Implement getOrderById(orderId) → Promise<Order>
-- [ ] 2.2.5 Implement addItemToOrder(orderId, itemId, quantity, specialRequest?) → Promise<OrderItem>
-- [ ] 2.2.6 Implement updateOrderItem(orderId, itemId, quantity?, specialRequest?) → Promise<OrderItem>
-- [ ] 2.2.7 Implement removeOrderItem(orderId, itemId) → Promise<void>
-- [ ] 2.2.8 Implement confirmOrder(orderId) → Promise<Order>
-- [ ] 2.2.9 Implement cancelOrder(orderId, reason) → Promise<Order>
-- [ ] 2.2.10 Handle API errors with toast notifications
+- [x] 2.2.1 Create `services/order.service.ts`
+- [x] 2.2.2 Implement createOrder(tableId, customerName?, partySize?) → Promise<Order>
+- [x] 2.2.3 Implement getOrders(filters: {status?, tableId?, date?}) → Promise<Order[]>
+- [x] 2.2.4 Implement getOrderById(orderId) → Promise<Order>
+- [x] 2.2.5 Implement addItemToOrder(orderId, itemId, quantity, specialRequest?) → Promise<OrderItem>
+- [x] 2.2.6 Implement updateOrderItem(orderId, itemId, quantity?, specialRequest?) → Promise<OrderItem>
+- [x] 2.2.7 Implement removeOrderItem(orderId, itemId) → Promise<void>
+- [x] 2.2.8 Implement confirmOrder(orderId) → Promise<Order>
+- [x] 2.2.9 Implement cancelOrder(orderId, reason) → Promise<Order>
+- [x] 2.2.10 Handle API errors with toast notifications
 
 ### 2.3 TypeScript Types
-- [ ] 2.3.1 Create `types/order.types.ts`
-- [ ] 2.3.2 Define Order interface (orderId, orderNumber, tableId, staffId, status, items[], amounts, timestamps)
-- [ ] 2.3.3 Define OrderItem interface (orderItemId, orderId, itemId, menuItem, quantity, unitPrice, specialRequest)
-- [ ] 2.3.4 Define OrderStatus enum ('pending', 'confirmed', 'completed', 'cancelled')
-- [ ] 2.3.5 Define CreateOrderRequest, AddItemRequest, UpdateItemRequest DTOs
-- [ ] 2.3.6 Define OrderFilters interface for query params
+- [x] 2.3.1 Create `types/order.types.ts`
+- [x] 2.3.2 Define Order interface (orderId, orderNumber, tableId, staffId, status, items[], amounts, timestamps)
+- [x] 2.3.3 Define OrderItem interface (orderItemId, orderId, itemId, menuItem, quantity, unitPrice, specialRequest)
+- [x] 2.3.4 Define OrderStatus enum ('pending', 'confirmed', 'completed', 'cancelled')
+- [x] 2.3.5 Define CreateOrderRequest, AddItemRequest, UpdateItemRequest DTOs
+- [x] 2.3.6 Define OrderFilters interface for query params
 
 ### 2.4 State Management Hooks
-- [ ] 2.4.1 Create `hooks/useOrders.ts` (fetch orders list with filters)
-- [ ] 2.4.2 Create `hooks/useOrder.ts` (fetch single order by ID)
-- [ ] 2.4.3 Create `hooks/useCreateOrder.ts` (mutation to create order)
-- [ ] 2.4.4 Create `hooks/useAddOrderItem.ts` (mutation to add item)
-- [ ] 2.4.5 Create `hooks/useRemoveOrderItem.ts` (mutation to remove item)
-- [ ] 2.4.6 Create `hooks/useUpdateOrderItem.ts` (mutation to update quantity/special request)
-- [ ] 2.4.7 Create `hooks/useConfirmOrder.ts` (mutation to confirm order)
-- [ ] 2.4.8 Create `hooks/useCancelOrder.ts` (mutation to cancel order)
-- [ ] 2.4.9 Implement optimistic updates for item add/remove/update
-- [ ] 2.4.10 Implement cache invalidation on order status changes
+- [x] 2.4.1 Create `hooks/useOrders.ts` (fetch orders list with filters)
+- [x] 2.4.2 Create `hooks/useOrder.ts` (fetch single order by ID)
+- [x] 2.4.3 Create `hooks/useCreateOrder.ts` (mutation to create order)
+- [x] 2.4.4 Create `hooks/useAddOrderItem.ts` (mutation to add item)
+- [x] 2.4.5 Create `hooks/useRemoveOrderItem.ts` (mutation to remove item)
+- [x] 2.4.6 Create `hooks/useUpdateOrderItem.ts` (mutation to update quantity/special request)
+- [x] 2.4.7 Create `hooks/useConfirmOrder.ts` (mutation to confirm order)
+- [x] 2.4.8 Create `hooks/useCancelOrder.ts` (mutation to cancel order)
+- [x] 2.4.9 Implement optimistic updates for item add/remove/update
+- [x] 2.4.10 Implement cache invalidation on order status changes
 
 ### 2.5 Core Components
-- [ ] 2.5.1 Create `components/OrderCard.tsx` (display order summary with status badge)
-- [ ] 2.5.2 Create `components/OrderItemList.tsx` (list of order items with quantity, price)
-- [ ] 2.5.3 Create `components/OrderStatusBadge.tsx` (color-coded status indicator)
-- [ ] 2.5.4 Create `components/MenuItemPicker.tsx` (select menu items to add to order)
-- [ ] 2.5.5 Create `components/OrderSummary.tsx` (subtotal, tax, total display)
-- [ ] 2.5.6 Create `components/OrderActions.tsx` (confirm/cancel buttons with permission checks)
-- [ ] 2.5.7 Use shadcn/ui components: Button, Card, Badge, Select, Input
-- [ ] 2.5.8 Implement responsive design for all components
+- [x] 2.5.1 Create `components/OrderCard.tsx` (display order summary with status badge)
+- [x] 2.5.2 Create `components/OrderItemList.tsx` (list of order items with quantity, price)
+- [x] 2.5.3 Create `components/OrderStatusBadge.tsx` (color-coded status indicator)
+- [x] 2.5.4 Create `components/MenuItemPicker.tsx` (select menu items to add to order)
+- [x] 2.5.5 Create `components/OrderSummary.tsx` (subtotal, tax, total display)
+- [x] 2.5.6 Create `components/OrderActions.tsx` (confirm/cancel buttons with permission checks)
+- [x] 2.5.7 Use shadcn/ui components: Button, Card, Badge, Select, Input
+- [x] 2.5.8 Implement responsive design for all components
 
 ### 2.6 Views
-- [ ] 2.6.1 Create `views/OrderListView.tsx` (table showing all orders with filters)
-- [ ] 2.6.2 Implement filters: status dropdown, table number, date range
-- [ ] 2.6.3 Implement search by order number
-- [ ] 2.6.4 Implement pagination or infinite scroll
-- [ ] 2.6.5 Create `views/OrderDetailsView.tsx` (full order details with items)
-- [ ] 2.6.6 Show table info, customer info, staff info, timestamps
-- [ ] 2.6.7 Show item list with quantities, prices, special requests
-- [ ] 2.6.8 Show order total with tax breakdown
+- [x] 2.6.1 Create `views/OrderListView.tsx` (table showing all orders with filters)
+- [x] 2.6.2 Implement filters: status dropdown, table number, date range
+- [x] 2.6.3 Implement search by order number
+- [x] 2.6.4 Implement pagination or infinite scroll
+- [x] 2.6.5 Create `views/OrderDetailsView.tsx` (full order details with items)
+- [x] 2.6.6 Show table info, customer info, staff info, timestamps
+- [x] 2.6.7 Show item list with quantities, prices, special requests
+- [x] 2.6.8 Show order total with tax breakdown
 - [ ] 2.6.9 Implement real-time order updates via WebSocket
 
 ### 2.7 Dialogs
-- [ ] 2.7.1 Create `dialogs/single/CreateOrderDialog.tsx`
-- [ ] 2.7.2 Select table from available tables
-- [ ] 2.7.3 Optional customer name, phone, party size inputs
-- [ ] 2.7.4 Optional link to reservation
-- [ ] 2.7.5 Create `dialogs/single/AddItemDialog.tsx`
-- [ ] 2.7.6 Browse/search menu items by category
-- [ ] 2.7.7 Select quantity (number input with +/- buttons)
-- [ ] 2.7.8 Optional special request textarea
-- [ ] 2.7.9 Show item price and calculated subtotal
-- [ ] 2.7.10 Create `dialogs/single/CancelOrderDialog.tsx` (cancellation reason required)
+- [x] 2.7.1 Create `dialogs/single/CreateOrderDialog.tsx`
+- [x] 2.7.2 Select table from available tables
+- [x] 2.7.3 Optional customer name, phone, party size inputs
+- [x] 2.7.4 Optional link to reservation
+- [x] 2.7.5 Create `dialogs/single/AddItemDialog.tsx`
+- [x] 2.7.6 Browse/search menu items by category
+- [x] 2.7.7 Select quantity (number input with +/- buttons)
+- [x] 2.7.8 Optional special request textarea
+- [x] 2.7.9 Show item price and calculated subtotal
+- [x] 2.7.10 Create `dialogs/single/CancelOrderDialog.tsx` (cancellation reason required)
 
 ### 2.8 Routing & Navigation
 - [x] 2.8.1 Add `/orders` route in app router (orders list)
@@ -381,12 +381,12 @@
 - [x] 2.8.5 Implement deep linking to order details from other modules
 
 ### 2.9 Permissions & Access Control
-- [ ] 2.9.1 Check user role before showing Create Order button
-- [ ] 2.9.2 Only waiters/admins can create orders
-- [ ] 2.9.3 Only waiters/admins can add/remove items
-- [ ] 2.9.4 Only waiters/admins can confirm orders
-- [ ] 2.9.5 Only admins can cancel confirmed orders
-- [ ] 2.9.6 Kitchen staff can view orders but not modify
+- [x] 2.9.1 Check user role before showing Create Order button
+- [x] 2.9.2 Only waiters/admins can create orders
+- [x] 2.9.3 Only waiters/admins can add/remove items
+- [x] 2.9.4 Only waiters/admins can confirm orders
+- [x] 2.9.5 Only admins can cancel confirmed orders
+- [x] 2.9.6 Kitchen staff can view orders but not modify
 
 ### 2.10 Testing
 - [ ] 2.10.1 Manual test: Create order for available table

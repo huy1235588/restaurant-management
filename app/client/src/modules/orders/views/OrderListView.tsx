@@ -14,6 +14,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useAuthStore } from '@/stores/authStore';
+import { canCreateOrder, canConfirmOrderPermission, canCancelOrderPermission } from '../utils';
 
 interface OrderListViewProps {
     tables?: Array<{ tableId: number; tableNumber: string; status: string }>;
@@ -24,6 +26,9 @@ export function OrderListView({ tables = [] }: OrderListViewProps) {
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
     const [selectedOrderId, setSelectedOrderId] = useState<number>();
+
+    const { user } = useAuthStore();
+    const userRole = user?.role;
 
     const { data, isLoading } = useOrders({
         status: statusFilter !== 'all' ? statusFilter : undefined,
@@ -59,10 +64,12 @@ export function OrderListView({ tables = [] }: OrderListViewProps) {
                         Manage restaurant orders
                     </p>
                 </div>
-                <Button onClick={() => setCreateDialogOpen(true)}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    New Order
-                </Button>
+                {canCreateOrder(userRole) && (
+                    <Button onClick={() => setCreateDialogOpen(true)}>
+                        <Plus className="w-4 h-4 mr-2" />
+                        New Order
+                    </Button>
+                )}
             </div>
 
             <div className="flex gap-2">
@@ -108,8 +115,16 @@ export function OrderListView({ tables = [] }: OrderListViewProps) {
                             key={order.orderId}
                             order={order}
                             onView={handleViewOrder}
-                            onConfirm={handleConfirmOrder}
-                            onCancel={handleCancelClick}
+                            onConfirm={
+                                canConfirmOrderPermission(userRole)
+                                    ? handleConfirmOrder
+                                    : undefined
+                            }
+                            onCancel={
+                                canCancelOrderPermission(userRole, order.status)
+                                    ? handleCancelClick
+                                    : undefined
+                            }
                         />
                     ))}
                 </div>

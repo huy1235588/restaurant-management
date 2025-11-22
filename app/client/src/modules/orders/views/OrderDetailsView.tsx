@@ -8,21 +8,40 @@ import {
 } from '../components';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
-import { formatDateTime, canConfirmOrder, canCancelOrder } from '../utils';
+import { Loader2, ArrowLeft, CheckCircle, XCircle, Plus } from 'lucide-react';
+import { formatDateTime, canConfirmOrder, canCancelOrder, canModifyOrderItems, canConfirmOrderPermission, canCancelOrderPermission } from '../utils';
 import { useState } from 'react';
-import { CancelOrderDialog } from '../dialogs';
+import { CancelOrderDialog, AddItemDialog } from '../dialogs';
+import { useAuthStore } from '@/stores/authStore';
 
 interface OrderDetailsViewProps {
     orderId: number;
+    menuItems?: Array<{
+        itemId: number;
+        itemCode: string;
+        itemName: string;
+        description?: string | null;
+        price: number;
+        imageUrl?: string | null;
+        categoryId: number;
+        isAvailable: boolean;
+        category?: {
+            categoryId: number;
+            categoryName: string;
+        };
+    }>;
 }
 
-export function OrderDetailsView({ orderId }: OrderDetailsViewProps) {
+export function OrderDetailsView({ orderId, menuItems = [] }: OrderDetailsViewProps) {
     const { data: order, isLoading } = useOrder(orderId);
     const { mutate: confirmOrder } = useConfirmOrder();
     const { mutate: updateItem } = useUpdateOrderItem(orderId);
     const { mutate: removeItem } = useRemoveOrderItem(orderId);
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+    const [addItemDialogOpen, setAddItemDialogOpen] = useState(false);
+
+    const { user } = useAuthStore();
+    const userRole = user?.role;
 
     if (isLoading) {
         return (
@@ -57,6 +76,7 @@ export function OrderDetailsView({ orderId }: OrderDetailsViewProps) {
     };
 
     const isPending = order.status === 'pending';
+    const canEdit = isPending && canModifyOrderItems(userRole);
 
     return (
         <div className="space-y-6">
@@ -127,16 +147,27 @@ export function OrderDetailsView({ orderId }: OrderDetailsViewProps) {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Order Items</CardTitle>
+                            <div className="flex items-center justify-between">
+                                <CardTitle>Order Items</CardTitle>
+                                {canEdit && menuItems.length > 0 && (
+                                    <Button
+                                        size="sm"
+                                        onClick={() => setAddItemDialogOpen(true)}
+                                    >
+                                        <Plus className="w-4 h-4 mr-2" />
+                                        Add Item
+                                    </Button>
+                                )}
+                            </div>
                         </CardHeader>
                         <CardContent>
                             <OrderItemList
                                 items={order.orderItems || []}
-                                editable={isPending}
+                                editable={canEdit}
                                 onUpdateQuantity={
-                                    isPending ? handleUpdateQuantity : undefined
+                                    canEdit ? handleUpdateQuantity : undefined
                                 }
-                                onRemove={isPending ? handleRemoveItem : undefined}
+                                onRemove={canEdit ? handleRemoveItem : undefined}
                             />
                         </CardContent>
                     </Card>
@@ -157,7 +188,7 @@ export function OrderDetailsView({ orderId }: OrderDetailsViewProps) {
                             <CardTitle>Actions</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-2">
-                            {canConfirmOrder(order.status) && (
+                            {canConfirmOrder(order.status) && canConfirmOrderPermission(userRole) && (
                                 <Button
                                     className="w-full"
                                     onClick={handleConfirm}
@@ -167,7 +198,7 @@ export function OrderDetailsView({ orderId }: OrderDetailsViewProps) {
                                     Confirm & Send to Kitchen
                                 </Button>
                             )}
-                            {canCancelOrder(order.status) && (
+                            {canCancelOrder(order.status) && canCancelOrderPermission(userRole, order.status) && (
                                 <Button
                                     variant="destructive"
                                     className="w-full"
@@ -186,6 +217,13 @@ export function OrderDetailsView({ orderId }: OrderDetailsViewProps) {
                 open={cancelDialogOpen}
                 onOpenChange={setCancelDialogOpen}
                 orderId={orderId}
+            />
+
+            <AddItemDialog
+                open={addItemDialogOpen}
+                onOpenChange={setAddItemDialogOpen}
+                orderId={orderId}
+                menuItems={menuItems}
             />
         </div>
     );

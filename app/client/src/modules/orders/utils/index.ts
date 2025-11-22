@@ -1,4 +1,5 @@
 import { OrderStatus } from "../types";
+import { UserRole } from "@/types";
 
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
     [OrderStatus.PENDING]: "Pending",
@@ -48,4 +49,41 @@ export function canConfirmOrder(status: OrderStatus): boolean {
 
 export function canCancelOrder(status: OrderStatus): boolean {
     return status === OrderStatus.PENDING || status === OrderStatus.CONFIRMED;
+}
+
+// Permission checks
+export function canCreateOrder(role?: UserRole): boolean {
+    if (!role) return false;
+    return ['admin', 'manager', 'waiter'].includes(role);
+}
+
+export function canViewOrders(role?: UserRole): boolean {
+    if (!role) return false;
+    // All roles can view orders
+    return true;
+}
+
+export function canModifyOrderItems(role?: UserRole): boolean {
+    if (!role) return false;
+    return ['admin', 'manager', 'waiter'].includes(role);
+}
+
+export function canConfirmOrderPermission(role?: UserRole): boolean {
+    if (!role) return false;
+    return ['admin', 'manager', 'waiter'].includes(role);
+}
+
+export function canCancelOrderPermission(role?: UserRole, status?: OrderStatus): boolean {
+    if (!role) return false;
+    
+    // Admins can cancel any order
+    if (role === 'admin') return true;
+    
+    // Managers and waiters can only cancel pending or confirmed orders
+    if (['manager', 'waiter'].includes(role)) {
+        if (!status) return false;
+        return status === OrderStatus.PENDING || status === OrderStatus.CONFIRMED;
+    }
+    
+    return false;
 }
