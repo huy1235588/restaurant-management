@@ -38,9 +38,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { MenuItem } from '@/types';
 
 const orderItemSchema = z.object({
-    menuItemId: z.number().min(1, 'Vui lòng chọn món'),
+    itemId: z.number().min(1, 'Vui lòng chọn món'),
     quantity: z.number().min(1, 'Số lượng phải lớn hơn 0'),
-    note: z.string().optional(),
+    specialRequest: z.string().optional(),
 });
 
 const addItemsSchema = z.object({
@@ -64,7 +64,7 @@ export function AddItemsDialog({ open, onClose, orderId, onSuccess }: AddItemsDi
     const form = useForm<AddItemsFormData>({
         resolver: zodResolver(addItemsSchema),
         defaultValues: {
-            items: [{ menuItemId: 0, quantity: 1, note: '' }],
+            items: [{ itemId: 0, quantity: 1, specialRequest: '' }],
         },
     });
 
@@ -88,7 +88,7 @@ export function AddItemsDialog({ open, onClose, orderId, onSuccess }: AddItemsDi
     };
 
     const handleAddItem = () => {
-        append({ menuItemId: 0, quantity: 1, note: '' });
+        append({ itemId: 0, quantity: 1, specialRequest: '' });
     };
 
     const handleRemoveItem = (index: number) => {
@@ -102,7 +102,7 @@ export function AddItemsDialog({ open, onClose, orderId, onSuccess }: AddItemsDi
         if (!menuData?.items) return 0;
 
         return items.reduce((total, item) => {
-            const menuItem = menuData.items.find((m: MenuItem) => m.itemId === item.menuItemId);
+            const menuItem = menuData.items.find((m: MenuItem) => m.itemId === item.itemId);
             return total + (menuItem?.price || 0) * item.quantity;
         }, 0);
     };
@@ -142,7 +142,7 @@ export function AddItemsDialog({ open, onClose, orderId, onSuccess }: AddItemsDi
                                                     {/* Menu Item Selection */}
                                                     <FormField
                                                         control={form.control}
-                                                        name={`items.${index}.menuItemId`}
+                                                        name={`items.${index}.itemId`}
                                                         render={({ field }) => (
                                                             <FormItem className="flex-1">
                                                                 <Select
@@ -212,7 +212,7 @@ export function AddItemsDialog({ open, onClose, orderId, onSuccess }: AddItemsDi
                                                 {/* Item Note */}
                                                 <FormField
                                                     control={form.control}
-                                                    name={`items.${index}.note`}
+                                                    name={`items.${index}.specialRequest`}
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <FormControl>

@@ -68,7 +68,7 @@ export function InvoicePreviewDialog({ open, onClose, order }: InvoicePreviewDia
                             <div className="grid grid-cols-2 gap-4 text-sm">
                                 <div>
                                     <p className="text-muted-foreground">Số hóa đơn:</p>
-                                    <p className="font-medium">#{order.id}</p>
+                                    <p className="font-medium">#{order.orderNumber || order.orderId || order.id}</p>
                                 </div>
                                 <div>
                                     <p className="text-muted-foreground">Ngày giờ:</p>
@@ -99,26 +99,26 @@ export function InvoicePreviewDialog({ open, onClose, order }: InvoicePreviewDia
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {order.items?.map((item, index) => (
-                                        <tr key={item.id} className="border-b">
+                                    {(order.orderItems || order.items)?.map((item, index) => (
+                                        <tr key={item.orderItemId || item.id} className="border-b">
                                             <td className="py-2">
                                                 <div>
                                                     <p className="font-medium">
-                                                        {item.menuItem?.name || 'Unknown'}
+                                                        {item.menuItem?.itemName || item.menuItem?.name || 'Unknown'}
                                                     </p>
-                                                    {item.note && (
+                                                    {(item.specialRequest || item.note) && (
                                                         <p className="text-xs text-muted-foreground italic">
-                                                            Ghi chú: {item.note}
+                                                            Ghi chú: {item.specialRequest || item.note}
                                                         </p>
                                                     )}
                                                 </div>
                                             </td>
                                             <td className="text-center py-2">{item.quantity}</td>
                                             <td className="text-right py-2">
-                                                {formatCurrency(item.menuItem?.price || 0)}
+                                                {formatCurrency(item.unitPrice || item.menuItem?.price || 0)}
                                             </td>
                                             <td className="text-right py-2 font-medium">
-                                                {formatCurrency((item.menuItem?.price || 0) * item.quantity)}
+                                                {formatCurrency(item.totalPrice || (item.unitPrice || item.menuItem?.price || 0) * item.quantity)}
                                             </td>
                                         </tr>
                                     ))}
@@ -132,12 +132,12 @@ export function InvoicePreviewDialog({ open, onClose, order }: InvoicePreviewDia
                         <div className="space-y-2">
                             <div className="flex justify-between text-lg font-semibold">
                                 <span>TỔNG CỘNG:</span>
-                                <span>{formatCurrency(order.totalAmount)}</span>
+                                <span>{formatCurrency(order.finalAmount || order.totalAmount)}</span>
                             </div>
-                            {order.note && (
+                            {(order.notes || order.note) && (
                                 <div className="text-sm">
                                     <p className="text-muted-foreground">Ghi chú:</p>
-                                    <p>{order.note}</p>
+                                    <p>{order.notes || order.note}</p>
                                 </div>
                             )}
                         </div>

@@ -31,10 +31,10 @@ export function OrderItemCard({
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
                         <CardTitle className="text-base">
-                            {item.menuItem?.name || 'Unknown Item'}
+                            {item.menuItem?.itemName || item.menuItem?.name || 'Unknown Item'}
                         </CardTitle>
                         <p className="text-sm text-muted-foreground mt-1">
-                            {t('orders.quantity')}: {item.quantity} × {formatCurrency(item.menuItem?.price || 0)}
+                            {t('orders.quantity')}: {item.quantity} × {formatCurrency(item.unitPrice || item.menuItem?.price || 0)}
                         </p>
                     </div>
                     <OrderItemStatusBadge status={item.status} />
@@ -42,14 +42,14 @@ export function OrderItemCard({
             </CardHeader>
             <CardContent>
                 <div className="space-y-2">
-                    {item.note && (
+                    {(item.specialRequest || item.note) && (
                         <p className="text-sm text-muted-foreground">
-                            <span className="font-medium">{t('orders.note')}:</span> {item.note}
+                            <span className="font-medium">{t('orders.note')}:</span> {item.specialRequest || item.note}
                         </p>
                     )}
                     <div className="flex items-center justify-between">
                         <p className="text-sm font-semibold">
-                            {t('orders.subtotal')}: {formatCurrency((item.menuItem?.price || 0) * item.quantity)}
+                            {t('orders.subtotal')}: {formatCurrency(item.totalPrice || (item.unitPrice || item.menuItem?.price || 0) * item.quantity)}
                         </p>
                         {showActions && (
                             <div className="flex gap-2">
@@ -57,7 +57,7 @@ export function OrderItemCard({
                                     <Button
                                         size="sm"
                                         variant="outline"
-                                        onClick={() => onMarkServed(item.id)}
+                                        onClick={() => onMarkServed(item.orderItemId || item.id)}
                                     >
                                         <Check className="h-4 w-4 mr-1" />
                                         {t('orders.markServed')}
@@ -67,7 +67,7 @@ export function OrderItemCard({
                                     <Button
                                         size="sm"
                                         variant="destructive"
-                                        onClick={() => onCancelItem(item.id)}
+                                        onClick={() => onCancelItem(item.orderItemId || item.id)}
                                     >
                                         <Trash2 className="h-4 w-4 mr-1" />
                                         {t('orders.cancelItem')}

@@ -62,7 +62,7 @@ export function CancelOrderDialog({
 
         try {
             await cancelMutation.mutateAsync({
-                orderId: order.id,
+                orderId: order.orderId || order.id,
                 data,
             });
             form.reset();
@@ -92,16 +92,16 @@ export function CancelOrderDialog({
                     <AlertDescription>
                         <div className="space-y-2">
                             <div className="flex justify-between">
-                                <span className="font-semibold">Đơn hàng #{order.id}</span>
+                                <span className="font-semibold">Đơn hàng #{order.orderNumber || order.orderId || order.id}</span>
                                 <span>Bàn {order.table?.tableNumber}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span>Số món:</span>
-                                <span>{order.items?.length || 0} món</span>
+                                <span>{(order.orderItems || order.items)?.length || 0} món</span>
                             </div>
                             <div className="flex justify-between font-semibold">
                                 <span>Tổng tiền:</span>
-                                <span>{formatCurrency(order.totalAmount)}</span>
+                                <span>{formatCurrency(order.finalAmount || order.totalAmount)}</span>
                             </div>
                         </div>
                     </AlertDescription>

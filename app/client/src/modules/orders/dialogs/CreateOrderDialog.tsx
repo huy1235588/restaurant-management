@@ -41,14 +41,18 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { MenuItem, Table } from '@/types';
 
 const orderItemSchema = z.object({
-    menuItemId: z.number().min(1, 'Vui lòng chọn món'),
+    itemId: z.number().min(1, 'Vui lòng chọn món'),
     quantity: z.number().min(1, 'Số lượng phải lớn hơn 0'),
-    note: z.string().optional(),
+    specialRequest: z.string().optional(),
 });
 
 const createOrderSchema = z.object({
     tableId: z.number().min(1, 'Vui lòng chọn bàn'),
-    note: z.string().max(500).optional(),
+    partySize: z.number().min(1, 'Số người phải lớn hơn 0'),
+    customerName: z.string().max(255).optional(),
+    customerPhone: z.string().max(20).optional(),
+    reservationId: z.number().optional(),
+    notes: z.string().max(500).optional(),
     items: z.array(orderItemSchema).min(1, 'Phải có ít nhất 1 món'),
 });
 
@@ -70,8 +74,11 @@ export function CreateOrderDialog({ open, onClose, onSuccess }: CreateOrderDialo
         resolver: zodResolver(createOrderSchema),
         defaultValues: {
             tableId: 0,
-            note: '',
-            items: [{ menuItemId: 0, quantity: 1, note: '' }],
+            partySize: 2,
+            customerName: '',
+            customerPhone: '',
+            notes: '',
+            items: [{ itemId: 0, quantity: 1, specialRequest: '' }],
         },
     });
 
@@ -92,7 +99,7 @@ export function CreateOrderDialog({ open, onClose, onSuccess }: CreateOrderDialo
     };
 
     const handleAddItem = () => {
-        append({ menuItemId: 0, quantity: 1, note: '' });
+        append({ itemId: 0, quantity: 1, specialRequest: '' });
     };
 
     const handleRemoveItem = (index: number) => {
@@ -106,7 +113,7 @@ export function CreateOrderDialog({ open, onClose, onSuccess }: CreateOrderDialo
         if (!menuData?.items) return 0;
 
         return items.reduce((total, item) => {
-            const menuItem = menuData.items.find((m: MenuItem) => m.itemId === item.menuItemId);
+            const menuItem = menuData.items.find((m: MenuItem) => m.itemId === item.itemId);
             return total + (menuItem?.price || 0) * item.quantity;
         }, 0);
     };
@@ -183,7 +190,7 @@ export function CreateOrderDialog({ open, onClose, onSuccess }: CreateOrderDialo
                                                         {/* Menu Item Selection */}
                                                         <FormField
                                                             control={form.control}
-                                                            name={`items.${index}.menuItemId`}
+                                                            name={`items.${index}.itemId`}
                                                             render={({ field }) => (
                                                                 <FormItem className="flex-1">
                                                                     <Select
@@ -253,7 +260,7 @@ export function CreateOrderDialog({ open, onClose, onSuccess }: CreateOrderDialo
                                                     {/* Item Note */}
                                                     <FormField
                                                         control={form.control}
-                                                        name={`items.${index}.note`}
+                                                        name={`items.${index}.specialRequest`}
                                                         render={({ field }) => (
                                                             <FormItem>
                                                                 <FormControl>
@@ -272,10 +279,67 @@ export function CreateOrderDialog({ open, onClose, onSuccess }: CreateOrderDialo
                                     ))}
                                 </div>
 
+                                {/* Party Size */}
+                                <FormField
+                                    control={form.control}
+                                    name="partySize"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Số người *</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    min="1"
+                                                    placeholder="Nhập số người"
+                                                    {...field}
+                                                    onChange={(e) => field.onChange(parseInt(e.target.value))}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                {/* Customer Name */}
+                                <FormField
+                                    control={form.control}
+                                    name="customerName"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Tên khách hàng</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    placeholder="Nhập tên khách hàng (tùy chọn)"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                {/* Customer Phone */}
+                                <FormField
+                                    control={form.control}
+                                    name="customerPhone"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Số điện thoại</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    placeholder="Nhập số điện thoại (tùy chọn)"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
                                 {/* Order Note */}
                                 <FormField
                                     control={form.control}
-                                    name="note"
+                                    name="notes"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>{t('orders.orderNote')}</FormLabel>

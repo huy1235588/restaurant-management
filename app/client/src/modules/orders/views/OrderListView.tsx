@@ -146,17 +146,17 @@ export function OrderListView({
                         </TableHeader>
                         <TableBody>
                             {data.data.map((order) => (
-                                <TableRow key={order.id}>
-                                    <TableCell className="font-medium">#{order.id}</TableCell>
+                                <TableRow key={order.orderId || order.id}>
+                                    <TableCell className="font-medium">#{order.orderNumber || order.orderId || order.id}</TableCell>
                                     <TableCell>
                                         {order.table?.tableNumber || 'N/A'}
                                     </TableCell>
                                     <TableCell>
                                         <OrderStatusBadge status={order.status} />
                                     </TableCell>
-                                    <TableCell>{order.items?.length || 0}</TableCell>
+                                    <TableCell>{(order.orderItems || order.items)?.length || 0}</TableCell>
                                     <TableCell className="font-semibold">
-                                        {formatCurrency(order.totalAmount)}
+                                        {formatCurrency(order.finalAmount || order.totalAmount)}
                                     </TableCell>
                                     <TableCell className="text-sm text-muted-foreground">
                                         {formatDateTime(order.createdAt)}

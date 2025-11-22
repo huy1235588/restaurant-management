@@ -32,16 +32,23 @@ export enum OrderPriority {
 
 export interface OrderItem {
     id: number;
+    orderItemId: number;
     orderId: number;
+    itemId: number;
     menuItemId: number;
     quantity: number;
+    unitPrice: number;
+    totalPrice: number;
     price: number;
+    specialRequest?: string;
     note?: string;
     status: OrderItemStatus;
     createdAt: Date | string;
     updatedAt: Date | string;
     menuItem?: {
+        itemId: number;
         id: number;
+        itemName: string;
         name: string;
         code: string;
         price: number;
@@ -51,21 +58,37 @@ export interface OrderItem {
 
 export interface Order {
     id: number;
+    orderId: number;
+    orderNumber: string;
     tableId: number;
     staffId?: number;
+    reservationId?: number;
+    customerName?: string;
+    customerPhone?: string;
+    partySize?: number;
     status: OrderStatus;
+    notes?: string;
     note?: string;
     totalAmount: number;
+    finalAmount: number;
+    cancelledAt?: Date | string;
+    cancellationReason?: string;
+    confirmedAt?: Date | string;
+    completedAt?: Date | string;
     createdAt: Date | string;
     updatedAt: Date | string;
     table?: {
+        tableId: number;
         id: number;
         tableNumber: string;
+        capacity: number;
     };
     staff?: {
+        staffId: number;
         id: number;
         fullName: string;
     };
+    orderItems?: OrderItem[];
     items?: OrderItem[];
 }
 
@@ -82,14 +105,18 @@ export interface KitchenOrder {
 }
 
 export interface CreateOrderItemDto {
-    menuItemId: number;
+    itemId: number;
     quantity: number;
-    note?: string;
+    specialRequest?: string;
 }
 
 export interface CreateOrderDto {
     tableId: number;
-    note?: string;
+    reservationId?: number;
+    customerName?: string;
+    customerPhone?: string;
+    partySize: number;
+    notes?: string;
     items: CreateOrderItemDto[];
 }
 

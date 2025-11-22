@@ -64,7 +64,7 @@ export function CancelItemDialog({
         try {
             await cancelMutation.mutateAsync({
                 orderId,
-                itemId: item.id,
+                itemId: item.orderItemId || item.id,
                 data,
             });
             form.reset();
@@ -93,12 +93,12 @@ export function CancelItemDialog({
                 <Alert variant="destructive">
                     <AlertDescription>
                         <div className="space-y-1">
-                            <p className="font-semibold">{item.menuItem?.name}</p>
+                            <p className="font-semibold">{item.menuItem?.itemName || item.menuItem?.name}</p>
                             <p className="text-sm">
                                 Số lượng: {item.quantity}
                             </p>
-                            {item.note && (
-                                <p className="text-sm">Ghi chú: {item.note}</p>
+                            {(item.specialRequest || item.note) && (
+                                <p className="text-sm">Ghi chú: {item.specialRequest || item.note}</p>
                             )}
                         </div>
                     </AlertDescription>

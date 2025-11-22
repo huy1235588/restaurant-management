@@ -45,7 +45,7 @@ export function OrderDetailsDialog({
 
     const handleMarkServed = async (itemId: number) => {
         if (!order) return;
-        await markServedMutation.mutateAsync({ orderId: order.id, itemId });
+        await markServedMutation.mutateAsync({ orderId: order.orderId || order.id, itemId });
     };
 
     const handleCancelItem = (item: OrderItemType) => {
@@ -108,12 +108,12 @@ export function OrderDetailsDialog({
                                     </div>
                                 </div>
 
-                                {order.note && (
+                                {(order.notes || order.note) && (
                                     <div>
                                         <span className="text-sm text-muted-foreground">
                                             Ghi chú:
                                         </span>
-                                        <p className="text-sm mt-1">{order.note}</p>
+                                        <p className="text-sm mt-1">{order.notes || order.note}</p>
                                     </div>
                                 )}
                             </div>
@@ -136,11 +136,11 @@ export function OrderDetailsDialog({
                                     )}
                                 </div>
 
-                                {order.items && order.items.length > 0 ? (
+                                {(order.orderItems || order.items) && (order.orderItems || order.items)!.length > 0 ? (
                                     <div className="space-y-2">
-                                        {order.items.map((item) => (
+                                        {(order.orderItems || order.items)!.map((item) => (
                                             <OrderItemCard
-                                                key={item.id}
+                                                key={item.orderItemId || item.id}
                                                 item={item}
                                                 onCancelItem={
                                                     onCancelItem ? () => handleCancelItem(item) : undefined
@@ -164,7 +164,7 @@ export function OrderDetailsDialog({
                                 <div className="flex justify-between items-center text-lg font-semibold">
                                     <span>{t('orders.totalAmount')}:</span>
                                     <span className="text-primary">
-                                        {formatCurrency(order.totalAmount)}
+                                        {formatCurrency(order.finalAmount || order.totalAmount)}
                                     </span>
                                 </div>
                             </div>

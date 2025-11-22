@@ -94,7 +94,7 @@ export default function OrdersPage() {
                 <AddItemsDialog
                     open={addItemsDialogOpen}
                     onClose={() => setAddItemsDialogOpen(false)}
-                    orderId={selectedOrder.id}
+                    orderId={selectedOrder.orderId || selectedOrder.id}
                 />
             )}
 
@@ -103,7 +103,7 @@ export default function OrdersPage() {
                 open={cancelItemDialogOpen}
                 onClose={() => setCancelItemDialogOpen(false)}
                 item={selectedOrderItem}
-                orderId={selectedOrder?.id || 0}
+                orderId={selectedOrder?.orderId || selectedOrder?.id || 0}
             />
 
             {/* Cancel Order Dialog */}
@@ -119,7 +119,7 @@ export default function OrdersPage() {
             <OrderDetailsDialog
                 open={detailsDialogOpen}
                 onClose={() => setDetailsDialogOpen(false)}
-                orderId={selectedOrder?.id || null}
+                orderId={selectedOrder?.orderId || selectedOrder?.id || null}
                 onAddItems={(order) => {
                     setDetailsDialogOpen(false);
                     setSelectedOrder(order);

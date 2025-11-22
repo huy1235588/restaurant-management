@@ -86,7 +86,7 @@ export const useAddItems = () => {
         mutationFn: ({ orderId, data }: { orderId: number; data: AddItemsDto }) =>
             orderApi.addItems(orderId, data),
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.id) });
+            queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.orderId || data.id) });
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
             queryClient.invalidateQueries({ queryKey: orderKeys.kitchenQueue() });
             toast.success('Đã thêm món vào đơn hàng');
@@ -112,7 +112,7 @@ export const useCancelItem = () => {
             data: CancelItemDto;
         }) => orderApi.cancelItem(orderId, itemId, data),
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.id) });
+            queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.orderId || data.id) });
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
             queryClient.invalidateQueries({ queryKey: orderKeys.kitchenQueue() });
             toast.success('Đã hủy món');
@@ -131,7 +131,7 @@ export const useCancelOrder = () => {
         mutationFn: ({ orderId, data }: { orderId: number; data: CancelOrderDto }) =>
             orderApi.cancel(orderId, data),
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.id) });
+            queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.orderId || data.id) });
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
             queryClient.invalidateQueries({ queryKey: orderKeys.count() });
             queryClient.invalidateQueries({ queryKey: orderKeys.kitchenQueue() });
@@ -151,7 +151,7 @@ export const useUpdateOrderStatus = () => {
         mutationFn: ({ orderId, data }: { orderId: number; data: UpdateOrderStatusDto }) =>
             orderApi.updateStatus(orderId, data),
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.id) });
+            queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.orderId || data.id) });
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
             toast.success('Đã cập nhật trạng thái đơn hàng');
         },
@@ -169,7 +169,7 @@ export const useMarkItemAsServed = () => {
         mutationFn: ({ orderId, itemId }: { orderId: number; itemId: number }) =>
             orderApi.markItemAsServed(orderId, itemId),
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.id) });
+            queryClient.invalidateQueries({ queryKey: orderKeys.detail(data.orderId || data.id) });
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
             toast.success('Đã đánh dấu món đã phục vụ');
         },
