@@ -53,11 +53,11 @@ export function ReservationListView() {
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Status</label>
                             <Select
-                                value={filters.status}
+                                value={filters.status || "all"}
                                 onValueChange={(value) =>
                                     setFilters({
                                         ...filters,
-                                        status: value as ReservationStatus,
+                                        status: value === "all" ? undefined : (value as ReservationStatus),
                                     })
                                 }
                             >
@@ -65,7 +65,7 @@ export function ReservationListView() {
                                     <SelectValue placeholder="All statuses" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">All statuses</SelectItem>
+                                    <SelectItem value="all">All statuses</SelectItem>
                                     <SelectItem value={ReservationStatus.PENDING}>Pending</SelectItem>
                                     <SelectItem value={ReservationStatus.CONFIRMED}>
                                         Confirmed
