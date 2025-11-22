@@ -12,6 +12,10 @@ import { CategoryModule } from '@/modules/category/category.module';
 import { MenuModule } from '@/modules/menu/menu.module';
 import { StorageModule } from '@/modules/storage/storage.module';
 import { TableModule } from '@/modules/table/table.module';
+import { OrderModule } from '@/modules/orders/order.module';
+import { ReservationModule } from '@/modules/reservations/reservation.module';
+import { KitchenModule } from '@/modules/kitchen/kitchen.module';
+import { BillingModule } from '@/modules/billing/billing.module';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import configuration from '@/config/configuration';
 
@@ -46,6 +50,14 @@ import configuration from '@/config/configuration';
         StorageModule,
         // Table
         TableModule,
+        // Orders
+        OrderModule,
+        // Reservations
+        ReservationModule,
+        // Kitchen
+        KitchenModule,
+        // Billing
+        BillingModule,
     ],
     controllers: [AppController],
     providers: [
