@@ -30,10 +30,7 @@ import {
     ReservationAlreadyCompletedException,
     CannotModifyReservationException,
     CannotCancelReservationException,
-    OrderAlreadyExistsException,
-    ReservationNotConfirmedException,
-    ReservationNotSeatedException,
-    TableOccupiedException,
+    ReservationExpiredException,
     InvalidStatusTransitionException,
 } from './exceptions/reservation.exceptions';
 import { ReservationHelper } from './helpers/reservation.helper';
@@ -112,20 +109,42 @@ export class ReservationService {
         userId?: number,
     ): Promise<Reservation> {
         // Validate reservation date and time
-        if (!ReservationHelper.isFutureDateTime(dto.reservationDate, dto.reservationTime)) {
+        if (
+            !ReservationHelper.isFutureDateTime(
+                dto.reservationDate,
+                dto.reservationTime,
+            )
+        ) {
             throw new InvalidReservationDateException();
         }
 
-        if (!ReservationHelper.isWithinMinAdvanceTime(dto.reservationDate, dto.reservationTime)) {
-            throw new ReservationTooEarlyException(RESERVATION_CONSTANTS.MIN_ADVANCE_BOOKING_MINUTES);
+        if (
+            !ReservationHelper.isWithinMinAdvanceTime(
+                dto.reservationDate,
+                dto.reservationTime,
+            )
+        ) {
+            throw new ReservationTooEarlyException(
+                RESERVATION_CONSTANTS.MIN_ADVANCE_BOOKING_MINUTES,
+            );
         }
 
-        if (!ReservationHelper.isWithinMaxAdvanceTime(dto.reservationDate, dto.reservationTime)) {
-            throw new ReservationTooFarException(RESERVATION_CONSTANTS.MAX_ADVANCE_BOOKING_DAYS);
+        if (
+            !ReservationHelper.isWithinMaxAdvanceTime(
+                dto.reservationDate,
+                dto.reservationTime,
+            )
+        ) {
+            throw new ReservationTooFarException(
+                RESERVATION_CONSTANTS.MAX_ADVANCE_BOOKING_DAYS,
+            );
         }
 
         if (!ReservationHelper.isValidPartySize(dto.partySize)) {
-            throw new InvalidPartySizeException(dto.partySize);
+            throw new InvalidPartySizeException(
+                RESERVATION_CONSTANTS.MIN_PARTY_SIZE,
+                RESERVATION_CONSTANTS.MAX_PARTY_SIZE,
+            );
         }
 
         const reservationDateTime = ReservationHelper.combineDateTime(
@@ -152,11 +171,7 @@ export class ReservationService {
             });
 
             if (availableTables.length === 0) {
-                throw new TablesNotAvailableException(
-                    dto.reservationDate,
-                    dto.reservationTime,
-                    dto.partySize,
-                );
+                throw new TablesNotAvailableException([]);
             }
 
             // Prefer preferred table if available
@@ -214,6 +229,10 @@ export class ReservationService {
         }
 
         // Create reservation
+        const [hours, minutes] = dto.reservationTime.split(':');
+        const reservationTimeDate = new Date();
+        reservationTimeDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
         const reservation = await this.reservationRepository.create({
             customerName: dto.customerName,
             phoneNumber: dto.phoneNumber,
@@ -221,8 +240,10 @@ export class ReservationService {
             customer: { connect: { customerId: customer.customerId } },
             table: { connect: { tableId } },
             reservationDate: new Date(dto.reservationDate),
-            reservationTime: ReservationHelper.parseTime(dto.reservationTime),
-            duration: dto.duration || RESERVATION_CONSTANTS.DEFAULT_RESERVATION_DURATION,
+            reservationTime: reservationTimeDate,
+            duration:
+                dto.duration ||
+                RESERVATION_CONSTANTS.DEFAULT_RESERVATION_DURATION_MINUTES,
             partySize: dto.partySize,
             specialRequest: dto.specialRequest,
             depositAmount: dto.depositAmount,
@@ -266,13 +287,16 @@ export class ReservationService {
                 existing.reservationDate.toISOString().split('T')[0];
             const newTime =
                 dto.reservationTime ||
-                ReservationHelper.formatTime(existing.reservationTime);
+                existing.reservationTime.toISOString().substring(11, 16);
 
             if (!ReservationHelper.isFutureDateTime(newDate, newTime)) {
                 throw new InvalidReservationDateException();
             }
 
-            const reservationDateTime = ReservationHelper.combineDateTime(newDate, newTime);
+            const reservationDateTime = ReservationHelper.combineDateTime(
+                newDate,
+                newTime,
+            );
             const duration = dto.duration || existing.duration;
             const endTime = new Date(
                 reservationDateTime.getTime() + duration * 60000,
@@ -295,7 +319,10 @@ export class ReservationService {
                 changes.reservationDate = new Date(dto.reservationDate);
             }
             if (dto.reservationTime) {
-                changes.reservationTime = ReservationHelper.parseTime(dto.reservationTime);
+                const [hours, minutes] = dto.reservationTime.split(':');
+                const timeDate = new Date();
+                timeDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+                changes.reservationTime = timeDate;
             }
         }
 
@@ -389,10 +416,14 @@ export class ReservationService {
         }
 
         // Check if reservation time has passed grace period
-        const reservationDate = reservation.reservationDate.toISOString().split('T')[0];
-        const reservationTime = ReservationHelper.formatTime(reservation.reservationTime);
+        const reservationDate = reservation.reservationDate
+            .toISOString()
+            .split('T')[0];
+        const reservationTime = reservation.reservationTime
+            .toISOString()
+            .substring(11, 16);
         if (ReservationHelper.isExpired(reservationDate, reservationTime)) {
-            throw new ReservationExpiredException(id);
+            throw new ReservationExpiredException(reservation.reservationCode);
         }
 
         // Use Prisma transaction to atomically:
@@ -477,7 +508,11 @@ export class ReservationService {
 
         // Check if there's a linked order
         const order = await this.orderService.getOrderByReservation(id);
-        if (order && order.status !== OrderStatus.completed) {
+        if (
+            order &&
+            'status' in order &&
+            order.status !== OrderStatus.completed
+        ) {
             throw new CannotModifyReservationException(
                 reservation.status,
                 'Cannot complete reservation while order is still active',
@@ -524,13 +559,11 @@ export class ReservationService {
         const order = await this.orderService.getOrderByReservation(id);
         if (
             order &&
+            'status' in order &&
             order.status !== OrderStatus.cancelled &&
             order.status !== OrderStatus.completed
         ) {
-            throw new CannotCancelReservationException(
-                reservation.status,
-                'Cannot cancel reservation while order is still active',
-            );
+            throw new CannotCancelReservationException(reservation.status);
         }
 
         // Release table if it was occupied

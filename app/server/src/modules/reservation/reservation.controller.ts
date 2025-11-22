@@ -57,7 +57,7 @@ export class ReservationController {
         const result = await this.reservationService.findAll(query);
         return {
             success: true,
-            message: RESERVATION_MESSAGES.SUCCESS.RETRIEVED,
+            message: RESERVATION_MESSAGES.SUCCESS.RESERVATIONS_RETRIEVED,
             data: result,
         };
     }
@@ -84,7 +84,7 @@ export class ReservationController {
         const reservations = await this.reservationService.findByPhone(phone);
         return {
             success: true,
-            message: RESERVATION_MESSAGES.SUCCESS.RETRIEVED,
+            message: RESERVATION_MESSAGES.SUCCESS.RESERVATIONS_RETRIEVED,
             data: reservations,
         };
     }
@@ -98,7 +98,7 @@ export class ReservationController {
         const reservation = await this.reservationService.findByCode(code);
         return {
             success: true,
-            message: RESERVATION_MESSAGES.SUCCESS.RETRIEVED,
+            message: RESERVATION_MESSAGES.SUCCESS.RESERVATION_RETRIEVED,
             data: reservation,
         };
     }
@@ -112,7 +112,7 @@ export class ReservationController {
         const reservation = await this.reservationService.findById(id);
         return {
             success: true,
-            message: RESERVATION_MESSAGES.SUCCESS.RETRIEVED,
+            message: RESERVATION_MESSAGES.SUCCESS.RESERVATION_RETRIEVED,
             data: reservation,
         };
     }
@@ -134,7 +134,7 @@ export class ReservationController {
         const reservation = await this.reservationService.create(dto, userId);
         return {
             success: true,
-            message: RESERVATION_MESSAGES.SUCCESS.CREATED,
+            message: RESERVATION_MESSAGES.SUCCESS.RESERVATION_CREATED,
             data: reservation,
         };
     }
@@ -158,7 +158,7 @@ export class ReservationController {
         );
         return {
             success: true,
-            message: RESERVATION_MESSAGES.SUCCESS.UPDATED,
+            message: RESERVATION_MESSAGES.SUCCESS.RESERVATION_UPDATED,
             data: reservation,
         };
     }
@@ -176,15 +176,14 @@ export class ReservationController {
         const reservation = await this.reservationService.confirm(id, userId);
         return {
             success: true,
-            message: RESERVATION_MESSAGES.SUCCESS.CONFIRMED,
+            message: RESERVATION_MESSAGES.SUCCESS.RESERVATION_CONFIRMED,
             data: reservation,
         };
     }
 
     @Patch(':id/seated')
     @ApiOperation({
-        summary:
-            'Mark reservation as seated (check-in) and auto-create order',
+        summary: 'Mark reservation as seated (check-in) and auto-create order',
     })
     @ApiParam({ name: 'id', description: 'Reservation ID' })
     @ApiResponse({
@@ -200,7 +199,7 @@ export class ReservationController {
         const result = await this.reservationService.seat(id, userId);
         return {
             success: true,
-            message: RESERVATION_MESSAGES.SUCCESS.SEATED,
+            message: RESERVATION_MESSAGES.SUCCESS.RESERVATION_SEATED,
             data: result,
         };
     }
@@ -217,7 +216,7 @@ export class ReservationController {
         const reservation = await this.reservationService.complete(id, userId);
         return {
             success: true,
-            message: RESERVATION_MESSAGES.SUCCESS.COMPLETED,
+            message: RESERVATION_MESSAGES.SUCCESS.RESERVATION_COMPLETED,
             data: reservation,
         };
     }
@@ -239,7 +238,7 @@ export class ReservationController {
         );
         return {
             success: true,
-            message: RESERVATION_MESSAGES.SUCCESS.CANCELLED,
+            message: RESERVATION_MESSAGES.SUCCESS.RESERVATION_CANCELLED,
             data: reservation,
         };
     }
@@ -259,7 +258,7 @@ export class ReservationController {
         );
         return {
             success: true,
-            message: RESERVATION_MESSAGES.SUCCESS.MARKED_NO_SHOW,
+            message: RESERVATION_MESSAGES.SUCCESS.RESERVATION_NO_SHOW,
             data: reservation,
         };
     }
