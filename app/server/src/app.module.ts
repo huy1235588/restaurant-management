@@ -16,6 +16,8 @@ import { ReservationModule } from '@/modules/reservation/reservation.module';
 import { ReservationAuditModule } from '@/modules/reservation-audit';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import configuration from '@/config/configuration';
+import { OrderModule } from '@/modules/order/order.module';
+import { ReportModule } from '@/modules/report/report.module';
 
 @Module({
     imports: [
@@ -52,6 +54,10 @@ import configuration from '@/config/configuration';
         ReservationModule,
         // Reservation Audit
         ReservationAuditModule,
+        // Order
+        OrderModule,
+        // Report
+        ReportModule,
     ],
     controllers: [AppController],
     providers: [
