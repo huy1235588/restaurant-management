@@ -181,19 +181,27 @@ export class ReservationController {
     }
 
     @Patch(':id/seated')
-    @ApiOperation({ summary: 'Mark reservation as seated (check-in)' })
+    @ApiOperation({
+        summary:
+            'Mark reservation as seated (check-in) and auto-create order',
+    })
     @ApiParam({ name: 'id', description: 'Reservation ID' })
-    @ApiResponse({ status: 200, description: 'Reservation marked as seated' })
+    @ApiResponse({
+        status: 200,
+        description:
+            'Reservation marked as seated and order created successfully',
+    })
     async seat(
         @Param('id', ParseIntPipe) id: number,
         @RequestDecorator() req: RequestWithUser,
     ) {
         const userId = req.user?.staffId;
-        const reservation = await this.reservationService.seat(id, userId);
+        const result = await this.reservationService.seat(id, userId);
         return {
             success: true,
-            message: 'Reservation marked as seated',
-            data: reservation,
+            message:
+                'Reservation marked as seated and order created successfully',
+            data: result,
         };
     }
 

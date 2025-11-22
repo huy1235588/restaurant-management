@@ -3,10 +3,12 @@ import {
     NotFoundException,
     BadRequestException,
     ConflictException,
+    Logger,
 } from '@nestjs/common';
 import { ReservationRepository } from './reservation.repository';
 import { PrismaService } from '@/database/prisma.service';
 import { ReservationAuditService } from '../reservation-audit';
+import { OrderService } from '../order/order.service';
 import {
     CreateReservationDto,
     UpdateReservationDto,
@@ -19,14 +21,18 @@ import {
     ReservationStatus,
     RestaurantTable,
     TableStatus,
+    OrderStatus,
 } from '@prisma/generated/client';
 
 @Injectable()
 export class ReservationService {
+    private readonly logger = new Logger(ReservationService.name);
+
     constructor(
         private readonly reservationRepository: ReservationRepository,
         private readonly prisma: PrismaService,
         private readonly auditService: ReservationAuditService,
+        private readonly orderService: OrderService,
     ) {}
 
     async findAll(query: QueryReservationDto) {
@@ -346,7 +352,10 @@ export class ReservationService {
         return updated;
     }
 
-    async seat(id: number, userId?: number): Promise<Reservation> {
+    async seat(
+        id: number,
+        userId?: number,
+    ): Promise<{ reservation: Reservation; order: any }> {
         const reservation = await this.findById(id);
 
         if (
@@ -358,23 +367,71 @@ export class ReservationService {
             );
         }
 
-        // Update table status to occupied
-        await this.prisma.restaurantTable.update({
-            where: { tableId: reservation.tableId },
-            data: { status: TableStatus.occupied },
+        // Use Prisma transaction to atomically:
+        // 1. Update table status to occupied
+        // 2. Update reservation status to seated
+        // 3. Create order linked to reservation
+        const result = await this.prisma.$transaction(async (tx) => {
+            // 1. Update table status
+            await tx.restaurantTable.update({
+                where: { tableId: reservation.tableId },
+                data: { status: TableStatus.occupied },
+            });
+
+            // 2. Update reservation status
+            const updatedReservation = await tx.reservation.update({
+                where: { reservationId: id },
+                data: {
+                    status: ReservationStatus.seated,
+                    seatedAt: new Date(),
+                },
+                include: {
+                    table: true,
+                    customer: true,
+                },
+            });
+
+            // 3. Create order linked to reservation
+            const order = await tx.order.create({
+                data: {
+                    tableId: reservation.tableId,
+                    staffId: userId || null,
+                    reservationId: id,
+                    customerName: reservation.customerName,
+                    customerPhone: reservation.phoneNumber,
+                    partySize: reservation.partySize,
+                    notes: reservation.specialRequest,
+                    status: OrderStatus.pending,
+                    totalAmount: 0,
+                    finalAmount: 0,
+                },
+                include: {
+                    table: true,
+                    staff: true,
+                    orderItems: {
+                        include: {
+                            menuItem: true,
+                        },
+                    },
+                },
+            });
+
+            return { reservation: updatedReservation, order };
         });
 
-        const updated = await this.reservationRepository.update(id, {
-            status: ReservationStatus.seated,
-            seatedAt: new Date(),
-        });
-
+        // Create audit log
         await this.auditService.create(id, 'seat', userId, {
             oldStatus: reservation.status,
             newStatus: ReservationStatus.seated,
+            orderId: result.order.orderId,
+            orderNumber: result.order.orderNumber,
         });
 
-        return updated;
+        this.logger.log(
+            `Reservation ${reservation.reservationCode} seated. Order ${result.order.orderNumber} auto-created.`,
+        );
+
+        return result;
     }
 
     async complete(id: number, userId?: number): Promise<Reservation> {
@@ -383,6 +440,14 @@ export class ReservationService {
         if (reservation.status !== ReservationStatus.seated) {
             throw new BadRequestException(
                 'Only seated reservations can be completed',
+            );
+        }
+
+        // Check if there's a linked order
+        const order = await this.orderService.getOrderByReservation(id);
+        if (order && order.status !== OrderStatus.completed) {
+            throw new BadRequestException(
+                'Cannot complete reservation while order is still active. Please complete or cancel the order first.',
             );
         }
 
@@ -415,6 +480,18 @@ export class ReservationService {
         if (reservation.status === ReservationStatus.completed) {
             throw new BadRequestException(
                 'Cannot cancel completed reservation',
+            );
+        }
+
+        // Check if there's a linked order
+        const order = await this.orderService.getOrderByReservation(id);
+        if (
+            order &&
+            order.status !== OrderStatus.cancelled &&
+            order.status !== OrderStatus.completed
+        ) {
+            throw new BadRequestException(
+                'Cannot cancel reservation while order is still active. Please cancel the order first.',
             );
         }
 

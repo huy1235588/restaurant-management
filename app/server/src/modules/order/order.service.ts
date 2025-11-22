@@ -80,6 +80,13 @@ export class OrderService {
     }
 
     /**
+     * Get order by reservation ID
+     */
+    async getOrderByReservation(reservationId: number) {
+        return this.orderRepository.findByReservation(reservationId);
+    }
+
+    /**
      * Create new order
      */
     async createOrder(data: CreateOrderDto, staffId: number) {

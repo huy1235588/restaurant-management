@@ -147,6 +147,13 @@ export class OrderRepository {
         });
     }
 
+    async findByReservation(reservationId: number) {
+        return this.prisma.order.findFirst({
+            where: { reservationId },
+            include: this.includeRelations,
+        });
+    }
+
     private buildWhereClause(filters?: OrderFilters): Prisma.OrderWhereInput {
         if (!filters) return {};
 

@@ -63,9 +63,9 @@ export function useReservationActions() {
         try {
             setLoading(true);
             setError(null);
-            const reservation = await reservationApi.seat(id);
-            toast.success('Customer checked in');
-            return reservation;
+            const result = await reservationApi.seat(id);
+            toast.success(`Customer checked in. Order ${result.order.orderNumber} created.`);
+            return result;
         } catch (err: any) {
             const errorMessage = err.response?.data?.message || 'Failed to check in';
             setError(errorMessage);

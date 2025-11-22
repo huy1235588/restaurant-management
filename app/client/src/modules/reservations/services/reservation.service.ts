@@ -8,6 +8,7 @@ import {
     PaginatedResponse,
     ApiResponse,
     ReservationFilterOptions,
+    SeatReservationResponse,
 } from "../types";
 
 export const reservationApi = {
@@ -83,11 +84,11 @@ export const reservationApi = {
         return response.data.data;
     },
 
-    // Mark as seated (check-in)
-    seat: async (id: number): Promise<Reservation> => {
-        const response = await axiosInstance.patch<ApiResponse<Reservation>>(
-            `/reservations/${id}/seated`
-        );
+    // Mark as seated (check-in) and auto-create order
+    seat: async (id: number): Promise<SeatReservationResponse> => {
+        const response = await axiosInstance.patch<
+            ApiResponse<SeatReservationResponse>
+        >(`/reservations/${id}/seated`);
         return response.data.data;
     },
 

@@ -88,6 +88,11 @@ export interface Order {
         id: number;
         fullName: string;
     };
+    reservation?: {
+        reservationId: number;
+        reservationCode: string;
+        customerName: string;
+    };
     orderItems?: OrderItem[];
     items?: OrderItem[];
 }

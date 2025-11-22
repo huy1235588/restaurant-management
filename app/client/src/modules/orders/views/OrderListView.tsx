@@ -137,6 +137,7 @@ export function OrderListView({
                             <TableRow>
                                 <TableHead>{t('orders.orderNumber')}</TableHead>
                                 <TableHead>{t('orders.table')}</TableHead>
+                                <TableHead>Reservation</TableHead>
                                 <TableHead>{t('orders.status')}</TableHead>
                                 <TableHead>{t('orders.items')}</TableHead>
                                 <TableHead>{t('orders.total')}</TableHead>
@@ -150,6 +151,17 @@ export function OrderListView({
                                     <TableCell className="font-medium">#{order.orderNumber || order.orderId || order.id}</TableCell>
                                     <TableCell>
                                         {order.table?.tableNumber || 'N/A'}
+                                    </TableCell>
+                                    <TableCell>
+                                        {order.reservationId ? (
+                                            <div className="flex items-center gap-1">
+                                                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-medium">
+                                                    {order.reservation?.reservationCode || `#${order.reservationId}`}
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <span className="text-xs text-muted-foreground">Walk-in</span>
+                                        )}
                                     </TableCell>
                                     <TableCell>
                                         <OrderStatusBadge status={order.status} />

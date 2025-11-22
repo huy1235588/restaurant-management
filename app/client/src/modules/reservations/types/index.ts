@@ -122,6 +122,25 @@ export interface CancelReservationDto {
     reason?: string;
 }
 
+export interface SeatReservationResponse {
+    reservation: Reservation;
+    order: {
+        orderId: number;
+        orderNumber: string;
+        tableId: number;
+        staffId: number | null;
+        reservationId: number;
+        customerName: string;
+        customerPhone: string;
+        partySize: number;
+        status: string;
+        totalAmount: number;
+        finalAmount: number;
+        orderTime: string;
+        notes?: string;
+    };
+}
+
 export interface CheckAvailabilityDto {
     date: string;
     partySize: number;
