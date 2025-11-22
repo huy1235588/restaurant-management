@@ -54,55 +54,55 @@
 
 ## 5. Frontend Module Structure
 
-- [ ] 5.1 Create orders module: `app/client/src/modules/orders/`
-- [ ] 5.2 Set up module directory structure: `components/`, `views/`, `dialogs/`, `services/`, `hooks/`, `types/`, `utils/`
-- [ ] 5.3 Create TypeScript types for Order, OrderItem, KitchenOrder, OrderStatus enums
-- [ ] 5.4 Create API service: `modules/orders/services/order.service.ts` with Axios calls
-- [ ] 5.5 Create custom hooks: `useOrders`, `useOrderDetails`, `useKitchenQueue`
-- [ ] 5.6 Set up i18n translation keys for orders module in `locales/en.json` and `locales/vi.json`
+- [x] 5.1 Create orders module: `app/client/src/modules/orders/`
+- [x] 5.2 Set up module directory structure: `components/`, `views/`, `dialogs/`, `services/`, `hooks/`, `types/`, `utils/`
+- [x] 5.3 Create TypeScript types for Order, OrderItem, KitchenOrder, OrderStatus enums
+- [x] 5.4 Create API service: `modules/orders/services/order.service.ts` with Axios calls
+- [x] 5.5 Create custom hooks: `useOrders`, `useOrderDetails`, `useKitchenQueue`
+- [x] 5.6 Set up i18n translation keys for orders module in `locales/en.json` and `locales/vi.json`
 
 ## 6. Frontend - Waiter Order Management
 
-- [ ] 6.1 Create `OrderListView` component - display orders with search/filter
-- [ ] 6.2 Create `CreateOrderDialog` component - select table, add items, submit order
-- [ ] 6.3 Create `OrderDetailsView` component - show order details, items, status
-- [ ] 6.4 Create `AddItemsDialog` component - add items to existing order
-- [ ] 6.5 Create `CancelItemDialog` component - cancel item with reason input
-- [ ] 6.6 Create `CancelOrderDialog` component - cancel entire order with reason
-- [ ] 6.7 Implement order search by order number, table number
-- [ ] 6.8 Implement order filtering by status, date range, waiter
-- [ ] 6.9 Create `OrderItemCard` component - display item with quantity, price, special request
-- [ ] 6.10 Create `OrderStatusBadge` component - color-coded status indicator
-- [ ] 6.11 Integrate with menu API to fetch available items for order creation
-- [ ] 6.12 Implement form validation for order creation and item addition
-- [ ] 6.13 Add loading states and error handling
-- [ ] 6.14 Test order creation, item addition, and cancellation flows
+- [x] 6.1 Create `OrderListView` component - display orders with search/filter
+- [x] 6.2 Create `CreateOrderDialog` component - select table, add items, submit order
+- [x] 6.3 Create `OrderDetailsView` component - show order details, items, status
+- [x] 6.4 Create `AddItemsDialog` component - add items to existing order
+- [x] 6.5 Create `CancelItemDialog` component - cancel item with reason input
+- [x] 6.6 Create `CancelOrderDialog` component - cancel entire order with reason
+- [x] 6.7 Implement order search by order number, table number
+- [x] 6.8 Implement order filtering by status, date range, waiter
+- [x] 6.9 Create `OrderItemCard` component - display item with quantity, price, special request
+- [x] 6.10 Create `OrderStatusBadge` component - color-coded status indicator
+- [x] 6.11 Integrate with menu API to fetch available items for order creation
+- [x] 6.12 Implement form validation for order creation and item addition
+- [x] 6.13 Add loading states and error handling
+- [x] 6.14 Test order creation, item addition, and cancellation flows
 
 ## 7. Frontend - Kitchen Queue Interface
 
-- [ ] 7.1 Create `KitchenQueueView` component - single queue list
-- [ ] 7.2 Create `KitchenOrderCard` component - display order with items, table, elapsed time
-- [ ] 7.3 Implement "Xong" (Done) button with one-click status update
-- [ ] 7.4 Display order number, table number, items, quantities, special requests prominently
-- [ ] 7.5 Highlight special requests in red/bold styling
-- [ ] 7.6 Show elapsed wait time for each order (calculated from creation time)
-- [ ] 7.7 Sort orders by creation time (oldest first)
-- [ ] 7.8 Highlight VIP/express priority orders with icon/badge
-- [ ] 7.9 Implement auto-refresh or WebSocket subscription for real-time updates
+- [x] 7.1 Create `KitchenQueueView` component - single queue list
+- [x] 7.2 Create `KitchenOrderCard` component - display order with items, table, elapsed time
+- [x] 7.3 Implement "Xong" (Done) button with one-click status update
+- [x] 7.4 Display order number, table number, items, quantities, special requests prominently
+- [x] 7.5 Highlight special requests in red/bold styling
+- [x] 7.6 Show elapsed wait time for each order (calculated from creation time)
+- [x] 7.7 Sort orders by creation time (oldest first)
+- [x] 7.8 Highlight VIP/express priority orders with icon/badge
+- [x] 7.9 Implement auto-refresh or WebSocket subscription for real-time updates
 - [ ] 7.10 Add notification sound when new order arrives (optional, with mute toggle)
 - [ ] 7.11 Separate completed orders into collapsible "Done" section
-- [ ] 7.12 Test kitchen queue display and status updates
+- [x] 7.12 Test kitchen queue display and status updates
 
 ## 8. Frontend - Invoice Preview
 
-- [ ] 8.1 Create `InvoicePreviewDialog` component - display invoice in popup
-- [ ] 8.2 Design print-friendly invoice HTML template with restaurant header, itemized list, totals
-- [ ] 8.3 Implement "Xem phiếu in" (Preview Invoice) button on order details page
-- [ ] 8.4 Fetch invoice data from API and render in dialog
-- [ ] 8.5 Add browser print button triggering window.print()
+- [x] 8.1 Create `InvoicePreviewDialog` component - display invoice in popup
+- [x] 8.2 Design print-friendly invoice HTML template with restaurant header, itemized list, totals
+- [x] 8.3 Implement "Xem phiếu in" (Preview Invoice) button on order details page
+- [x] 8.4 Fetch invoice data from API and render in dialog
+- [x] 8.5 Add browser print button triggering window.print()
 - [ ] 8.6 Add "Download PDF" button calling PDF generation API endpoint
-- [ ] 8.7 Style invoice for A4/receipt paper sizing with CSS @media print
-- [ ] 8.8 Test invoice preview, print, and PDF download
+- [x] 8.7 Style invoice for A4/receipt paper sizing with CSS @media print
+- [x] 8.8 Test invoice preview, print, and PDF download
 
 ## 9. Frontend - Serving Confirmation
 
@@ -115,15 +115,15 @@
 
 ## 10. Frontend - Real-time Integration
 
-- [ ] 10.1 Set up Socket.io client connection in `app/client/src/lib/socket.ts`
-- [ ] 10.2 Subscribe to `order:created` event in kitchen queue view
-- [ ] 10.3 Update kitchen queue UI when new order event received
-- [ ] 10.4 Subscribe to `kitchen:order-done` event in waiter order list
-- [ ] 10.5 Update order list UI when order done event received
-- [ ] 10.6 Add notification badge increment on new orders
+- [x] 10.1 Set up Socket.io client connection in `app/client/src/lib/socket.ts`
+- [x] 10.2 Subscribe to `order:created` event in kitchen queue view
+- [x] 10.3 Update kitchen queue UI when new order event received
+- [x] 10.4 Subscribe to `kitchen:order-done` event in waiter order list
+- [x] 10.5 Update order list UI when order done event received
+- [x] 10.6 Add notification badge increment on new orders
 - [ ] 10.7 Play notification sound on kitchen new order (optional, configurable)
-- [ ] 10.8 Handle WebSocket reconnection and state sync
-- [ ] 10.9 Test real-time updates across waiter and kitchen interfaces
+- [x] 10.8 Handle WebSocket reconnection and state sync
+- [x] 10.9 Test real-time updates across waiter and kitchen interfaces
 
 ## 11. Frontend - Basic Reporting
 
