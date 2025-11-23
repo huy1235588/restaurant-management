@@ -127,8 +127,8 @@ export function CreateReservationView() {
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                         {/* Customer Information Card */}
-                        <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-lg">
-                            <CardHeader className="bg-linear-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">
+                        <Card className="pt-0 border-2 border-gray-200 dark:border-gray-700 shadow-lg">
+                            <CardHeader className="pt-6 rounded-t-xl rounded-tr-xl bg-linear-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 bg-blue-600 dark:bg-blue-500 rounded-lg flex items-center justify-center">
                                         <User className="w-5 h-5 text-white" />
@@ -209,8 +209,8 @@ export function CreateReservationView() {
                         </Card>
 
                         {/* Reservation Details Card */}
-                        <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-lg">
-                            <CardHeader className="bg-linear-to-r from-purple-50 to-blue-50 dark:from-gray-800 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">
+                        <Card className="pt-0 border-2 border-gray-200 dark:border-gray-700 shadow-lg">
+                            <CardHeader className="pt-6 rounded-t-xl rounded-tr-xl bg-linear-to-r from-purple-50 to-blue-50 dark:from-gray-800 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 bg-purple-600 dark:bg-purple-500 rounded-lg flex items-center justify-center">
                                         <Calendar className="w-5 h-5 text-white" />
@@ -311,8 +311,8 @@ export function CreateReservationView() {
 
                         {/* Table Selection Card */}
                         {tables.length > 0 && (
-                            <Card className="border-2 border-green-200 dark:border-green-700 shadow-lg">
-                                <CardHeader className="bg-linear-to-r from-green-50 to-emerald-50 dark:from-gray-800 dark:to-gray-800 border-b border-green-200 dark:border-green-700">
+                            <Card className="pt-0 border-2 border-green-200 dark:border-green-700 shadow-lg">
+                                <CardHeader className="pt-6 rounded-t-xl rounded-tr-xl bg-linear-to-r from-green-50 to-emerald-50 dark:from-gray-800 dark:to-gray-800 border-b border-green-200 dark:border-green-700">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 bg-green-600 dark:bg-green-500 rounded-lg flex items-center justify-center">
                                             <CheckCircle2 className="w-5 h-5 text-white" />
@@ -370,8 +370,8 @@ export function CreateReservationView() {
                         )}
 
                         {/* Special Requests Card */}
-                        <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-lg">
-                            <CardHeader className="bg-linear-to-r from-gray-50 to-gray-50 dark:from-gray-800 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">
+                        <Card className="pt-0 border-2 border-gray-200 dark:border-gray-700 shadow-lg">
+                            <CardHeader className="pt-6 rounded-t-xl rounded-tr-xl bg-linear-to-r from-gray-50 to-gray-50 dark:from-gray-800 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 bg-gray-600 dark:bg-gray-500 rounded-lg flex items-center justify-center">
                                         <FileText className="w-5 h-5 text-white" />
