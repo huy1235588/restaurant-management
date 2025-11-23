@@ -104,12 +104,12 @@ export function OrderListView() {
                         className="pl-9"
                     />
                 </div>
-                <Select value={status} onValueChange={(value) => setStatus(value as OrderStatus | '')}>
+                <Select value={status} onValueChange={(value) => setStatus(value === "all" ? '' : value as OrderStatus | '')}>
                     <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Trạng thái" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="">Tất cả</SelectItem>
+                        <SelectItem value="all">Tất cả</SelectItem>
                         <SelectItem value="pending">Đang chờ</SelectItem>
                         <SelectItem value="confirmed">Đã xác nhận</SelectItem>
                         <SelectItem value="ready">Sẵn sàng</SelectItem>
