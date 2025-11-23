@@ -17,11 +17,9 @@ export * from './dto';
 
 // Services
 export { OrderService } from './order.service';
-export { KitchenService } from './kitchen.service';
 
 // Repositories
 export { OrderRepository } from './order.repository';
-export { KitchenRepository } from './kitchen.repository';
 
 // Module
 export { OrderModule } from './order.module';

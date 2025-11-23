@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '@/database/prisma.service';
 import { OrderRepository, FindOrdersOptions } from './order.repository';
-import { KitchenRepository } from './kitchen.repository';
 import { OrderGateway } from './order.gateway';
 import {
     CreateOrderDto,
@@ -40,7 +39,6 @@ export class OrderService {
 
     constructor(
         private readonly orderRepository: OrderRepository,
-        private readonly kitchenRepository: KitchenRepository,
         private readonly prisma: PrismaService,
         private readonly orderGateway: OrderGateway,
     ) {}
