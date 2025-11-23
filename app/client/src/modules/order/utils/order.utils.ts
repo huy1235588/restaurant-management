@@ -35,6 +35,7 @@ export const calculateOrderFinancials = (
     serviceCharge: number;
     tax: number;
     total: number;
+    discount: number;
 } => {
     const subtotal = calculateOrderTotal(items);
     const serviceCharge = subtotal * serviceChargeRate;
@@ -46,6 +47,7 @@ export const calculateOrderFinancials = (
         serviceCharge,
         tax,
         total,
+        discount: 0,
     };
 };
 

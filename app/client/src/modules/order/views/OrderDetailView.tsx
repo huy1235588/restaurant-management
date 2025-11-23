@@ -100,7 +100,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                             {formatDateTime(order.createdAt)}
                         </p>
                     </div>
-                    <OrderStatusBadge status={order.orderStatus} />
+                    <OrderStatusBadge status={order.status} />
                 </div>
                 <div className="flex gap-2">
                     {canAddItems(order) && (
@@ -119,7 +119,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                         <Printer className="mr-2 h-4 w-4" />
                         In
                     </Button>
-                    {order.orderStatus === 'completed' && (
+                    {order.status === 'completed' && (
                         <Button variant="outline" onClick={handleCreateBill}>
                             <Receipt className="mr-2 h-4 w-4" />
                             Tạo hóa đơn
@@ -166,54 +166,32 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                                     </p>
                                 </div>
                             </div>
-                            {order.specialRequests && (
-                                <>
-                                    <Separator />
-                                    <div>
-                                        <p className="text-sm font-medium text-muted-foreground">Yêu cầu đặc biệt</p>
-                                        <p className="text-base mt-1">{order.specialRequests}</p>
-                                    </div>
-                                </>
-                            )}
                         </CardContent>
                     </Card>
 
                     {/* Order Items */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Món ăn ({order.items?.length || 0})</CardTitle>
+                            <CardTitle>Món ăn ({order.orderItems?.length || 0})</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <OrderItemList
-                                items={order.items || []}
-                                orderStatus={order.orderStatus}
+                                items={order.orderItems || []}
                                 onCancelItem={setItemToCancel}
                             />
                         </CardContent>
                     </Card>
-
-                    {/* Timeline */}
-                    {order.timeline && order.timeline.length > 0 && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Lịch sử</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <OrderTimeline events={order.timeline} />
-                            </CardContent>
-                        </Card>
-                    )}
                 </div>
 
                 {/* Sidebar - Right Column (1/3) */}
                 <div className="space-y-6">
                     {/* Order Summary */}
                     <OrderSummaryCard
-                        subtotal={order.subtotal}
-                        serviceCharge={order.serviceCharge}
-                        tax={order.tax}
-                        discount={order.discount}
-                        total={order.total}
+                        subtotal={(order.orderItems || []).reduce((sum: number, item: any) => sum + item.price * item.quantity, 0)}
+                        serviceCharge={0}
+                        tax={0}
+                        discount={0}
+                        total={(order.orderItems || []).reduce((sum: number, item: any) => sum + item.price * item.quantity, 0)}
                     />
 
                     {/* Additional Info */}

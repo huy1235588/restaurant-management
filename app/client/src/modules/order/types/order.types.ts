@@ -201,9 +201,12 @@ export interface KitchenOrderReadyEvent {
 
 // UI State
 
-export interface ShoppingCartItem extends CreateOrderItemDto {
-    menuItem: MenuItem;
+export interface ShoppingCartItem {
+    menuItemId: number;
+    name: string;
     price: number;
+    quantity: number;
+    specialRequests?: string;
 }
 
 export interface CreateOrderFormData {

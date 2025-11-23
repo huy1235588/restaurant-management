@@ -11,7 +11,7 @@ import { ShoppingCart } from '../components/ShoppingCart';
 import { OrderSummaryCard } from '../components/OrderSummaryCard';
 import { OrderStatusBadge } from '../components/OrderStatusBadge';
 import { useOrderById, useAddItems } from '../hooks';
-import { ShoppingCartItem } from '../types';
+import { ShoppingCartItem, OrderItem } from '../types';
 import { formatOrderNumber, formatCurrency, calculateOrderFinancials } from '../utils';
 import { ArrowLeft, Save, AlertCircle } from 'lucide-react';
 
@@ -25,7 +25,7 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
     const { data: order, isLoading, error } = useOrderById(orderId);
-    const addItemsMutation = useAddItems(orderId);
+    const addItemsMutation = useAddItems();
 
     // Warn about unsaved changes
     useEffect(() => {
@@ -55,11 +55,14 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
         }
 
         await addItemsMutation.mutateAsync({
-            items: cartItems.map((item) => ({
-                menuItemId: item.menuItemId,
-                quantity: item.quantity,
-                specialRequests: item.specialRequests,
-            })),
+            orderId,
+            data: {
+                items: cartItems.map((item) => ({
+                    itemId: item.menuItemId,
+                    quantity: item.quantity,
+                    specialRequest: item.specialRequests,
+                })),
+            },
         });
         setHasUnsavedChanges(false);
         // Navigation handled by useAddItems hook
@@ -93,12 +96,40 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
         );
     }
 
-    const currentFinancials = calculateOrderFinancials(order.subtotal);
-    const newItemsSubtotal = cartItems.reduce(
-        (sum, item) => sum + item.price * item.quantity,
+    const currentFinancials = calculateOrderFinancials(order.orderItems || []);
+    
+    // Convert cart items to OrderItem format
+    const tempNewItems: OrderItem[] = cartItems.map((item, index) => ({
+        orderItemId: -(index + 1), // Negative IDs for temp items
+        orderId: order.orderId,
+        itemId: item.menuItemId,
+        menuItem: {
+            itemId: item.menuItemId,
+            itemName: item.name,
+            price: item.price,
+            categoryId: 0,
+            description: null,
+            imageUrl: null,
+            isAvailable: true,
+        },
+        quantity: item.quantity,
+        unitPrice: item.price,
+        totalPrice: item.price * item.quantity,
+        specialRequest: item.specialRequests || null,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+    }));
+    
+    const newItemsSubtotal = tempNewItems.reduce(
+        (sum: number, item: any) => sum + item.totalPrice,
         0
     );
-    const newFinancials = calculateOrderFinancials(order.subtotal + newItemsSubtotal);
+    
+    const newFinancials = calculateOrderFinancials([
+        ...(order.orderItems || []),
+        ...tempNewItems,
+    ]);
 
     return (
         <div className="space-y-6">
@@ -117,7 +148,7 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
                             Bàn {order.table?.tableNumber || 'N/A'}
                         </p>
                     </div>
-                    <OrderStatusBadge status={order.orderStatus} />
+                    <OrderStatusBadge status={order.status} />
                 </div>
             </div>
 
@@ -129,12 +160,12 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
                         <CardHeader>
                             <CardTitle>Đơn hàng hiện tại</CardTitle>
                             <CardDescription>
-                                {order.items?.length || 0} món - Tổng: {formatCurrency(order.total)}
+                                {order.orderItems?.length || 0} món - Tổng: {formatCurrency(currentFinancials.total)}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-2">
-                                {order.items?.map((item) => (
+                                {order.orderItems?.map((item: any) => (
                                     <div
                                         key={item.orderItemId}
                                         className="flex justify-between text-sm"
@@ -218,7 +249,7 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
                                 <div className="space-y-2">
                                     <div className="flex justify-between text-sm">
                                         <span className="text-muted-foreground">Tổng hiện tại:</span>
-                                        <span>{formatCurrency(order.total)}</span>
+                                        <span>{formatCurrency(currentFinancials.total)}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span className="text-muted-foreground">Thêm:</span>

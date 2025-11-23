@@ -48,19 +48,19 @@ export function ShoppingCart({
                     <div className="space-y-3">
                         {items.map((item, index) => (
                             <div
-                                key={`${item.itemId}-${index}`}
+                                key={`${item.menuItemId}-${index}`}
                                 className="flex gap-3 rounded-lg border p-3"
                             >
                                 <div className="flex-1 space-y-1">
                                     <h4 className="font-medium text-sm">
-                                        {item.menuItem.itemName}
+                                        {item.name}
                                     </h4>
                                     <p className="text-xs text-muted-foreground">
                                         {formatCurrency(item.price)}
                                     </p>
-                                    {item.specialRequest && (
+                                    {item.specialRequests && (
                                         <p className="text-xs text-amber-600 dark:text-amber-400">
-                                            📝 {item.specialRequest}
+                                            📝 {item.specialRequests}
                                         </p>
                                     )}
                                 </div>

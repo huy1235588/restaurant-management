@@ -6,8 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useMenuItems } from '@/modules/menu/hooks';
-import { useCategories } from '@/modules/menu/hooks';
+import { useMenuItems, useCategories } from '@/modules/menu/hooks';
 import { MenuItem as MenuItemType } from '@/types';
 import { ShoppingCartItem } from '../types';
 import { formatCurrency } from '../utils';
@@ -55,7 +54,7 @@ export function MenuItemSelector({ cartItems, onAddItem }: MenuItemSelectorProps
                 >
                     <TabsList className="w-full justify-start overflow-x-auto">
                         <TabsTrigger value="all">Tất cả</TabsTrigger>
-                        {categories.map((category) => (
+                        {categories.map((category: any) => (
                             <TabsTrigger key={category.categoryId} value={category.categoryId.toString()}>
                                 {category.categoryName}
                             </TabsTrigger>

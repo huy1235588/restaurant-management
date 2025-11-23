@@ -17,7 +17,7 @@ import { MenuItemSelector } from '../components/MenuItemSelector';
 import { ShoppingCart } from '../components/ShoppingCart';
 import { OrderSummaryCard } from '../components/OrderSummaryCard';
 import { useCreateOrder } from '../hooks';
-import { CreateOrderFormData, ShoppingCartItem } from '../types';
+import { CreateOrderFormData, ShoppingCartItem, CreateOrderDto, OrderItem } from '../types';
 import {
     step1TableSchema,
     step2CustomerSchema,
@@ -45,6 +45,7 @@ export function CreateOrderView() {
             customerName: '',
             customerPhone: '',
             partySize: 1,
+            reservationId: undefined,
             specialRequests: '',
         },
     });
@@ -141,16 +142,17 @@ export function CreateOrderView() {
         if (!selectedTableId || cartItems.length === 0) return;
 
         const customerInfo = customerForm.getValues();
-        const orderData: CreateOrderFormData = {
+        const orderData: CreateOrderDto = {
             tableId: selectedTableId,
             items: cartItems.map((item) => ({
-                menuItemId: item.menuItemId,
+                itemId: item.menuItemId,
                 quantity: item.quantity,
-                specialRequests: item.specialRequests,
+                specialRequest: item.specialRequests,
             })),
             customerName: customerInfo.customerName || undefined,
             customerPhone: customerInfo.customerPhone || undefined,
-            specialRequests: customerInfo.specialRequests || undefined,
+            partySize: customerInfo.partySize,
+            notes: customerInfo.specialRequests || undefined,
         };
 
         await createOrderMutation.mutateAsync(orderData);
@@ -159,15 +161,36 @@ export function CreateOrderView() {
         // Navigation handled by useCreateOrder hook
     };
 
-    const financials = calculateOrderFinancials(
-        cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-    );
+    // Convert cart items to OrderItem format for financial calculations
+    const tempOrderItems: OrderItem[] = cartItems.map((item, index) => ({
+        orderItemId: index,
+        orderId: 0,
+        itemId: item.menuItemId,
+        menuItem: {
+            itemId: item.menuItemId,
+            itemName: item.name,
+            price: item.price,
+            categoryId: 0,
+            description: null,
+            imageUrl: null,
+            isAvailable: true,
+        },
+        quantity: item.quantity,
+        unitPrice: item.price,
+        totalPrice: item.price * item.quantity,
+        specialRequest: item.specialRequests || null,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+    }));
+
+    const financials = calculateOrderFinancials(tempOrderItems);
 
     const steps = [
-        { number: 1, title: 'Chọn bàn', completed: currentStep > 1 },
-        { number: 2, title: 'Thông tin khách', completed: currentStep > 2 },
-        { number: 3, title: 'Chọn món', completed: currentStep > 3 },
-        { number: 4, title: 'Xác nhận', completed: false },
+        { id: 1, name: 'Chọn bàn' },
+        { id: 2, name: 'Thông tin khách' },
+        { id: 3, name: 'Chọn món' },
+        { id: 4, name: 'Xác nhận' },
     ];
 
     return (

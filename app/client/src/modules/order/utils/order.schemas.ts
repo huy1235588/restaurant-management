@@ -61,6 +61,7 @@ export const step2CustomerSchema = z.object({
         .or(z.literal('')),
     partySize: z.number().min(1, 'Party size must be at least 1'),
     reservationId: z.number().positive().optional(),
+    specialRequests: z.string().max(1000).optional(),
 });
 
 // Step 3: Menu items schema
