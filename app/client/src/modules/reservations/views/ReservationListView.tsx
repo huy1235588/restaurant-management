@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useReservations } from '../hooks/useReservations';
 import { ReservationList, ReservationFilters } from '../components';
 import {
-    CreateReservationDialog,
     ConfirmReservationDialog,
     CancelReservationDialog,
     CheckInDialog,
@@ -17,30 +16,29 @@ import { useRouter, useSearchParams } from 'next/navigation';
 export function ReservationListView() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    
+
     // Initialize filters from URL
     const [filters, setFilters] = useState<FilterType>(() => {
         const params: FilterType = {
             page: Number(searchParams.get('page')) || 1,
             limit: Number(searchParams.get('limit')) || 12,
         };
-        
+
         const status = searchParams.get('status');
         if (status) params.status = status as any;
-        
+
         const date = searchParams.get('date');
         if (date) params.date = date;
-        
+
         const search = searchParams.get('search');
         if (search) params.search = search;
-        
+
         return params;
     });
 
     const { reservations, pagination, loading, refetch } = useReservations(filters);
 
     // Dialog states
-    const [showCreateDialog, setShowCreateDialog] = useState(false);
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [showCancelDialog, setShowCancelDialog] = useState(false);
     const [showCheckInDialog, setShowCheckInDialog] = useState(false);
@@ -51,26 +49,26 @@ export function ReservationListView() {
     // Update URL when filters change
     useEffect(() => {
         const params = new URLSearchParams();
-        
+
         if (filters.page && filters.page !== 1) {
             params.set('page', filters.page.toString());
         }
-        
+
         if (filters.status) {
             params.set('status', filters.status);
         }
-        
+
         if (filters.date) {
             params.set('date', filters.date);
         }
-        
+
         if (filters.search) {
             params.set('search', filters.search);
         }
-        
+
         const queryString = params.toString();
         const newUrl = queryString ? `/reservations?${queryString}` : '/reservations';
-        
+
         router.replace(newUrl, { scroll: false });
     }, [filters, router]);
 
@@ -146,7 +144,7 @@ export function ReservationListView() {
                     </div>
 
                     <Button
-                        onClick={() => setShowCreateDialog(true)}
+                        onClick={() => router.push('/reservations/create')}
                         size="lg"
                         className="bg-linear-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 hover:from-blue-700 hover:to-purple-700 dark:hover:from-blue-600 dark:hover:to-purple-600 shadow-xl shadow-blue-500/30 dark:shadow-blue-400/20 hover:shadow-2xl hover:shadow-blue-500/40 dark:hover:shadow-blue-400/30 transition-all duration-300 gap-2 text-base px-6 py-6"
                     >
@@ -264,11 +262,6 @@ export function ReservationListView() {
             )}
 
             {/* Dialogs */}
-            <CreateReservationDialog
-                open={showCreateDialog}
-                onClose={() => setShowCreateDialog(false)}
-                onSuccess={handleSuccess}
-            />
             <ConfirmReservationDialog
                 open={showConfirmDialog}
                 reservation={selectedReservation}
