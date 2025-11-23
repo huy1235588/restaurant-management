@@ -29,11 +29,11 @@ export function StepIndicator({ steps, currentStep, onStepClick }: StepIndicator
                                 className={cn(
                                     'flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-semibold transition-colors',
                                     currentStep === step.id &&
-                                        'border-primary bg-primary text-primary-foreground',
+                                    'border-primary bg-primary text-primary-foreground',
                                     currentStep > step.id &&
-                                        'border-primary bg-primary text-primary-foreground',
+                                    'border-primary bg-primary text-primary-foreground',
                                     currentStep < step.id &&
-                                        'border-muted bg-background text-muted-foreground',
+                                    'border-muted bg-background text-muted-foreground',
                                     onStepClick && 'cursor-pointer hover:border-primary/50'
                                 )}
                             >

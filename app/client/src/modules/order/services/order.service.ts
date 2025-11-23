@@ -1,4 +1,4 @@
-import axiosInstance from '@/lib/axios';
+import axiosInstance from "@/lib/axios";
 import {
     Order,
     CreateOrderDto,
@@ -9,13 +9,13 @@ import {
     PaginatedOrders,
     ApiResponse,
     OrderFilterOptions,
-} from '../types';
+} from "../types";
 
 export const orderApi = {
     // Get all orders with pagination and filters
     getAll: async (params?: OrderFilterOptions): Promise<PaginatedOrders> => {
         const response = await axiosInstance.get<ApiResponse<PaginatedOrders>>(
-            '/orders',
+            "/orders",
             { params }
         );
         return response.data.data;
@@ -23,10 +23,9 @@ export const orderApi = {
 
     // Get orders count with filters
     getCount: async (params?: Partial<OrderFilterOptions>): Promise<number> => {
-        const response = await axiosInstance.get<ApiResponse<{ count: number }>>(
-            '/orders/count',
-            { params }
-        );
+        const response = await axiosInstance.get<
+            ApiResponse<{ count: number }>
+        >("/orders/count", { params });
         return response.data.data.count;
     },
 
@@ -41,7 +40,7 @@ export const orderApi = {
     // Create new order
     create: async (data: CreateOrderDto): Promise<Order> => {
         const response = await axiosInstance.post<ApiResponse<Order>>(
-            '/orders',
+            "/orders",
             data
         );
         return response.data.data;

@@ -97,7 +97,7 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
     }
 
     const currentFinancials = calculateOrderFinancials(order.orderItems || []);
-    
+
     // Convert cart items to OrderItem format
     const tempNewItems: OrderItem[] = cartItems.map((item, index) => ({
         orderItemId: -(index + 1), // Negative IDs for temp items
@@ -120,12 +120,12 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
     }));
-    
+
     const newItemsSubtotal = tempNewItems.reduce(
         (sum: number, item: any) => sum + item.totalPrice,
         0
     );
-    
+
     const newFinancials = calculateOrderFinancials([
         ...(order.orderItems || []),
         ...tempNewItems,

@@ -1,7 +1,7 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { orderApi } from '../services/order.service';
-import { orderKeys } from './useOrders';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { orderApi } from "../services/order.service";
+import { orderKeys } from "./useOrders";
 
 /**
  * Hook to mark an order item as served
@@ -25,11 +25,11 @@ export const useMarkItemServed = () => {
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
 
             // Show success message
-            toast.success('Đánh dấu đã phục vụ thành công');
+            toast.success("Đánh dấu đã phục vụ thành công");
         },
         onError: (error: any) => {
             toast.error(
-                error.response?.data?.message || 'Đánh dấu đã phục vụ thất bại'
+                error.response?.data?.message || "Đánh dấu đã phục vụ thất bại"
             );
         },
     });

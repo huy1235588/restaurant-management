@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
-import { orderApi } from '../services/order.service';
-import { orderKeys } from './useOrders';
+import { useQuery } from "@tanstack/react-query";
+import { orderApi } from "../services/order.service";
+import { orderKeys } from "./useOrders";
 
 /**
  * Hook to fetch a single order by ID

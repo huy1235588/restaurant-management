@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
-import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { useEffect, useState } from "react";
+import { io, Socket } from "socket.io-client";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import {
     OrderCreatedEvent,
     OrderUpdatedEvent,
@@ -11,10 +11,11 @@ import {
     OrderItemCancelledEvent,
     OrderCancelledEvent,
     KitchenOrderReadyEvent,
-} from '../types';
-import { orderKeys } from './useOrders';
+} from "../types";
+import { orderKeys } from "./useOrders";
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001';
+const SOCKET_URL =
+    process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
 
 interface UseOrderSocketOptions {
     onOrderCreated?: (event: OrderCreatedEvent) => void;
@@ -46,30 +47,30 @@ export function useOrderSocket(options: UseOrderSocketOptions = {}) {
     useEffect(() => {
         // Initialize socket connection
         const newSocket = io(SOCKET_URL, {
-            transports: ['websocket', 'polling'],
+            transports: ["websocket", "polling"],
             reconnection: true,
             reconnectionDelay: 1000,
             reconnectionAttempts: 5,
         });
 
         // Connection event handlers
-        newSocket.on('connect', () => {
-            console.log('Order socket connected');
+        newSocket.on("connect", () => {
+            console.log("Order socket connected");
             setIsConnected(true);
         });
 
-        newSocket.on('disconnect', () => {
-            console.log('Order socket disconnected');
+        newSocket.on("disconnect", () => {
+            console.log("Order socket disconnected");
             setIsConnected(false);
         });
 
-        newSocket.on('connect_error', (error) => {
-            console.error('Order socket connection error:', error);
+        newSocket.on("connect_error", (error) => {
+            console.error("Order socket connection error:", error);
         });
 
         // Order event handlers
-        newSocket.on('order:created', (event: OrderCreatedEvent) => {
-            console.log('New order created:', event);
+        newSocket.on("order:created", (event: OrderCreatedEvent) => {
+            console.log("New order created:", event);
 
             // Invalidate and refetch orders list
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
@@ -91,8 +92,8 @@ export function useOrderSocket(options: UseOrderSocketOptions = {}) {
             }
         });
 
-        newSocket.on('order:updated', (event: OrderUpdatedEvent) => {
-            console.log('Order updated:', event);
+        newSocket.on("order:updated", (event: OrderUpdatedEvent) => {
+            console.log("Order updated:", event);
 
             // Invalidate queries
             queryClient.invalidateQueries({
@@ -106,8 +107,8 @@ export function useOrderSocket(options: UseOrderSocketOptions = {}) {
             }
         });
 
-        newSocket.on('order:status-changed', (event: OrderUpdatedEvent) => {
-            console.log('Order status changed:', event);
+        newSocket.on("order:status-changed", (event: OrderUpdatedEvent) => {
+            console.log("Order status changed:", event);
 
             // Invalidate queries
             queryClient.invalidateQueries({
@@ -128,8 +129,8 @@ export function useOrderSocket(options: UseOrderSocketOptions = {}) {
             }
         });
 
-        newSocket.on('order:items-added', (event: OrderItemsAddedEvent) => {
-            console.log('Items added to order:', event);
+        newSocket.on("order:items-added", (event: OrderItemsAddedEvent) => {
+            console.log("Items added to order:", event);
 
             // Invalidate queries
             queryClient.invalidateQueries({
@@ -150,28 +151,33 @@ export function useOrderSocket(options: UseOrderSocketOptions = {}) {
             }
         });
 
-        newSocket.on('order:item-cancelled', (event: OrderItemCancelledEvent) => {
-            console.log('Order item cancelled:', event);
+        newSocket.on(
+            "order:item-cancelled",
+            (event: OrderItemCancelledEvent) => {
+                console.log("Order item cancelled:", event);
 
-            // Invalidate queries
-            queryClient.invalidateQueries({
-                queryKey: orderKeys.detail(event.orderId),
-            });
-            queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+                // Invalidate queries
+                queryClient.invalidateQueries({
+                    queryKey: orderKeys.detail(event.orderId),
+                });
+                queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
 
-            // Show notification
-            if (enableNotifications) {
-                toast.warning(`Món trong đơn hàng #${event.orderNumber} đã bị hủy`);
+                // Show notification
+                if (enableNotifications) {
+                    toast.warning(
+                        `Món trong đơn hàng #${event.orderNumber} đã bị hủy`
+                    );
+                }
+
+                // Custom callback
+                if (onItemCancelled) {
+                    onItemCancelled(event);
+                }
             }
+        );
 
-            // Custom callback
-            if (onItemCancelled) {
-                onItemCancelled(event);
-            }
-        });
-
-        newSocket.on('order:cancelled', (event: OrderCancelledEvent) => {
-            console.log('Order cancelled:', event);
+        newSocket.on("order:cancelled", (event: OrderCancelledEvent) => {
+            console.log("Order cancelled:", event);
 
             // Invalidate queries
             queryClient.invalidateQueries({
@@ -191,8 +197,8 @@ export function useOrderSocket(options: UseOrderSocketOptions = {}) {
             }
         });
 
-        newSocket.on('kitchen:order-ready', (event: KitchenOrderReadyEvent) => {
-            console.log('Kitchen order ready:', event);
+        newSocket.on("kitchen:order-ready", (event: KitchenOrderReadyEvent) => {
+            console.log("Kitchen order ready:", event);
 
             // Invalidate queries
             queryClient.invalidateQueries({
@@ -248,12 +254,12 @@ export function useOrderSocket(options: UseOrderSocketOptions = {}) {
 // Helper function to play notification sound
 function playNotificationSound() {
     try {
-        const audio = new Audio('/sounds/notification.mp3');
+        const audio = new Audio("/sounds/notification.mp3");
         audio.volume = 0.5;
         audio.play().catch((error) => {
-            console.warn('Failed to play notification sound:', error);
+            console.warn("Failed to play notification sound:", error);
         });
     } catch (error) {
-        console.warn('Notification sound not available:', error);
+        console.warn("Notification sound not available:", error);
     }
 }

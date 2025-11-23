@@ -1,18 +1,18 @@
 // Order status enum
 export type OrderStatus =
-    | 'pending' // Just created, not sent to kitchen
-    | 'confirmed' // Sent to kitchen, awaiting preparation
-    | 'ready' // All items ready, waiting for pickup
-    | 'serving' // Delivered to table, customer eating
-    | 'completed' // Finished and paid
-    | 'cancelled'; // Cancelled by waiter or kitchen
+    | "pending" // Just created, not sent to kitchen
+    | "confirmed" // Sent to kitchen, awaiting preparation
+    | "ready" // All items ready, waiting for pickup
+    | "serving" // Delivered to table, customer eating
+    | "completed" // Finished and paid
+    | "cancelled"; // Cancelled by waiter or kitchen
 
 // Order item status enum
 export type OrderItemStatus =
-    | 'pending' // Not started
-    | 'ready' // Finished
-    | 'served' // Delivered to customer
-    | 'cancelled'; // Cancelled
+    | "pending" // Not started
+    | "ready" // Finished
+    | "served" // Delivered to customer
+    | "cancelled"; // Cancelled
 
 // Menu Item interface (minimal - full version in menu module)
 export interface MenuItem {
@@ -139,8 +139,8 @@ export interface OrderFilterOptions {
     startDate?: string;
     endDate?: string;
     search?: string; // Search by order number, customer name, phone
-    sortBy?: 'orderTime' | 'createdAt' | 'totalAmount' | 'status';
-    sortOrder?: 'asc' | 'desc';
+    sortBy?: "orderTime" | "createdAt" | "totalAmount" | "status";
+    sortOrder?: "asc" | "desc";
 }
 
 export interface PaginationInfo {
@@ -212,16 +212,16 @@ export interface ShoppingCartItem {
 export interface CreateOrderFormData {
     // Step 1: Table
     tableId?: number;
-    
+
     // Step 2: Customer
     customerName?: string;
     customerPhone?: string;
     partySize: number;
     reservationId?: number;
-    
+
     // Step 3: Menu Items
     items: ShoppingCartItem[];
-    
+
     // Step 4: Review
     notes?: string;
 }
