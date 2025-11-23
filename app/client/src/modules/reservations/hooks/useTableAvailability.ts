@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { reservationApi } from '../services/reservation.service';
-import { CheckAvailabilityDto } from '../types';
+import { useState, useEffect } from "react";
+import { reservationApi } from "../services/reservation.service";
+import { CheckAvailabilityDto } from "../types";
 
 // Hook to check table availability
 export function useTableAvailability(params: CheckAvailabilityDto | null) {
@@ -21,7 +21,9 @@ export function useTableAvailability(params: CheckAvailabilityDto | null) {
             const data = await reservationApi.checkAvailability(params);
             setTables(data);
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Failed to check availability');
+            setError(
+                err.response?.data?.message || "Failed to check availability"
+            );
             setTables([]);
         } finally {
             setLoading(false);
@@ -31,7 +33,13 @@ export function useTableAvailability(params: CheckAvailabilityDto | null) {
     useEffect(() => {
         checkAvailability();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [params?.date, params?.partySize, params?.duration, params?.floor, params?.section]);
+    }, [
+        params?.date,
+        params?.partySize,
+        params?.duration,
+        params?.floor,
+        params?.section,
+    ]);
 
     return { tables, loading, error, refetch: checkAvailability };
 }
