@@ -3,9 +3,16 @@ import { BillRepository, FindOptions } from './bill.repository';
 import { PaymentRepository } from './payment.repository';
 import { PrismaService } from '@/database/prisma.service';
 import { CreateBillDto, ApplyDiscountDto, ProcessPaymentDto } from './dto';
-import { PaymentStatus, OrderStatus, TableStatus } from '@prisma/generated/client';
+import {
+    PaymentStatus,
+    OrderStatus,
+    TableStatus,
+} from '@prisma/generated/client';
 import { ConfigService } from '@nestjs/config';
-import { BILLING_CONSTANTS, BILLING_MESSAGES } from './constants/billing.constants';
+import {
+    BILLING_CONSTANTS,
+    BILLING_MESSAGES,
+} from './constants/billing.constants';
 import {
     BillNotFoundException,
     BillAlreadyExistsException,
@@ -81,16 +88,24 @@ export class BillingService {
         });
 
         if (!order) {
-            this.logger.warn(`Order not found for bill creation: ${data.orderId}`);
+            this.logger.warn(
+                `Order not found for bill creation: ${data.orderId}`,
+            );
             throw new NotFoundException(BILLING_MESSAGES.ERROR.ORDER_NOT_FOUND);
         }
 
         // Check if order is ready for billing
-        if (order.status !== OrderStatus.ready && order.status !== OrderStatus.serving) {
+        if (
+            order.status !== OrderStatus.ready &&
+            order.status !== OrderStatus.serving
+        ) {
             this.logger.warn(
                 `Order ${data.orderId} not ready for billing. Status: ${order.status}`,
             );
-            throw new OrderNotReadyForBillingException(data.orderId, order.status);
+            throw new OrderNotReadyForBillingException(
+                data.orderId,
+                order.status,
+            );
         }
 
         // Check if bill already exists
@@ -139,10 +154,10 @@ export class BillingService {
                         itemId: orderItem.itemId,
                         itemName: orderItem.menuItem.itemName,
                         quantity: orderItem.quantity,
-                        unitPrice: orderItem.unitPrice,
-                        subtotal: orderItem.totalPrice,
+                        unitPrice: Number(orderItem.unitPrice),
+                        subtotal: Number(orderItem.totalPrice),
                         discount: 0,
-                        total: orderItem.totalPrice,
+                        total: Number(orderItem.totalPrice),
                     },
                 });
             }
@@ -180,8 +195,14 @@ export class BillingService {
         // Calculate percentage discount if provided
         if (discountData.percentage) {
             // Validate percentage
-            if (!BillingHelper.isValidDiscountPercentage(discountData.percentage)) {
-                throw new InvalidDiscountPercentageException(discountData.percentage);
+            if (
+                !BillingHelper.isValidDiscountPercentage(
+                    discountData.percentage,
+                )
+            ) {
+                throw new InvalidDiscountPercentageException(
+                    discountData.percentage,
+                );
             }
 
             discountAmount = BillingHelper.calculateDiscountAmount(
@@ -191,9 +212,17 @@ export class BillingService {
         }
 
         // Validate discount amount
-        if (!BillingHelper.isValidDiscountAmount(discountAmount, Number(bill.subtotal))) {
+        if (
+            !BillingHelper.isValidDiscountAmount(
+                discountAmount,
+                Number(bill.subtotal),
+            )
+        ) {
             if (discountAmount < 0) {
-                throw new InvalidDiscountAmountException(discountAmount, Number(bill.subtotal));
+                throw new InvalidDiscountAmountException(
+                    discountAmount,
+                    Number(bill.subtotal),
+                );
             }
             if (discountAmount > Number(bill.subtotal)) {
                 throw new DiscountExceedsSubtotalException(
@@ -252,7 +281,7 @@ export class BillingService {
         // Check if bill can accept payment
         if (!BillingHelper.isPending(bill.paymentStatus)) {
             this.logger.warn(
-                `Cannot process payment for bill ${billId} with status ${bill.paymentStatus}`,
+                `Cannot process payment for bill ${billId} with status ${bill.paymentStatus} and staff ${staffId}`,
             );
             throw new BillNotPendingException(billId, bill.paymentStatus);
         }
@@ -266,7 +295,12 @@ export class BillingService {
         }
 
         // Validate payment amount
-        if (!BillingHelper.isValidPaymentAmount(paymentData.amount, Number(bill.totalAmount))) {
+        if (
+            !BillingHelper.isValidPaymentAmount(
+                paymentData.amount,
+                Number(bill.totalAmount),
+            )
+        ) {
             throw new InvalidPaymentAmountException(
                 paymentData.amount,
                 Number(bill.totalAmount),

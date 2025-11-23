@@ -59,6 +59,7 @@ kitchen/
 ### 3. Real-time Updates (WebSocket)
 
 Events emitted to clients:
+
 - `kitchen:new_order` - New order in kitchen
 - `kitchen:order_update` - Order status updated
 - `kitchen:order_ready` - Order ready for pickup
@@ -151,19 +152,19 @@ KitchenHelper.calculateAveragePrepTime(prepTimes[])
 ### Performance Helpers
 
 ```typescript
-KitchenHelper.isSlowPreparation(prepTimeMinutes)
-KitchenHelper.isFastPreparation(prepTimeMinutes)
-KitchenHelper.getPrepTimePerformance(actualTime, estimatedTime)
+KitchenHelper.isSlowPreparation(prepTimeMinutes);
+KitchenHelper.isFastPreparation(prepTimeMinutes);
+KitchenHelper.getPrepTimePerformance(actualTime, estimatedTime);
 // Returns: 'fast' | 'on-time' | 'slow'
 ```
 
 ### Priority Helpers
 
 ```typescript
-KitchenHelper.isValidPriority(priority)
-KitchenHelper.getPriorityWeight(priority)
-KitchenHelper.compareOrderPriority(orderA, orderB)
-KitchenHelper.sortOrdersByPriority(orders)
+KitchenHelper.isValidPriority(priority);
+KitchenHelper.getPriorityWeight(priority);
+KitchenHelper.compareOrderPriority(orderA, orderB);
+KitchenHelper.sortOrdersByPriority(orders);
 ```
 
 ### Status Helpers
@@ -179,17 +180,17 @@ KitchenHelper.isFinalState(status)
 ### Queue Management Helpers
 
 ```typescript
-KitchenHelper.isQueueNearCapacity(currentCount)
-KitchenHelper.isQueueFull(currentCount)
-KitchenHelper.filterActiveOrders(orders)
-KitchenHelper.groupOrdersByStatus(orders)
+KitchenHelper.isQueueNearCapacity(currentCount);
+KitchenHelper.isQueueFull(currentCount);
+KitchenHelper.filterActiveOrders(orders);
+KitchenHelper.groupOrdersByStatus(orders);
 ```
 
 ### Display Helpers
 
 ```typescript
-KitchenHelper.getStatusDisplayName(status)
-KitchenHelper.getPriorityDisplayName(priority)
+KitchenHelper.getStatusDisplayName(status);
+KitchenHelper.getPriorityDisplayName(priority);
 ```
 
 ## Constants
@@ -198,16 +199,16 @@ KitchenHelper.getPriorityDisplayName(priority)
 
 ```typescript
 KITCHEN_CONSTANTS = {
-    DEFAULT_PREP_TIME: 20,              // 20 minutes
+    DEFAULT_PREP_TIME: 20, // 20 minutes
     MIN_PREP_TIME: 5,
     MAX_PREP_TIME: 120,
     PRIORITIES: ['low', 'normal', 'high', 'urgent'],
     DEFAULT_PRIORITY: 'normal',
     AUTO_CANCEL_TIMEOUT_MINUTES: 60,
     MAX_CONCURRENT_ORDERS: 20,
-    SLOW_PREP_TIME_THRESHOLD: 30,       // Flag if > 30 min
-    FAST_PREP_TIME_THRESHOLD: 10,       // Flag if < 10 min
-}
+    SLOW_PREP_TIME_THRESHOLD: 30, // Flag if > 30 min
+    FAST_PREP_TIME_THRESHOLD: 10, // Flag if < 10 min
+};
 ```
 
 ### Status Flow
@@ -219,17 +220,17 @@ KITCHEN_STATUS_FLOW = {
     ready: ['completed'],
     completed: [],
     cancelled: [],
-}
+};
 ```
 
 ### Messages
 
 ```typescript
-KITCHEN_MESSAGES.SUCCESS.ORDER_CREATED
-KITCHEN_MESSAGES.SUCCESS.ORDER_READY
-KITCHEN_MESSAGES.ERROR.ORDER_NOT_FOUND
-KITCHEN_MESSAGES.ERROR.CANNOT_COMPLETE
-KITCHEN_MESSAGES.WARNING.SLOW_PREPARATION
+KITCHEN_MESSAGES.SUCCESS.ORDER_CREATED;
+KITCHEN_MESSAGES.SUCCESS.ORDER_READY;
+KITCHEN_MESSAGES.ERROR.ORDER_NOT_FOUND;
+KITCHEN_MESSAGES.ERROR.CANNOT_COMPLETE;
+KITCHEN_MESSAGES.WARNING.SLOW_PREPARATION;
 ```
 
 ## Usage Examples
@@ -321,21 +322,21 @@ socket.on('kitchen:order_completed', (data) => {
 
 ## Status Descriptions
 
-| Status | Description | Next Actions |
-|--------|-------------|--------------|
-| `pending` | Waiting for chef | Start Preparing or Cancel |
-| `ready` | Food is ready | Complete (pickup) |
-| `completed` | Picked up by waiter | Final state |
-| `cancelled` | Order cancelled | Final state |
+| Status      | Description         | Next Actions              |
+| ----------- | ------------------- | ------------------------- |
+| `pending`   | Waiting for chef    | Start Preparing or Cancel |
+| `ready`     | Food is ready       | Complete (pickup)         |
+| `completed` | Picked up by waiter | Final state               |
+| `cancelled` | Order cancelled     | Final state               |
 
 ## Priority Descriptions
 
-| Priority | Weight | Use Case |
-|----------|--------|----------|
-| `urgent` | 4 | VIP orders, complaints |
-| `high` | 3 | Large parties, time-sensitive |
-| `normal` | 2 | Standard orders |
-| `low` | 1 | Pre-orders, non-urgent |
+| Priority | Weight | Use Case                      |
+| -------- | ------ | ----------------------------- |
+| `urgent` | 4      | VIP orders, complaints        |
+| `high`   | 3      | Large parties, time-sensitive |
+| `normal` | 2      | Standard orders               |
+| `low`    | 1      | Pre-orders, non-urgent        |
 
 ## Validation Rules
 
@@ -402,13 +403,11 @@ try {
 ```typescript
 // Get prep times for analysis
 const prepTimes = kitchenOrders
-    .filter(o => o.prepTimeActual)
-    .map(o => o.prepTimeActual);
+    .filter((o) => o.prepTimeActual)
+    .map((o) => o.prepTimeActual);
 
 const avgPrepTime = KitchenHelper.calculateAveragePrepTime(prepTimes);
-const slowOrders = prepTimes.filter(t => 
-    KitchenHelper.isSlowPreparation(t)
-);
+const slowOrders = prepTimes.filter((t) => KitchenHelper.isSlowPreparation(t));
 ```
 
 ## Performance Considerations

@@ -1,4 +1,7 @@
-import { BILLING_CONSTANTS, PaymentMethod } from '../constants/billing.constants';
+import {
+    BILLING_CONSTANTS,
+    PaymentMethod,
+} from '../constants/billing.constants';
 import { PaymentStatus } from '@prisma/generated/client';
 
 /**
@@ -16,7 +19,10 @@ export class BillingHelper {
     /**
      * Calculate service charge from subtotal
      */
-    static calculateServiceCharge(subtotal: number, serviceRate: number): number {
+    static calculateServiceCharge(
+        subtotal: number,
+        serviceRate: number,
+    ): number {
         return Number((subtotal * serviceRate).toFixed(2));
     }
 
@@ -29,13 +35,18 @@ export class BillingHelper {
         serviceCharge: number,
         discountAmount: number = 0,
     ): number {
-        return Number((subtotal + taxAmount + serviceCharge - discountAmount).toFixed(2));
+        return Number(
+            (subtotal + taxAmount + serviceCharge - discountAmount).toFixed(2),
+        );
     }
 
     /**
      * Calculate discount percentage from amount
      */
-    static calculateDiscountPercentage(discountAmount: number, subtotal: number): number {
+    static calculateDiscountPercentage(
+        discountAmount: number,
+        subtotal: number,
+    ): number {
         if (subtotal === 0) return 0;
         return Number(((discountAmount / subtotal) * 100).toFixed(2));
     }
@@ -43,7 +54,10 @@ export class BillingHelper {
     /**
      * Calculate discount amount from percentage
      */
-    static calculateDiscountAmount(subtotal: number, percentage: number): number {
+    static calculateDiscountAmount(
+        subtotal: number,
+        percentage: number,
+    ): number {
         return Number((subtotal * (percentage / 100)).toFixed(2));
     }
 
@@ -58,7 +72,10 @@ export class BillingHelper {
     /**
      * Validate discount amount
      */
-    static isValidDiscountAmount(discountAmount: number, subtotal: number): boolean {
+    static isValidDiscountAmount(
+        discountAmount: number,
+        subtotal: number,
+    ): boolean {
         return discountAmount >= 0 && discountAmount <= subtotal;
     }
 
@@ -66,21 +83,28 @@ export class BillingHelper {
      * Validate discount percentage
      */
     static isValidDiscountPercentage(percentage: number): boolean {
-        return percentage >= 0 && percentage <= BILLING_CONSTANTS.MAX_DISCOUNT_PERCENTAGE;
+        return (
+            percentage >= 0 &&
+            percentage <= BILLING_CONSTANTS.MAX_DISCOUNT_PERCENTAGE
+        );
     }
 
     /**
      * Check if discount requires manager approval
      */
     static requiresManagerApproval(discountPercentage: number): boolean {
-        return discountPercentage > BILLING_CONSTANTS.MANAGER_APPROVAL_THRESHOLD;
+        return (
+            discountPercentage > BILLING_CONSTANTS.MANAGER_APPROVAL_THRESHOLD
+        );
     }
 
     /**
      * Validate payment method
      */
     static isValidPaymentMethod(method: string): method is PaymentMethod {
-        return BILLING_CONSTANTS.PAYMENT_METHODS.includes(method as PaymentMethod);
+        return BILLING_CONSTANTS.PAYMENT_METHODS.includes(
+            method as PaymentMethod,
+        );
     }
 
     /**
@@ -131,14 +155,20 @@ export class BillingHelper {
     /**
      * Validate payment amount matches total
      */
-    static isValidPaymentAmount(paymentAmount: number, totalAmount: number): boolean {
+    static isValidPaymentAmount(
+        paymentAmount: number,
+        totalAmount: number,
+    ): boolean {
         return Math.abs(paymentAmount - totalAmount) < 0.01; // Allow for floating point precision
     }
 
     /**
      * Check if payment is sufficient
      */
-    static isSufficientPayment(paymentAmount: number, totalAmount: number): boolean {
+    static isSufficientPayment(
+        paymentAmount: number,
+        totalAmount: number,
+    ): boolean {
         return paymentAmount >= totalAmount;
     }
 
@@ -154,7 +184,10 @@ export class BillingHelper {
         const { subtotal, taxRate, serviceRate, discountAmount = 0 } = params;
 
         const taxAmount = this.calculateTaxAmount(subtotal, taxRate);
-        const serviceCharge = this.calculateServiceCharge(subtotal, serviceRate);
+        const serviceCharge = this.calculateServiceCharge(
+            subtotal,
+            serviceRate,
+        );
         const totalAmount = this.calculateTotalAmount(
             subtotal,
             taxAmount,

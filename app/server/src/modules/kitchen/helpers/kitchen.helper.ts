@@ -40,7 +40,9 @@ export class KitchenHelper {
         estimatedPrepTime: number = KITCHEN_CONSTANTS.DEFAULT_PREP_TIME,
     ): Date {
         const completionTime = new Date(startedAt);
-        completionTime.setMinutes(completionTime.getMinutes() + estimatedPrepTime);
+        completionTime.setMinutes(
+            completionTime.getMinutes() + estimatedPrepTime,
+        );
         return completionTime;
     }
 
@@ -66,7 +68,9 @@ export class KitchenHelper {
      * Validate priority level
      */
     static isValidPriority(priority: string): priority is KitchenPriority {
-        return KITCHEN_CONSTANTS.PRIORITIES.includes(priority as KitchenPriority);
+        return KITCHEN_CONSTANTS.PRIORITIES.includes(
+            priority as KitchenPriority,
+        );
     }
 
     /**
@@ -89,7 +93,9 @@ export class KitchenHelper {
         a: { priority: KitchenPriority; createdAt: Date },
         b: { priority: KitchenPriority; createdAt: Date },
     ): number {
-        const priorityDiff = this.getPriorityWeight(b.priority) - this.getPriorityWeight(a.priority);
+        const priorityDiff =
+            this.getPriorityWeight(b.priority) -
+            this.getPriorityWeight(a.priority);
         if (priorityDiff !== 0) return priorityDiff;
 
         // Same priority, earlier orders first
@@ -103,7 +109,9 @@ export class KitchenHelper {
         currentStatus: KitchenOrderStatus,
         newStatus: KitchenOrderStatus,
     ): boolean {
-        const allowedTransitions = KITCHEN_STATUS_FLOW[currentStatus] as readonly KitchenOrderStatus[] | undefined;
+        const allowedTransitions = KITCHEN_STATUS_FLOW[currentStatus] as
+            | readonly KitchenOrderStatus[]
+            | undefined;
         return allowedTransitions?.includes(newStatus) ?? false;
     }
 
@@ -111,28 +119,40 @@ export class KitchenHelper {
      * Check if order can be modified
      */
     static canModifyOrder(status: KitchenOrderStatus): boolean {
-        return status !== KitchenOrderStatus.completed && status !== KitchenOrderStatus.cancelled;
+        return (
+            status !== KitchenOrderStatus.completed &&
+            status !== KitchenOrderStatus.cancelled
+        );
     }
 
     /**
      * Check if order can be cancelled
      */
     static canCancelOrder(status: KitchenOrderStatus): boolean {
-        return status !== KitchenOrderStatus.completed && status !== KitchenOrderStatus.cancelled;
+        return (
+            status !== KitchenOrderStatus.completed &&
+            status !== KitchenOrderStatus.cancelled
+        );
     }
 
     /**
      * Check if order is active
      */
     static isActiveOrder(status: KitchenOrderStatus): boolean {
-        return status === KitchenOrderStatus.pending || status === KitchenOrderStatus.ready;
+        return (
+            status === KitchenOrderStatus.pending ||
+            status === KitchenOrderStatus.ready
+        );
     }
 
     /**
      * Check if order is in final state
      */
     static isFinalState(status: KitchenOrderStatus): boolean {
-        return status === KitchenOrderStatus.completed || status === KitchenOrderStatus.cancelled;
+        return (
+            status === KitchenOrderStatus.completed ||
+            status === KitchenOrderStatus.cancelled
+        );
     }
 
     /**
@@ -187,7 +207,10 @@ export class KitchenHelper {
     /**
      * Get prep time performance indicator
      */
-    static getPrepTimePerformance(actualTime: number, estimatedTime: number): 'fast' | 'on-time' | 'slow' {
+    static getPrepTimePerformance(
+        actualTime: number,
+        estimatedTime: number,
+    ): 'fast' | 'on-time' | 'slow' {
         if (actualTime <= estimatedTime * 0.8) return 'fast';
         if (actualTime <= estimatedTime * 1.2) return 'on-time';
         return 'slow';
@@ -213,13 +236,17 @@ export class KitchenHelper {
     static sortOrdersByPriority<
         T extends { priority: KitchenPriority; createdAt: Date },
     >(orders: T[]): T[] {
-        return [...orders].sort((a, b) => KitchenHelper.compareOrderPriority(a, b));
+        return [...orders].sort((a, b) =>
+            KitchenHelper.compareOrderPriority(a, b),
+        );
     }
 
     /**
      * Filter active orders
      */
-    static filterActiveOrders<T extends { status: KitchenOrderStatus }>(orders: T[]): T[] {
+    static filterActiveOrders<T extends { status: KitchenOrderStatus }>(
+        orders: T[],
+    ): T[] {
         return orders.filter((order) => this.isActiveOrder(order.status));
     }
 

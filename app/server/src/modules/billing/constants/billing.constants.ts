@@ -57,18 +57,21 @@ export const BILLING_MESSAGES = {
         BILL_NOT_FOUND: 'Bill not found',
         BILL_ALREADY_EXISTS: 'Bill already exists for this order',
         BILL_NOT_PENDING: 'Bill is not pending payment',
-        CANNOT_VOID_PAID_BILL: 'Cannot void a paid bill without proper authorization',
+        CANNOT_VOID_PAID_BILL:
+            'Cannot void a paid bill without proper authorization',
 
         // Order validation
         ORDER_NOT_FOUND: 'Order not found',
-        ORDER_NOT_READY: 'Order must be ready or being served before creating bill',
+        ORDER_NOT_READY:
+            'Order must be ready or being served before creating bill',
         ORDER_ALREADY_HAS_BILL: 'Order already has an associated bill',
 
         // Discount errors
         INVALID_DISCOUNT_AMOUNT: 'Invalid discount amount',
         DISCOUNT_EXCEEDS_SUBTOTAL: 'Discount amount cannot exceed subtotal',
         DISCOUNT_NEGATIVE: 'Discount amount cannot be negative',
-        DISCOUNT_PERCENTAGE_INVALID: 'Discount percentage must be between 0 and 100',
+        DISCOUNT_PERCENTAGE_INVALID:
+            'Discount percentage must be between 0 and 100',
         REQUIRES_MANAGER_APPROVAL: 'This discount requires manager approval',
 
         // Payment errors
@@ -84,7 +87,8 @@ export const BILLING_MESSAGES = {
     },
     WARNING: {
         LARGE_DISCOUNT: 'Large discount amount detected',
-        MANAGER_APPROVAL_REQUIRED: 'Manager approval required for this discount',
+        MANAGER_APPROVAL_REQUIRED:
+            'Manager approval required for this discount',
     },
 } as const;
 

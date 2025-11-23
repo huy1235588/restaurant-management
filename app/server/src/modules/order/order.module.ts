@@ -12,11 +12,7 @@ import { WebSocketModule } from '@/shared/websocket';
 @Module({
     imports: [WebSocketModule],
     controllers: [OrderController],
-    providers: [
-        OrderService,
-        OrderRepository,
-        OrderGateway,
-    ],
+    providers: [OrderService, OrderRepository, OrderGateway],
     exports: [OrderService, OrderRepository],
 })
 export class OrderModule {}

@@ -48,39 +48,39 @@ export class OrderGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     @SubscribeMessage(SOCKET_EVENTS.JOIN_KITCHEN)
-    handleJoinKitchen(@ConnectedSocket() client: Socket) {
+    async handleJoinKitchen(@ConnectedSocket() client: Socket) {
         const room = SOCKET_ROOMS.KITCHEN;
-        client.join(room);
+        await client.join(room);
         this.logger.log(`Client ${client.id} joined ${room} room`);
         return { message: `Joined ${room} room successfully` };
     }
 
     @SubscribeMessage(SOCKET_EVENTS.LEAVE_KITCHEN)
-    handleLeaveKitchen(@ConnectedSocket() client: Socket) {
+    async handleLeaveKitchen(@ConnectedSocket() client: Socket) {
         const room = SOCKET_ROOMS.KITCHEN;
-        client.leave(room);
+        await client.leave(room);
         this.logger.log(`Client ${client.id} left ${room} room`);
         return { message: `Left ${room} room successfully` };
     }
 
     @SubscribeMessage(SOCKET_EVENTS.JOIN_WAITER)
-    handleJoinWaiter(
+    async handleJoinWaiter(
         @ConnectedSocket() client: Socket,
         @MessageBody() staffId: number,
     ) {
         const room = SOCKET_ROOMS.WAITER(staffId);
-        client.join(room);
+        await client.join(room);
         this.logger.log(`Client ${client.id} joined ${room} room`);
         return { message: `Joined ${room} room successfully` };
     }
 
     @SubscribeMessage(SOCKET_EVENTS.LEAVE_WAITER)
-    handleLeaveWaiter(
+    async handleLeaveWaiter(
         @ConnectedSocket() client: Socket,
         @MessageBody() staffId: number,
     ) {
         const room = SOCKET_ROOMS.WAITER(staffId);
-        client.leave(room);
+        await client.leave(room);
         this.logger.log(`Client ${client.id} left ${room} room`);
         return { message: `Left ${room} room successfully` };
     }
@@ -137,10 +137,7 @@ export class OrderGateway implements OnGatewayConnection, OnGatewayDisconnect {
     /**
      * Emit order item served event
      */
-    emitOrderItemServed(data: {
-        order: OrderEventData;
-        itemId: number;
-    }): void {
+    emitOrderItemServed(data: { order: OrderEventData; itemId: number }): void {
         this.socketEmitter.emitOrderItemServed(data);
     }
 }

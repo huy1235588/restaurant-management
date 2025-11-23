@@ -1,9 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { KitchenRepository, KitchenOrderFilters } from './kitchen.repository';
 import { PrismaService } from '@/database/prisma.service';
 import { KitchenOrderStatus, OrderStatus } from '@prisma/generated/client';
 import { KitchenGateway } from './kitchen.gateway';
-import { KITCHEN_MESSAGES, KITCHEN_CONSTANTS } from './constants/kitchen.constants';
+import { KITCHEN_CONSTANTS } from './constants/kitchen.constants';
 import {
     KitchenOrderNotFoundException,
     KitchenOrderAlreadyExistsException,
@@ -62,7 +62,9 @@ export class KitchenService {
         });
 
         if (!order) {
-            this.logger.warn(`Order not found for kitchen order creation: ${orderId}`);
+            this.logger.warn(
+                `Order not found for kitchen order creation: ${orderId}`,
+            );
             throw new MainOrderNotFoundException(orderId);
         }
 
@@ -77,7 +79,9 @@ export class KitchenService {
         const existing = await this.kitchenRepository.findByOrderId(orderId);
 
         if (existing) {
-            this.logger.warn(`Kitchen order already exists for order ${orderId}`);
+            this.logger.warn(
+                `Kitchen order already exists for order ${orderId}`,
+            );
             throw new KitchenOrderAlreadyExistsException(orderId);
         }
 
@@ -163,7 +167,10 @@ export class KitchenService {
 
         const completedAt = new Date();
         const prepTimeActual = kitchenOrder.startedAt
-            ? KitchenHelper.calculatePrepTime(kitchenOrder.startedAt, completedAt)
+            ? KitchenHelper.calculatePrepTime(
+                  kitchenOrder.startedAt,
+                  completedAt,
+              )
             : null;
 
         const updated = await this.prisma.$transaction(async (tx) => {

@@ -62,7 +62,8 @@ export const KITCHEN_MESSAGES = {
 
         // Order validation
         MAIN_ORDER_NOT_FOUND: 'Main order not found',
-        ORDER_NOT_CONFIRMED: 'Order must be confirmed before sending to kitchen',
+        ORDER_NOT_CONFIRMED:
+            'Order must be confirmed before sending to kitchen',
         CANNOT_CANCEL_COMPLETED: 'Cannot cancel completed kitchen order',
         CANNOT_MODIFY_COMPLETED: 'Cannot modify completed kitchen order',
 

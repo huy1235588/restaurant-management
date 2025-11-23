@@ -47,6 +47,7 @@ billing/
 ### 1. Bill Creation
 
 Automatically creates bills from orders with:
+
 - Subtotal calculation from order items
 - Tax calculation (configurable rate)
 - Service charge calculation (configurable rate)
@@ -62,6 +63,7 @@ Automatically creates bills from orders with:
 ### 3. Payment Processing
 
 Supports multiple payment methods:
+
 - **Cash**: With change calculation
 - **Card**: Credit/debit card payments
 - **E-wallet**: Digital wallet payments
@@ -105,45 +107,50 @@ Supports multiple payment methods:
 ### Calculation Helpers
 
 ```typescript
-BillingHelper.calculateTaxAmount(subtotal, taxRate)
-BillingHelper.calculateServiceCharge(subtotal, serviceRate)
-BillingHelper.calculateTotalAmount(subtotal, tax, service, discount)
-BillingHelper.calculateDiscountPercentage(discountAmount, subtotal)
-BillingHelper.calculateDiscountAmount(subtotal, percentage)
-BillingHelper.calculateChange(paidAmount, totalAmount)
-BillingHelper.calculateBillSummary({ subtotal, taxRate, serviceRate, discountAmount })
+BillingHelper.calculateTaxAmount(subtotal, taxRate);
+BillingHelper.calculateServiceCharge(subtotal, serviceRate);
+BillingHelper.calculateTotalAmount(subtotal, tax, service, discount);
+BillingHelper.calculateDiscountPercentage(discountAmount, subtotal);
+BillingHelper.calculateDiscountAmount(subtotal, percentage);
+BillingHelper.calculateChange(paidAmount, totalAmount);
+BillingHelper.calculateBillSummary({
+    subtotal,
+    taxRate,
+    serviceRate,
+    discountAmount,
+});
 ```
 
 ### Validation Helpers
 
 ```typescript
-BillingHelper.isValidDiscountAmount(amount, subtotal)
-BillingHelper.isValidDiscountPercentage(percentage)
-BillingHelper.requiresManagerApproval(discountPercentage)
-BillingHelper.isValidPaymentMethod(method)
-BillingHelper.isValidPaymentAmount(paymentAmount, totalAmount)
-BillingHelper.isSufficientPayment(paymentAmount, totalAmount)
-BillingHelper.isValidTaxRate(rate)
-BillingHelper.isValidServiceRate(rate)
+BillingHelper.isValidDiscountAmount(amount, subtotal);
+BillingHelper.isValidDiscountPercentage(percentage);
+BillingHelper.requiresManagerApproval(discountPercentage);
+BillingHelper.isValidPaymentMethod(method);
+BillingHelper.isValidPaymentAmount(paymentAmount, totalAmount);
+BillingHelper.isSufficientPayment(paymentAmount, totalAmount);
+BillingHelper.isValidTaxRate(rate);
+BillingHelper.isValidServiceRate(rate);
 ```
 
 ### State Helpers
 
 ```typescript
-BillingHelper.canModifyBill(status)
-BillingHelper.canVoidBill(status)
-BillingHelper.isPaid(status)
-BillingHelper.isPending(status)
+BillingHelper.canModifyBill(status);
+BillingHelper.canVoidBill(status);
+BillingHelper.isPaid(status);
+BillingHelper.isPending(status);
 ```
 
 ### Formatting Helpers
 
 ```typescript
-BillingHelper.formatBillNumber(billNumber)
-BillingHelper.formatCurrency(amount, currency)
-BillingHelper.getPaymentMethodDisplayName(method)
-BillingHelper.getPaymentStatusDisplayName(status)
-BillingHelper.roundAmount(amount)
+BillingHelper.formatBillNumber(billNumber);
+BillingHelper.formatCurrency(amount, currency);
+BillingHelper.getPaymentMethodDisplayName(method);
+BillingHelper.getPaymentStatusDisplayName(status);
+BillingHelper.roundAmount(amount);
 ```
 
 ## Constants
@@ -152,23 +159,23 @@ BillingHelper.roundAmount(amount)
 
 ```typescript
 BILLING_CONSTANTS = {
-    DEFAULT_TAX_RATE: 0.1,              // 10%
-    DEFAULT_SERVICE_RATE: 0.05,         // 5%
+    DEFAULT_TAX_RATE: 0.1, // 10%
+    DEFAULT_SERVICE_RATE: 0.05, // 5%
     MAX_DISCOUNT_PERCENTAGE: 100,
-    MANAGER_APPROVAL_THRESHOLD: 10,     // 10%
+    MANAGER_APPROVAL_THRESHOLD: 10, // 10%
     PAYMENT_METHODS: ['cash', 'card', 'e-wallet', 'transfer'],
     // ... more constants
-}
+};
 ```
 
 ### Messages
 
 ```typescript
-BILLING_MESSAGES.SUCCESS.BILL_CREATED
-BILLING_MESSAGES.SUCCESS.PAYMENT_PROCESSED
-BILLING_MESSAGES.ERROR.BILL_NOT_FOUND
-BILLING_MESSAGES.ERROR.DISCOUNT_EXCEEDS_SUBTOTAL
-BILLING_MESSAGES.WARNING.LARGE_DISCOUNT
+BILLING_MESSAGES.SUCCESS.BILL_CREATED;
+BILLING_MESSAGES.SUCCESS.PAYMENT_PROCESSED;
+BILLING_MESSAGES.ERROR.BILL_NOT_FOUND;
+BILLING_MESSAGES.ERROR.DISCOUNT_EXCEEDS_SUBTOTAL;
+BILLING_MESSAGES.WARNING.LARGE_DISCOUNT;
 ```
 
 ## Usage Examples
@@ -191,7 +198,11 @@ const discountDto = {
     reason: 'VIP customer discount',
 };
 
-const updatedBill = await billingService.applyDiscount(billId, discountDto, userId);
+const updatedBill = await billingService.applyDiscount(
+    billId,
+    discountDto,
+    userId,
+);
 ```
 
 ### 3. Apply Amount Discount
@@ -202,7 +213,11 @@ const discountDto = {
     reason: 'Promotional discount',
 };
 
-const updatedBill = await billingService.applyDiscount(billId, discountDto, userId);
+const updatedBill = await billingService.applyDiscount(
+    billId,
+    discountDto,
+    userId,
+);
 ```
 
 ### 4. Process Cash Payment

@@ -24,8 +24,9 @@ export class KitchenGateway
 
     private logger: Logger = new Logger('KitchenGateway');
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     afterInit(_server: Server) {
-        this.logger.log('Kitchen WebSocket Gateway initialized');
+        this.logger.log(`Kitchen WebSocket Gateway initialized`);
     }
 
     handleConnection(client: Socket) {

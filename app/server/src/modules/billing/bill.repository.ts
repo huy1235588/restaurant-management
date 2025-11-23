@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/database/prisma.service';
-import { Prisma, Bill, PaymentStatus, PaymentMethod } from '@prisma/generated/client';
+import {
+    Prisma,
+    Bill,
+    PaymentStatus,
+    PaymentMethod,
+} from '@prisma/generated/client';
 
 export interface BillFilters {
     paymentStatus?: PaymentStatus;

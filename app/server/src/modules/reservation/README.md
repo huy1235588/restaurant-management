@@ -87,10 +87,9 @@ reservation/
 ### 3. Reservation Validation
 
 - **Time Validation**:
-  - Minimum 30 minutes in advance
-  - Maximum 90 days in advance
-  - Future date/time only
-  
+    - Minimum 30 minutes in advance
+    - Maximum 90 days in advance
+    - Future date/time only
 - **Party Size**: 1-20 guests
 - **Table Capacity**: Match or exceed party size
 - **Duplicate Prevention**: Same customer, same time slot
@@ -111,6 +110,7 @@ noshow      → (final state)
 ### 5. Integration with Order Module
 
 When customer is seated:
+
 - Create order linked to reservation
 - Transfer customer info
 - Link to reserved table
@@ -153,14 +153,14 @@ When customer is seated:
 ### Date/Time Helpers
 
 ```typescript
-ReservationHelper.combineDateTime(date, time)
-ReservationHelper.isFutureDateTime(date, time)
-ReservationHelper.isWithinMinAdvanceTime(date, time)
-ReservationHelper.isWithinMaxAdvanceTime(date, time)
-ReservationHelper.calculateEndTime(date, time, duration)
-ReservationHelper.isExpired(date, time)
-ReservationHelper.isWithinGracePeriod(date, time)
-ReservationHelper.hasReservationTimePassed(date, time)
+ReservationHelper.combineDateTime(date, time);
+ReservationHelper.isFutureDateTime(date, time);
+ReservationHelper.isWithinMinAdvanceTime(date, time);
+ReservationHelper.isWithinMaxAdvanceTime(date, time);
+ReservationHelper.calculateEndTime(date, time, duration);
+ReservationHelper.isExpired(date, time);
+ReservationHelper.isWithinGracePeriod(date, time);
+ReservationHelper.hasReservationTimePassed(date, time);
 ```
 
 ### Validation Helpers
@@ -180,11 +180,11 @@ ReservationHelper.isValidStatusTransition(current, new)
 ### Utility Helpers
 
 ```typescript
-ReservationHelper.formatReservationCode(code)
-ReservationHelper.isActiveReservation(status)
-ReservationHelper.getStatusPriority(status)
-ReservationHelper.getTimeUntilReservation(date, time)
-ReservationHelper.isToday(date)
+ReservationHelper.formatReservationCode(code);
+ReservationHelper.isActiveReservation(status);
+ReservationHelper.getStatusPriority(status);
+ReservationHelper.getTimeUntilReservation(date, time);
+ReservationHelper.isToday(date);
 ```
 
 ## Constants
@@ -201,18 +201,18 @@ RESERVATION_CONSTANTS = {
     MIN_PARTY_SIZE: 1,
     MAX_PARTY_SIZE: 20,
     MAX_TABLES_PER_RESERVATION: 3,
-}
+};
 ```
 
 ### Messages
 
 ```typescript
-RESERVATION_MESSAGES.SUCCESS.RESERVATION_CREATED
-RESERVATION_MESSAGES.SUCCESS.RESERVATION_CONFIRMED
-RESERVATION_MESSAGES.SUCCESS.RESERVATION_SEATED
-RESERVATION_MESSAGES.SUCCESS.ORDER_CREATED
-RESERVATION_MESSAGES.ERROR.RESERVATION_NOT_FOUND
-RESERVATION_MESSAGES.ERROR.TABLES_NOT_AVAILABLE
+RESERVATION_MESSAGES.SUCCESS.RESERVATION_CREATED;
+RESERVATION_MESSAGES.SUCCESS.RESERVATION_CONFIRMED;
+RESERVATION_MESSAGES.SUCCESS.RESERVATION_SEATED;
+RESERVATION_MESSAGES.SUCCESS.ORDER_CREATED;
+RESERVATION_MESSAGES.ERROR.RESERVATION_NOT_FOUND;
+RESERVATION_MESSAGES.ERROR.TABLES_NOT_AVAILABLE;
 ```
 
 ## Usage Examples
@@ -354,14 +354,14 @@ try {
 
 ## Status Descriptions
 
-| Status | Description | Next Actions |
-|--------|-------------|--------------|
-| `pending` | Awaiting confirmation | Confirm or Cancel |
-| `confirmed` | Confirmed by staff | Seat, Cancel, or Mark No-Show |
-| `seated` | Customer arrived and seated | Create Order, Complete |
-| `completed` | Service finished | Final state |
-| `cancelled` | Cancelled | Final state |
-| `noshow` | Customer didn't arrive | Final state |
+| Status      | Description                 | Next Actions                  |
+| ----------- | --------------------------- | ----------------------------- |
+| `pending`   | Awaiting confirmation       | Confirm or Cancel             |
+| `confirmed` | Confirmed by staff          | Seat, Cancel, or Mark No-Show |
+| `seated`    | Customer arrived and seated | Create Order, Complete        |
+| `completed` | Service finished            | Final state                   |
+| `cancelled` | Cancelled                   | Final state                   |
+| `noshow`    | Customer didn't arrive      | Final state                   |
 
 ## Performance Considerations
 

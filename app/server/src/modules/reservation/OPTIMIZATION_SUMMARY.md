@@ -60,17 +60,18 @@ No-show (noshow):
 
 ```typescript
 RESERVATION_CONSTANTS = {
-    MIN_ADVANCE_BOOKING_MINUTES: 30,      // Đặt trước tối thiểu 30 phút
-    MAX_ADVANCE_BOOKING_DAYS: 90,         // Đặt trước tối đa 90 ngày
-    DEFAULT_RESERVATION_DURATION: 120,     // Mặc định 2 giờ
-    GRACE_PERIOD_MINUTES: 15,             // Chờ khách 15 phút
-    AUTO_CANCEL_NO_SHOW_MINUTES: 30,      // Auto hủy sau 30 phút
+    MIN_ADVANCE_BOOKING_MINUTES: 30, // Đặt trước tối thiểu 30 phút
+    MAX_ADVANCE_BOOKING_DAYS: 90, // Đặt trước tối đa 90 ngày
+    DEFAULT_RESERVATION_DURATION: 120, // Mặc định 2 giờ
+    GRACE_PERIOD_MINUTES: 15, // Chờ khách 15 phút
+    AUTO_CANCEL_NO_SHOW_MINUTES: 30, // Auto hủy sau 30 phút
     MIN_PARTY_SIZE: 1,
     MAX_PARTY_SIZE: 20,
-}
+};
 ```
 
 **Messages được tổ chức:**
+
 - `RESERVATION_MESSAGES.SUCCESS.*`
 - `RESERVATION_MESSAGES.ERROR.*`
 - `RESERVATION_STATUS_MESSAGES` - Mô tả từng status
@@ -81,6 +82,7 @@ RESERVATION_CONSTANTS = {
 **File:** `exceptions/reservation.exceptions.ts`
 
 **Reservation Exceptions:**
+
 - `ReservationNotFoundException`
 - `ReservationAlreadyConfirmedException`
 - `ReservationAlreadyCancelledException`
@@ -91,17 +93,20 @@ RESERVATION_CONSTANTS = {
 - `ReservationExpiredException`
 
 **Table & Availability:**
+
 - `TableNotAvailableException`
 - `TablesNotAvailableException`
 - `TableOccupiedException`
 
 **Validation:**
+
 - `InvalidReservationDateException`
 - `ReservationTooEarlyException`
 - `ReservationTooFarException`
 - `InvalidPartySizeException`
 
 **Workflow:**
+
 - `OrderAlreadyExistsException`
 - `ReservationNotConfirmedException`
 - `ReservationNotSeatedException`
@@ -112,18 +117,20 @@ RESERVATION_CONSTANTS = {
 **File:** `helpers/reservation.helper.ts`
 
 **Date/Time Helpers:**
+
 ```typescript
-combineDateTime(date, time)
-isFutureDateTime(date, time)
-isWithinMinAdvanceTime(date, time)
-isWithinMaxAdvanceTime(date, time)
-calculateEndTime(date, time, duration)
-isExpired(date, time)
-isWithinGracePeriod(date, time)
-hasReservationTimePassed(date, time)
+combineDateTime(date, time);
+isFutureDateTime(date, time);
+isWithinMinAdvanceTime(date, time);
+isWithinMaxAdvanceTime(date, time);
+calculateEndTime(date, time, duration);
+isExpired(date, time);
+isWithinGracePeriod(date, time);
+hasReservationTimePassed(date, time);
 ```
 
 **Validation Helpers:**
+
 ```typescript
 isValidPartySize(size)
 canModifyReservation(status)
@@ -137,6 +144,7 @@ isValidStatusTransition(current, new)
 ```
 
 **Utility Helpers:**
+
 ```typescript
 formatReservationCode(code)
 isActiveReservation(status)
@@ -150,6 +158,7 @@ formatTime(time)
 ### 4. ✅ Improved DTOs
 
 **Files Updated:**
+
 - `dto/base.dto.ts` - Base DTOs mới
 - `create-reservation.dto.ts` - Validation chi tiết
 - `cancel-reservation.dto.ts` - Bắt buộc lý do
@@ -157,6 +166,7 @@ formatTime(time)
 **Cải tiến:**
 
 #### Trước:
+
 ```typescript
 @MaxLength(100)
 customerName: string;
@@ -166,6 +176,7 @@ reason?: string;
 ```
 
 #### Sau:
+
 ```typescript
 @MaxLength(RESERVATION_CONSTANTS.MAX_CUSTOMER_NAME_LENGTH, {
     message: `Name cannot exceed ${RESERVATION_CONSTANTS.MAX_CUSTOMER_NAME_LENGTH} characters`,
@@ -185,6 +196,7 @@ reason: string; // Không còn optional
 **File:** `reservation.service.ts`
 
 **Imports mới:**
+
 ```typescript
 import { ReservationHelper } from './helpers/reservation.helper';
 import { RESERVATION_CONSTANTS } from './constants/reservation.constants';
@@ -198,6 +210,7 @@ import {
 **Sử dụng trong code:**
 
 #### Trước:
+
 ```typescript
 if (reservationDateTime < new Date()) {
     throw new BadRequestException('Reservation date must be in the future');
@@ -205,13 +218,26 @@ if (reservationDateTime < new Date()) {
 ```
 
 #### Sau:
+
 ```typescript
-if (!ReservationHelper.isFutureDateTime(dto.reservationDate, dto.reservationTime)) {
+if (
+    !ReservationHelper.isFutureDateTime(
+        dto.reservationDate,
+        dto.reservationTime,
+    )
+) {
     throw new InvalidReservationDateException();
 }
 
-if (!ReservationHelper.isWithinMinAdvanceTime(dto.reservationDate, dto.reservationTime)) {
-    throw new ReservationTooEarlyException(RESERVATION_CONSTANTS.MIN_ADVANCE_BOOKING_MINUTES);
+if (
+    !ReservationHelper.isWithinMinAdvanceTime(
+        dto.reservationDate,
+        dto.reservationTime,
+    )
+) {
+    throw new ReservationTooEarlyException(
+        RESERVATION_CONSTANTS.MIN_ADVANCE_BOOKING_MINUTES,
+    );
 }
 ```
 
@@ -269,6 +295,7 @@ reservation/
 ## Metrics
 
 ### Files Created: 5
+
 - `constants/reservation.constants.ts`
 - `exceptions/reservation.exceptions.ts`
 - `helpers/reservation.helper.ts`
@@ -276,38 +303,46 @@ reservation/
 - `README.md`
 
 ### Files Modified: 3+
+
 - `reservation.service.ts` (imports updated)
 - `create-reservation.dto.ts` (improved validation)
 - `cancel-reservation.dto.ts` (reason required)
 
 ### Custom Exceptions: 15+
+
 ### Helper Functions: 25+
+
 ### Constants: 20+
 
 ## Lợi ích đạt được
 
 ### 1. Quy trình rõ ràng ⬆️⬆️⬆️
+
 - Workflow được định nghĩa cụ thể
 - Status transitions có validation
 - Business rules được enforce
 
 ### 2. Code Quality ⬆️⬆️⬆️
+
 - Custom exceptions với context
 - Helper functions tái sử dụng
 - Constants thay vì magic values
 - Better error messages
 
 ### 3. Maintainability ⬆️⬆️⬆️
+
 - Dễ tìm và sửa bugs
 - Dễ thêm features mới
 - Code có tổ chức tốt
 
 ### 4. Developer Experience ⬆️⬆️
+
 - Error messages rõ ràng
 - Type safety tốt hơn
 - IntelliSense tốt hơn
 
 ### 5. Business Logic ⬆️⬆️⬆️
+
 - Grace period handling
 - Auto no-show detection
 - Advance booking validation
@@ -371,22 +406,26 @@ PATCH /reservations/:id/complete
 ## Validation Rules Mới
 
 ### Time Constraints
+
 - ✅ Đặt trước tối thiểu 30 phút
 - ✅ Đặt trước tối đa 90 ngày
 - ✅ Grace period 15 phút
 - ✅ Auto cancel no-show sau 30 phút
 
 ### Party Size
+
 - ✅ Min: 1 người
 - ✅ Max: 20 người
 - ✅ Phải nhỏ hơn hoặc bằng table capacity
 
 ### Customer Info
+
 - ✅ Tên: 1-100 ký tự (required)
 - ✅ SĐT: 10-11 số (required)
 - ✅ Email: Valid format (optional)
 
 ### Special Fields
+
 - ✅ Special requests: Max 500 ký tự
 - ✅ Notes: Max 1000 ký tự
 - ✅ Cancellation reason: Required, max 500 ký tự
@@ -394,6 +433,7 @@ PATCH /reservations/:id/complete
 ## Breaking Changes
 
 **KHÔNG CÓ** breaking changes cho API:
+
 - ✅ Endpoints paths giữ nguyên
 - ✅ Request format tương thích
 - ⚠️ `reason` trong CancelReservationDto giờ là required (cải thiện data quality)
@@ -418,30 +458,30 @@ PATCH /reservations/:id/complete
 ## Next Steps
 
 1. **Controller Refactoring**
-   - Cập nhật messages sử dụng constants
-   - Improve API documentation
-   - Add workflow examples
+    - Cập nhật messages sử dụng constants
+    - Improve API documentation
+    - Add workflow examples
 
 2. **Repository Optimization**
-   - Add indexes for performance
-   - Optimize queries
-   - Add caching
+    - Add indexes for performance
+    - Optimize queries
+    - Add caching
 
 3. **Advanced Features**
-   - Reservation reminders
-   - Waitlist management
-   - Recurring reservations
-   - VIP priority booking
+    - Reservation reminders
+    - Waitlist management
+    - Recurring reservations
+    - VIP priority booking
 
 4. **Testing**
-   - Unit tests cho helpers
-   - Integration tests
-   - E2E tests workflow
+    - Unit tests cho helpers
+    - Integration tests
+    - E2E tests workflow
 
 5. **Documentation**
-   - API examples
-   - Workflow diagrams
-   - Postman collection
+    - API examples
+    - Workflow diagrams
+    - Postman collection
 
 ## Kết luận
 
@@ -452,8 +492,8 @@ Module Reservation đã được tối ưu thành công với:
 ✅ **Custom exceptions** - Error handling tốt hơn  
 ✅ **Helper functions** - Code reuse và consistency  
 ✅ **Business rules** - Validation đầy đủ  
-✅ **Developer friendly** - Error messages rõ ràng, IntelliSense tốt  
+✅ **Developer friendly** - Error messages rõ ràng, IntelliSense tốt
 
 **Thời gian thực hiện:** ~2 giờ  
 **Độ phức tạp:** Medium-High  
-**Impact:** High - Cải thiện toàn bộ reservation workflow  
+**Impact:** High - Cải thiện toàn bộ reservation workflow

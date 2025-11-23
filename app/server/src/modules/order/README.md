@@ -137,8 +137,8 @@ Better error context and handling:
 Success and error messages organized by category:
 
 ```typescript
-ORDER_MESSAGES.SUCCESS.ORDER_CREATED
-ORDER_MESSAGES.ERROR.ORDER_NOT_FOUND
+ORDER_MESSAGES.SUCCESS.ORDER_CREATED;
+ORDER_MESSAGES.ERROR.ORDER_NOT_FOUND;
 ```
 
 ### KITCHEN_MESSAGES
@@ -146,8 +146,8 @@ ORDER_MESSAGES.ERROR.ORDER_NOT_FOUND
 Kitchen-specific messages:
 
 ```typescript
-KITCHEN_MESSAGES.SUCCESS.ORDER_READY
-KITCHEN_MESSAGES.ERROR.ORDER_NOT_FOUND
+KITCHEN_MESSAGES.SUCCESS.ORDER_READY;
+KITCHEN_MESSAGES.ERROR.ORDER_NOT_FOUND;
 ```
 
 ## Order Status Flow
@@ -214,9 +214,8 @@ const readyOrder = await kitchenService.markOrderAsReady(
 );
 
 // Mark as completed (picked up)
-const completedOrder = await kitchenService.markOrderAsCompleted(
-    kitchenOrderId,
-);
+const completedOrder =
+    await kitchenService.markOrderAsCompleted(kitchenOrderId);
 ```
 
 ## WebSocket Events

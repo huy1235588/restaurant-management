@@ -3,6 +3,7 @@
 ## Ngày thực hiện: 22/11/2025
 
 ## Mục tiêu
+
 Tối ưu lại module quản lý đơn hàng (Order Module) để code đẹp hơn, dễ bảo trì, và tuân theo best practices.
 
 ## Những thay đổi đã thực hiện
@@ -10,13 +11,16 @@ Tối ưu lại module quản lý đơn hàng (Order Module) để code đẹp h
 ### 1. Tách biệt Controllers (✅ Hoàn thành)
 
 #### Trước:
+
 - 1 controller duy nhất `OrderController` xử lý cả order và kitchen
 
 #### Sau:
+
 - **OrderController** (`/orders`): Xử lý các thao tác chính với đơn hàng
 - **KitchenController** (`/kitchen`): Xử lý riêng các thao tác bếp
 
 **Lợi ích:**
+
 - Code dễ đọc và tìm kiếm hơn
 - Phân tách rõ ràng responsibility
 - API endpoints có tổ chức tốt hơn
@@ -34,6 +38,7 @@ return { message: ORDER_MESSAGES.SUCCESS.ORDER_CREATED };
 ```
 
 **Lợi ích:**
+
 - Dễ dàng thay đổi messages ở 1 nơi
 - Nhất quán trong toàn bộ module
 - Hỗ trợ đa ngôn ngữ trong tương lai
@@ -43,18 +48,21 @@ return { message: ORDER_MESSAGES.SUCCESS.ORDER_CREATED };
 **File:** `exceptions/order.exceptions.ts`
 
 #### Trước:
+
 ```typescript
 throw new NotFoundException('Order not found');
 throw new BadRequestException('Table already has an active order');
 ```
 
 #### Sau:
+
 ```typescript
 throw new OrderNotFoundException(orderId);
 throw new TableOccupiedException(tableId, orderNumber);
 ```
 
 **Các exceptions mới:**
+
 - `OrderNotFoundException`
 - `OrderItemNotFoundException`
 - `TableNotFoundException`
@@ -70,6 +78,7 @@ throw new TableOccupiedException(tableId, orderNumber);
 - `CannotCompleteKitchenOrderException`
 
 **Lợi ích:**
+
 - Error messages rõ ràng và có context
 - Dễ dàng handle từng loại lỗi cụ thể
 - Cải thiện debugging
@@ -81,19 +90,20 @@ throw new TableOccupiedException(tableId, orderNumber);
 Các utility functions tái sử dụng:
 
 ```typescript
-OrderHelper.canModifyOrder(status)
-OrderHelper.canCancelOrder(status)
-OrderHelper.calculateTotalAmount(items)
-OrderHelper.calculateActiveItemsTotal(items)
-OrderHelper.areAllItemsServed(items)
-OrderHelper.isValidStatusTransition(currentStatus, newStatus)
-OrderHelper.calculateItemTotal(price, quantity)
-OrderHelper.formatOrderNumber(orderNumber)
-OrderHelper.isActiveOrder(status)
-OrderHelper.getStatusPriority(status)
+OrderHelper.canModifyOrder(status);
+OrderHelper.canCancelOrder(status);
+OrderHelper.calculateTotalAmount(items);
+OrderHelper.calculateActiveItemsTotal(items);
+OrderHelper.areAllItemsServed(items);
+OrderHelper.isValidStatusTransition(currentStatus, newStatus);
+OrderHelper.calculateItemTotal(price, quantity);
+OrderHelper.formatOrderNumber(orderNumber);
+OrderHelper.isActiveOrder(status);
+OrderHelper.getStatusPriority(status);
 ```
 
 **Lợi ích:**
+
 - Tái sử dụng logic
 - Code dễ test
 - Giảm duplicate code
@@ -101,19 +111,22 @@ OrderHelper.getStatusPriority(status)
 ### 5. Cải thiện DTOs (✅ Hoàn thành)
 
 **File:** `dto/base.dto.ts` - Base DTOs tái sử dụng
-**Files cải thiện:** 
+**Files cải thiện:**
+
 - `create-order.dto.ts`
 - `cancel-item.dto.ts`
 - `cancel-order.dto.ts`
 - `update-order-status.dto.ts`
 
 #### Trước:
+
 ```typescript
 @MaxLength(500)
 reason: string;
 ```
 
 #### Sau:
+
 ```typescript
 @MaxLength(ORDER_CONSTANTS.MAX_CANCELLATION_REASON_LENGTH, {
     message: `Reason cannot exceed ${ORDER_CONSTANTS.MAX_CANCELLATION_REASON_LENGTH} characters`,
@@ -123,6 +136,7 @@ reason: string;
 ```
 
 **Cải tiến:**
+
 - Validation messages chi tiết hơn
 - Sử dụng constants thay vì hardcode
 - Thêm `@IsInt()` thay vì `@IsNumber()` cho ID fields
@@ -133,6 +147,7 @@ reason: string;
 **OrderService và KitchenService:**
 
 #### Trước:
+
 ```typescript
 if (!order) {
     throw new NotFoundException('Order not found');
@@ -140,6 +155,7 @@ if (!order) {
 ```
 
 #### Sau:
+
 ```typescript
 if (!order) {
     this.logger.warn(`Order not found: ${orderId}`);
@@ -148,6 +164,7 @@ if (!order) {
 ```
 
 **Cải tiến:**
+
 - Sử dụng custom exceptions
 - Log messages chi tiết hơn
 - Better error context
@@ -222,6 +239,7 @@ order/
 ## Metrics
 
 ### Files Created: 7
+
 - `constants/order.constants.ts`
 - `exceptions/order.exceptions.ts`
 - `helpers/order.helper.ts`
@@ -231,6 +249,7 @@ order/
 - `README.md`
 
 ### Files Modified: 8
+
 - `order.controller.ts`
 - `order.service.ts`
 - `kitchen.service.ts`
@@ -241,6 +260,7 @@ order/
 - `update-order-status.dto.ts`
 
 ### Lines of Code:
+
 - **Trước:** ~1,200 lines
 - **Sau:** ~1,600 lines (tăng do documentation và separation)
 - **Code quality:** Cải thiện đáng kể
@@ -248,31 +268,37 @@ order/
 ## Lợi ích đạt được
 
 ### 1. Maintainability (Dễ bảo trì) ⬆️⬆️⬆️
+
 - Code có tổ chức rõ ràng
 - Dễ tìm và sửa bugs
 - Dễ thêm features mới
 
 ### 2. Readability (Dễ đọc) ⬆️⬆️⬆️
+
 - Controllers ngắn gọn, tập trung
 - Constants thay vì magic strings
 - Helper functions tự giải thích
 
 ### 3. Testability (Dễ test) ⬆️⬆️
+
 - Logic tách biệt trong helpers
 - Custom exceptions dễ mock
 - Services có dependency injection rõ ràng
 
 ### 4. Error Handling (Xử lý lỗi) ⬆️⬆️⬆️
+
 - Error messages rõ ràng và có context
 - Dễ catch và handle specific errors
 - Better debugging experience
 
 ### 5. Type Safety (An toàn kiểu) ⬆️⬆️
+
 - Constants có type checking
 - DTOs validation mạnh mẽ hơn
 - Helpers có type inference tốt
 
 ### 6. API Documentation (Tài liệu API) ⬆️⬆️
+
 - Swagger docs chi tiết hơn
 - Description rõ ràng
 - Examples trong decorators
@@ -280,11 +306,13 @@ order/
 ## Breaking Changes
 
 **KHÔNG CÓ** - Tất cả API endpoints giữ nguyên:
+
 - ✅ Endpoints paths không đổi
 - ✅ Request/Response format không đổi
 - ✅ Backward compatible 100%
 
 **Chỉ thêm endpoints mới:**
+
 - `GET /kitchen/queue`
 - `GET /kitchen/orders`
 - `GET /kitchen/orders/:id`
@@ -294,6 +322,7 @@ order/
 ## Migration Guide
 
 Không cần migration vì:
+
 1. API endpoints không đổi
 2. Database schema không thay đổi
 3. Response format giữ nguyên
@@ -312,28 +341,29 @@ Không cần migration vì:
 ## Next Steps (Khuyến nghị)
 
 1. **Viết Unit Tests**
-   - Test helpers
-   - Test custom exceptions
-   - Test validation
+    - Test helpers
+    - Test custom exceptions
+    - Test validation
 
 2. **Performance Optimization**
-   - Add caching cho frequently accessed data
-   - Optimize database queries
-   - Add indexes nếu cần
+    - Add caching cho frequently accessed data
+    - Optimize database queries
+    - Add indexes nếu cần
 
 3. **Monitoring**
-   - Add metrics tracking
-   - Error rate monitoring
-   - Performance monitoring
+    - Add metrics tracking
+    - Error rate monitoring
+    - Performance monitoring
 
 4. **Documentation**
-   - API documentation (Swagger)
-   - Code comments
-   - Architecture diagrams
+    - API documentation (Swagger)
+    - Code comments
+    - Architecture diagrams
 
 ## Kết luận
 
 Module Order đã được tối ưu thành công với:
+
 - ✅ Clean architecture
 - ✅ Separation of concerns
 - ✅ Better error handling

@@ -66,7 +66,10 @@ export class BillingController {
     @ApiResponse({ status: 201, description: 'Bill created successfully' })
     @ApiResponse({ status: 400, description: 'Bad request' })
     @ApiResponse({ status: 404, description: 'Order not found' })
-    async createBill(@Body() createBillDto: CreateBillDto, @Request() req) {
+    async createBill(
+        @Body() createBillDto: CreateBillDto,
+        @Request() req: { user?: { staffId?: number } },
+    ) {
         const staffId = req.user?.staffId;
         return this.billingService.createBill(createBillDto, staffId);
     }
@@ -80,7 +83,7 @@ export class BillingController {
     async applyDiscount(
         @Param('id', ParseIntPipe) id: number,
         @Body() discountDto: ApplyDiscountDto,
-        @Request() req,
+        @Request() req: { user?: { staffId?: number } },
     ) {
         const userId = req.user?.staffId;
         return this.billingService.applyDiscount(id, discountDto, userId);
@@ -95,7 +98,7 @@ export class BillingController {
     async processPayment(
         @Param('id', ParseIntPipe) id: number,
         @Body() paymentDto: ProcessPaymentDto,
-        @Request() req,
+        @Request() req: { user?: { staffId?: number } },
     ) {
         const staffId = req.user?.staffId;
         return this.billingService.processPayment(id, paymentDto, staffId);
@@ -114,7 +117,7 @@ export class BillingController {
     async voidBill(
         @Param('id', ParseIntPipe) id: number,
         @Body('reason') reason: string,
-        @Request() req,
+        @Request() req: { user?: { staffId?: number } },
     ) {
         const userId = req.user?.staffId;
         return this.billingService.voidBill(id, reason, userId);
