@@ -18,7 +18,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useReservationActions } from '@/modules/reservations/hooks/useReservationActions';
 import { useTableAvailability } from '@/modules/reservations/hooks/useTableAvailability';
-import { TableSelector } from '@/modules/reservations/components';
+import { TableSelector } from '@/modules/reservations/components/TableSelector';
 import { ArrowLeft, Calendar, Users, Clock, Mail, Phone, User, FileText, Loader2 } from 'lucide-react';
 
 const reservationSchema = z.object({
@@ -310,23 +310,18 @@ export function CreateReservationView() {
                             </CardContent>
                         </Card>
 
-                        {/* Table Selection */}
-                        <FormField
-                            control={form.control}
-                            name="tableId"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormControl>
-                                        <TableSelector
-                                            tables={tables}
-                                            selectedTableId={field.value}
-                                            onSelectTable={field.onChange}
-                                            loading={loadingTables}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
+                        {/* Table Selection Card */}
+                        <TableSelector
+                            tables={tables}
+                            loading={loadingTables}
+                            selectedTableId={form.watch('tableId')}
+                            onSelectTable={(tableId) => {
+                                form.setValue('tableId', tableId, {
+                                    shouldValidate: true,
+                                    shouldDirty: true,
+                                    shouldTouch: true
+                                });
+                            }}
                         />
 
                         {/* Special Requests Card */}
