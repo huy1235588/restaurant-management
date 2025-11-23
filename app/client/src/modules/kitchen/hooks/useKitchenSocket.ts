@@ -13,19 +13,22 @@ import {
 import { KITCHEN_CONFIG } from "../constants/kitchen.constants";
 import { kitchenQueryKeys } from "../utils/kitchen-query-keys";
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
+const KITCHEN_NAMESPACE = "/kitchen";
 const MAX_RECONNECT_ATTEMPTS = 5;
+const DEBOUNCE_DELAY = 500; // Debounce query invalidation by 500ms
 
-export function useKitchenSocket() {
-    const [isConnected, setIsConnected] = useState(false);
-    const [reconnectAttempts, setReconnectAttempts] = useState(0);
-    const socketRef = useRef<Socket | null>(null);
-    const queryClient = useQueryClient();
-    const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+// Singleton socket instance - shared across all components
+let globalSocket: Socket | null = null;
+let socketRefCount = 0;
 
-    useEffect(() => {
-        // Connect to /kitchen namespace
-        const socket = io(`${SOCKET_URL}/kitchen`, {
+// Debounced invalidation tracker
+let invalidationTimer: NodeJS.Timeout | null = null;
+
+function getOrCreateSocket(): Socket {
+    if (!globalSocket) {
+        console.log("[KitchenSocket] Creating new socket instance");
+        globalSocket = io(`${SOCKET_URL}${KITCHEN_NAMESPACE}`, {
             transports: ["websocket", "polling"],
             reconnection: true,
             reconnectionDelay: 1000,
@@ -33,46 +36,77 @@ export function useKitchenSocket() {
             reconnectionAttempts: MAX_RECONNECT_ATTEMPTS,
         });
 
+        globalSocket.on("connect", () => {
+            console.log("[KitchenSocket] Connected");
+        });
+
+        globalSocket.on("disconnect", () => {
+            console.log("[KitchenSocket] Disconnected");
+        });
+
+        globalSocket.on("connect_error", (error) => {
+            console.error("[KitchenSocket] Connection error:", error);
+        });
+    }
+    return globalSocket;
+}
+
+function cleanupSocket() {
+    if (globalSocket && socketRefCount === 0) {
+        console.log("[KitchenSocket] Cleaning up socket instance");
+        globalSocket.close();
+        globalSocket = null;
+    }
+}
+
+// Debounced query invalidation helper
+function debouncedInvalidateQueries(
+    queryClient: ReturnType<typeof useQueryClient>,
+    queryKey: readonly unknown[]
+) {
+    if (invalidationTimer) {
+        clearTimeout(invalidationTimer);
+    }
+    
+    invalidationTimer = setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: queryKey as unknown[] });
+        invalidationTimer = null;
+    }, DEBOUNCE_DELAY);
+}
+
+export function useKitchenSocket() {
+    const [isConnected, setIsConnected] = useState(false);
+    const socketRef = useRef<Socket | null>(null);
+    const queryClient = useQueryClient();
+    const handlersRegistered = useRef(false);
+
+    useEffect(() => {
+        // Get or create shared socket instance
+        const socket = getOrCreateSocket();
         socketRef.current = socket;
+        socketRefCount++;
 
-        // Connection events
-        socket.on("connect", () => {
-            console.log("[Kitchen Socket] Connected");
-            setIsConnected(true);
-            setReconnectAttempts(0);
+        console.log(
+            `[KitchenSocket] Component mounted (refCount: ${socketRefCount})`
+        );
 
-            // Clear any pending reconnect timeout
-            if (reconnectTimeoutRef.current) {
-                clearTimeout(reconnectTimeoutRef.current);
-                reconnectTimeoutRef.current = null;
-            }
-        });
+        // Update connection status
+        setIsConnected(socket.connected);
 
-        socket.on("disconnect", (reason) => {
-            console.log("[Kitchen Socket] Disconnected:", reason);
-            setIsConnected(false);
+        const handleConnect = () => setIsConnected(true);
+        const handleDisconnect = () => setIsConnected(false);
 
-            // Auto-reconnect with exponential backoff
-            if (reason === "io server disconnect") {
-                // Server initiated disconnect - try to reconnect
-                attemptReconnect();
-            }
-        });
+        socket.on("connect", handleConnect);
+        socket.on("disconnect", handleDisconnect);
 
-        socket.on("connect_error", (error) => {
-            console.error("[Kitchen Socket] Connection error:", error);
-            setIsConnected(false);
-            attemptReconnect();
-        });
-
-        // Kitchen events
+        // Register event handlers only once per component instance
+        if (!handlersRegistered.current) {
+            handlersRegistered.current = true;
         socket.on(KitchenSocketEvents.NEW_ORDER, (data: NewOrderEvent) => {
             console.log("[Kitchen Socket] New order:", data.data);
 
-            // Invalidate orders list to refetch
-            queryClient.invalidateQueries({
-                queryKey: kitchenQueryKeys.list(),
-            });
+            // Debounced invalidation for better performance
+            debouncedInvalidateQueries(queryClient, kitchenQueryKeys.list());
 
             // Show notification
             toast.info(`New Order #${data.data.order.orderNumber}`, {
@@ -92,10 +126,10 @@ export function useKitchenSocket() {
             (data: OrderUpdateEvent) => {
                 console.log("[Kitchen Socket] Order updated:", data.data);
 
-                // Invalidate both list and detail queries
-                queryClient.invalidateQueries({
-                    queryKey: kitchenQueryKeys.list(),
-                });
+                // Debounced invalidation for list
+                debouncedInvalidateQueries(queryClient, kitchenQueryKeys.list());
+                
+                // Immediate invalidation for detail view
                 queryClient.invalidateQueries({
                     queryKey: kitchenQueryKeys.detail(data.data.kitchenOrderId),
                 });
@@ -107,10 +141,10 @@ export function useKitchenSocket() {
             (data: OrderCompletedEvent) => {
                 console.log("[Kitchen Socket] Order completed:", data.data);
 
-                // Invalidate queries
-                queryClient.invalidateQueries({
-                    queryKey: kitchenQueryKeys.list(),
-                });
+                // Debounced invalidation for list
+                debouncedInvalidateQueries(queryClient, kitchenQueryKeys.list());
+                
+                // Immediate invalidation for detail view
                 queryClient.invalidateQueries({
                     queryKey: kitchenQueryKeys.detail(data.data.kitchenOrderId),
                 });
@@ -122,55 +156,33 @@ export function useKitchenSocket() {
             }
         );
 
+            // Store cleanup function for event handlers
+            return () => {
+                socket.off(KitchenSocketEvents.NEW_ORDER);
+                socket.off(KitchenSocketEvents.ORDER_UPDATED);
+                socket.off(KitchenSocketEvents.ORDER_COMPLETED);
+            };
+        }
+
         // Cleanup on unmount
         return () => {
-            console.log("[Kitchen Socket] Disconnecting...");
+            socket.off("connect", handleConnect);
+            socket.off("disconnect", handleDisconnect);
 
-            if (reconnectTimeoutRef.current) {
-                clearTimeout(reconnectTimeoutRef.current);
-            }
+            socketRefCount--;
+            console.log(
+                `[KitchenSocket] Component unmounted (refCount: ${socketRefCount})`
+            );
 
-            if (socketRef.current) {
-                socketRef.current.disconnect();
-                socketRef.current = null;
-            }
+            // Only close socket when no components are using it
+            setTimeout(() => {
+                cleanupSocket();
+            }, 1000);
         };
-    }, [queryClient]);
-
-    // Exponential backoff reconnect
-    const attemptReconnect = () => {
-        if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-            toast.error("Connection Lost", {
-                description:
-                    "Unable to connect to kitchen display. Please refresh the page.",
-            });
-            return;
-        }
-
-        const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
-        console.log(
-            `[Kitchen Socket] Reconnecting in ${delay / 1000}s (attempt ${
-                reconnectAttempts + 1
-            }/${MAX_RECONNECT_ATTEMPTS})`
-        );
-
-        reconnectTimeoutRef.current = setTimeout(() => {
-            setReconnectAttempts((prev) => prev + 1);
-            socketRef.current?.connect();
-        }, delay);
-    };
-
-    // Manual reconnect
-    const reconnect = () => {
-        if (socketRef.current) {
-            setReconnectAttempts(0);
-            socketRef.current.connect();
-        }
-    };
+    }, []); // Empty deps - socket persists across component lifecycle
 
     return {
         isConnected,
-        reconnect,
         socket: socketRef.current,
     };
 }

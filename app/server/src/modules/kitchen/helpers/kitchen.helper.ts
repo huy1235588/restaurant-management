@@ -20,31 +20,34 @@ export class KitchenHelper {
 
     /**
      * Check if preparation is slow
+     * @deprecated - SLOW_PREP_TIME_THRESHOLD constant removed
      */
-    static isSlowPreparation(prepTimeMinutes: number): boolean {
-        return prepTimeMinutes > KITCHEN_CONSTANTS.SLOW_PREP_TIME_THRESHOLD;
-    }
+    // static isSlowPreparation(prepTimeMinutes: number): boolean {
+    //     return prepTimeMinutes > KITCHEN_CONSTANTS.SLOW_PREP_TIME_THRESHOLD;
+    // }
 
     /**
      * Check if preparation is fast
+     * @deprecated - FAST_PREP_TIME_THRESHOLD constant removed
      */
-    static isFastPreparation(prepTimeMinutes: number): boolean {
-        return prepTimeMinutes < KITCHEN_CONSTANTS.FAST_PREP_TIME_THRESHOLD;
-    }
+    // static isFastPreparation(prepTimeMinutes: number): boolean {
+    //     return prepTimeMinutes < KITCHEN_CONSTANTS.FAST_PREP_TIME_THRESHOLD;
+    // }
 
     /**
      * Get estimated completion time
+     * @deprecated - DEFAULT_PREP_TIME constant removed
      */
-    static getEstimatedCompletionTime(
-        startedAt: Date,
-        estimatedPrepTime: number = KITCHEN_CONSTANTS.DEFAULT_PREP_TIME,
-    ): Date {
-        const completionTime = new Date(startedAt);
-        completionTime.setMinutes(
-            completionTime.getMinutes() + estimatedPrepTime,
-        );
-        return completionTime;
-    }
+    // static getEstimatedCompletionTime(
+    //     startedAt: Date,
+    //     estimatedPrepTime: number = KITCHEN_CONSTANTS.DEFAULT_PREP_TIME,
+    // ): Date {
+    //     const completionTime = new Date(startedAt);
+    //     completionTime.setMinutes(
+    //         completionTime.getMinutes() + estimatedPrepTime,
+    //     );
+    //     return completionTime;
+    // }
 
     /**
      * Calculate elapsed time since order was created
@@ -57,12 +60,13 @@ export class KitchenHelper {
 
     /**
      * Check if order is waiting too long (not started)
+     * @deprecated - AUTO_CANCEL_TIMEOUT_MINUTES constant removed
      */
-    static isWaitingTooLong(createdAt: Date, startedAt: Date | null): boolean {
-        if (startedAt) return false;
-        const elapsedMinutes = this.getElapsedTime(createdAt);
-        return elapsedMinutes > KITCHEN_CONSTANTS.AUTO_CANCEL_TIMEOUT_MINUTES;
-    }
+    // static isWaitingTooLong(createdAt: Date, startedAt: Date | null): boolean {
+    //     if (startedAt) return false;
+    //     const elapsedMinutes = this.getElapsedTime(createdAt);
+    //     return elapsedMinutes > KITCHEN_CONSTANTS.AUTO_CANCEL_TIMEOUT_MINUTES;
+    // }
 
     /**
      * Validate priority level
@@ -197,38 +201,42 @@ export class KitchenHelper {
 
     /**
      * Calculate average preparation time
+     * @deprecated - DEFAULT_PREP_TIME constant removed
      */
-    static calculateAveragePrepTime(prepTimes: number[]): number {
-        if (prepTimes.length === 0) return KITCHEN_CONSTANTS.DEFAULT_PREP_TIME;
-        const sum = prepTimes.reduce((acc, time) => acc + time, 0);
-        return Math.round(sum / prepTimes.length);
-    }
+    // static calculateAveragePrepTime(prepTimes: number[]): number {
+    //     if (prepTimes.length === 0) return KITCHEN_CONSTANTS.DEFAULT_PREP_TIME;
+    //     const sum = prepTimes.reduce((acc, time) => acc + time, 0);
+    //     return Math.round(sum / prepTimes.length);
+    // }
 
     /**
      * Get prep time performance indicator
+     * @deprecated - No longer needed in simplified flow
      */
-    static getPrepTimePerformance(
-        actualTime: number,
-        estimatedTime: number,
-    ): 'fast' | 'on-time' | 'slow' {
-        if (actualTime <= estimatedTime * 0.8) return 'fast';
-        if (actualTime <= estimatedTime * 1.2) return 'on-time';
-        return 'slow';
-    }
+    // static getPrepTimePerformance(
+    //     actualTime: number,
+    //     estimatedTime: number,
+    // ): 'fast' | 'on-time' | 'slow' {
+    //     if (actualTime <= estimatedTime * 0.8) return 'fast';
+    //     if (actualTime <= estimatedTime * 1.2) return 'on-time';
+    //     return 'slow';
+    // }
 
     /**
      * Check if queue is near capacity
+     * @deprecated - MAX_CONCURRENT_ORDERS constant removed
      */
-    static isQueueNearCapacity(currentCount: number): boolean {
-        return currentCount >= KITCHEN_CONSTANTS.MAX_CONCURRENT_ORDERS * 0.8;
-    }
+    // static isQueueNearCapacity(currentCount: number): boolean {
+    //     return currentCount >= KITCHEN_CONSTANTS.MAX_CONCURRENT_ORDERS * 0.8;
+    // }
 
     /**
      * Check if queue is full
+     * @deprecated - MAX_CONCURRENT_ORDERS constant removed
      */
-    static isQueueFull(currentCount: number): boolean {
-        return currentCount >= KITCHEN_CONSTANTS.MAX_CONCURRENT_ORDERS;
-    }
+    // static isQueueFull(currentCount: number): boolean {
+    //     return currentCount >= KITCHEN_CONSTANTS.MAX_CONCURRENT_ORDERS;
+    // }
 
     /**
      * Sort orders by priority and time

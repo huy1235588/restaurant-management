@@ -27,7 +27,10 @@ import {
     CannotModifyCancelledOrderException,
     OrderAlreadyCancelledException,
     BillAlreadyCreatedException,
+    InvalidOrderStatusException,
+    CannotAddItemsToServingOrderException,
 } from './exceptions/order.exceptions';
+import { OrderHelper } from './helpers/order.helper';
 
 /**
  * Order Service
@@ -188,6 +191,14 @@ export class OrderService {
     async addItemsToOrder(orderId: number, data: AddItemsDto) {
         // Get existing order
         const order = await this.getOrderById(orderId);
+
+        // Prevent adding items if order is being served
+        if (order.status === OrderStatus.serving) {
+            this.logger.warn(
+                `Attempted to add items to serving order: ${order.orderNumber}`,
+            );
+            throw new CannotAddItemsToServingOrderException(orderId);
+        }
 
         // Check if order can be modified
         if (order.status === OrderStatus.completed) {
@@ -458,6 +469,14 @@ export class OrderService {
      */
     async updateOrderStatus(orderId: number, data: UpdateOrderStatusDto) {
         const order = await this.getOrderById(orderId);
+
+        // Validate status transition
+        if (!OrderHelper.isValidStatusTransition(order.status, data.status)) {
+            this.logger.warn(
+                `Invalid status transition for order ${order.orderNumber}: ${order.status} -> ${data.status}`,
+            );
+            throw new InvalidOrderStatusException(order.status, data.status);
+        }
 
         const updateData: Record<string, unknown> = {
             status: data.status,

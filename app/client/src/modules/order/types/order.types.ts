@@ -10,7 +10,7 @@ export type OrderStatus =
 // Order item status enum
 export type OrderItemStatus =
     | "pending" // Not started
-    | "ready" // Finished
+    | "active" // In progress/finished
     | "served" // Delivered to customer
     | "cancelled"; // Cancelled
 
@@ -44,6 +44,20 @@ export interface Staff {
     role?: string;
 }
 
+// Kitchen Order interface (minimal - full version in kitchen module)
+export interface KitchenOrder {
+    kitchenOrderId: number;
+    status: 'pending' | 'preparing' | 'completed' | 'cancelled';
+    priority: 'low' | 'normal' | 'high' | 'urgent';
+    startedAt?: string | null;
+    completedAt?: string | null;
+    chefId?: number | null;
+    chef?: {
+        staffId: number;
+        fullName: string;
+    } | null;
+}
+
 // Order Item interface
 export interface OrderItem {
     orderItemId: number;
@@ -73,11 +87,11 @@ export interface Order {
     partySize: number;
     status: OrderStatus;
     notes?: string | null;
-    // Financial fields
-    totalAmount: number;
-    discountAmount: number;
-    taxAmount: number;
-    finalAmount: number;
+    // Financial fields (string for Decimal precision)
+    totalAmount: string;
+    discountAmount: string;
+    taxAmount: string;
+    finalAmount: string;
     // Timestamps
     orderTime: string;
     confirmedAt?: string | null;
@@ -88,6 +102,7 @@ export interface Order {
     updatedAt: string;
     // Relations
     orderItems: OrderItem[];
+    kitchenOrder?: KitchenOrder | null;
 }
 
 // DTOs

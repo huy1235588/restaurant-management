@@ -260,13 +260,6 @@ export class KitchenService {
             `Kitchen order #${kitchenOrderId} completed (prep time: ${prepTimeActual} min)`,
         );
 
-        // Log if preparation was slow
-        if (prepTimeActual && KitchenHelper.isSlowPreparation(prepTimeActual)) {
-            this.logger.warn(
-                `Slow preparation detected for kitchen order #${kitchenOrderId}: ${prepTimeActual} min`,
-            );
-        }
-
         // Emit WebSocket event
         this.kitchenGateway.emitOrderCompleted(updated);
 

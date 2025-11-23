@@ -12,6 +12,7 @@ export function useStartPreparing() {
 
     return useMutation({
         mutationFn: (id: number) => kitchenApi.startPreparing(id),
+        retry: 1,
 
         onMutate: async (id) => {
             // Cancel outgoing refetches

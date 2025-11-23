@@ -54,6 +54,22 @@ export class OrderRepository {
                 customerName: true,
             },
         },
+        kitchenOrder: {
+            select: {
+                kitchenOrderId: true,
+                status: true,
+                priority: true,
+                startedAt: true,
+                completedAt: true,
+                chefId: true,
+                chef: {
+                    select: {
+                        staffId: true,
+                        fullName: true,
+                    },
+                },
+            },
+        },
     };
 
     async findById(orderId: number) {

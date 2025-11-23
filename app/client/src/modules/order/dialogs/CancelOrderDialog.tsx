@@ -67,7 +67,7 @@ export function CancelOrderDialog({
     if (!order) return null;
 
     const hasItemsInProgress = order.orderItems.some(
-        (item) => item.status === 'ready' || item.status === 'pending'
+        (item) => item.status === 'active' || item.status === 'pending'
     );
 
     return (
@@ -104,7 +104,7 @@ export function CancelOrderDialog({
                         </div>
                         <div className="text-sm font-bold">
                             <span className="text-muted-foreground">Tổng tiền: </span>
-                            <span>{formatCurrency(order.finalAmount)}</span>
+                            <span>{formatCurrency(parseFloat(order.finalAmount))}</span>
                         </div>
                     </div>
 

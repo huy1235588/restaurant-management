@@ -18,6 +18,7 @@ export const useUpdateOrderStatus = () => {
             orderId: number;
             data: UpdateOrderStatusDto;
         }) => orderApi.updateStatus(orderId, data),
+        retry: 1,
         onSuccess: (order) => {
             // Invalidate queries
             queryClient.invalidateQueries({

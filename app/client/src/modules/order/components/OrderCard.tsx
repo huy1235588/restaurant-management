@@ -87,7 +87,7 @@ export function OrderCard({ order, onCancelOrder }: OrderCardProps) {
                             </p>
                         </div>
                         <p className="text-lg font-bold">
-                            {formatCurrency(order.finalAmount)}
+                            {formatCurrency(parseFloat(order.finalAmount))}
                         </p>
                     </div>
 

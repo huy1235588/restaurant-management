@@ -16,6 +16,7 @@ export const useCreateOrder = () => {
 
     return useMutation({
         mutationFn: (data: CreateOrderDto) => orderApi.create(data),
+        retry: 1,
         onSuccess: (order) => {
             // Invalidate orders list
             queryClient.invalidateQueries({ queryKey: orderKeys.lists() });

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -28,12 +28,14 @@ import { calculateOrderFinancials, formatCurrency } from '../utils';
 import { ArrowLeft, ArrowRight, Save, AlertCircle } from 'lucide-react';
 
 const STORAGE_KEY = 'order-draft';
+const STORAGE_DEBOUNCE_DELAY = 1000;
 
 export function CreateOrderView() {
     const router = useRouter();
     const [currentStep, setCurrentStep] = useState(1);
     const [cartItems, setCartItems] = useState<ShoppingCartItem[]>([]);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+    const storageTimerRef = useRef<NodeJS.Timeout | null>(null);
 
     // Step 1: Table Selection
     const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
@@ -68,18 +70,34 @@ export function CreateOrderView() {
         }
     }, []);
 
-    // Save draft to localStorage
+    // Save draft to localStorage with debouncing
     useEffect(() => {
         if (hasUnsavedChanges) {
-            const draft = {
-                step: currentStep,
-                tableId: selectedTableId,
-                cartItems,
-                customerInfo: customerForm.getValues(),
-                timestamp: new Date().toISOString(),
-            };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+            // Clear existing timer
+            if (storageTimerRef.current) {
+                clearTimeout(storageTimerRef.current);
+            }
+
+            // Set new timer
+            storageTimerRef.current = setTimeout(() => {
+                const draft = {
+                    step: currentStep,
+                    tableId: selectedTableId,
+                    cartItems,
+                    customerInfo: customerForm.getValues(),
+                    timestamp: new Date().toISOString(),
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+                storageTimerRef.current = null;
+            }, STORAGE_DEBOUNCE_DELAY);
         }
+
+        // Cleanup on unmount
+        return () => {
+            if (storageTimerRef.current) {
+                clearTimeout(storageTimerRef.current);
+            }
+        };
     }, [currentStep, selectedTableId, cartItems, customerForm, hasUnsavedChanges]);
 
     // Warn about unsaved changes

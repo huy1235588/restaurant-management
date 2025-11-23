@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { RefreshCw, Maximize2, Minimize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useKitchenOrders } from "../hooks/useKitchenOrders";
@@ -39,15 +39,17 @@ export function KitchenDisplayView() {
     const completeOrderMutation = useCompleteOrder();
     const cancelMutation = useCancelKitchenOrder();
 
-    // Filter and sort orders
-    const filteredOrders = orders
-        ? KitchenHelpers.sortOrdersByPriority(
+    // Filter and sort orders with useMemo for performance
+    const filteredOrders = useMemo(() => {
+        if (!orders) return [];
+        
+        return KitchenHelpers.sortOrdersByPriority(
             KitchenHelpers.filterOrdersByPriority(
                 KitchenHelpers.filterOrdersByStatus(orders, statusFilter),
                 priorityFilter
             )
-        )
-        : [];
+        );
+    }, [orders, statusFilter, priorityFilter]);
 
     // Fullscreen toggle
     const toggleFullscreen = () => {

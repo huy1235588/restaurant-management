@@ -15,7 +15,8 @@ import {
 import { orderKeys } from "./useOrders";
 
 const SOCKET_URL =
-    process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
+    process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
+const ORDER_NAMESPACE = "/orders";
 
 interface UseOrderSocketOptions {
     onOrderCreated?: (event: OrderCreatedEvent) => void;
@@ -35,7 +36,7 @@ let socketRefCount = 0;
 function getOrCreateSocket(): Socket {
     if (!globalSocket) {
         console.log("[OrderSocket] Creating new socket instance");
-        globalSocket = io(SOCKET_URL, {
+        globalSocket = io(`${SOCKET_URL}${ORDER_NAMESPACE}`, {
             transports: ["websocket", "polling"],
             reconnection: true,
             reconnectionDelay: 1000,

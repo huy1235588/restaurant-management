@@ -3,8 +3,8 @@ import { z } from "zod";
 // Order item schema
 export const createOrderItemSchema = z.object({
     itemId: z.number().positive("Item ID must be positive"),
-    quantity: z.number().min(1, "Quantity must be at least 1"),
-    specialRequest: z.string().max(500).optional(),
+    quantity: z.number().min(1, "Quantity must be at least 1").max(99, "Quantity cannot exceed 99"),
+    specialRequest: z.string().max(200, "Special request cannot exceed 200 characters").optional(),
 });
 
 // Create order schema
@@ -14,10 +14,10 @@ export const createOrderSchema = z.object({
     customerName: z.string().max(255).optional(),
     customerPhone: z
         .string()
-        .regex(/^[0-9]{10,20}$/, "Invalid phone number format")
+        .regex(/^[0-9]{10,11}$/, "Phone number must be 10-11 digits")
         .optional()
         .or(z.literal("")),
-    partySize: z.number().min(1, "Party size must be at least 1"),
+    partySize: z.number().min(1, "Party size must be at least 1").max(50, "Party size cannot exceed 50"),
     notes: z.string().max(1000).optional(),
     items: z
         .array(createOrderItemSchema)
@@ -63,12 +63,12 @@ export const step2CustomerSchema = z.object({
     customerName: z.string().max(255).optional(),
     customerPhone: z
         .string()
-        .regex(/^[0-9]{10,20}$/, "Invalid phone number format")
+        .regex(/^[0-9]{10,11}$/, "Phone number must be 10-11 digits")
         .optional()
         .or(z.literal("")),
-    partySize: z.number().min(1, "Party size must be at least 1"),
+    partySize: z.number().min(1, "Party size must be at least 1").max(50, "Party size cannot exceed 50"),
     reservationId: z.number().positive().optional(),
-    specialRequests: z.string().max(1000).optional(),
+    specialRequests: z.string().max(500, "Special requests cannot exceed 500 characters").optional(),
 });
 
 // Step 3: Menu items schema

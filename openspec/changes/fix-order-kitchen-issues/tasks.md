@@ -21,66 +21,66 @@
 ### 3. Backend Order Service
 - [x] 3.1 Remove kitchen order creation from `createOrder()` in `order.service.ts`
 - [x] 3.2 Update `updateOrderStatus()` to trigger kitchen order creation when status = `confirmed`
-- [ ] 3.3 Add status transition validation using `isValidStatusTransition()` helper
-- [ ] 3.4 Update order validation to check `serving` status when adding/removing items
+- [x] 3.3 Add status transition validation using `isValidStatusTransition()` helper
+- [x] 3.4 Update order validation to check `serving` status when adding/removing items
 
 ### 4. Backend Constants & Helpers
 - [x] 4.1 Update `KITCHEN_STATUS_FLOW` in constants to reflect new flow: `pending → preparing → completed`
 - [x] 4.2 Update `isValidStatusTransition()` in helpers for new simplified flow
-- [ ] 4.3 Remove unused constants: `SLOW_PREP_TIME_THRESHOLD`, `MAX_CONCURRENT_ORDERS`, `AUTO_CANCEL_TIMEOUT_MINUTES`
+- [x] 4.3 Remove unused constants: `SLOW_PREP_TIME_THRESHOLD`, `MAX_CONCURRENT_ORDERS`, `AUTO_CANCEL_TIMEOUT_MINUTES`
 
 ### 5. WebSocket Events Standardization
 - [x] 5.1 Update Kitchen Gateway to use standard event structure with `event`, `data`, `timestamp`, `source` fields
 - [x] 5.2 Rename events: `order:new` → keep, `order:update` → `kitchen:preparing`, `order:completed` → `kitchen:completed`
 - [x] 5.3 Add missing event: `kitchen:preparing` when chef starts preparing
 - [x] 5.4 Remove event: `kitchen:ready` (merged into `kitchen:completed`)
-- [ ] 5.5 Implement room-based broadcasting: `kitchen`, `waiter:${staffId}`, `table:${tableId}`
+- [x] 5.5 Implement room-based broadcasting: `kitchen`, `waiter:${staffId}`, `table:${tableId}`
 
 ## Phase 2: Frontend Critical Fixes (Week 2)
 
 ### 6. Frontend Type Definitions
-- [ ] 6.1 Update `order.types.ts` - Change financial fields from `number` to `string` (totalAmount, discountAmount, taxAmount, finalAmount)
-- [ ] 6.2 Add helper function `parseDecimal(value: string): number` in order utils
+- [x] 6.1 Update `order.types.ts` - Change financial fields from `number` to `string` (totalAmount, discountAmount, taxAmount, finalAmount)
+- [x] 6.2 Add helper function `parseDecimal(value: string): number` in order utils
 - [x] 6.3 Update `kitchen.types.ts` - Remove `READY` status from KitchenOrderStatus enum
 - [x] 6.4 Update `kitchen.types.ts` - Ensure KitchenPriority matches backend: `"low" | "normal" | "high" | "urgent"`
-- [ ] 6.5 Update OrderItemStatus enum - Change `ready` to `active` to match backend
+- [x] 6.5 Update OrderItemStatus enum - Change `ready` to `active` to match backend
 
 ### 7. Frontend WebSocket Fixes
-- [ ] 7.1 Fix `useOrderSocket.ts` - Connect to `/orders` namespace instead of base URL
-- [ ] 7.2 Update event listeners in `useOrderSocket.ts` to match backend events
-- [ ] 7.3 Apply singleton pattern to `useKitchenSocket.ts` (like Order module)
+- [x] 7.1 Fix `useOrderSocket.ts` - Connect to `/orders` namespace instead of base URL
+- [x] 7.2 Update event listeners in `useOrderSocket.ts` to match backend events
+- [x] 7.3 Apply singleton pattern to `useKitchenSocket.ts` (like Order module)
 - [x] 7.4 Update event names in Kitchen hooks: listen to `kitchen:preparing`, `kitchen:completed`
 - [x] 7.5 Remove event listener for `kitchen:ready` (deprecated)
 
 ### 8. Frontend Validation Schemas
-- [ ] 8.1 Add phone validation regex in `order.schemas.ts`: `/^[0-9]{10,11}$/`
-- [ ] 8.2 Add max constraint to `partySize` (max: 50) in customer schema
-- [ ] 8.3 Add max length to `specialRequests` (max: 500) in customer schema
-- [ ] 8.4 Add max constraint to `quantity` (max: 99) in order item schema
-- [ ] 8.5 Add max length to `specialRequest` (max: 200) in order item schema
+- [x] 8.1 Add phone validation regex in `order.schemas.ts`: `/^[0-9]{10,11}$/`
+- [x] 8.2 Add max constraint to `partySize` (max: 50) in customer schema
+- [x] 8.3 Add max length to `specialRequests` (max: 500) in customer schema
+- [x] 8.4 Add max constraint to `quantity` (max: 99) in order item schema
+- [x] 8.5 Add max length to `specialRequest` (max: 200) in order item schema
 
 ### 9. Frontend Error Handling
-- [ ] 9.1 Add error interceptor in `axios.ts` to show toast on errors
-- [ ] 9.2 Add `onError` handlers to all mutation hooks in Order module
-- [ ] 9.3 Add `onError` handlers to all mutation hooks in Kitchen module
-- [ ] 9.4 Add retry logic (retry: 1) to critical mutations
-- [ ] 9.5 Create `OrderErrorBoundary` and `KitchenErrorBoundary` components
+- [x] 9.1 Add error interceptor in `axios.ts` to show toast on errors
+- [x] 9.2 Add `onError` handlers to all mutation hooks in Order module
+- [x] 9.3 Add `onError` handlers to all mutation hooks in Kitchen module
+- [x] 9.4 Add retry logic (retry: 1) to critical mutations
+- [x] 9.5 Create `OrderErrorBoundary` and `KitchenErrorBoundary` components
 
 ## Phase 3: Performance & Polish (Week 3)
 
 ### 10. Frontend Performance Optimizations
-- [ ] 10.1 Add `useMemo` for filtered orders in `KitchenDisplayView.tsx`
-- [ ] 10.2 Add debounced localStorage save in `CreateOrderView.tsx` (1000ms delay)
-- [ ] 10.3 Add debounced query invalidation in WebSocket handlers (500ms delay)
+- [x] 10.1 Add `useMemo` for filtered orders in `KitchenDisplayView.tsx`
+- [x] 10.2 Add debounced localStorage save in `CreateOrderView.tsx` (1000ms delay)
+- [x] 10.3 Add debounced query invalidation in WebSocket handlers (500ms delay)
 - [ ] 10.4 Split large components into smaller memoized sub-components
 
 ### 11. Backend Performance
-- [ ] 11.1 Add include relations in `getAllKitchenOrders()` to fetch order, table, items in one query
-- [ ] 11.2 Implement pagination (default: page=1, limit=20) in kitchen orders endpoint
-- [ ] 11.3 Add targeted room broadcasting in WebSocket (avoid broadcast to all clients)
+- [x] 11.1 Add include relations in `getAllKitchenOrders()` to fetch order, table, items in one query
+- [x] 11.2 Implement pagination (default: page=1, limit=20) in kitchen orders endpoint
+- [x] 11.3 Add targeted room broadcasting in WebSocket (avoid broadcast to all clients)
 
 ### 12. Edge Cases Handling
-- [ ] 12.1 Add validation to prevent adding items when order status is `serving`
+- [x] 12.1 Add validation to prevent adding items when order status is `serving`
 - [ ] 12.2 Handle orphan kitchen orders with cascade delete
 - [ ] 12.3 Add unique constraint validation in createKitchenOrder to prevent duplicates
 - [ ] 12.4 Test concurrent chef claims with optimistic locking
@@ -99,8 +99,8 @@
 - [x] 14.1 Update Kitchen status badges to show only 3 states: Pending, Preparing, Completed
 - [x] 14.2 Update Kitchen action buttons: "Start Preparing", "Complete Order"
 - [x] 14.3 Update Kitchen filters to remove "Ready" option
-- [ ] 14.4 Update Order detail view to show correct kitchen status
-- [ ] 14.5 Add loading states and error boundaries to critical views
+- [x] 14.4 Update Order detail view to show correct kitchen status
+- [x] 14.5 Add loading states and error boundaries to critical views
 
 ## Validation Checklist
 

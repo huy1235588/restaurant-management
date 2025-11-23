@@ -1,5 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '@/stores/authStore';
+import { toast } from 'sonner';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 
@@ -117,6 +118,22 @@ axiosInstance.interceptors.response.use(
 
                 return Promise.reject(refreshError);
             }
+        }
+
+        // Show error toast for non-401 errors
+        if (error.response) {
+            const errorMessage =
+                (error.response.data as any)?.message ||
+                error.message ||
+                'An error occurred';
+            
+            // Don't show toast for auth errors (handled by redirect)
+            if (error.response.status !== 401) {
+                toast.error(errorMessage);
+            }
+        } else if (error.request) {
+            // Network error
+            toast.error('Network error. Please check your connection.');
         }
 
         return Promise.reject(error);

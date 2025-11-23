@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { OrderStatusBadge } from '../components/OrderStatusBadge';
+import { KitchenStatusBadge } from '../components/KitchenStatusBadge';
 import { OrderItemList } from '../components/OrderItemList';
 import { OrderSummaryCard } from '../components/OrderSummaryCard';
 import { OrderTimeline } from '../components/OrderTimeline';
@@ -165,6 +166,16 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                                         {order.customerPhone || 'Không có'}
                                     </p>
                                 </div>
+                            </div>
+                            <Separator />
+                            <div>
+                                <p className="text-sm font-medium text-muted-foreground mb-2">Trạng thái bếp</p>
+                                <KitchenStatusBadge kitchenOrder={order.kitchenOrder} />
+                                {order.kitchenOrder?.chef && (
+                                    <p className="text-sm text-muted-foreground mt-1">
+                                        Đầu bếp: {order.kitchenOrder.chef.fullName}
+                                    </p>
+                                )}
                             </div>
                         </CardContent>
                     </Card>

@@ -12,28 +12,13 @@ export const KITCHEN_CONSTANTS = {
     DEFAULT_LIMIT: 50,
     MAX_LIMIT: 200,
 
-    // Preparation time estimates (in minutes)
-    DEFAULT_PREP_TIME: 20,
-    MIN_PREP_TIME: 5,
-    MAX_PREP_TIME: 120,
-
     // Priority levels
     PRIORITIES: ['low', 'normal', 'high', 'urgent'] as const,
     DEFAULT_PRIORITY: 'normal' as const,
 
-    // Auto-cancellation
-    AUTO_CANCEL_TIMEOUT_MINUTES: 60, // Cancel if not started in 60 min
-
     // Business rules
     MAX_NOTES_LENGTH: 1000,
     MAX_SPECIAL_INSTRUCTIONS_LENGTH: 500,
-
-    // Queue management
-    MAX_CONCURRENT_ORDERS: 20, // Maximum orders in preparing state
-
-    // Performance thresholds
-    SLOW_PREP_TIME_THRESHOLD: 30, // Minutes - flag as slow if exceeds
-    FAST_PREP_TIME_THRESHOLD: 10, // Minutes - flag as fast
 } as const;
 
 /**

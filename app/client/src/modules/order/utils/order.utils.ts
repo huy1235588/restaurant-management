@@ -1,6 +1,16 @@
 import { OrderStatus, OrderItemStatus, Order, OrderItem } from "../types";
 
 /**
+ * Parse string decimal to number
+ * Used for financial fields that come as string from backend (Prisma Decimal)
+ */
+export const parseDecimal = (value: string | number): number => {
+    if (typeof value === "number") return value;
+    const parsed = parseFloat(value);
+    return isNaN(parsed) ? 0 : parsed;
+};
+
+/**
  * Format order number for display
  */
 export const formatOrderNumber = (orderNumber: string): string => {
@@ -80,7 +90,7 @@ export const getOrderItemStatusColor = (status: OrderItemStatus): string => {
     switch (status) {
         case "pending":
             return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
-        case "ready":
+        case "active":
             return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
         case "served":
             return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
@@ -120,8 +130,8 @@ export const getOrderItemStatusLabel = (status: OrderItemStatus): string => {
     switch (status) {
         case "pending":
             return "Pending";
-        case "ready":
-            return "Ready";
+        case "active":
+            return "Active";
         case "served":
             return "Served";
         case "cancelled":
@@ -156,7 +166,7 @@ export const canCancelOrderItem = (item: OrderItem): boolean => {
  * Check if an order item can be marked as served
  */
 export const canMarkItemServed = (item: OrderItem): boolean => {
-    return item.status === "ready";
+    return item.status === "active";
 };
 
 /**

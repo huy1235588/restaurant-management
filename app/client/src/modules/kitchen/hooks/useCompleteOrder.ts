@@ -12,6 +12,7 @@ export function useCompleteOrder() {
 
     return useMutation({
         mutationFn: (id: number) => kitchenApi.completeOrder(id),
+        retry: 1,
 
         onMutate: async (id) => {
             await queryClient.cancelQueries({ queryKey: kitchenQueryKeys.all });
