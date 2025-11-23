@@ -261,7 +261,7 @@ export class KitchenService {
         );
 
         // Emit WebSocket event
-        this.kitchenGateway.emitOrderCompleted(updated);
+        this.kitchenGateway.emitOrderCompleted(updated as any);
 
         return updated;
     }

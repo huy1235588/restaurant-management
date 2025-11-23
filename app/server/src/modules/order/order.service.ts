@@ -1,7 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { PrismaService } from '@/database/prisma.service';
 import { OrderRepository, FindOrdersOptions } from './order.repository';
 import { OrderGateway } from './order.gateway';
+import { KitchenService } from '@/modules/kitchen/kitchen.service';
 import {
     CreateOrderDto,
     AddItemsDto,
@@ -44,6 +45,8 @@ export class OrderService {
         private readonly orderRepository: OrderRepository,
         private readonly prisma: PrismaService,
         private readonly orderGateway: OrderGateway,
+        @Inject(forwardRef(() => KitchenService))
+        private readonly kitchenService: KitchenService,
     ) {}
 
     /**
@@ -272,7 +275,7 @@ export class OrderService {
             `${data.items.length} items added to order: ${order.orderNumber}`,
         );
 
-        // Emit WebSocket event to kitchen
+        // Emit WebSocket event to kitchen and all clients
         this.orderGateway.emitOrderItemsAdded(updatedOrder);
 
         return updatedOrder;
@@ -502,21 +505,17 @@ export class OrderService {
                 });
 
             if (!existingKitchenOrder) {
-                await this.prisma.kitchenOrder.create({
-                    data: {
-                        orderId: updatedOrder.orderId,
-                        status: KitchenOrderStatus.pending,
-                    },
-                });
-                this.logger.log(
-                    `Kitchen order created for order: ${updatedOrder.orderNumber}`,
-                );
+                // Use KitchenService to create kitchen order (emits WebSocket event)
+                await this.kitchenService.createKitchenOrder(orderId);
             }
         }
 
         this.logger.log(
             `Order status updated: ${order.orderNumber} -> ${data.status}`,
         );
+
+        // Emit order status changed event
+        this.orderGateway.emitOrderStatusChanged(updatedOrder);
 
         return updatedOrder;
     }

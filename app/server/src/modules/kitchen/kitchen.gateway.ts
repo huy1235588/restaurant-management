@@ -15,7 +15,7 @@ import { KitchenOrder } from '@prisma/generated/client';
         origin: process.env.CLIENT_URL || 'http://localhost:3000',
         credentials: true,
     },
-    namespace: 'kitchen',
+    namespace: '/kitchen',
 })
 export class KitchenGateway
     implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -30,10 +30,10 @@ export class KitchenGateway
         this.logger.log(`Kitchen WebSocket Gateway initialized`);
     }
 
-    handleConnection(client: Socket) {
+    async handleConnection(client: Socket) {
         this.logger.log(`Client connected: ${client.id}`);
         // Auto-join kitchen room for all kitchen connections
-        client.join('kitchen');
+        await client.join('kitchen');
         this.logger.log(`Client ${client.id} joined kitchen room`);
     }
 
@@ -45,9 +45,9 @@ export class KitchenGateway
      * Handle client joining waiter-specific room
      */
     @SubscribeMessage('join-waiter')
-    handleJoinWaiter(client: Socket, staffId: number) {
+    async handleJoinWaiter(client: Socket, staffId: number) {
         const room = `waiter:${staffId}`;
-        client.join(room);
+        await client.join(room);
         this.logger.log(`Client ${client.id} joined room: ${room}`);
         return { success: true, room };
     }
@@ -56,9 +56,9 @@ export class KitchenGateway
      * Handle client leaving waiter-specific room
      */
     @SubscribeMessage('leave-waiter')
-    handleLeaveWaiter(client: Socket, staffId: number) {
+    async handleLeaveWaiter(client: Socket, staffId: number) {
         const room = `waiter:${staffId}`;
-        client.leave(room);
+        await client.leave(room);
         this.logger.log(`Client ${client.id} left room: ${room}`);
         return { success: true, room };
     }
@@ -75,7 +75,9 @@ export class KitchenGateway
             timestamp: new Date().toISOString(),
             source: 'kitchen',
         });
-        this.logger.log(`Emitted new order to kitchen: Kitchen Order #${order.orderId}`);
+        this.logger.log(
+            `Emitted new order to kitchen: Kitchen Order #${order.orderId}`,
+        );
     }
 
     /**
@@ -100,7 +102,9 @@ export class KitchenGateway
      * Broadcast to kitchen room and notify waiter if assigned
      * @param order - The completed kitchen order
      */
-    emitOrderCompleted(order: any) {
+    emitOrderCompleted(
+        order: Partial<KitchenOrder & { order: { staffId: number } }>,
+    ) {
         // Notify kitchen room
         this.server.to('kitchen').emit('order:completed', {
             event: 'order:completed',
@@ -108,7 +112,7 @@ export class KitchenGateway
             timestamp: new Date().toISOString(),
             source: 'kitchen',
         });
-        
+
         // Notify assigned waiter if exists
         const staffId = order.order?.staffId;
         if (staffId) {
@@ -121,7 +125,7 @@ export class KitchenGateway
             });
             this.logger.log(`Notified waiter ${staffId} of completed order`);
         }
-        
+
         this.logger.log(
             `Emitted order completed: Kitchen Order #${order.kitchenOrderId}`,
         );

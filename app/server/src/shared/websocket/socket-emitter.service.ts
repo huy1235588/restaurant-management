@@ -168,10 +168,7 @@ export class SocketEmitterService {
     /**
      * Emit when order item is marked as served
      */
-    emitOrderItemServed(data: {
-        order: OrderEventData;
-        itemId: number;
-    }): void {
+    emitOrderItemServed(data: { order: OrderEventData; itemId: number }): void {
         this.logger.log(
             `Item ${data.itemId} served in order: ${data.order.orderNumber}`,
         );
