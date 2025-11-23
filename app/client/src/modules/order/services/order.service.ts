@@ -14,11 +14,14 @@ import {
 export const orderApi = {
     // Get all orders with pagination and filters
     getAll: async (params?: OrderFilterOptions): Promise<PaginatedOrders> => {
-        const response = await axiosInstance.get<ApiResponse<PaginatedOrders>>(
-            "/orders",
-            { params }
-        );
-        return response.data.data;
+        const response = await axiosInstance.get<
+            PaginatedOrders & { message?: string }
+        >("/orders", { params });
+        // Server returns { message, data, meta } directly
+        return {
+            data: response.data.data,
+            meta: response.data.meta,
+        };
     },
 
     // Get orders count with filters

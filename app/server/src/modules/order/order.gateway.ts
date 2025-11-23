@@ -6,6 +6,7 @@ import {
     ConnectedSocket,
     OnGatewayConnection,
     OnGatewayDisconnect,
+    OnGatewayInit,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
@@ -24,22 +25,22 @@ import {
     },
     namespace: '/orders',
 })
-export class OrderGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class OrderGateway
+    implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
     @WebSocketServer()
     server: Server;
 
     private readonly logger = new Logger(OrderGateway.name);
 
-    constructor(private readonly socketEmitter: SocketEmitterService) {
-        // Initialize the emitter service with the server instance
-        // This will be set in afterInit hook if needed
+    constructor(private readonly socketEmitter: SocketEmitterService) {}
+
+    afterInit(server: Server) {
+        this.socketEmitter.setServer(server);
+        this.logger.log('Order WebSocket Gateway initialized');
     }
 
     handleConnection(client: Socket) {
-        // Initialize socket emitter with server when first client connects
-        if (!this.socketEmitter['server']) {
-            this.socketEmitter.setServer(this.server);
-        }
         this.logger.log(`Client connected: ${client.id}`);
     }
 
