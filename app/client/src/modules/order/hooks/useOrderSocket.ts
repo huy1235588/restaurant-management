@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -28,6 +28,43 @@ interface UseOrderSocketOptions {
     enableSound?: boolean;
 }
 
+// Singleton socket instance - shared across all components
+let globalSocket: Socket | null = null;
+let socketRefCount = 0;
+
+function getOrCreateSocket(): Socket {
+    if (!globalSocket) {
+        console.log("[OrderSocket] Creating new socket instance");
+        globalSocket = io(SOCKET_URL, {
+            transports: ["websocket", "polling"],
+            reconnection: true,
+            reconnectionDelay: 1000,
+            reconnectionAttempts: 5,
+        });
+
+        globalSocket.on("connect", () => {
+            console.log("[OrderSocket] Connected");
+        });
+
+        globalSocket.on("disconnect", () => {
+            console.log("[OrderSocket] Disconnected");
+        });
+
+        globalSocket.on("connect_error", (error) => {
+            console.error("[OrderSocket] Connection error:", error);
+        });
+    }
+    return globalSocket;
+}
+
+function cleanupSocket() {
+    if (globalSocket && socketRefCount === 0) {
+        console.log("[OrderSocket] Cleaning up socket instance");
+        globalSocket.close();
+        globalSocket = null;
+    }
+}
+
 export function useOrderSocket(options: UseOrderSocketOptions = {}) {
     const {
         onOrderCreated,
@@ -40,121 +77,123 @@ export function useOrderSocket(options: UseOrderSocketOptions = {}) {
         enableSound = false,
     } = options;
 
-    const [socket, setSocket] = useState<Socket | null>(null);
     const [isConnected, setIsConnected] = useState(false);
     const queryClient = useQueryClient();
+    const socketRef = useRef<Socket | null>(null);
+    const handlersRegistered = useRef(false);
 
     useEffect(() => {
-        // Initialize socket connection
-        const newSocket = io(SOCKET_URL, {
-            transports: ["websocket", "polling"],
-            reconnection: true,
-            reconnectionDelay: 1000,
-            reconnectionAttempts: 5,
-        });
+        // Get or create shared socket instance
+        const socket = getOrCreateSocket();
+        socketRef.current = socket;
+        socketRefCount++;
 
-        // Connection event handlers
-        newSocket.on("connect", () => {
-            console.log("Order socket connected");
-            setIsConnected(true);
-        });
+        console.log(
+            `[OrderSocket] Component mounted (refCount: ${socketRefCount})`
+        );
 
-        newSocket.on("disconnect", () => {
-            console.log("Order socket disconnected");
-            setIsConnected(false);
-        });
+        // Update connection status
+        setIsConnected(socket.connected);
 
-        newSocket.on("connect_error", (error) => {
-            console.error("Order socket connection error:", error);
-        });
+        const handleConnect = () => setIsConnected(true);
+        const handleDisconnect = () => setIsConnected(false);
 
-        // Order event handlers
-        newSocket.on("order:created", (event: OrderCreatedEvent) => {
-            console.log("New order created:", event);
+        socket.on("connect", handleConnect);
+        socket.on("disconnect", handleDisconnect);
 
-            // Invalidate and refetch orders list
-            queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
-            queryClient.invalidateQueries({ queryKey: orderKeys.count({}) });
+        // Register event handlers only once per component instance
+        if (!handlersRegistered.current) {
+            handlersRegistered.current = true;
 
-            // Show notification
-            if (enableNotifications) {
-                toast.success(`Đơn hàng mới #${event.orderNumber} đã được tạo`);
-            }
+            // Order event handlers
+            const handleOrderCreated = (event: OrderCreatedEvent) => {
+                console.log("[OrderSocket] New order created:", event);
 
-            // Play sound
-            if (enableSound) {
-                playNotificationSound();
-            }
+                // Invalidate and refetch orders list
+                queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+                queryClient.invalidateQueries({
+                    queryKey: orderKeys.count({}),
+                });
 
-            // Custom callback
-            if (onOrderCreated) {
-                onOrderCreated(event);
-            }
-        });
+                // Show notification
+                if (enableNotifications) {
+                    toast.success(
+                        `Đơn hàng mới #${event.orderNumber} đã được tạo`
+                    );
+                }
 
-        newSocket.on("order:updated", (event: OrderUpdatedEvent) => {
-            console.log("Order updated:", event);
+                // Play sound
+                if (enableSound) {
+                    playNotificationSound();
+                }
 
-            // Invalidate queries
-            queryClient.invalidateQueries({
-                queryKey: orderKeys.detail(event.orderId),
-            });
-            queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+                // Custom callback
+                if (onOrderCreated) {
+                    onOrderCreated(event);
+                }
+            };
 
-            // Custom callback
-            if (onOrderUpdated) {
-                onOrderUpdated(event);
-            }
-        });
+            const handleOrderUpdated = (event: OrderUpdatedEvent) => {
+                console.log("[OrderSocket] Order updated:", event);
 
-        newSocket.on("order:status-changed", (event: OrderUpdatedEvent) => {
-            console.log("Order status changed:", event);
+                // Invalidate queries
+                queryClient.invalidateQueries({
+                    queryKey: orderKeys.detail(event.orderId),
+                });
+                queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
 
-            // Invalidate queries
-            queryClient.invalidateQueries({
-                queryKey: orderKeys.detail(event.orderId),
-            });
-            queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+                // Custom callback
+                if (onOrderUpdated) {
+                    onOrderUpdated(event);
+                }
+            };
 
-            // Show notification
-            if (enableNotifications) {
-                toast.info(
-                    `Đơn hàng #${event.orderNumber} chuyển sang trạng thái: ${event.status}`
-                );
-            }
+            const handleStatusChanged = (event: OrderUpdatedEvent) => {
+                console.log("[OrderSocket] Order status changed:", event);
 
-            // Custom callback
-            if (onOrderUpdated) {
-                onOrderUpdated(event);
-            }
-        });
+                // Invalidate queries
+                queryClient.invalidateQueries({
+                    queryKey: orderKeys.detail(event.orderId),
+                });
+                queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
 
-        newSocket.on("order:items-added", (event: OrderItemsAddedEvent) => {
-            console.log("Items added to order:", event);
+                // Show notification
+                if (enableNotifications) {
+                    toast.info(
+                        `Đơn hàng #${event.orderNumber} chuyển sang trạng thái: ${event.status}`
+                    );
+                }
 
-            // Invalidate queries
-            queryClient.invalidateQueries({
-                queryKey: orderKeys.detail(event.orderId),
-            });
-            queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+                // Custom callback
+                if (onOrderUpdated) {
+                    onOrderUpdated(event);
+                }
+            };
 
-            // Show notification
-            if (enableNotifications) {
-                toast.success(
-                    `Đã thêm ${event.items.length} món vào đơn hàng #${event.orderNumber}`
-                );
-            }
+            const handleItemsAdded = (event: OrderItemsAddedEvent) => {
+                console.log("[OrderSocket] Items added to order:", event);
 
-            // Custom callback
-            if (onItemsAdded) {
-                onItemsAdded(event);
-            }
-        });
+                // Invalidate queries
+                queryClient.invalidateQueries({
+                    queryKey: orderKeys.detail(event.orderId),
+                });
+                queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
 
-        newSocket.on(
-            "order:item-cancelled",
-            (event: OrderItemCancelledEvent) => {
-                console.log("Order item cancelled:", event);
+                // Show notification
+                if (enableNotifications) {
+                    toast.success(
+                        `Đã thêm ${event.items.length} món vào đơn hàng #${event.orderNumber}`
+                    );
+                }
+
+                // Custom callback
+                if (onItemsAdded) {
+                    onItemsAdded(event);
+                }
+            };
+
+            const handleItemCancelled = (event: OrderItemCancelledEvent) => {
+                console.log("[OrderSocket] Order item cancelled:", event);
 
                 // Invalidate queries
                 queryClient.invalidateQueries({
@@ -173,80 +212,101 @@ export function useOrderSocket(options: UseOrderSocketOptions = {}) {
                 if (onItemCancelled) {
                     onItemCancelled(event);
                 }
-            }
-        );
+            };
 
-        newSocket.on("order:cancelled", (event: OrderCancelledEvent) => {
-            console.log("Order cancelled:", event);
+            const handleOrderCancelled = (event: OrderCancelledEvent) => {
+                console.log("[OrderSocket] Order cancelled:", event);
 
-            // Invalidate queries
-            queryClient.invalidateQueries({
-                queryKey: orderKeys.detail(event.orderId),
-            });
-            queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
-            queryClient.invalidateQueries({ queryKey: orderKeys.count({}) });
+                // Invalidate queries
+                queryClient.invalidateQueries({
+                    queryKey: orderKeys.detail(event.orderId),
+                });
+                queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+                queryClient.invalidateQueries({
+                    queryKey: orderKeys.count({}),
+                });
 
-            // Show notification
-            if (enableNotifications) {
-                toast.error(`Đơn hàng #${event.orderNumber} đã bị hủy`);
-            }
+                // Show notification
+                if (enableNotifications) {
+                    toast.error(`Đơn hàng #${event.orderNumber} đã bị hủy`);
+                }
 
-            // Custom callback
-            if (onOrderCancelled) {
-                onOrderCancelled(event);
-            }
-        });
+                // Custom callback
+                if (onOrderCancelled) {
+                    onOrderCancelled(event);
+                }
+            };
 
-        newSocket.on("kitchen:order-ready", (event: KitchenOrderReadyEvent) => {
-            console.log("Kitchen order ready:", event);
+            const handleKitchenReady = (event: KitchenOrderReadyEvent) => {
+                console.log("[OrderSocket] Kitchen order ready:", event);
 
-            // Invalidate queries
-            queryClient.invalidateQueries({
-                queryKey: orderKeys.detail(event.orderId),
-            });
-            queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+                // Invalidate queries
+                queryClient.invalidateQueries({
+                    queryKey: orderKeys.detail(event.orderId),
+                });
+                queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
 
-            // Show notification
-            if (enableNotifications) {
-                toast.success(
-                    `Đơn hàng #${event.orderNumber} đã sẵn sàng để phục vụ! 🍽️`,
-                    {
-                        duration: 5000,
-                    }
-                );
-            }
+                // Show notification
+                if (enableNotifications) {
+                    toast.success(
+                        `Đơn hàng #${event.orderNumber} đã sẵn sàng để phục vụ! 🍽️`,
+                        {
+                            duration: 5000,
+                        }
+                    );
+                }
 
-            // Play sound
-            if (enableSound) {
-                playNotificationSound();
-            }
+                // Play sound
+                if (enableSound) {
+                    playNotificationSound();
+                }
 
-            // Custom callback
-            if (onKitchenOrderReady) {
-                onKitchenOrderReady(event);
-            }
-        });
+                // Custom callback
+                if (onKitchenOrderReady) {
+                    onKitchenOrderReady(event);
+                }
+            };
 
-        setSocket(newSocket);
+            socket.on("order:created", handleOrderCreated);
+            socket.on("order:updated", handleOrderUpdated);
+            socket.on("order:status-changed", handleStatusChanged);
+            socket.on("order:items-added", handleItemsAdded);
+            socket.on("order:item-cancelled", handleItemCancelled);
+            socket.on("order:cancelled", handleOrderCancelled);
+            socket.on("kitchen:order-ready", handleKitchenReady);
+
+            // Store cleanup function
+            return () => {
+                socket.off("order:created", handleOrderCreated);
+                socket.off("order:updated", handleOrderUpdated);
+                socket.off("order:status-changed", handleStatusChanged);
+                socket.off("order:items-added", handleItemsAdded);
+                socket.off("order:item-cancelled", handleItemCancelled);
+                socket.off("order:cancelled", handleOrderCancelled);
+                socket.off("kitchen:order-ready", handleKitchenReady);
+            };
+        }
 
         // Cleanup on unmount
         return () => {
-            newSocket.close();
+            socket.off("connect", handleConnect);
+            socket.off("disconnect", handleDisconnect);
+
+            socketRefCount--;
+            console.log(
+                `[OrderSocket] Component unmounted (refCount: ${socketRefCount})`
+            );
+
+            // Only close socket when no components are using it
+            // Use a small delay to prevent reconnection when navigating between pages
+            setTimeout(() => {
+                cleanupSocket();
+            }, 1000);
         };
-    }, [
-        queryClient,
-        onOrderCreated,
-        onOrderUpdated,
-        onItemsAdded,
-        onItemCancelled,
-        onOrderCancelled,
-        onKitchenOrderReady,
-        enableNotifications,
-        enableSound,
-    ]);
+    }, []); // Empty deps - socket persists across component lifecycle
 
     return {
-        socket,
+        socket: socketRef.current,
         isConnected,
     };
 }

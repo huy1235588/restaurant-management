@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { kitchenApi } from "../services/kitchen.service";
-import { kitchenKeys } from "../utils/kitchen-query-keys";
+import { kitchenQueryKeys } from "../utils/kitchen-query-keys";
 import { toast } from "sonner";
 
 /**
@@ -14,7 +14,7 @@ export function useCancelKitchenOrder() {
 
     onSuccess: () => {
       toast.success("Order cancelled");
-      queryClient.invalidateQueries({ queryKey: kitchenKeys.orders() });
+      queryClient.invalidateQueries({ queryKey: kitchenQueryKeys.orders() });
     },
 
     onError: (error: any) => {
