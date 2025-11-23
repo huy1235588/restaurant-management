@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useKitchenOrders } from "../hooks/useKitchenOrders";
 import { useKitchenSocket } from "../hooks/useKitchenSocket";
 import { useStartPreparing } from "../hooks/useStartPreparing";
-import { useMarkReady } from "../hooks/useMarkReady";
-import { useMarkCompleted } from "../hooks/useMarkCompleted";
+import { useCompleteOrder } from "../hooks/useCompleteOrder";
 import { useCancelKitchenOrder } from "../hooks/useCancelKitchenOrder";
 import {
     KitchenOrderStatus,
@@ -37,8 +36,7 @@ export function KitchenDisplayView() {
 
     // Mutations
     const startPreparingMutation = useStartPreparing();
-    const markReadyMutation = useMarkReady();
-    const markCompletedMutation = useMarkCompleted();
+    const completeOrderMutation = useCompleteOrder();
     const cancelMutation = useCancelKitchenOrder();
 
     // Filter and sort orders
@@ -95,12 +93,8 @@ export function KitchenDisplayView() {
         startPreparingMutation.mutate(orderId);
     };
 
-    const handleMarkReady = (orderId: number) => {
-        markReadyMutation.mutate(orderId);
-    };
-
-    const handleMarkCompleted = (orderId: number) => {
-        markCompletedMutation.mutate(orderId);
+    const handleCompleteOrder = (orderId: number) => {
+        completeOrderMutation.mutate(orderId);
     };
 
     const handleCancel = (orderId: number) => {
@@ -204,15 +198,15 @@ export function KitchenDisplayView() {
                         </Button>
                         <Button
                             variant={
-                                statusFilter === KitchenOrderStatus.READY
+                                statusFilter === KitchenOrderStatus.PREPARING
                                     ? "default"
                                     : "outline"
                             }
                             size="sm"
-                            onClick={() => setStatusFilter(KitchenOrderStatus.READY)}
+                            onClick={() => setStatusFilter(KitchenOrderStatus.PREPARING)}
                             className="h-7 md:h-8 text-xs md:text-sm px-2 md:px-3"
                         >
-                            Ready
+                            Preparing
                         </Button>
                         <Button
                             variant={
@@ -284,8 +278,7 @@ export function KitchenDisplayView() {
                                 key={order.kitchenOrderId}
                                 order={order}
                                 onStartPreparing={handleStartPreparing}
-                                onMarkReady={handleMarkReady}
-                                onMarkCompleted={handleMarkCompleted}
+                                onCompleteOrder={handleCompleteOrder}
                                 onCancel={handleCancel}
                             />
                         ))}

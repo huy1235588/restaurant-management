@@ -45,8 +45,7 @@ export const KITCHEN_MESSAGES = {
         ORDER_RETRIEVED: 'Kitchen order retrieved successfully',
         ORDERS_RETRIEVED: 'Kitchen orders retrieved successfully',
         PREPARATION_STARTED: 'Order preparation started',
-        ORDER_READY: 'Order is ready for pickup',
-        ORDER_COMPLETED: 'Order completed (picked up)',
+        ORDER_COMPLETED: 'Order completed successfully',
         ORDER_CANCELLED: 'Kitchen order cancelled',
         PRIORITY_UPDATED: 'Order priority updated',
         CHEF_ASSIGNED: 'Chef assigned to order',
@@ -69,8 +68,7 @@ export const KITCHEN_MESSAGES = {
 
         // Status transition errors
         INVALID_STATUS_TRANSITION: 'Invalid kitchen order status transition',
-        CANNOT_MARK_READY: 'Cannot mark order as ready in current state',
-        CANNOT_COMPLETE: 'Can only complete ready orders',
+        CANNOT_COMPLETE: 'Cannot complete order in current state',
 
         // Queue errors
         QUEUE_FULL: 'Kitchen queue is full, cannot accept more orders',
@@ -93,11 +91,11 @@ export type KitchenPriority = (typeof KITCHEN_CONSTANTS.PRIORITIES)[number];
 
 /**
  * Status flow validation
+ * Simplified flow: pending → preparing → completed (with cancellation at any point)
  */
 export const KITCHEN_STATUS_FLOW = {
     pending: ['preparing', 'cancelled'],
-    preparing: ['ready', 'cancelled'],
-    ready: ['completed'],
+    preparing: ['completed', 'cancelled'],
     completed: [],
     cancelled: [],
 } as const;

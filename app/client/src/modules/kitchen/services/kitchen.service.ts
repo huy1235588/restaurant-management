@@ -36,21 +36,10 @@ export const kitchenApi = {
     },
 
     /**
-     * Mark an order as ready for pickup
+     * Mark an order as completed
      * @param id - Kitchen order ID
      */
-    async markReady(id: number): Promise<KitchenOrder> {
-        const response = await axiosInstance.patch(
-            `/kitchen/orders/${id}/ready`
-        );
-        return response.data.data || response.data;
-    },
-
-    /**
-     * Mark an order as completed (picked up by waiter)
-     * @param id - Kitchen order ID
-     */
-    async markCompleted(id: number): Promise<KitchenOrder> {
+    async completeOrder(id: number): Promise<KitchenOrder> {
         const response = await axiosInstance.patch(
             `/kitchen/orders/${id}/complete`
         );

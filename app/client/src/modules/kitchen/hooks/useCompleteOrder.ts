@@ -5,13 +5,13 @@ import { toast } from "sonner";
 import { KitchenOrderStatus } from "../types/kitchen.types";
 
 /**
- * Hook to mark a kitchen order as ready for pickup
+ * Hook to complete a kitchen order
  */
-export function useMarkReady() {
+export function useCompleteOrder() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (id: number) => kitchenApi.markReady(id),
+        mutationFn: (id: number) => kitchenApi.completeOrder(id),
 
         onMutate: async (id) => {
             await queryClient.cancelQueries({ queryKey: kitchenQueryKeys.all });
@@ -20,16 +20,12 @@ export function useMarkReady() {
                 kitchenQueryKeys.list()
             );
 
-            // Optimistically update to "ready" status
+            // Optimistically update to "completed" status
             queryClient.setQueryData(kitchenQueryKeys.list(), (old: any) => {
                 if (!old) return old;
                 return old.map((order: any) =>
                     order.kitchenOrderId === id
-                        ? {
-                              ...order,
-                              status: KitchenOrderStatus.READY,
-                              completedAt: new Date().toISOString(),
-                          }
+                        ? { ...order, status: KitchenOrderStatus.COMPLETED }
                         : order
                 );
             });
@@ -38,7 +34,7 @@ export function useMarkReady() {
         },
 
         onSuccess: () => {
-            toast.success("Order ready for pickup!");
+            toast.success("Order completed!");
             queryClient.invalidateQueries({
                 queryKey: kitchenQueryKeys.list(),
             });
@@ -54,7 +50,7 @@ export function useMarkReady() {
 
             const errorMessage =
                 error?.response?.data?.message ||
-                "Failed to mark order as ready";
+                "Failed to mark order as completed";
             toast.error(errorMessage);
         },
     });

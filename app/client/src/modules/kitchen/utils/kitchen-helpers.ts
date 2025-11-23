@@ -107,17 +107,10 @@ export class KitchenHelpers {
     }
 
     /**
-     * Check if order can be marked ready
-     */
-    static canMarkReady(status: KitchenOrderStatus): boolean {
-        return status === KitchenOrderStatus.READY;
-    }
-
-    /**
      * Check if order can be completed
      */
     static canComplete(status: KitchenOrderStatus): boolean {
-        return status === KitchenOrderStatus.READY;
+        return status === KitchenOrderStatus.PREPARING;
     }
 
     /**

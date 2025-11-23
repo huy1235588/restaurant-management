@@ -46,9 +46,9 @@ enum OrderItemStatus {
 }
 
 enum KitchenOrderStatus {
-    pending // New order
-    ready // All items complete, ready for pickup
-    completed // Waiter picked up order
+    pending // New order, waiting for chef
+    preparing // Chef is cooking
+    completed // Order finished and served
     cancelled // Order cancelled
 }
 
@@ -56,6 +56,13 @@ enum OrderPriority {
     normal // Standard order
     express // Rush order (customer in hurry)
     vip // VIP customer
+}
+
+enum KitchenPriority {
+    low // Low priority
+    normal // Standard priority
+    high // High priority
+    urgent // Urgent, rush order
 }
 
 enum StationType {
@@ -384,27 +391,22 @@ model OrderItem {
 // ============================================
 
 model KitchenOrder {
-    kitchenOrderId    Int                @id @default(autoincrement())
-    orderId           Int                @unique // One-to-one with Order
-    staffId           Int? // chef assigned
-    stationId         Int? // kitchen station assigned
-    priority          OrderPriority      @default(normal)
-    status            KitchenOrderStatus @default(pending)
-    prepTimeEstimated Int? // in minutes
-    prepTimeActual    Int? // in minutes
-    startedAt         DateTime?
-    completedAt       DateTime?
-    notes             String?            @db.Text
-    createdAt         DateTime           @default(now())
-    updatedAt         DateTime           @updatedAt
+    kitchenOrderId Int                @id @default(autoincrement())
+    orderId        Int                @unique // One-to-one with Order
+    staffId        Int? // chef assigned
+    priority       KitchenPriority    @default(normal)
+    status         KitchenOrderStatus @default(pending)
+    prepTimeActual Int? // actual prep time in minutes
+    startedAt      DateTime?
+    completedAt    DateTime?
+    createdAt      DateTime           @default(now())
+    updatedAt      DateTime           @updatedAt
 
-    order   Order           @relation(fields: [orderId], references: [orderId], onDelete: Cascade)
-    chef    Staff?          @relation(fields: [staffId], references: [staffId], onDelete: SetNull)
-    station KitchenStation? @relation(fields: [stationId], references: [stationId], onDelete: SetNull)
+    order Order  @relation(fields: [orderId], references: [orderId], onDelete: Cascade)
+    chef  Staff? @relation(fields: [staffId], references: [staffId], onDelete: SetNull)
 
     @@index([orderId])
     @@index([staffId])
-    @@index([stationId])
     @@index([status])
     @@index([priority])
     @@index([createdAt])
@@ -418,8 +420,6 @@ model KitchenStation {
     isActive  Boolean     @default(true)
     createdAt DateTime    @default(now())
     updatedAt DateTime    @updatedAt
-
-    kitchenOrders KitchenOrder[]
 
     @@index([type])
     @@index([isActive])

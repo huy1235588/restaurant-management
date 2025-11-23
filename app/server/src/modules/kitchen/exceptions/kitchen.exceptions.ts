@@ -73,34 +73,6 @@ export class KitchenOrderNotPendingException extends BadRequestException {
 }
 
 /**
- * Cannot mark order as ready exception
- */
-export class CannotMarkOrderReadyException extends BadRequestException {
-    constructor(kitchenOrderId: number, currentStatus: string) {
-        super({
-            message: KITCHEN_MESSAGES.ERROR.CANNOT_MARK_READY,
-            error: 'Cannot Mark Order Ready',
-            kitchenOrderId,
-            currentStatus,
-        });
-    }
-}
-
-/**
- * Can only complete ready orders exception
- */
-export class CanOnlyCompleteReadyOrdersException extends BadRequestException {
-    constructor(kitchenOrderId: number, currentStatus: string) {
-        super({
-            message: KITCHEN_MESSAGES.ERROR.CANNOT_COMPLETE,
-            error: 'Can Only Complete Ready Orders',
-            kitchenOrderId,
-            currentStatus,
-        });
-    }
-}
-
-/**
  * Kitchen order already completed exception
  */
 export class KitchenOrderAlreadyCompletedException extends BadRequestException {

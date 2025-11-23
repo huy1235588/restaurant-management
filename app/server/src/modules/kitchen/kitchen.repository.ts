@@ -8,6 +8,9 @@ import {
 
 export interface KitchenOrderFilters {
     status?: KitchenOrderStatus;
+    skip?: number;
+    take?: number;
+    include?: Prisma.KitchenOrderInclude;
 }
 
 @Injectable()

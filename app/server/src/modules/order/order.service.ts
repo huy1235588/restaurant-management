@@ -163,18 +163,10 @@ export class OrderService {
                 },
             });
 
-            // Update table status to occupied
-            await tx.restaurantTable.update({
+            // Update table status
+            await this.prisma.restaurantTable.update({
                 where: { tableId: data.tableId },
                 data: { status: TableStatus.occupied },
-            });
-
-            // Create kitchen order
-            await tx.kitchenOrder.create({
-                data: {
-                    orderId: newOrder.orderId,
-                    status: KitchenOrderStatus.pending,
-                },
             });
 
             return newOrder;
@@ -482,6 +474,26 @@ export class OrderService {
             orderId,
             updateData,
         );
+
+        // Trigger kitchen order creation when order is confirmed
+        if (data.status === OrderStatus.confirmed) {
+            const existingKitchenOrder =
+                await this.prisma.kitchenOrder.findUnique({
+                    where: { orderId },
+                });
+
+            if (!existingKitchenOrder) {
+                await this.prisma.kitchenOrder.create({
+                    data: {
+                        orderId: updatedOrder.orderId,
+                        status: KitchenOrderStatus.pending,
+                    },
+                });
+                this.logger.log(
+                    `Kitchen order created for order: ${updatedOrder.orderNumber}`,
+                );
+            }
+        }
 
         this.logger.log(
             `Order status updated: ${order.orderNumber} -> ${data.status}`,

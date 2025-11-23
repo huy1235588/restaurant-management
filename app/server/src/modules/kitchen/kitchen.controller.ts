@@ -32,14 +32,24 @@ export class KitchenController {
     @ApiQuery({
         name: 'status',
         required: false,
-        enum: ['pending', 'ready', 'completed', 'cancelled'],
+        enum: ['pending', 'preparing', 'completed', 'cancelled'],
     })
+    @ApiQuery({ name: 'page', required: false, type: Number })
+    @ApiQuery({ name: 'limit', required: false, type: Number })
     @ApiResponse({
         status: 200,
         description: 'Kitchen orders retrieved successfully',
     })
-    async getAllKitchenOrders(@Query() filters: KitchenOrderFiltersDto) {
-        return this.kitchenService.getAllKitchenOrders(filters);
+    async getAllKitchenOrders(
+        @Query() filters: KitchenOrderFiltersDto,
+        @Query('page') page?: number,
+        @Query('limit') limit?: number,
+    ) {
+        return this.kitchenService.getAllKitchenOrders(
+            filters,
+            page ? parseInt(page.toString()) : 1,
+            limit ? parseInt(limit.toString()) : 20,
+        );
     }
 
     @Get('orders/:id')
@@ -68,24 +78,14 @@ export class KitchenController {
         return this.kitchenService.startPreparing(id, staffId);
     }
 
-    @Patch('orders/:id/ready')
-    @ApiOperation({ summary: 'Mark order as ready' })
-    @ApiParam({ name: 'id', description: 'Kitchen order ID' })
-    @ApiResponse({ status: 200, description: 'Order marked as ready' })
-    @ApiResponse({ status: 400, description: 'Bad request' })
-    @ApiResponse({ status: 404, description: 'Kitchen order not found' })
-    async markReady(@Param('id', ParseIntPipe) id: number) {
-        return this.kitchenService.markReady(id);
-    }
-
     @Patch('orders/:id/complete')
-    @ApiOperation({ summary: 'Mark order as completed (picked up)' })
+    @ApiOperation({ summary: 'Complete kitchen order (dish ready and served)' })
     @ApiParam({ name: 'id', description: 'Kitchen order ID' })
     @ApiResponse({ status: 200, description: 'Order completed' })
     @ApiResponse({ status: 400, description: 'Bad request' })
     @ApiResponse({ status: 404, description: 'Kitchen order not found' })
-    async markCompleted(@Param('id', ParseIntPipe) id: number) {
-        return this.kitchenService.markCompleted(id);
+    async completeOrder(@Param('id', ParseIntPipe) id: number) {
+        return this.kitchenService.completeOrder(id);
     }
 
     @Patch('orders/:id/cancel')

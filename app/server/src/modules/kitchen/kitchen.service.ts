@@ -10,7 +10,6 @@ import {
     MainOrderNotFoundException,
     OrderNotConfirmedException,
     KitchenOrderNotPendingException,
-    CanOnlyCompleteReadyOrdersException,
     KitchenOrderAlreadyCompletedException,
     KitchenOrderAlreadyCancelledException,
     CannotCancelCompletedOrderException,
@@ -28,10 +27,34 @@ export class KitchenService {
     ) {}
 
     /**
-     * Get all kitchen orders with filters
+     * Get all kitchen orders with filters and pagination
+     * Includes related order, table, items data to prevent N+1 queries
      */
-    async getAllKitchenOrders(filters?: KitchenOrderFilters) {
-        return this.kitchenRepository.findAll(filters);
+    async getAllKitchenOrders(
+        filters?: KitchenOrderFilters,
+        page: number = 1,
+        limit: number = 20,
+    ) {
+        const skip = (page - 1) * limit;
+
+        return this.kitchenRepository.findAll({
+            ...filters,
+            skip,
+            take: limit,
+            include: {
+                order: {
+                    include: {
+                        table: true,
+                        orderItems: {
+                            include: {
+                                menuItem: true,
+                            },
+                        },
+                    },
+                },
+                chef: true,
+            },
+        });
     }
 
     /**
@@ -110,10 +133,14 @@ export class KitchenService {
     /**
      * Start preparing (chef claims order)
      */
+    /**
+     * Start preparing kitchen order
+     * Implements optimistic locking to prevent concurrent chef claims
+     */
     async startPreparing(kitchenOrderId: number, staffId?: number) {
         const kitchenOrder = await this.getKitchenOrderById(kitchenOrderId);
 
-        // Validate status using helper
+        // Validate status
         if (!KitchenHelper.canModifyOrder(kitchenOrder.status)) {
             this.logger.warn(
                 `Cannot start preparing kitchen order ${kitchenOrderId} with status ${kitchenOrder.status}`,
@@ -131,18 +158,37 @@ export class KitchenService {
             );
         }
 
-        const updated = await this.kitchenRepository.update(kitchenOrderId, {
-            status: KitchenOrderStatus.ready, // Simplified: we skip "preparing" and go straight to "ready" after chef starts
+        // Optimistic locking: only update if still pending and unclaimed
+        const updateData: any = {
+            status: KitchenOrderStatus.preparing,
             startedAt: new Date(),
-            ...(staffId && {
-                chef: {
-                    connect: { staffId },
-                },
-            }),
+        };
+
+        if (staffId) {
+            updateData.staffId = staffId;
+        }
+
+        const result = await this.prisma.kitchenOrder.updateMany({
+            where: {
+                kitchenOrderId,
+                status: KitchenOrderStatus.pending,
+                staffId: null, // Only if no chef assigned yet
+            },
+            data: updateData,
         });
 
+        if (result.count === 0) {
+            this.logger.warn(
+                `Kitchen order ${kitchenOrderId} already claimed by another chef`,
+            );
+            throw new Error('Order already claimed by another chef');
+        }
+
+        // Fetch updated order
+        const updated = await this.getKitchenOrderById(kitchenOrderId);
+
         this.logger.log(
-            `Kitchen order #${kitchenOrderId} started by chef ${staffId}`,
+            `Kitchen order #${kitchenOrderId} started preparing by chef ${staffId}`,
         );
 
         // Emit WebSocket event
@@ -152,9 +198,10 @@ export class KitchenService {
     }
 
     /**
-     * Mark as ready for pickup
+     * Complete kitchen order (dish is ready and served)
+     * Renamed from markReady to simplify flow
      */
-    async markReady(kitchenOrderId: number) {
+    async completeOrder(kitchenOrderId: number) {
         const kitchenOrder = await this.getKitchenOrderById(kitchenOrderId);
 
         if (kitchenOrder.status === KitchenOrderStatus.completed) {
@@ -178,7 +225,7 @@ export class KitchenService {
             const updatedKitchen = await tx.kitchenOrder.update({
                 where: { kitchenOrderId },
                 data: {
-                    status: KitchenOrderStatus.ready,
+                    status: KitchenOrderStatus.completed,
                     completedAt,
                     prepTimeActual,
                 },
@@ -206,7 +253,7 @@ export class KitchenService {
         });
 
         this.logger.log(
-            `Kitchen order #${kitchenOrderId} marked as ready (prep time: ${prepTimeActual} min)`,
+            `Kitchen order #${kitchenOrderId} completed (prep time: ${prepTimeActual} min)`,
         );
 
         // Log if preparation was slow
@@ -215,60 +262,6 @@ export class KitchenService {
                 `Slow preparation detected for kitchen order #${kitchenOrderId}: ${prepTimeActual} min`,
             );
         }
-
-        // Emit WebSocket event
-        this.kitchenGateway.emitOrderUpdate(updated);
-
-        return updated;
-    }
-
-    /**
-     * Mark as completed (waiter picked up)
-     */
-    async markCompleted(kitchenOrderId: number) {
-        const kitchenOrder = await this.getKitchenOrderById(kitchenOrderId);
-
-        if (kitchenOrder.status !== KitchenOrderStatus.ready) {
-            this.logger.warn(
-                `Cannot complete kitchen order ${kitchenOrderId} with status ${kitchenOrder.status}`,
-            );
-            throw new CanOnlyCompleteReadyOrdersException(
-                kitchenOrderId,
-                kitchenOrder.status,
-            );
-        }
-
-        const updated = await this.prisma.$transaction(async (tx) => {
-            // Update kitchen order
-            const updatedKitchen = await tx.kitchenOrder.update({
-                where: { kitchenOrderId },
-                data: { status: KitchenOrderStatus.completed },
-                include: {
-                    order: {
-                        include: {
-                            table: true,
-                            orderItems: {
-                                include: {
-                                    menuItem: true,
-                                },
-                            },
-                        },
-                    },
-                },
-            });
-
-            // Update order status to serving
-            await tx.order.update({
-                where: { orderId: kitchenOrder.orderId },
-                data: { status: OrderStatus.serving },
-            });
-
-            return updatedKitchen;
-        });
-
-        this.logger.log(
-            `Kitchen order #${kitchenOrderId} completed (picked up by waiter)`,
-        );
 
         // Emit WebSocket event
         this.kitchenGateway.emitOrderCompleted(updated);

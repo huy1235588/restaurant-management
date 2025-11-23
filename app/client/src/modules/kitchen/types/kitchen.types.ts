@@ -1,6 +1,6 @@
 export enum KitchenOrderStatus {
     PENDING = "pending",
-    READY = "ready",
+    PREPARING = "preparing",
     COMPLETED = "completed",
     CANCELLED = "cancelled",
 }

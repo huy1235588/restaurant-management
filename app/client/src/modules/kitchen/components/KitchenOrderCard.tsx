@@ -14,16 +14,14 @@ import { KitchenHelpers } from "../utils/kitchen-helpers";
 interface KitchenOrderCardProps {
     order: KitchenOrder;
     onStartPreparing: (orderId: number) => void;
-    onMarkReady: (orderId: number) => void;
-    onMarkCompleted: (orderId: number) => void;
+    onCompleteOrder: (orderId: number) => void;
     onCancel: (orderId: number) => void;
 }
 
 export function KitchenOrderCard({
     order,
     onStartPreparing,
-    onMarkReady,
-    onMarkCompleted,
+    onCompleteOrder,
     onCancel,
 }: KitchenOrderCardProps) {
     const [isNew, setIsNew] = useState(false);
@@ -39,7 +37,6 @@ export function KitchenOrderCard({
     }, [order.createdAt]);
 
     const canStart = KitchenHelpers.canStartOrder(order.status);
-    const canMarkReady = KitchenHelpers.canMarkReady(order.status);
     const canComplete = KitchenHelpers.canComplete(order.status);
 
     return (
@@ -102,22 +99,11 @@ export function KitchenOrderCard({
                     </Button>
                 )}
 
-                {/* Mark Ready Button */}
-                {canMarkReady && (
-                    <Button
-                        className="w-full bg-green-600 hover:bg-green-700"
-                        onClick={() => onMarkReady(order.kitchenOrderId)}
-                        size="lg"
-                    >
-                        Mark Ready
-                    </Button>
-                )}
-
                 {/* Complete Button */}
                 {canComplete && (
                     <Button
-                        className="w-full bg-blue-600 hover:bg-blue-700"
-                        onClick={() => onMarkCompleted(order.kitchenOrderId)}
+                        className="w-full bg-green-600 hover:bg-green-700"
+                        onClick={() => onCompleteOrder(order.kitchenOrderId)}
                         size="lg"
                     >
                         Complete Order
@@ -125,7 +111,7 @@ export function KitchenOrderCard({
                 )}
 
                 {/* Cancel Button */}
-                {(canStart || canMarkReady) && (
+                {canStart && (
                     <Button
                         className="w-full"
                         variant="destructive"

@@ -141,7 +141,7 @@ export class KitchenHelper {
     static isActiveOrder(status: KitchenOrderStatus): boolean {
         return (
             status === KitchenOrderStatus.pending ||
-            status === KitchenOrderStatus.ready
+            status === KitchenOrderStatus.preparing
         );
     }
 
@@ -161,7 +161,7 @@ export class KitchenHelper {
     static getStatusDisplayName(status: KitchenOrderStatus): string {
         const displayNames: Record<KitchenOrderStatus, string> = {
             [KitchenOrderStatus.pending]: 'Chờ xử lý',
-            [KitchenOrderStatus.ready]: 'Sẵn sàng',
+            [KitchenOrderStatus.preparing]: 'Đang chuẩn bị',
             [KitchenOrderStatus.completed]: 'Hoàn thành',
             [KitchenOrderStatus.cancelled]: 'Đã hủy',
         };

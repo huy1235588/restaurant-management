@@ -12,15 +12,15 @@ export const STATUS_COLORS: Record<
         text: "text-gray-800",
         border: "border-gray-300",
     },
-    [KitchenOrderStatus.READY]: {
+    [KitchenOrderStatus.PREPARING]: {
+        bg: "bg-yellow-100",
+        text: "text-yellow-800",
+        border: "border-yellow-300",
+    },
+    [KitchenOrderStatus.COMPLETED]: {
         bg: "bg-green-100",
         text: "text-green-800",
         border: "border-green-300",
-    },
-    [KitchenOrderStatus.COMPLETED]: {
-        bg: "bg-blue-100",
-        text: "text-blue-800",
-        border: "border-blue-300",
     },
     [KitchenOrderStatus.CANCELLED]: {
         bg: "bg-red-100",
