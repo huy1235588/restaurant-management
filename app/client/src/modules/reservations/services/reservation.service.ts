@@ -1,16 +1,20 @@
 import axiosInstance from "@/lib/axios";
-import { ApiResponse, PaginatedResponse } from "@/types";
 import {
     Reservation,
     CreateReservationDto,
     UpdateReservationDto,
-    ReservationFilters,
-    AvailableTable,
+    CancelReservationDto,
+    CheckAvailabilityDto,
+    PaginatedResponse,
+    ApiResponse,
+    ReservationFilterOptions,
+    SeatReservationResponse,
 } from "../types";
 
 export const reservationApi = {
+    // Get all reservations with pagination and filters
     getAll: async (
-        params?: ReservationFilters & { page?: number; limit?: number }
+        params?: ReservationFilterOptions
     ): Promise<PaginatedResponse<Reservation>> => {
         const response = await axiosInstance.get<
             ApiResponse<PaginatedResponse<Reservation>>
@@ -18,6 +22,7 @@ export const reservationApi = {
         return response.data.data;
     },
 
+    // Get reservation by ID
     getById: async (id: number): Promise<Reservation> => {
         const response = await axiosInstance.get<ApiResponse<Reservation>>(
             `/reservations/${id}`
@@ -25,6 +30,32 @@ export const reservationApi = {
         return response.data.data;
     },
 
+    // Get reservation by code
+    getByCode: async (code: string): Promise<Reservation> => {
+        const response = await axiosInstance.get<ApiResponse<Reservation>>(
+            `/reservations/code/${code}`
+        );
+        return response.data.data;
+    },
+
+    // Get reservations by phone number
+    getByPhone: async (phone: string): Promise<Reservation[]> => {
+        const response = await axiosInstance.get<ApiResponse<Reservation[]>>(
+            `/reservations/phone/${phone}`
+        );
+        return response.data.data;
+    },
+
+    // Check table availability
+    checkAvailability: async (params: CheckAvailabilityDto): Promise<any[]> => {
+        const response = await axiosInstance.get<ApiResponse<any[]>>(
+            "/reservations/check-availability",
+            { params }
+        );
+        return response.data.data;
+    },
+
+    // Create new reservation
     create: async (data: CreateReservationDto): Promise<Reservation> => {
         const response = await axiosInstance.post<ApiResponse<Reservation>>(
             "/reservations",
@@ -33,58 +64,58 @@ export const reservationApi = {
         return response.data.data;
     },
 
+    // Update reservation
     update: async (
         id: number,
         data: UpdateReservationDto
     ): Promise<Reservation> => {
-        const response = await axiosInstance.patch<ApiResponse<Reservation>>(
+        const response = await axiosInstance.put<ApiResponse<Reservation>>(
             `/reservations/${id}`,
             data
         );
         return response.data.data;
     },
 
+    // Confirm reservation
     confirm: async (id: number): Promise<Reservation> => {
-        const response = await axiosInstance.post<ApiResponse<Reservation>>(
+        const response = await axiosInstance.patch<ApiResponse<Reservation>>(
             `/reservations/${id}/confirm`
         );
         return response.data.data;
     },
 
-    seat: async (id: number): Promise<Reservation> => {
-        const response = await axiosInstance.post<ApiResponse<Reservation>>(
-            `/reservations/${id}/seat`
-        );
+    // Mark as seated (check-in) and auto-create order
+    seat: async (id: number): Promise<SeatReservationResponse> => {
+        const response = await axiosInstance.patch<
+            ApiResponse<SeatReservationResponse>
+        >(`/reservations/${id}/seated`);
         return response.data.data;
     },
 
-    noShow: async (id: number): Promise<Reservation> => {
-        const response = await axiosInstance.post<ApiResponse<Reservation>>(
-            `/reservations/${id}/no-show`
-        );
-        return response.data.data;
-    },
-
+    // Complete reservation
     complete: async (id: number): Promise<Reservation> => {
-        const response = await axiosInstance.post<ApiResponse<Reservation>>(
+        const response = await axiosInstance.patch<ApiResponse<Reservation>>(
             `/reservations/${id}/complete`
         );
         return response.data.data;
     },
 
-    cancel: async (id: number): Promise<void> => {
-        await axiosInstance.delete(`/reservations/${id}`);
+    // Cancel reservation
+    cancel: async (
+        id: number,
+        data?: CancelReservationDto
+    ): Promise<Reservation> => {
+        const response = await axiosInstance.patch<ApiResponse<Reservation>>(
+            `/reservations/${id}/cancel`,
+            data || {}
+        );
+        return response.data.data;
     },
 
-    getAvailableTables: async (params: {
-        date: string;
-        time: string;
-        duration: number;
-        partySize: number;
-    }): Promise<AvailableTable[]> => {
-        const response = await axiosInstance.get<ApiResponse<AvailableTable[]>>(
-            "/reservations/available-tables",
-            { params }
+    // Mark as no-show
+    markNoShow: async (id: number): Promise<Reservation> => {
+        const response = await axiosInstance.patch<ApiResponse<Reservation>>(
+            `/reservations/${id}/no-show`
         );
         return response.data.data;
     },

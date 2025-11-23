@@ -1,63 +1,184 @@
-// Reservation types based on backend schema
+// Reservation status enum
+export type ReservationStatus =
+    | 'pending'
+    | 'confirmed'
+    | 'seated'
+    | 'completed'
+    | 'cancelled'
+    | 'no_show';
 
-export enum ReservationStatus {
-    PENDING = "pending",
-    CONFIRMED = "confirmed",
-    SEATED = "seated",
-    COMPLETED = "completed",
-    CANCELLED = "cancelled",
-    NO_SHOW = "no-show",
-}
-
-export interface Reservation {
-    reservationId: number;
-    reservationCode: string;
-    customerName: string;
+// Customer interface
+export interface Customer {
+    customerId: number;
+    name: string;
     phoneNumber: string;
-    email?: string | null;
-    tableId: number;
-    reservationDate: string;
-    reservationTime: string;
-    partySize: number;
-    duration: number;
-    status: ReservationStatus;
-    specialRequest?: string | null;
-    depositAmount?: number | null;
-    table?: {
-        tableId: number;
-        tableNumber: string;
-        capacity: number;
-    };
+    email?: string;
+    birthday?: string;
+    preferences?: any;
+    notes?: string;
+    isVip: boolean;
     createdAt: string;
     updatedAt: string;
 }
 
-export interface CreateReservationDto {
+// Restaurant Table interface
+export interface RestaurantTable {
+    tableId: number;
+    tableNumber: string;
+    tableName?: string;
+    capacity: number;
+    minCapacity: number;
+    floor: number;
+    section?: string;
+    status: string;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
+
+// Main Reservation interface
+export interface Reservation {
+    reservationId: number;
+    id?: number; // Alias for reservationId
+    reservationCode: string;
     customerName: string;
     phoneNumber: string;
     email?: string;
+    customerId?: number;
     tableId: number;
     reservationDate: string;
     reservationTime: string;
+    duration: number;
     partySize: number;
-    duration?: number;
+    status: ReservationStatus;
     specialRequest?: string;
     depositAmount?: number;
+    notes?: string;
+    tags?: string[];
+    createdBy?: number;
+    confirmedAt?: string;
+    seatedAt?: string;
+    completedAt?: string;
+    cancelledAt?: string;
+    cancellationReason?: string;
+    createdAt: string;
+    updatedAt: string;
+    // Relations
+    customer?: Customer;
+    table?: RestaurantTable;
+    audits?: ReservationAudit[];
 }
 
-export interface UpdateReservationDto extends Partial<CreateReservationDto> {}
+// Reservation Audit interface
+export interface ReservationAudit {
+    auditId: number;
+    reservationId: number;
+    action: string;
+    userId?: number;
+    changes?: any;
+    createdAt: string;
+    user?: {
+        staffId: number;
+        fullName: string;
+    };
+}
 
-export interface ReservationFilters {
-    status?: ReservationStatus;
+// DTOs
+
+export interface CreateReservationDto {
+    customerId?: number;
+    customerName: string;
+    phoneNumber: string; // Fixed: was customerPhone
+    email?: string; // Fixed: was customerEmail
     tableId?: number;
+    floor?: number;
+    preferredTableId?: number;
+    reservationDate: string;
+    reservationTime: string;
+    duration?: number;
+    partySize: number;
+    specialRequest?: string;
+    depositAmount?: number;
+    notes?: string;
+    tags?: string[];
+}
+
+export interface UpdateReservationDto {
+    customerName?: string;
+    phoneNumber?: string; // Fixed: was customerPhone
+    email?: string; // Fixed: was customerEmail
+    tableId?: number;
+    reservationDate?: string;
+    reservationTime?: string;
+    duration?: number;
+    partySize?: number;
+    specialRequest?: string;
+    depositAmount?: number;
+    notes?: string;
+    tags?: string[];
+}
+
+export interface CancelReservationDto {
+    reason?: string;
+}
+
+export interface SeatReservationResponse {
+    reservation: Reservation;
+    order: {
+        orderId: number;
+        orderNumber: string;
+        tableId: number;
+        staffId: number | null;
+        reservationId: number;
+        customerName: string;
+        customerPhone: string;
+        partySize: number;
+        status: string;
+        totalAmount: number;
+        finalAmount: number;
+        orderTime: string;
+        notes?: string;
+    };
+}
+
+export interface CheckAvailabilityDto {
+    date: string;
+    partySize: number;
+    duration?: number; // Optional - defaults to 120 on backend
+    floor?: number;
+    section?: string;
+}
+
+export interface ReservationFilterOptions {
+    page?: number;
+    limit?: number;
+    status?: ReservationStatus;
+    date?: string;
     startDate?: string;
     endDate?: string;
+    tableId?: number;
     search?: string;
+    sortBy?: 'reservationDate' | 'reservationTime' | 'createdAt' | 'status';
+    sortOrder?: 'asc' | 'desc';
 }
 
-export interface AvailableTable {
-    tableId: number;
-    tableNumber: string;
-    capacity: number;
-    location?: string;
+// Pagination
+
+export interface PaginationInfo {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+}
+
+export interface PaginatedResponse<T> {
+    items: T[];
+    pagination: PaginationInfo;
+}
+
+// API Response wrapper
+export interface ApiResponse<T> {
+    success: boolean;
+    data: T;
+    message?: string;
 }
