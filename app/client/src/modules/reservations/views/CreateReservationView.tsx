@@ -18,7 +18,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useReservationActions } from '@/modules/reservations/hooks/useReservationActions';
 import { useTableAvailability } from '@/modules/reservations/hooks/useTableAvailability';
-import { ArrowLeft, Calendar, Users, Clock, Mail, Phone, User, FileText, Loader2, CheckCircle2 } from 'lucide-react';
+import { TableSelector } from '@/modules/reservations/components';
+import { ArrowLeft, Calendar, Users, Clock, Mail, Phone, User, FileText, Loader2 } from 'lucide-react';
 
 const reservationSchema = z.object({
     customerName: z.string().min(1, 'Name is required').max(100),
@@ -309,65 +310,24 @@ export function CreateReservationView() {
                             </CardContent>
                         </Card>
 
-                        {/* Table Selection Card */}
-                        {tables.length > 0 && (
-                            <Card className="pt-0 border-2 border-green-200 dark:border-green-700 shadow-lg">
-                                <CardHeader className="pt-6 rounded-t-xl rounded-tr-xl bg-linear-to-r from-green-50 to-emerald-50 dark:from-gray-800 dark:to-gray-800 border-b border-green-200 dark:border-green-700">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-green-600 dark:bg-green-500 rounded-lg flex items-center justify-center">
-                                            <CheckCircle2 className="w-5 h-5 text-white" />
-                                        </div>
-                                        <div>
-                                            <CardTitle className="text-xl">Available Tables</CardTitle>
-                                            <CardDescription>Select a table for this reservation</CardDescription>
-                                        </div>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="pt-6">
-                                    <FormField
-                                        control={form.control}
-                                        name="tableId"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormControl>
-                                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                                                        {tables.map((table: any) => (
-                                                            <button
-                                                                key={table.id}
-                                                                type="button"
-                                                                onClick={() => field.onChange(table.id)}
-                                                                className={`p-4 border-2 rounded-xl text-sm font-semibold transition-all duration-200 ${field.value === table.id
-                                                                        ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/30 scale-105'
-                                                                        : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-300'
-                                                                    }`}
-                                                            >
-                                                                <div className="text-lg mb-1">
-                                                                    Table {table.tableNumber}
-                                                                </div>
-                                                                <div className={`text-xs ${field.value === table.id
-                                                                        ? 'text-blue-100'
-                                                                        : 'text-gray-500 dark:text-gray-400'
-                                                                    }`}>
-                                                                    <Users className="w-3 h-3 inline mr-1" />
-                                                                    {table.capacity} seats
-                                                                </div>
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </FormControl>
-                                                {loadingTables && (
-                                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 flex items-center gap-2">
-                                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                                        Checking availability...
-                                                    </p>
-                                                )}
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </CardContent>
-                            </Card>
-                        )}
+                        {/* Table Selection */}
+                        <FormField
+                            control={form.control}
+                            name="tableId"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <TableSelector
+                                            tables={tables}
+                                            selectedTableId={field.value}
+                                            onSelectTable={field.onChange}
+                                            loading={loadingTables}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
                         {/* Special Requests Card */}
                         <Card className="pt-0 border-2 border-gray-200 dark:border-gray-700 shadow-lg">
