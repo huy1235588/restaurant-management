@@ -13,10 +13,10 @@ import { OrderSummaryCard } from '../components/OrderSummaryCard';
 import { OrderTimeline } from '../components/OrderTimeline';
 import { CancelItemDialog } from '../dialogs/CancelItemDialog';
 import { CancelOrderDialog } from '../dialogs/CancelOrderDialog';
-import { useOrderById, useOrderSocket } from '../hooks';
+import { useOrderById, useOrderSocket, useUpdateOrderStatus } from '../hooks';
 import { Order, OrderItem } from '../types';
 import { formatOrderNumber, formatDateTime, canAddItems, canCancelOrder } from '../utils';
-import { ArrowLeft, Plus, XCircle, Printer, Receipt } from 'lucide-react';
+import { ArrowLeft, Plus, XCircle, Printer, Receipt, Check } from 'lucide-react';
 
 interface OrderDetailViewProps {
     orderId: number;
@@ -28,6 +28,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
     const [showCancelOrderDialog, setShowCancelOrderDialog] = useState(false);
 
     const { data: order, isLoading, error } = useOrderById(orderId);
+    const updateStatusMutation = useUpdateOrderStatus();
 
     // Real-time updates
     useOrderSocket({
@@ -45,6 +46,13 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
 
     const handleCancelOrder = () => {
         setShowCancelOrderDialog(true);
+    };
+
+    const handleConfirmOrder = () => {
+        updateStatusMutation.mutate({
+            orderId,
+            data: { status: 'confirmed' },
+        });
     };
 
     const handlePrint = () => {
@@ -104,8 +112,17 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                     <OrderStatusBadge status={order.status} />
                 </div>
                 <div className="flex gap-2">
+                    {order.status === 'pending' && (
+                        <Button 
+                            onClick={handleConfirmOrder}
+                            disabled={updateStatusMutation.isPending}
+                        >
+                            <Check className="mr-2 h-4 w-4" />
+                            {updateStatusMutation.isPending ? 'Đang xác nhận...' : 'Xác nhận đơn'}
+                        </Button>
+                    )}
                     {canAddItems(order) && (
-                        <Button onClick={handleAddItems}>
+                        <Button onClick={handleAddItems} variant="outline">
                             <Plus className="mr-2 h-4 w-4" />
                             Thêm món
                         </Button>
@@ -170,10 +187,10 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                             <Separator />
                             <div>
                                 <p className="text-sm font-medium text-muted-foreground mb-2">Trạng thái bếp</p>
-                                <KitchenStatusBadge kitchenOrder={order.kitchenOrder} />
-                                {order.kitchenOrder?.chef && (
+                                <KitchenStatusBadge kitchenOrder={(order as any).kitchenOrders?.[0] || null} />
+                                {(order as any).kitchenOrders?.[0]?.chef && (
                                     <p className="text-sm text-muted-foreground mt-1">
-                                        Đầu bếp: {order.kitchenOrder.chef.fullName}
+                                        Đầu bếp: {(order as any).kitchenOrders[0].chef.fullName}
                                     </p>
                                 )}
                             </div>
@@ -198,11 +215,11 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                 <div className="space-y-6">
                     {/* Order Summary */}
                     <OrderSummaryCard
-                        subtotal={(order.orderItems || []).reduce((sum: number, item: any) => sum + item.price * item.quantity, 0)}
+                        subtotal={(order.orderItems || []).reduce((sum: number, item: any) => sum + Number(item.unitPrice) * item.quantity, 0)}
                         serviceCharge={0}
                         tax={0}
                         discount={0}
-                        total={(order.orderItems || []).reduce((sum: number, item: any) => sum + item.price * item.quantity, 0)}
+                        total={(order.orderItems || []).reduce((sum: number, item: any) => sum + Number(item.unitPrice) * item.quantity, 0)}
                     />
 
                     {/* Additional Info */}

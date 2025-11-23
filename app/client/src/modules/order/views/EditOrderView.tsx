@@ -171,15 +171,15 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
                                         className="flex justify-between text-sm"
                                     >
                                         <span className="flex-1">
-                                            {item.menuItem?.name || 'Unknown'} x{item.quantity}
-                                            {item.specialRequests && (
+                                            {item.menuItem?.itemName || 'Unknown'} x{item.quantity}
+                                            {item.specialRequest && (
                                                 <span className="text-muted-foreground ml-2">
-                                                    ({item.specialRequests})
+                                                    ({item.specialRequest})
                                                 </span>
                                             )}
                                         </span>
                                         <span className="font-medium">
-                                            {formatCurrency(item.price * item.quantity)}
+                                            {formatCurrency(Number(item.unitPrice) * item.quantity)}
                                         </span>
                                     </div>
                                 ))}

@@ -54,14 +54,14 @@ export class OrderRepository {
                 customerName: true,
             },
         },
-        kitchenOrder: {
+        kitchenOrders: {
             select: {
                 kitchenOrderId: true,
                 status: true,
                 priority: true,
                 startedAt: true,
                 completedAt: true,
-                chefId: true,
+                staffId: true,
                 chef: {
                     select: {
                         staffId: true,
