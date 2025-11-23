@@ -1,15 +1,23 @@
-import {
-    Injectable,
-    NotFoundException,
-    BadRequestException,
-    Logger,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { BillRepository, FindOptions } from './bill.repository';
 import { PaymentRepository } from './payment.repository';
 import { PrismaService } from '@/database/prisma.service';
 import { CreateBillDto, ApplyDiscountDto, ProcessPaymentDto } from './dto';
 import { PaymentStatus, OrderStatus, TableStatus } from '@prisma/generated/client';
 import { ConfigService } from '@nestjs/config';
+import { BILLING_CONSTANTS, BILLING_MESSAGES } from './constants/billing.constants';
+import {
+    BillNotFoundException,
+    BillAlreadyExistsException,
+    OrderNotReadyForBillingException,
+    BillNotPendingException,
+    InvalidDiscountAmountException,
+    DiscountExceedsSubtotalException,
+    InvalidDiscountPercentageException,
+    InvalidPaymentAmountException,
+    InvalidPaymentMethodException,
+} from './exceptions/billing.exceptions';
+import { BillingHelper } from './helpers/billing.helper';
 
 @Injectable()
 export class BillingService {
@@ -23,8 +31,14 @@ export class BillingService {
         private readonly prisma: PrismaService,
         private readonly configService: ConfigService,
     ) {
-        this.TAX_RATE = this.configService.get<number>('billing.taxRate', 0.1); // 10%
-        this.SERVICE_RATE = this.configService.get<number>('billing.serviceRate', 0.05); // 5%
+        this.TAX_RATE = this.configService.get<number>(
+            'billing.taxRate',
+            BILLING_CONSTANTS.DEFAULT_TAX_RATE,
+        );
+        this.SERVICE_RATE = this.configService.get<number>(
+            'billing.serviceRate',
+            BILLING_CONSTANTS.DEFAULT_SERVICE_RATE,
+        );
     }
 
     /**
@@ -41,7 +55,8 @@ export class BillingService {
         const bill = await this.billRepository.findById(billId);
 
         if (!bill) {
-            throw new NotFoundException('Bill not found');
+            this.logger.warn(`Bill not found: ${billId}`);
+            throw new BillNotFoundException(billId);
         }
 
         return bill;
@@ -66,26 +81,31 @@ export class BillingService {
         });
 
         if (!order) {
-            throw new NotFoundException('Order not found');
+            this.logger.warn(`Order not found for bill creation: ${data.orderId}`);
+            throw new NotFoundException(BILLING_MESSAGES.ERROR.ORDER_NOT_FOUND);
         }
 
         // Check if order is ready for billing
         if (order.status !== OrderStatus.ready && order.status !== OrderStatus.serving) {
-            throw new BadRequestException(
-                'Order must be ready or being served before creating bill',
+            this.logger.warn(
+                `Order ${data.orderId} not ready for billing. Status: ${order.status}`,
             );
+            throw new OrderNotReadyForBillingException(data.orderId, order.status);
         }
 
         // Check if bill already exists
         if (order.bill) {
-            throw new BadRequestException('Bill already exists for this order');
+            this.logger.warn(`Bill already exists for order ${data.orderId}`);
+            throw new BillAlreadyExistsException(data.orderId);
         }
 
-        // Calculate bill amounts
+        // Calculate bill amounts using helper
         const subtotal = Number(order.totalAmount);
-        const taxAmount = subtotal * this.TAX_RATE;
-        const serviceCharge = subtotal * this.SERVICE_RATE;
-        const totalAmount = subtotal + taxAmount + serviceCharge;
+        const billSummary = BillingHelper.calculateBillSummary({
+            subtotal,
+            taxRate: this.TAX_RATE,
+            serviceRate: this.SERVICE_RATE,
+        });
 
         // Create bill in transaction
         const bill = await this.prisma.$transaction(async (tx) => {
@@ -95,12 +115,12 @@ export class BillingService {
                     orderId: data.orderId,
                     tableId: order.tableId,
                     staffId,
-                    subtotal,
-                    taxAmount,
-                    taxRate: this.TAX_RATE,
-                    serviceCharge,
+                    subtotal: billSummary.subtotal,
+                    taxAmount: billSummary.taxAmount,
+                    taxRate: billSummary.taxRate,
+                    serviceCharge: billSummary.serviceCharge,
                     discountAmount: 0,
-                    totalAmount,
+                    totalAmount: billSummary.totalAmount,
                     paidAmount: 0,
                     changeAmount: 0,
                     paymentStatus: PaymentStatus.pending,
@@ -147,43 +167,62 @@ export class BillingService {
     ) {
         const bill = await this.getBillById(billId);
 
-        if (bill.paymentStatus !== PaymentStatus.pending) {
-            throw new BadRequestException('Can only apply discount to pending bills');
+        // Check if bill can be modified
+        if (!BillingHelper.canModifyBill(bill.paymentStatus)) {
+            this.logger.warn(
+                `Cannot apply discount to bill ${billId} with status ${bill.paymentStatus}`,
+            );
+            throw new BillNotPendingException(billId, bill.paymentStatus);
         }
 
-        let discountAmount = discountData.amount;
+        let discountAmount = discountData.amount || 0;
 
         // Calculate percentage discount if provided
         if (discountData.percentage) {
-            discountAmount = Number(bill.subtotal) * (discountData.percentage / 100);
-        }
+            // Validate percentage
+            if (!BillingHelper.isValidDiscountPercentage(discountData.percentage)) {
+                throw new InvalidDiscountPercentageException(discountData.percentage);
+            }
 
-        // Validate discount amount
-        if (discountAmount < 0) {
-            throw new BadRequestException('Discount amount cannot be negative');
-        }
-
-        if (discountAmount > Number(bill.subtotal)) {
-            throw new BadRequestException(
-                'Discount amount cannot exceed subtotal',
+            discountAmount = BillingHelper.calculateDiscountAmount(
+                Number(bill.subtotal),
+                discountData.percentage,
             );
         }
 
-        // Check if discount requires manager approval (>10%)
-        const discountPercentage = (discountAmount / Number(bill.subtotal)) * 100;
-        if (discountPercentage > 10) {
+        // Validate discount amount
+        if (!BillingHelper.isValidDiscountAmount(discountAmount, Number(bill.subtotal))) {
+            if (discountAmount < 0) {
+                throw new InvalidDiscountAmountException(discountAmount, Number(bill.subtotal));
+            }
+            if (discountAmount > Number(bill.subtotal)) {
+                throw new DiscountExceedsSubtotalException(
+                    discountAmount,
+                    Number(bill.subtotal),
+                );
+            }
+        }
+
+        // Check if discount requires manager approval
+        const discountPercentage = BillingHelper.calculateDiscountPercentage(
+            discountAmount,
+            Number(bill.subtotal),
+        );
+
+        if (BillingHelper.requiresManagerApproval(discountPercentage)) {
             this.logger.warn(
                 `Large discount applied: ${discountPercentage.toFixed(2)}% on bill ${bill.billNumber} by user ${userId}`,
             );
             // In production, this would trigger an approval workflow
         }
 
-        // Recalculate total with discount
-        const newTotal =
-            Number(bill.subtotal) +
-            Number(bill.taxAmount) +
-            Number(bill.serviceCharge) -
-            discountAmount;
+        // Recalculate total with discount using helper
+        const newTotal = BillingHelper.calculateTotalAmount(
+            Number(bill.subtotal),
+            Number(bill.taxAmount),
+            Number(bill.serviceCharge),
+            discountAmount,
+        );
 
         const updated = await this.billRepository.update(billId, {
             discountAmount,
@@ -210,22 +249,35 @@ export class BillingService {
     ) {
         const bill = await this.getBillById(billId);
 
-        if (bill.paymentStatus !== PaymentStatus.pending) {
-            throw new BadRequestException('Bill is not pending payment');
+        // Check if bill can accept payment
+        if (!BillingHelper.isPending(bill.paymentStatus)) {
+            this.logger.warn(
+                `Cannot process payment for bill ${billId} with status ${bill.paymentStatus}`,
+            );
+            throw new BillNotPendingException(billId, bill.paymentStatus);
         }
 
-        // Validate payment amount equals total (no partial payments)
-        if (paymentData.amount !== Number(bill.totalAmount)) {
-            throw new BadRequestException(
-                `Payment amount must equal total amount (${bill.totalAmount})`,
+        // Validate payment method
+        if (!BillingHelper.isValidPaymentMethod(paymentData.paymentMethod)) {
+            throw new InvalidPaymentMethodException(
+                paymentData.paymentMethod,
+                BILLING_CONSTANTS.PAYMENT_METHODS,
             );
         }
 
-        // Calculate change (for cash payments)
-        const changeAmount =
-            paymentData.paymentMethod === 'cash'
-                ? paymentData.amount - Number(bill.totalAmount)
-                : 0;
+        // Validate payment amount
+        if (!BillingHelper.isValidPaymentAmount(paymentData.amount, Number(bill.totalAmount))) {
+            throw new InvalidPaymentAmountException(
+                paymentData.amount,
+                Number(bill.totalAmount),
+            );
+        }
+
+        // Calculate change using helper
+        const changeAmount = BillingHelper.calculateChange(
+            paymentData.amount,
+            Number(bill.totalAmount),
+        );
 
         // Process payment in transaction
         const result = await this.prisma.$transaction(async (tx) => {

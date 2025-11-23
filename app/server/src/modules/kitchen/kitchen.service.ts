@@ -1,13 +1,21 @@
-import {
-    Injectable,
-    NotFoundException,
-    BadRequestException,
-    Logger,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { KitchenRepository, KitchenOrderFilters } from './kitchen.repository';
 import { PrismaService } from '@/database/prisma.service';
 import { KitchenOrderStatus, OrderStatus } from '@prisma/generated/client';
 import { KitchenGateway } from './kitchen.gateway';
+import { KITCHEN_MESSAGES, KITCHEN_CONSTANTS } from './constants/kitchen.constants';
+import {
+    KitchenOrderNotFoundException,
+    KitchenOrderAlreadyExistsException,
+    MainOrderNotFoundException,
+    OrderNotConfirmedException,
+    KitchenOrderNotPendingException,
+    CanOnlyCompleteReadyOrdersException,
+    KitchenOrderAlreadyCompletedException,
+    KitchenOrderAlreadyCancelledException,
+    CannotCancelCompletedOrderException,
+} from './exceptions/kitchen.exceptions';
+import { KitchenHelper } from './helpers/kitchen.helper';
 
 @Injectable()
 export class KitchenService {
@@ -34,7 +42,8 @@ export class KitchenService {
             await this.kitchenRepository.findById(kitchenOrderId);
 
         if (!kitchenOrder) {
-            throw new NotFoundException('Kitchen order not found');
+            this.logger.warn(`Kitchen order not found: ${kitchenOrderId}`);
+            throw new KitchenOrderNotFoundException(kitchenOrderId);
         }
 
         return kitchenOrder;
@@ -53,29 +62,32 @@ export class KitchenService {
         });
 
         if (!order) {
-            throw new NotFoundException('Order not found');
+            this.logger.warn(`Order not found for kitchen order creation: ${orderId}`);
+            throw new MainOrderNotFoundException(orderId);
         }
 
         if (order.status !== OrderStatus.confirmed) {
-            throw new BadRequestException('Order must be confirmed first');
+            this.logger.warn(
+                `Order ${orderId} not confirmed. Current status: ${order.status}`,
+            );
+            throw new OrderNotConfirmedException(orderId, order.status);
         }
 
         // Check if kitchen order already exists
         const existing = await this.kitchenRepository.findByOrderId(orderId);
 
         if (existing) {
-            throw new BadRequestException(
-                'Kitchen order already exists for this order',
-            );
+            this.logger.warn(`Kitchen order already exists for order ${orderId}`);
+            throw new KitchenOrderAlreadyExistsException(orderId);
         }
 
-        // Create kitchen order
+        // Create kitchen order with default priority
         const kitchenOrder = await this.kitchenRepository.create({
             order: {
                 connect: { orderId },
             },
             status: KitchenOrderStatus.pending,
-            priority: 'normal', // Default priority
+            priority: KITCHEN_CONSTANTS.DEFAULT_PRIORITY,
         });
 
         this.logger.log(
@@ -97,9 +109,21 @@ export class KitchenService {
     async startPreparing(kitchenOrderId: number, staffId?: number) {
         const kitchenOrder = await this.getKitchenOrderById(kitchenOrderId);
 
+        // Validate status using helper
+        if (!KitchenHelper.canModifyOrder(kitchenOrder.status)) {
+            this.logger.warn(
+                `Cannot start preparing kitchen order ${kitchenOrderId} with status ${kitchenOrder.status}`,
+            );
+            throw new KitchenOrderNotPendingException(
+                kitchenOrderId,
+                kitchenOrder.status,
+            );
+        }
+
         if (kitchenOrder.status !== KitchenOrderStatus.pending) {
-            throw new BadRequestException(
-                'Can only start preparing pending orders',
+            throw new KitchenOrderNotPendingException(
+                kitchenOrderId,
+                kitchenOrder.status,
             );
         }
 
@@ -130,21 +154,16 @@ export class KitchenService {
         const kitchenOrder = await this.getKitchenOrderById(kitchenOrderId);
 
         if (kitchenOrder.status === KitchenOrderStatus.completed) {
-            throw new BadRequestException('Kitchen order is already completed');
+            throw new KitchenOrderAlreadyCompletedException(kitchenOrderId);
         }
 
         if (kitchenOrder.status === KitchenOrderStatus.cancelled) {
-            throw new BadRequestException(
-                'Cannot mark cancelled order as ready',
-            );
+            throw new KitchenOrderAlreadyCancelledException(kitchenOrderId);
         }
 
         const completedAt = new Date();
         const prepTimeActual = kitchenOrder.startedAt
-            ? Math.floor(
-                  (completedAt.getTime() - kitchenOrder.startedAt.getTime()) /
-                      60000,
-              )
+            ? KitchenHelper.calculatePrepTime(kitchenOrder.startedAt, completedAt)
             : null;
 
         const updated = await this.prisma.$transaction(async (tx) => {
@@ -183,6 +202,13 @@ export class KitchenService {
             `Kitchen order #${kitchenOrderId} marked as ready (prep time: ${prepTimeActual} min)`,
         );
 
+        // Log if preparation was slow
+        if (prepTimeActual && KitchenHelper.isSlowPreparation(prepTimeActual)) {
+            this.logger.warn(
+                `Slow preparation detected for kitchen order #${kitchenOrderId}: ${prepTimeActual} min`,
+            );
+        }
+
         // Emit WebSocket event
         this.kitchenGateway.emitOrderUpdate(updated);
 
@@ -196,7 +222,13 @@ export class KitchenService {
         const kitchenOrder = await this.getKitchenOrderById(kitchenOrderId);
 
         if (kitchenOrder.status !== KitchenOrderStatus.ready) {
-            throw new BadRequestException('Can only complete ready orders');
+            this.logger.warn(
+                `Cannot complete kitchen order ${kitchenOrderId} with status ${kitchenOrder.status}`,
+            );
+            throw new CanOnlyCompleteReadyOrdersException(
+                kitchenOrderId,
+                kitchenOrder.status,
+            );
         }
 
         const updated = await this.prisma.$transaction(async (tx) => {
@@ -243,14 +275,14 @@ export class KitchenService {
     async cancelKitchenOrder(kitchenOrderId: number) {
         const kitchenOrder = await this.getKitchenOrderById(kitchenOrderId);
 
-        if (kitchenOrder.status === KitchenOrderStatus.completed) {
-            throw new BadRequestException(
-                'Cannot cancel completed kitchen order',
-            );
-        }
-
-        if (kitchenOrder.status === KitchenOrderStatus.cancelled) {
-            throw new BadRequestException('Kitchen order is already cancelled');
+        // Check if can cancel using helper
+        if (!KitchenHelper.canCancelOrder(kitchenOrder.status)) {
+            if (kitchenOrder.status === KitchenOrderStatus.completed) {
+                throw new CannotCancelCompletedOrderException(kitchenOrderId);
+            }
+            if (kitchenOrder.status === KitchenOrderStatus.cancelled) {
+                throw new KitchenOrderAlreadyCancelledException(kitchenOrderId);
+            }
         }
 
         const updated = await this.kitchenRepository.update(kitchenOrderId, {
