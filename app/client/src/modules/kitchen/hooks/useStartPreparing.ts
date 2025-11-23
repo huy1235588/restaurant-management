@@ -29,7 +29,7 @@ export function useStartPreparing() {
                     order.kitchenOrderId === id
                         ? {
                               ...order,
-                              status: KitchenOrderStatus.READY,
+                              status: KitchenOrderStatus.PREPARING,
                               startedAt: new Date().toISOString(),
                           }
                         : order

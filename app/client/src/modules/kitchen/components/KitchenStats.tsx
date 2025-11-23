@@ -16,7 +16,7 @@ export function KitchenStats({ orders }: KitchenStatsProps) {
     const inProgressCount = KitchenHelpers.getInProgressCount(orders);
 
     const readyCount = orders.filter(
-        (o) => o.status === KitchenOrderStatus.READY
+        (o) => o.status === KitchenOrderStatus.PREPARING
     ).length;
 
     const avgPrepTime = KitchenHelpers.calculateAvgPrepTime(orders);

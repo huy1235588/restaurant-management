@@ -159,7 +159,11 @@ export class KitchenService {
         }
 
         // Optimistic locking: only update if still pending and unclaimed
-        const updateData: any = {
+        const updateData: {
+            status: KitchenOrderStatus;
+            startedAt: Date;
+            staffId?: number;
+        } = {
             status: KitchenOrderStatus.preparing,
             startedAt: new Date(),
         };

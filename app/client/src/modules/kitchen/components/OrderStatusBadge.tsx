@@ -9,9 +9,9 @@ interface OrderStatusBadgeProps {
 export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
     const colors = STATUS_COLORS[status];
 
-    const statusLabel = {
+    const statusLabel: Record<KitchenOrderStatus, string> = {
         [KitchenOrderStatus.PENDING]: "Pending",
-        [KitchenOrderStatus.READY]: "Ready",
+        [KitchenOrderStatus.PREPARING]: "Preparing",
         [KitchenOrderStatus.COMPLETED]: "Completed",
         [KitchenOrderStatus.CANCELLED]: "Cancelled",
     };
