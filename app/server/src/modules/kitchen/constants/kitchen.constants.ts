@@ -63,11 +63,12 @@ export const KITCHEN_MESSAGES = {
 
 /**
  * Status flow validation
- * Simplified flow: pending → preparing → completed (with cancellation at any point)
+ * Simplified flow: pending → preparing → ready → completed
+ * Note: cancelled status removed - orders are deleted when cancelled
  */
 export const KITCHEN_STATUS_FLOW = {
-    pending: ['preparing', 'cancelled'],
-    preparing: ['completed', 'cancelled'],
+    pending: ['preparing'],
+    preparing: ['ready'],
+    ready: ['completed'],
     completed: [],
-    cancelled: [],
 } as const;

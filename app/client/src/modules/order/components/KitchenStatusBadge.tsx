@@ -14,13 +14,13 @@ const statusConfig = {
         label: 'Đang chuẩn bị',
         variant: 'default' as const,
     },
+    ready: {
+        label: 'Sẵn sàng',
+        variant: 'default' as const,
+    },
     completed: {
         label: 'Hoàn thành',
         variant: 'outline' as const,
-    },
-    cancelled: {
-        label: 'Đã hủy',
-        variant: 'destructive' as const,
     },
 };
 

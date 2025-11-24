@@ -70,10 +70,6 @@ export const getOrderStatusColor = (status: OrderStatus): string => {
             return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
         case "confirmed":
             return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
-        case "ready":
-            return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300";
-        case "serving":
-            return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300";
         case "completed":
             return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
         case "cancelled":
@@ -90,10 +86,8 @@ export const getOrderItemStatusColor = (status: OrderItemStatus): string => {
     switch (status) {
         case "pending":
             return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
-        case "active":
+        case "ready":
             return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
-        case "served":
-            return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
         case "cancelled":
             return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
         default:
@@ -107,17 +101,13 @@ export const getOrderItemStatusColor = (status: OrderItemStatus): string => {
 export const getOrderStatusLabel = (status: OrderStatus): string => {
     switch (status) {
         case "pending":
-            return "Pending";
+            return "Chờ xác nhận";
         case "confirmed":
-            return "Confirmed";
-        case "ready":
-            return "Ready";
-        case "serving":
-            return "Serving";
+            return "Đã xác nhận";
         case "completed":
-            return "Completed";
+            return "Hoàn thành";
         case "cancelled":
-            return "Cancelled";
+            return "Đã hủy";
         default:
             return status;
     }
@@ -129,13 +119,11 @@ export const getOrderStatusLabel = (status: OrderStatus): string => {
 export const getOrderItemStatusLabel = (status: OrderItemStatus): string => {
     switch (status) {
         case "pending":
-            return "Pending";
-        case "active":
-            return "Active";
-        case "served":
-            return "Served";
+            return "Đang chờ";
+        case "ready":
+            return "Sẵn sàng";
         case "cancelled":
-            return "Cancelled";
+            return "Đã hủy";
         default:
             return status;
     }
@@ -159,14 +147,14 @@ export const canAddItems = (order: Order): boolean => {
  * Check if an order item can be cancelled
  */
 export const canCancelOrderItem = (item: OrderItem): boolean => {
-    return !["served", "cancelled"].includes(item.status);
+    return item.status !== "cancelled";
 };
 
 /**
  * Check if an order item can be marked as served
  */
 export const canMarkItemServed = (item: OrderItem): boolean => {
-    return item.status === "active";
+    return item.status === "ready";
 };
 
 /**

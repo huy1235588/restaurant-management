@@ -1,17 +1,14 @@
 // Order status enum
 export type OrderStatus =
     | "pending" // Just created, not sent to kitchen
-    | "confirmed" // Sent to kitchen, awaiting preparation
-    | "ready" // All items ready, waiting for pickup
-    | "serving" // Delivered to table, customer eating
+    | "confirmed" // Sent to kitchen, being processed
     | "completed" // Finished and paid
     | "cancelled"; // Cancelled by waiter or kitchen
 
 // Order item status enum
 export type OrderItemStatus =
-    | "pending" // Not started
-    | "active" // In progress/finished
-    | "served" // Delivered to customer
+    | "pending" // Not ready yet
+    | "ready" // Ready to serve
     | "cancelled"; // Cancelled
 
 // Menu Item interface (minimal - full version in menu module)

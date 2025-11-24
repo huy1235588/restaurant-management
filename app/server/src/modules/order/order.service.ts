@@ -30,7 +30,6 @@ import {
     OrderAlreadyCancelledException,
     BillAlreadyCreatedException,
     InvalidOrderStatusException,
-    CannotAddItemsToServingOrderException,
 } from './exceptions/order.exceptions';
 import { OrderHelper } from './helpers/order.helper';
 
@@ -197,14 +196,6 @@ export class OrderService {
     async addItemsToOrder(orderId: number, data: AddItemsDto) {
         // Get existing order
         const order = await this.getOrderById(orderId);
-
-        // Prevent adding items if order is being served
-        if (order.status === OrderStatus.serving) {
-            this.logger.warn(
-                `Attempted to add items to serving order: ${order.orderNumber}`,
-            );
-            throw new CannotAddItemsToServingOrderException(orderId);
-        }
 
         // Check if order can be modified - allow completed orders to be reopened
         if (order.status === OrderStatus.cancelled) {
@@ -468,10 +459,9 @@ export class OrderService {
                 data: { status: OrderItemStatus.cancelled },
             });
 
-            // Update kitchen order
-            await tx.kitchenOrder.updateMany({
+            // Delete kitchen orders instead of updating status
+            await tx.kitchenOrder.deleteMany({
                 where: { orderId },
-                data: { status: KitchenOrderStatus.cancelled },
             });
 
             // Update order
@@ -608,15 +598,15 @@ export class OrderService {
             throw new OrderItemNotFoundException(orderItemId, orderId);
         }
 
-        // Update item status
+        // Update item status to ready (served status is removed)
         await this.prisma.orderItem.update({
             where: { orderItemId },
             data: {
-                status: OrderItemStatus.served,
+                status: OrderItemStatus.ready,
             },
         });
 
-        // Check if all items are served
+        // Check if all items are ready
         const allItems = await this.prisma.orderItem.findMany({
             where: {
                 orderId,
@@ -624,21 +614,16 @@ export class OrderService {
             },
         });
 
-        const allServed = allItems.every(
-            (item) => item.status === OrderItemStatus.served,
+        const allReady = allItems.every(
+            (item) => item.status === OrderItemStatus.ready,
         );
 
-        // Update order status if all items served
-        if (allServed && order.status !== OrderStatus.completed) {
-            await this.orderRepository.update(orderId, {
-                status: OrderStatus.completed,
-                completedAt: new Date(),
-            });
-            this.logger.log(`Order completed: ${order.orderNumber}`);
-        }
+        // Note: Order status is managed separately
+        // We don't auto-complete order when all items ready
+        // Order completes only when payment is done
 
         this.logger.log(
-            `Item ${orderItemId} marked as served in order ${order.orderNumber}`,
+            `Item ${orderItemId} marked as ready in order ${order.orderNumber}`,
         );
 
         const updatedOrder = await this.getOrderById(orderId);

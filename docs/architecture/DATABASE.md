@@ -77,29 +77,21 @@ Cơ sở dữ liệu được chia thành 8 module chính với **17 bảng**:
 - `maintenance` - Đang bảo trì (không dùng)
 
 ### OrderStatus - Trạng thái đơn hàng
-- `pending` - Chờ xác nhận (mới tạo)
-- `confirmed` - Đã xác nhận (gửi bếp)
-- `preparing` - Đang chuẩn bị (bếp đang nấu)
-- `ready` - Sẵn sàng (món đã xong)
-- `serving` - Đang phục vụ (đã mang ra bàn)
+- `pending` - Chờ xác nhận (mới tạo, chưa gửi bếp)
+- `confirmed` - Đã xác nhận (đã gửi bếp, đang xử lý)
 - `completed` - Hoàn thành (đã thanh toán)
 - `cancelled` - Đã hủy
 
 ### OrderItemStatus - Trạng thái chi tiết đơn
-- `pending` - Chưa bắt đầu
-- `preparing` - Đang nấu
-- `ready` - Đã xong
-- `served` - Đã phục vụ
+- `pending` - Chưa sẵn sàng (đang chờ hoặc đang nấu)
+- `ready` - Đã sẵn sàng (món đã xong)
 - `cancelled` - Đã hủy
 
 ### KitchenOrderStatus - Trạng thái đơn bếp
-- `pending` - Đơn mới, chưa được xác nhận
-- `confirmed` - Đầu bếp đã xác nhận
+- `pending` - Đơn mới, chờ đầu bếp bắt đầu
 - `preparing` - Đang nấu
-- `almost_ready` - Sắp xong
-- `ready` - Sẵn sàng lấy
-- `completed` - Đã lấy
-- `cancelled` - Đã hủy
+- `ready` - Sẵn sàng lấy (món đã xong, chờ phục vụ)
+- `completed` - Đã lấy (phục vụ đã mang ra bàn)
 
 ### OrderPriority - Độ ưu tiên đơn
 - `normal` - Đơn bình thường

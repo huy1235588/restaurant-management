@@ -46,9 +46,9 @@ export class OrderHelper {
     }
 
     /**
-     * Check if all items are served
+     * Check if all items are ready
      */
-    static areAllItemsServed(
+    static areAllItemsReady(
         items: Array<{ status: OrderItemStatus }>,
     ): boolean {
         const activeItems = items.filter(
@@ -56,7 +56,7 @@ export class OrderHelper {
         );
         return (
             activeItems.length > 0 &&
-            activeItems.every((item) => item.status === OrderItemStatus.served)
+            activeItems.every((item) => item.status === OrderItemStatus.ready)
         );
     }
 
@@ -67,21 +67,20 @@ export class OrderHelper {
         currentStatus: OrderStatus,
         newStatus: OrderStatus,
     ): boolean {
-        // Define allowed transitions based on actual database enum
-        // OrderStatus: pending -> confirmed -> ready -> serving -> completed
+        // Define allowed transitions based on simplified enum
+        // OrderStatus: pending -> confirmed -> completed
         const transitions: Record<OrderStatus, OrderStatus[]> = {
             [OrderStatus.pending]: [
                 OrderStatus.confirmed,
                 OrderStatus.cancelled,
             ],
-            [OrderStatus.confirmed]: [OrderStatus.ready, OrderStatus.cancelled],
-            [OrderStatus.ready]: [
-                OrderStatus.serving,
+            [OrderStatus.confirmed]: [
                 OrderStatus.completed,
                 OrderStatus.cancelled,
             ],
-            [OrderStatus.serving]: [OrderStatus.completed],
-            [OrderStatus.completed]: [], // Cannot transition from completed
+            [OrderStatus.completed]: [
+                OrderStatus.confirmed, // Allow reopening when adding items
+            ],
             [OrderStatus.cancelled]: [], // Cannot transition from cancelled
         };
 
@@ -113,16 +112,14 @@ export class OrderHelper {
 
     /**
      * Get order status priority for sorting
-     * Based on actual database enum: pending -> confirmed -> ready -> serving -> completed -> cancelled
+     * Based on simplified enum: pending -> confirmed -> completed -> cancelled
      */
     static getStatusPriority(status: OrderStatus): number {
         const priorities: Record<OrderStatus, number> = {
             [OrderStatus.pending]: 1,
             [OrderStatus.confirmed]: 2,
-            [OrderStatus.ready]: 3,
-            [OrderStatus.serving]: 4,
-            [OrderStatus.completed]: 5,
-            [OrderStatus.cancelled]: 6,
+            [OrderStatus.completed]: 3,
+            [OrderStatus.cancelled]: 4,
         };
         return priorities[status] ?? 99;
     }

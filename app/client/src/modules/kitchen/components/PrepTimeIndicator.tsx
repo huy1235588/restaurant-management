@@ -13,7 +13,7 @@ interface PrepTimeIndicatorProps {
 
 export function PrepTimeIndicator({ createdAt, status, completedAt }: PrepTimeIndicatorProps) {
     // Calculate initial elapsed time
-    const isTerminal = status === KitchenOrderStatus.COMPLETED || status === KitchenOrderStatus.CANCELLED;
+    const isTerminal = status === KitchenOrderStatus.COMPLETED;
     const finalTime = completedAt || createdAt;
     
     const [elapsedSeconds, setElapsedSeconds] = useState(
@@ -25,7 +25,7 @@ export function PrepTimeIndicator({ createdAt, status, completedAt }: PrepTimeIn
     // Update every second only if not in terminal status
     useEffect(() => {
         if (isTerminal) {
-            // For completed/cancelled orders, calculate final time once
+            // For completed orders, calculate final time once
             const finalElapsed = KitchenHelpers.calculateElapsedTime(createdAt, finalTime);
             setElapsedSeconds(finalElapsed);
             return; // No timer needed
@@ -52,9 +52,6 @@ export function PrepTimeIndicator({ createdAt, status, completedAt }: PrepTimeIn
             {status === KitchenOrderStatus.COMPLETED && (
                 <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
             )}
-            {status === KitchenOrderStatus.CANCELLED && (
-                <XCircle className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-            )}
             {!isTerminal && (
                 <Clock className={`h-4 w-4 ${colorClass}`} />
             )}
@@ -62,9 +59,7 @@ export function PrepTimeIndicator({ createdAt, status, completedAt }: PrepTimeIn
                 {formattedTime}
             </span>
             <span className="text-xs text-gray-500 dark:text-gray-400">
-                {isTerminal ? (
-                    status === KitchenOrderStatus.COMPLETED ? "completed in" : "cancelled at"
-                ) : "elapsed"}
+                {isTerminal ? "completed in" : "elapsed"}
             </span>
         </div>
     );

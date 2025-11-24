@@ -10,10 +10,10 @@ export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
     const colors = STATUS_COLORS[status];
 
     const statusLabel: Record<KitchenOrderStatus, string> = {
-        [KitchenOrderStatus.PENDING]: "Pending",
-        [KitchenOrderStatus.PREPARING]: "Preparing",
-        [KitchenOrderStatus.COMPLETED]: "Completed",
-        [KitchenOrderStatus.CANCELLED]: "Cancelled",
+        [KitchenOrderStatus.PENDING]: "Đang chờ",
+        [KitchenOrderStatus.PREPARING]: "Đang nấu",
+        [KitchenOrderStatus.READY]: "Sẵn sàng",
+        [KitchenOrderStatus.COMPLETED]: "Hoàn thành",
     };
 
     return (

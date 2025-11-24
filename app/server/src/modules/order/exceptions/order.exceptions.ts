@@ -101,11 +101,3 @@ export class InvalidOrderStatusException extends BadRequestException {
         super(`Invalid status transition from ${from} to ${to}`);
     }
 }
-
-export class CannotAddItemsToServingOrderException extends BadRequestException {
-    constructor(orderId: number) {
-        super(
-            `Cannot add items to order ${orderId} - order is currently being served`,
-        );
-    }
-}

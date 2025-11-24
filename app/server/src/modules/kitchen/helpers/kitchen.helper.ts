@@ -81,20 +81,14 @@ export class KitchenHelper {
      * Check if order can be modified
      */
     static canModifyOrder(status: KitchenOrderStatus): boolean {
-        return (
-            status !== KitchenOrderStatus.completed &&
-            status !== KitchenOrderStatus.cancelled
-        );
+        return status !== KitchenOrderStatus.completed;
     }
 
     /**
      * Check if order can be cancelled
      */
     static canCancelOrder(status: KitchenOrderStatus): boolean {
-        return (
-            status !== KitchenOrderStatus.completed &&
-            status !== KitchenOrderStatus.cancelled
-        );
+        return status !== KitchenOrderStatus.completed;
     }
 
     /**
@@ -111,10 +105,7 @@ export class KitchenHelper {
      * Check if order is in final state
      */
     static isFinalState(status: KitchenOrderStatus): boolean {
-        return (
-            status === KitchenOrderStatus.completed ||
-            status === KitchenOrderStatus.cancelled
-        );
+        return status === KitchenOrderStatus.completed;
     }
 
     /**
@@ -124,8 +115,8 @@ export class KitchenHelper {
         const displayNames: Record<KitchenOrderStatus, string> = {
             [KitchenOrderStatus.pending]: 'Chờ xử lý',
             [KitchenOrderStatus.preparing]: 'Đang chuẩn bị',
+            [KitchenOrderStatus.ready]: 'Sẵn sàng',
             [KitchenOrderStatus.completed]: 'Hoàn thành',
-            [KitchenOrderStatus.cancelled]: 'Đã hủy',
         };
         return displayNames[status] || status;
     }

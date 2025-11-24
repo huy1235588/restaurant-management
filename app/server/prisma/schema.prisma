@@ -31,25 +31,22 @@ enum TableStatus {
 
 enum OrderStatus {
     pending // Just created, not sent to kitchen
-    confirmed // Sent to kitchen, awaiting preparation
-    ready // All items ready, waiting for pickup
-    serving // Delivered to table, customer eating
+    confirmed // Sent to kitchen, being processed
     completed // Finished and paid
     cancelled // Cancelled by waiter or kitchen
 }
 
 enum OrderItemStatus {
-    pending // Not started
-    ready // Finished
-    served // Delivered to customer
+    pending // Not ready yet
+    ready // Ready to serve
     cancelled // Cancelled
 }
 
 enum KitchenOrderStatus {
-    pending // New order, waiting for chef
+    pending // New order, waiting for chef to start
     preparing // Chef is cooking
-    completed // Order finished and served
-    cancelled // Order cancelled
+    ready // Food ready, waiting for pickup
+    completed // Picked up by waiter
 }
 
 enum StationType {

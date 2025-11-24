@@ -217,10 +217,6 @@ export class KitchenService {
             throw new KitchenOrderAlreadyCompletedException(kitchenOrderId);
         }
 
-        if (kitchenOrder.status === KitchenOrderStatus.cancelled) {
-            throw new KitchenOrderAlreadyCancelledException(kitchenOrderId);
-        }
-
         const completedAt = new Date();
         const prepTimeActual = kitchenOrder.startedAt
             ? KitchenHelper.calculatePrepTime(
@@ -252,11 +248,8 @@ export class KitchenService {
                 },
             });
 
-            // Update order status
-            await tx.order.update({
-                where: { orderId: kitchenOrder.orderId },
-                data: { status: OrderStatus.ready },
-            });
+            // Note: Order status remains 'confirmed' until payment
+            // We don't auto-update order status when kitchen completes
 
             return updatedKitchen;
         });
@@ -277,39 +270,22 @@ export class KitchenService {
     }
 
     /**
-     * Cancel kitchen order
+     * Cancel kitchen order (now deletes the kitchen order)
+     * As per design: when order is cancelled, delete KitchenOrder instead of setting status
      */
     async cancelKitchenOrder(kitchenOrderId: number) {
         const kitchenOrder = await this.getKitchenOrderById(kitchenOrderId);
 
-        // Check if can cancel using helper
-        if (!KitchenHelper.canCancelOrder(kitchenOrder.status)) {
-            if (kitchenOrder.status === KitchenOrderStatus.completed) {
-                throw new CannotCancelCompletedOrderException(kitchenOrderId);
-            }
-            if (kitchenOrder.status === KitchenOrderStatus.cancelled) {
-                throw new KitchenOrderAlreadyCancelledException(kitchenOrderId);
-            }
+        // Check if can cancel (not already completed)
+        if (kitchenOrder.status === KitchenOrderStatus.completed) {
+            throw new CannotCancelCompletedOrderException(kitchenOrderId);
         }
 
-        // Cancel kitchen order and update main order status
-        const updated = await this.prisma.$transaction(async (tx) => {
-            // Update kitchen order status
-            const updatedKitchen = await tx.kitchenOrder.update({
+        // Delete kitchen order and update main order status
+        await this.prisma.$transaction(async (tx) => {
+            // Delete kitchen order (as per simplified design)
+            await tx.kitchenOrder.delete({
                 where: { kitchenOrderId },
-                data: { status: KitchenOrderStatus.cancelled },
-                include: {
-                    order: {
-                        include: {
-                            table: true,
-                            orderItems: {
-                                include: {
-                                    menuItem: true,
-                                },
-                            },
-                        },
-                    },
-                },
             });
 
             // Update main order status to cancelled
@@ -321,23 +297,16 @@ export class KitchenService {
                     cancellationReason: 'Cancelled by kitchen',
                 },
             });
-
-            return updatedKitchen;
         });
 
         this.logger.log(
-            `Kitchen order #${kitchenOrderId} cancelled, main order also cancelled`,
+            `Kitchen order #${kitchenOrderId} deleted, main order cancelled`,
         );
 
-        // Emit WebSocket event to kitchen namespace
-        this.kitchenGateway.emitOrderUpdate(updated);
-
-        // Notify order namespace that kitchen cancelled the order
-        this.socketEmitter.emitOrderCancelled(updated.order as any);
-        this.logger.log(
-            `Notified orders namespace: Kitchen cancelled order #${updated.orderId}`,
-        );
-
-        return updated;
+        // Emit WebSocket event to notify about cancellation
+        this.socketEmitter.emitOrderCancelled({
+            orderId: kitchenOrder.orderId,
+            reason: 'Cancelled by kitchen',
+        } as any);
     }
 }
