@@ -252,18 +252,37 @@ log_step "Running database migrations"
 log_info "Waiting for database to be ready..."
 sleep 10
 
+# Source .env file to get DATABASE_URL
+if [ -f "$DEPLOY_DIR/.env" ]; then
+    export $(cat "$DEPLOY_DIR/.env" | grep -v '^#' | xargs)
+    log_info "Environment variables loaded from .env"
+else
+    log_error ".env file not found"
+    exit 1
+fi
+
 # Check if server container is running
 if docker ps | grep -q "restaurant_server_prod"; then
     log_info "Running Prisma migrations..."
     
-    if docker exec restaurant_server_prod npx prisma migrate deploy; then
+    # Build DATABASE_URL from environment variables
+    DB_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public"
+    
+    # Run migration with explicit DATABASE_URL
+    if docker exec \
+        -e DATABASE_URL="$DB_URL" \
+        restaurant_server_prod \
+        npx prisma migrate deploy --schema prisma/schema.prisma; then
         log_info "✓ Database migrations completed"
     else
         log_error "Database migrations failed"
+        log_warn "Checking server logs for details..."
+        docker logs restaurant_server_prod | tail -20 | tee -a "$LOG_FILE"
         log_warn "Application may not function correctly"
     fi
 else
     log_error "Server container not running"
+    docker logs restaurant_server_prod | tail -50 | tee -a "$LOG_FILE"
     exit 1
 fi
 

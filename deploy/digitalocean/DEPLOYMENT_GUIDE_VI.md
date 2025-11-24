@@ -15,6 +15,11 @@ Hướng dẫn chi tiết từng bước để deploy Restaurant Management Syst
   - [Bước 3: Cấu Hình SSH](#bước-3-cấu-hình-ssh)
   - [Bước 4: Cài Đặt Môi Trường](#bước-4-cài-đặt-môi-trường)
   - [Bước 5: Deploy Ứng Dụng](#bước-5-deploy-ứng-dụng)
+    - [5.1 Cấu Hình Environment Variables](#51-cấu-hình-environment-variables)
+    - [5.2 Chạy Deploy Script](#52-chạy-deploy-script)
+    - [5.3 Database Migrations](#53-database-migrations---hướng-dẫn-chi-tiết)
+    - [5.4 Seed Dữ Liệu](#54-seed-dữ-liệu-demo-tùy-chọn)
+    - [5.5 Xác Minh Deployment](#55-xác-minh-deployment-thành-công)
   - [Bước 6: Cấu Hình SSL/HTTPS](#bước-6-cấu-hình-sslhttps)
 - [Sau Khi Deploy](#sau-khi-deploy)
 - [Troubleshooting](#troubleshooting)
@@ -515,7 +520,7 @@ bash deploy/digitalocean/scripts/deploy.sh
 Script sẽ:
 - ✅ Build Docker images (~5-10 phút lần đầu)
 - ✅ Start tất cả services (PostgreSQL, Redis, Backend, Frontend, Caddy)
-- ✅ Chạy database migrations
+- ✅ Chạy database migrations tự động
 - ✅ Verify health checks
 
 ⏱️ **Lần đầu:** 10-15 phút  
@@ -537,6 +542,107 @@ Bạn sẽ thấy 5 containers:
 ```bash
 # Backend
 docker logs restaurant_server_prod
+
+# Database (để xem migrations)
+docker logs restaurant_postgres_prod
+```
+
+#### 5.3 Database Migrations - Hướng Dẫn Chi Tiết
+
+Migrations chạy tự động trong deploy script. Tuy nhiên, nếu gặp lỗi, làm theo các bước sau:
+
+**Nếu migrations bị fail:**
+
+```bash
+# 1. Chạy troubleshoot script (khuyến nghị)
+bash deploy/digitalocean/scripts/troubleshoot-migration.sh
+
+# Script sẽ kiểm tra:
+# ✓ Cấu hình environment
+# ✓ Docker containers status
+# ✓ Database connectivity
+# ✓ Prisma configuration
+# ✓ Test migration status
+```
+
+**Nếu troubleshoot script báo OK:**
+
+```bash
+# 2. Chạy migration script
+bash deploy/digitalocean/scripts/migrate.sh
+
+# Script sẽ:
+# ✓ Load environment từ .env
+# ✓ Validate database connection
+# ✓ Build DATABASE_URL
+# ✓ Run Prisma migrations
+# ✓ Detailed logging
+```
+
+**Manual commands (nếu scripts fail):**
+
+```bash
+# 3. Nếu vẫn lỗi, chạy manual
+cd /opt/restaurant-management/deploy
+
+# Load environment
+export $(cat .env | grep -v '^#' | xargs)
+
+# Build DATABASE_URL
+export DB_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public"
+
+# Check migration status
+docker exec \
+  -e DATABASE_URL="$DB_URL" \
+  restaurant_server_prod \
+  npx prisma migrate status --schema prisma/schema.prisma
+
+# Run migrations
+docker exec \
+  -e DATABASE_URL="$DB_URL" \
+  restaurant_server_prod \
+  npx prisma migrate deploy --schema prisma/schema.prisma
+```
+
+**Xem migration logs:**
+```bash
+# Xem chi tiết migrations đã chạy
+docker logs restaurant_server_prod | grep -i "migration\|prisma"
+
+# Hoặc xem database logs
+docker logs restaurant_postgres_prod | tail -50
+```
+
+---
+
+#### 5.4 Seed Dữ Liệu Demo (Tùy Chọn)
+
+Thêm dữ liệu mẫu (users, menu items, tables):
+
+```bash
+docker exec -it restaurant_server_prod npm run seed
+```
+
+---
+
+#### 5.5 Xác Minh Deployment Thành Công
+
+```bash
+# 1. Kiểm tra tất cả containers
+docker ps
+
+# 2. Kiểm tra health của services
+bash deploy/digitalocean/scripts/health-check.sh
+
+# 3. Test frontend
+curl http://localhost:3000
+
+# 4. Test backend
+curl http://localhost:5000/api/v1/health
+
+# 5. Test với domain (nếu có)
+curl https://yourdomain.com
+```
 
 # Frontend
 docker logs restaurant_client_prod
@@ -942,6 +1048,78 @@ cat deploy/digitalocean/Caddyfile
 ```bash
 ufw allow 22/tcp
 ufw --force enable
+```
+
+#### 7. Database Migrations Failed
+
+**Lỗi:**
+```
+Error: The datasource property is required in your Prisma config file
+```
+
+**Nguyên nhân:**
+- `DATABASE_URL` chưa được pass đúng vào Docker container
+- Database container chưa ready
+- Network connectivity issues
+
+**Kiểm tra & Giải pháp:**
+
+```bash
+# 1. Chạy troubleshooter (dễ nhất)
+bash deploy/digitalocean/scripts/troubleshoot-migration.sh
+
+# Script sẽ tự động kiểm tra:
+# ✓ Environment configuration
+# ✓ Docker containers
+# ✓ Database connectivity
+# ✓ Prisma setup
+# ✓ Recommend next steps
+```
+
+**Nếu troubleshooter báo lỗi:**
+
+```bash
+# 2. Chạy migration script
+bash deploy/digitalocean/scripts/migrate.sh
+
+# Hoặc manual commands:
+cd /opt/restaurant-management/deploy
+
+# Load .env
+export $(cat .env | grep -v '^#' | xargs)
+
+# Build DATABASE_URL
+export DB_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public"
+
+# Test database
+docker exec restaurant_postgres_prod psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "SELECT 1;"
+
+# Check migration status
+docker exec -e DATABASE_URL="$DB_URL" \
+  restaurant_server_prod \
+  npx prisma migrate status --schema prisma/schema.prisma
+
+# Run migrations
+docker exec -e DATABASE_URL="$DB_URL" \
+  restaurant_server_prod \
+  npx prisma migrate deploy --schema prisma/schema.prisma
+```
+
+**Nếu vẫn lỗi:**
+
+```bash
+# 3. Xem detailed logs
+docker logs -f restaurant_server_prod
+
+# 4. Kiểm tra .env có đúng không
+cat .env | grep -i postgres
+
+# 5. Restart containers
+docker-compose down
+docker-compose up -d
+
+# 6. Retry migrations
+bash deploy/digitalocean/scripts/migrate.sh
 ```
 
 ---

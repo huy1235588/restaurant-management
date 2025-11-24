@@ -227,21 +227,44 @@ docker exec -it restaurant_postgres_prod psql -U restaurant_admin -d restaurant_
 ```
 
 ### Prisma Migrations
-```bash
-# Di chuyển vào server directory
-cd /opt/restaurant-management/app/server
 
-# Run migrations
-docker exec restaurant_server_prod npx prisma migrate deploy
+#### ✅ Recommended: Use Migration Scripts
+```bash
+# Run safe migrations
+bash /opt/restaurant-management/deploy/digitalocean/scripts/migrate.sh
+
+# Troubleshoot migration issues
+bash /opt/restaurant-management/deploy/digitalocean/scripts/troubleshoot-migration.sh
+```
+
+#### Manual Migration Commands
+```bash
+# Source .env file first
+cd /opt/restaurant-management/deploy
+export $(cat .env | grep -v '^#' | xargs)
+
+# Run migrations with explicit DATABASE_URL
+export DB_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public"
+
+docker exec \
+  -e DATABASE_URL="$DB_URL" \
+  restaurant_server_prod \
+  npx prisma migrate deploy --schema prisma/schema.prisma
+
+# Check migration status
+docker exec \
+  -e DATABASE_URL="$DB_URL" \
+  restaurant_server_prod \
+  npx prisma migrate status --schema prisma/schema.prisma
 
 # Generate Prisma Client
 docker exec restaurant_server_prod npx prisma generate
 
-# Check migration status
-docker exec restaurant_server_prod npx prisma migrate status
-
-# Reset database (DANGER - development only!)
-docker exec restaurant_server_prod npx prisma migrate reset --force
+# ⚠️ DANGER: Reset database (development only!)
+docker exec \
+  -e DATABASE_URL="$DB_URL" \
+  restaurant_server_prod \
+  npx prisma migrate reset --force
 ```
 
 ### Redis Access

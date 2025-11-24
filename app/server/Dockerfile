@@ -65,5 +65,5 @@ EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:5000/api/v1/health || exit 1
 
-# Start command with migration
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
+# Start application (migrations run separately via docker exec)
+CMD ["node", "dist/main"]
