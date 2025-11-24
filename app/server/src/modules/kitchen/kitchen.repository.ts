@@ -5,17 +5,28 @@ import {
     KitchenOrder,
     KitchenOrderStatus,
 } from '@prisma/generated/client';
+import { KitchenQueryHelper } from './helpers/kitchen-query.helper';
 
 export interface KitchenOrderFilters {
     status?: KitchenOrderStatus;
     skip?: number;
     take?: number;
     include?: Prisma.KitchenOrderInclude;
+    minimal?: boolean; // Use minimal includes for better performance
 }
 
 @Injectable()
 export class KitchenRepository {
     constructor(private readonly prisma: PrismaService) {}
+
+    /**
+     * Get appropriate includes based on query type
+     */
+    private getIncludes(minimal: boolean = false): Prisma.KitchenOrderInclude {
+        return minimal
+            ? KitchenQueryHelper.LIST_INCLUDES
+            : KitchenQueryHelper.STANDARD_INCLUDES;
+    }
 
     private buildWhereClause(
         filters?: KitchenOrderFilters,
@@ -32,27 +43,13 @@ export class KitchenRepository {
     }
 
     async findAll(filters?: KitchenOrderFilters): Promise<KitchenOrder[]> {
+        const includes = filters?.include || this.getIncludes(filters?.minimal);
+
         return this.prisma.kitchenOrder.findMany({
             where: this.buildWhereClause(filters),
-            include: {
-                order: {
-                    include: {
-                        table: true,
-                        orderItems: {
-                            include: {
-                                menuItem: true,
-                            },
-                        },
-                    },
-                },
-                chef: {
-                    select: {
-                        staffId: true,
-                        fullName: true,
-                        role: true,
-                    },
-                },
-            },
+            include: includes,
+            skip: filters?.skip,
+            take: filters?.take,
             orderBy: {
                 createdAt: 'asc', // FIFO (first-come-first-served)
             },
@@ -62,50 +59,14 @@ export class KitchenRepository {
     async findById(kitchenOrderId: number): Promise<KitchenOrder | null> {
         return this.prisma.kitchenOrder.findUnique({
             where: { kitchenOrderId },
-            include: {
-                order: {
-                    include: {
-                        table: true,
-                        orderItems: {
-                            include: {
-                                menuItem: true,
-                            },
-                        },
-                    },
-                },
-                chef: {
-                    select: {
-                        staffId: true,
-                        fullName: true,
-                        role: true,
-                    },
-                },
-            },
+            include: KitchenQueryHelper.STANDARD_INCLUDES,
         });
     }
 
     async findByOrderId(orderId: number): Promise<KitchenOrder | null> {
         return this.prisma.kitchenOrder.findUnique({
             where: { orderId },
-            include: {
-                order: {
-                    include: {
-                        table: true,
-                        orderItems: {
-                            include: {
-                                menuItem: true,
-                            },
-                        },
-                    },
-                },
-                chef: {
-                    select: {
-                        staffId: true,
-                        fullName: true,
-                        role: true,
-                    },
-                },
-            },
+            include: KitchenQueryHelper.STANDARD_INCLUDES,
         });
     }
 
@@ -134,25 +95,26 @@ export class KitchenRepository {
         return this.prisma.kitchenOrder.update({
             where: { kitchenOrderId },
             data,
-            include: {
-                order: {
-                    include: {
-                        table: true,
-                        orderItems: {
-                            include: {
-                                menuItem: true,
-                            },
-                        },
-                    },
-                },
-                chef: {
-                    select: {
-                        staffId: true,
-                        fullName: true,
-                        role: true,
-                    },
-                },
-            },
+            include: KitchenQueryHelper.STANDARD_INCLUDES,
+        });
+    }
+
+    /**
+     * Find kitchen order by ID with minimal data (for status checks)
+     */
+    async findByIdMinimal(kitchenOrderId: number) {
+        return this.prisma.kitchenOrder.findUnique({
+            where: { kitchenOrderId },
+            select: KitchenQueryHelper.STATUS_SELECT,
+        });
+    }
+
+    /**
+     * Count kitchen orders by status
+     */
+    async countByStatus(status?: KitchenOrderStatus): Promise<number> {
+        return this.prisma.kitchenOrder.count({
+            where: status ? { status } : {},
         });
     }
 }

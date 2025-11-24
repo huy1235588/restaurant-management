@@ -1,5 +1,6 @@
 'use client';
 
+import { memo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Order } from '../types';
@@ -19,22 +20,22 @@ interface OrderCardProps {
     onCancelOrder?: (order: Order) => void;
 }
 
-export function OrderCard({ order, onCancelOrder }: OrderCardProps) {
+export const OrderCard = memo(function OrderCard({ order, onCancelOrder }: OrderCardProps) {
     const router = useRouter();
 
-    const handleViewDetails = () => {
+    const handleViewDetails = useCallback(() => {
         router.push(`/orders/${order.orderId}`);
-    };
+    }, [router, order.orderId]);
 
-    const handleAddItems = () => {
+    const handleAddItems = useCallback(() => {
         router.push(`/orders/${order.orderId}/edit`);
-    };
+    }, [router, order.orderId]);
 
-    const handleCancelOrder = () => {
+    const handleCancelOrder = useCallback(() => {
         if (onCancelOrder) {
             onCancelOrder(order);
         }
-    };
+    }, [onCancelOrder, order]);
 
     return (
         <Card>
@@ -124,4 +125,12 @@ export function OrderCard({ order, onCancelOrder }: OrderCardProps) {
             </CardContent>
         </Card>
     );
-}
+}, (prevProps, nextProps) => {
+    // Only re-render if order data changed
+    return (
+        prevProps.order.orderId === nextProps.order.orderId &&
+        prevProps.order.status === nextProps.order.status &&
+        prevProps.order.updatedAt === nextProps.order.updatedAt &&
+        prevProps.order.finalAmount === nextProps.order.finalAmount
+    );
+});

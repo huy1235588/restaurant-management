@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useCallback, memo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,6 +31,25 @@ export function MenuItemSelector({ cartItems, onAddItem }: MenuItemSelectorProps
     const isLoading = categoriesLoading || menuLoading;
     const menuItems = menuData?.items || [];
 
+    // Memoize cart items lookup map for O(1) access
+    const cartItemsMap = useMemo(() => {
+        const map = new Map<number, number>();
+        cartItems.forEach(item => {
+            map.set(item.menuItemId, item.quantity);
+        });
+        return map;
+    }, [cartItems]);
+
+    // Memoize search handler
+    const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+    }, []);
+
+    // Memoize category change handler
+    const handleCategoryChange = useCallback((value: string) => {
+        setSelectedCategory(value === 'all' ? null : Number(value));
+    }, []);
+
     return (
         <div className="space-y-4">
             {/* Search */}
@@ -39,7 +58,7 @@ export function MenuItemSelector({ cartItems, onAddItem }: MenuItemSelectorProps
                 <Input
                     placeholder="Tìm món ăn..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={handleSearchChange}
                     className="pl-9"
                 />
             </div>
@@ -48,9 +67,7 @@ export function MenuItemSelector({ cartItems, onAddItem }: MenuItemSelectorProps
             {!categoriesLoading && categories.length > 0 && (
                 <Tabs
                     value={selectedCategory?.toString() || 'all'}
-                    onValueChange={(value) =>
-                        setSelectedCategory(value === 'all' ? null : Number(value))
-                    }
+                    onValueChange={handleCategoryChange}
                 >
                     <TabsList className="w-full justify-start overflow-x-auto">
                         <TabsTrigger value="all">Tất cả</TabsTrigger>
@@ -80,9 +97,7 @@ export function MenuItemSelector({ cartItems, onAddItem }: MenuItemSelectorProps
                                 key={item.itemId}
                                 item={item}
                                 onAdd={onAddItem}
-                                cartQuantity={
-                                    cartItems.find((ci) => ci.menuItemId === item.itemId)?.quantity || 0
-                                }
+                                cartQuantity={cartItemsMap.get(item.itemId) || 0}
                             />
                         ))}
                     </div>
@@ -98,8 +113,8 @@ interface MenuItemCardProps {
     cartQuantity: number;
 }
 
-function MenuItemCard({ item, onAdd, cartQuantity }: MenuItemCardProps) {
-    const handleAdd = () => {
+const MenuItemCard = memo(function MenuItemCard({ item, onAdd, cartQuantity }: MenuItemCardProps) {
+    const handleAdd = useCallback(() => {
         onAdd({
             menuItemId: item.itemId,
             name: item.itemName,
@@ -107,7 +122,7 @@ function MenuItemCard({ item, onAdd, cartQuantity }: MenuItemCardProps) {
             quantity: 1,
             specialRequests: undefined,
         });
-    };
+    }, [onAdd, item.itemId, item.itemName, item.price]);
 
     return (
         <div className="relative border rounded-lg overflow-hidden hover:shadow-md transition-shadow">
@@ -159,4 +174,12 @@ function MenuItemCard({ item, onAdd, cartQuantity }: MenuItemCardProps) {
             </div>
         </div>
     );
-}
+}, (prevProps, nextProps) => {
+    // Only re-render if item or cart quantity changed
+    return (
+        prevProps.item.itemId === nextProps.item.itemId &&
+        prevProps.item.isAvailable === nextProps.item.isAvailable &&
+        prevProps.item.price === nextProps.item.price &&
+        prevProps.cartQuantity === nextProps.cartQuantity
+    );
+});

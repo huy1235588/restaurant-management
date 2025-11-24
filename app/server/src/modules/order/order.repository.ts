@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/database/prisma.service';
 import { Prisma, OrderStatus } from '@prisma/generated/client';
+import { OrderQueryHelper } from './helpers/order-query.helper';
 
 export interface OrderFilters {
     status?: OrderStatus;
@@ -19,6 +20,7 @@ export interface FindOrdersOptions {
     };
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
+    minimal?: boolean; // Use minimal includes for better performance
 }
 
 @Injectable()
@@ -71,32 +73,43 @@ export class OrderRepository {
         },
     };
 
+    /**
+     * Get appropriate includes based on query type
+     */
+    private getIncludes(minimal: boolean = false): Prisma.OrderInclude {
+        return minimal
+            ? OrderQueryHelper.LIST_INCLUDES
+            : OrderQueryHelper.STANDARD_INCLUDES;
+    }
+
     async findById(orderId: number) {
         return this.prisma.order.findUnique({
             where: { orderId },
-            include: this.includeRelations,
+            include: OrderQueryHelper.STANDARD_INCLUDES,
         });
     }
 
     async findByOrderNumber(orderNumber: string) {
         return this.prisma.order.findUnique({
             where: { orderNumber },
-            include: this.includeRelations,
+            include: OrderQueryHelper.STANDARD_INCLUDES,
         });
     }
 
     async findAll(options?: FindOrdersOptions) {
         const where = this.buildWhereClause(options?.filters);
         const orderBy = this.buildOrderBy(options?.sortBy, options?.sortOrder);
+        const includes = this.getIncludes(options?.minimal);
 
         if (options?.pagination) {
             const { page, limit } = options.pagination;
             const skip = (page - 1) * limit;
 
+            // Use Promise.all for parallel execution
             const [orders, total] = await Promise.all([
                 this.prisma.order.findMany({
                     where,
-                    include: this.includeRelations,
+                    include: includes,
                     orderBy,
                     skip,
                     take: limit,
@@ -117,7 +130,7 @@ export class OrderRepository {
 
         const orders = await this.prisma.order.findMany({
             where,
-            include: this.includeRelations,
+            include: includes,
             orderBy,
         });
 
@@ -140,7 +153,7 @@ export class OrderRepository {
         return this.prisma.order.update({
             where: { orderId },
             data,
-            include: this.includeRelations,
+            include: OrderQueryHelper.STANDARD_INCLUDES,
         });
     }
 
@@ -158,14 +171,38 @@ export class OrderRepository {
                     notIn: [OrderStatus.completed, OrderStatus.cancelled],
                 },
             },
-            include: this.includeRelations,
+            include: OrderQueryHelper.STANDARD_INCLUDES,
         });
     }
 
     async findByReservation(reservationId: number) {
         return this.prisma.order.findFirst({
             where: { reservationId },
-            include: this.includeRelations,
+            include: OrderQueryHelper.STANDARD_INCLUDES,
+        });
+    }
+
+    /**
+     * Batch update order items status (optimized for multiple items)
+     */
+    async updateOrderItemsStatus(
+        orderId: number,
+        status: string,
+    ): Promise<number> {
+        const result = await this.prisma.orderItem.updateMany({
+            where: { orderId },
+            data: { status: status as any },
+        });
+        return result.count;
+    }
+
+    /**
+     * Get order with minimal data (for cache/quick lookups)
+     */
+    async findByIdMinimal(orderId: number) {
+        return this.prisma.order.findUnique({
+            where: { orderId },
+            select: OrderQueryHelper.ORDER_NUMBER_SELECT,
         });
     }
 

@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { RefreshCw, Maximize2, Minimize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import { useKitchenOrders } from "../hooks/useKitchenOrders";
 import { useKitchenSocket } from "../hooks/useKitchenSocket";
+import { useFullscreen } from "../hooks/useFullscreen";
 import { useStartPreparing } from "../hooks/useStartPreparing";
 import { useCompleteOrder } from "../hooks/useCompleteOrder";
 import { useCancelKitchenOrder } from "../hooks/useCancelKitchenOrder";
@@ -23,7 +23,9 @@ export function KitchenDisplayView() {
     const [statusFilter, setStatusFilter] = useState<
         KitchenOrderStatus | "all"
     >("all");
-    const [isFullscreen, setIsFullscreen] = useState(false);
+
+    // Use custom fullscreen hook
+    const { isFullscreen, toggleFullscreen } = useFullscreen();
 
     // Queries
     const { data: orders, isLoading, isError, refetch } = useKitchenOrders();
@@ -45,50 +47,34 @@ export function KitchenDisplayView() {
         );
     }, [orders, statusFilter]);
 
-    // Fullscreen toggle
-    const toggleFullscreen = () => {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
-            setIsFullscreen(true);
-            toast.info("Fullscreen Mode", {
-                description: "Press F11 or ESC to exit fullscreen",
-                duration: 3000,
-            });
-        } else {
-            document.exitFullscreen();
-            setIsFullscreen(false);
-        }
-    };
+    // Memoize stats for orders
+    const ordersStats = useMemo(() => {
+        if (!orders) return { total: 0, pending: 0, preparing: 0, completed: 0 };
+        
+        return orders.reduce((acc, order) => {
+            acc.total++;
+            if (order.status === 'pending') acc.pending++;
+            if (order.status === 'preparing') acc.preparing++;
+            if (order.status === 'completed') acc.completed++;
+            return acc;
+        }, { total: 0, pending: 0, preparing: 0, completed: 0 });
+    }, [orders]);
 
-    // Listen to fullscreen changes
-    useEffect(() => {
-        const handleFullscreenChange = () => {
-            setIsFullscreen(!!document.fullscreenElement);
-        };
+    // Memoize action handlers
+    const handleStartPreparing = useCallback((orderId: number) => {
+        startPreparingMutation.mutate(orderId);
+    }, [startPreparingMutation]);
 
-        document.addEventListener("fullscreenchange", handleFullscreenChange);
-        return () => {
-            document.removeEventListener(
-                "fullscreenchange",
-                handleFullscreenChange
-            );
-        };
-    }, []);
+    const handleCompleteOrder = useCallback((orderId: number) => {
+        completeOrderMutation.mutate(orderId);
+    }, [completeOrderMutation]);
 
-    // Keyboard shortcut for fullscreen (F11)
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "F11") {
-                e.preventDefault();
-                toggleFullscreen();
-            }
-        };
+    const handleCancel = useCallback((orderId: number) => {
+        cancelMutation.mutate(orderId);
+    }, [cancelMutation]);
 
-        document.addEventListener("keydown", handleKeyDown);
-        return () => {
-            document.removeEventListener("keydown", handleKeyDown);
-        };
-    }, []);
+    // Listen to fullscreen changes (already handled by useFullscreen hook)
+    // Removed duplicate fullscreen logic
 
     // Current time display
     const [currentTime, setCurrentTime] = useState(
@@ -102,19 +88,6 @@ export function KitchenDisplayView() {
 
         return () => clearInterval(timer);
     }, []);
-
-    // Action handlers
-    const handleStartPreparing = (orderId: number) => {
-        startPreparingMutation.mutate(orderId);
-    };
-
-    const handleCompleteOrder = (orderId: number) => {
-        completeOrderMutation.mutate(orderId);
-    };
-
-    const handleCancel = (orderId: number) => {
-        cancelMutation.mutate(orderId);
-    };
 
     return (
         <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900">

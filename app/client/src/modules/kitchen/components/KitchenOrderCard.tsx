@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
@@ -18,7 +18,7 @@ interface KitchenOrderCardProps {
     onCancel: (orderId: number) => void;
 }
 
-export function KitchenOrderCard({
+export const KitchenOrderCard = memo(function KitchenOrderCard({
     order,
     onStartPreparing,
     onCompleteOrder,
@@ -126,4 +126,11 @@ export function KitchenOrderCard({
             </CardFooter>
         </Card>
     );
-}
+}, (prevProps, nextProps) => {
+    // Custom comparison: only re-render if order data actually changed
+    return (
+        prevProps.order.kitchenOrderId === nextProps.order.kitchenOrderId &&
+        prevProps.order.status === nextProps.order.status &&
+        prevProps.order.updatedAt === nextProps.order.updatedAt
+    );
+});

@@ -22,9 +22,6 @@ import {
     OrderItemNotFoundException,
     TableNotFoundException,
     TableOccupiedException,
-    MenuItemNotFoundException,
-    MenuItemNotAvailableException,
-    MenuItemNotActiveException,
     CannotModifyCompletedOrderException,
     CannotModifyCancelledOrderException,
     OrderAlreadyCancelledException,
@@ -32,6 +29,7 @@ import {
     InvalidOrderStatusException,
 } from './exceptions/order.exceptions';
 import { OrderHelper } from './helpers/order.helper';
+import { OrderValidationHelper } from './helpers/order-validation.helper';
 
 /**
  * Order Service
@@ -132,14 +130,16 @@ export class OrderService {
             );
         }
 
-        // Validate menu items and calculate prices
-        const orderItems = await this.validateAndPrepareOrderItems(data.items);
+        // Validate menu items and calculate prices (optimized with single query)
+        const orderItems =
+            await OrderValidationHelper.validateAndPrepareOrderItems(
+                this.prisma,
+                data.items,
+            );
 
         // Calculate totals
-        const totalAmount = orderItems.reduce(
-            (sum, item) => sum + Number(item.totalPrice),
-            0,
-        );
+        const totalAmount =
+            OrderValidationHelper.calculateTotalAmount(orderItems);
 
         // Create order with items in a transaction
         const order = await this.prisma.$transaction(async (tx) => {
@@ -215,8 +215,12 @@ export class OrderService {
             throw new BillAlreadyCreatedException('add items');
         }
 
-        // Validate menu items and calculate prices
-        const orderItems = await this.validateAndPrepareOrderItems(data.items);
+        // Validate menu items and calculate prices (optimized with single query)
+        const orderItems =
+            await OrderValidationHelper.validateAndPrepareOrderItems(
+                this.prisma,
+                data.items,
+            );
 
         // Add items and update totals in a transaction
         const updatedOrder = await this.prisma.$transaction(async (tx) => {
@@ -228,17 +232,10 @@ export class OrderService {
                 })),
             });
 
-            // Calculate new total
-            const allItems = await tx.orderItem.findMany({
-                where: {
-                    orderId,
-                    status: { not: OrderItemStatus.cancelled },
-                },
-            });
-
-            const newTotal = allItems.reduce(
-                (sum, item) => sum + Number(item.totalPrice),
-                0,
+            // Calculate new total (optimized)
+            const newTotal = await OrderValidationHelper.calculateOrderTotal(
+                tx as any,
+                orderId,
             );
 
             // Prepare update data - if order was completed, reopen it
@@ -367,7 +364,7 @@ export class OrderService {
             throw new BillAlreadyCreatedException('cancel items');
         }
 
-        // Cancel item and update totals
+        // Cancel item and update totals (optimized)
         const updatedOrder = await this.prisma.$transaction(async (tx) => {
             // Update item status
             await tx.orderItem.update({
@@ -377,17 +374,10 @@ export class OrderService {
                 },
             });
 
-            // Recalculate total
-            const activeItems = await tx.orderItem.findMany({
-                where: {
-                    orderId,
-                    status: { not: OrderItemStatus.cancelled },
-                },
-            });
-
-            const newTotal = activeItems.reduce(
-                (sum, item) => sum + Number(item.totalPrice),
-                0,
+            // Recalculate total (optimized)
+            const newTotal = await OrderValidationHelper.calculateOrderTotal(
+                tx as any,
+                orderId,
             );
 
             // Update order
@@ -637,61 +627,5 @@ export class OrderService {
         return updatedOrder;
     }
 
-    /**
-     * Validate menu items and prepare order item data
-     */
-    private async validateAndPrepareOrderItems(
-        items: Array<{
-            itemId: number;
-            quantity: number;
-            specialRequest?: string;
-        }>,
-    ) {
-        const orderItems: Array<{
-            itemId: number;
-            quantity: number;
-            unitPrice: number;
-            totalPrice: number;
-            specialRequest: string | null;
-            status: OrderItemStatus;
-        }> = [];
-
-        for (const item of items) {
-            // Get menu item
-            const menuItem = await this.prisma.menuItem.findUnique({
-                where: { itemId: item.itemId },
-            });
-
-            if (!menuItem) {
-                this.logger.warn(`Menu item not found: ${item.itemId}`);
-                throw new MenuItemNotFoundException(item.itemId);
-            }
-
-            if (!menuItem.isAvailable) {
-                this.logger.warn(
-                    `Menu item not available: ${menuItem.itemName}`,
-                );
-                throw new MenuItemNotAvailableException(menuItem.itemName);
-            }
-
-            if (!menuItem.isActive) {
-                this.logger.warn(`Menu item not active: ${menuItem.itemName}`);
-                throw new MenuItemNotActiveException(menuItem.itemName);
-            }
-
-            const unitPrice = Number(menuItem.price);
-            const totalPrice = unitPrice * item.quantity;
-
-            orderItems.push({
-                itemId: item.itemId,
-                quantity: item.quantity,
-                unitPrice,
-                totalPrice,
-                specialRequest: item.specialRequest ?? null,
-                status: OrderItemStatus.pending,
-            });
-        }
-
-        return orderItems;
-    }
+    // Remove the old validateAndPrepareOrderItems method - now using helper
 }

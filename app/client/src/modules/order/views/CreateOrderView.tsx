@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -29,6 +29,12 @@ import { ArrowLeft, ArrowRight, Save, AlertCircle } from 'lucide-react';
 
 const STORAGE_KEY = 'order-draft';
 const STORAGE_DEBOUNCE_DELAY = 1000;
+const STEPS = [
+    { id: 1, name: 'Chọn bàn' },
+    { id: 2, name: 'Thông tin khách' },
+    { id: 3, name: 'Chọn món' },
+    { id: 4, name: 'Xác nhận' },
+];
 
 export function CreateOrderView() {
     const router = useRouter();
@@ -54,6 +60,46 @@ export function CreateOrderView() {
 
     const createOrderMutation = useCreateOrder();
 
+    // Memoize order items calculation
+    const tempOrderItems: OrderItem[] = useMemo(() => 
+        cartItems.map((item, index) => ({
+            orderItemId: index,
+            orderId: 0,
+            itemId: item.menuItemId,
+            menuItem: {
+                itemId: item.menuItemId,
+                itemName: item.name,
+                price: item.price,
+                categoryId: 0,
+                description: null,
+                imageUrl: null,
+                isAvailable: true,
+            },
+            quantity: item.quantity,
+            unitPrice: item.price,
+            totalPrice: item.price * item.quantity,
+            specialRequest: item.specialRequests || null,
+            status: 'pending',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        })), [cartItems]
+    );
+
+    // Memoize financial calculations
+    const financials = useMemo(() => 
+        calculateOrderFinancials(tempOrderItems), 
+        [tempOrderItems]
+    );
+
+    // Memoize draft data
+    const draftData = useMemo(() => ({
+        step: currentStep,
+        tableId: selectedTableId,
+        cartItems,
+        customerInfo: customerForm.getValues(),
+        timestamp: new Date().toISOString(),
+    }), [currentStep, selectedTableId, cartItems, customerForm]);
+
     // Load draft from localStorage
     useEffect(() => {
         const draft = localStorage.getItem(STORAGE_KEY);
@@ -72,25 +118,22 @@ export function CreateOrderView() {
 
     // Save draft to localStorage with debouncing
     useEffect(() => {
-        if (hasUnsavedChanges) {
-            // Clear existing timer
-            if (storageTimerRef.current) {
-                clearTimeout(storageTimerRef.current);
-            }
+        if (!hasUnsavedChanges) return;
 
-            // Set new timer
-            storageTimerRef.current = setTimeout(() => {
-                const draft = {
-                    step: currentStep,
-                    tableId: selectedTableId,
-                    cartItems,
-                    customerInfo: customerForm.getValues(),
-                    timestamp: new Date().toISOString(),
-                };
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
-                storageTimerRef.current = null;
-            }, STORAGE_DEBOUNCE_DELAY);
+        // Clear existing timer
+        if (storageTimerRef.current) {
+            clearTimeout(storageTimerRef.current);
         }
+
+        // Set new timer
+        storageTimerRef.current = setTimeout(() => {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(draftData));
+            } catch (error) {
+                console.error('Failed to save draft:', error);
+            }
+            storageTimerRef.current = null;
+        }, STORAGE_DEBOUNCE_DELAY);
 
         // Cleanup on unmount
         return () => {
@@ -98,7 +141,7 @@ export function CreateOrderView() {
                 clearTimeout(storageTimerRef.current);
             }
         };
-    }, [currentStep, selectedTableId, cartItems, customerForm, hasUnsavedChanges]);
+    }, [draftData, hasUnsavedChanges]);
 
     // Warn about unsaved changes
     useEffect(() => {
@@ -179,37 +222,7 @@ export function CreateOrderView() {
         // Navigation handled by useCreateOrder hook
     };
 
-    // Convert cart items to OrderItem format for financial calculations
-    const tempOrderItems: OrderItem[] = cartItems.map((item, index) => ({
-        orderItemId: index,
-        orderId: 0,
-        itemId: item.menuItemId,
-        menuItem: {
-            itemId: item.menuItemId,
-            itemName: item.name,
-            price: item.price,
-            categoryId: 0,
-            description: null,
-            imageUrl: null,
-            isAvailable: true,
-        },
-        quantity: item.quantity,
-        unitPrice: item.price,
-        totalPrice: item.price * item.quantity,
-        specialRequest: item.specialRequests || null,
-        status: 'pending',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-    }));
 
-    const financials = calculateOrderFinancials(tempOrderItems);
-
-    const steps = [
-        { id: 1, name: 'Chọn bàn' },
-        { id: 2, name: 'Thông tin khách' },
-        { id: 3, name: 'Chọn món' },
-        { id: 4, name: 'Xác nhận' },
-    ];
 
     return (
         <div className="space-y-6">
@@ -226,7 +239,7 @@ export function CreateOrderView() {
 
             {/* Step Indicator */}
             <StepIndicator
-                steps={steps}
+                steps={STEPS}
                 currentStep={currentStep}
                 onStepClick={handleStepClick}
             />

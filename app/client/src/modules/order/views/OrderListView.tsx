@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
     Select,
     SelectContent,
@@ -12,20 +13,25 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { OrderCard } from '../components/OrderCard';
+import { OrderCardSkeleton } from '../components/OrderCardSkeleton';
 import { CancelOrderDialog } from '../dialogs/CancelOrderDialog';
-import { useOrders, useOrderSocket } from '../hooks';
+import { useOrders, useOrderSocket, useFullscreen } from '../hooks';
 import { Order, OrderStatus } from '../types';
+import { ORDER_CONSTANTS } from '../constants';
 import { Plus, Search, Maximize2, Minimize2 } from 'lucide-react';
-import { toast } from 'sonner';
 
 export function OrderListView() {
     const router = useRouter();
     const [page, setPage] = useState(1);
-    const [limit] = useState(20);
+    const [limit] = useState(ORDER_CONSTANTS.DEFAULT_PAGE_SIZE);
     const [status, setStatus] = useState<OrderStatus | ''>('');
     const [search, setSearch] = useState('');
     const [orderToCancel, setOrderToCancel] = useState<Order | null>(null);
-    const [isFullscreen, setIsFullscreen] = useState(false);
+
+    // Use custom fullscreen hook
+    const { isFullscreen, toggleFullscreen } = useFullscreen({
+        toastDuration: ORDER_CONSTANTS.UI.FULLSCREEN_TOAST_DURATION,
+    });
 
     const { data, isLoading, error } = useOrders({
         page,
@@ -40,58 +46,17 @@ export function OrderListView() {
         enableSound: false,
     });
 
-    // Fullscreen toggle
-    const toggleFullscreen = () => {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
-            setIsFullscreen(true);
-            toast.info("Fullscreen Mode", {
-                description: "Press F11 or ESC to exit fullscreen",
-                duration: 3000,
-            });
-        } else {
-            document.exitFullscreen();
-            setIsFullscreen(false);
-        }
-    };
+    // Memoize filtered orders count for display
+    const ordersCount = useMemo(() => data?.data?.length || 0, [data?.data]);
 
-    // Listen to fullscreen changes
-    useEffect(() => {
-        const handleFullscreenChange = () => {
-            setIsFullscreen(!!document.fullscreenElement);
-        };
-
-        document.addEventListener("fullscreenchange", handleFullscreenChange);
-        return () => {
-            document.removeEventListener(
-                "fullscreenchange",
-                handleFullscreenChange
-            );
-        };
-    }, []);
-
-    // Keyboard shortcut for fullscreen (F11)
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "F11") {
-                e.preventDefault();
-                toggleFullscreen();
-            }
-        };
-
-        document.addEventListener("keydown", handleKeyDown);
-        return () => {
-            document.removeEventListener("keydown", handleKeyDown);
-        };
-    }, []);
-
-    const handleCreateOrder = () => {
+    // Memoize callbacks
+    const handleCreateOrder = useCallback(() => {
         router.push('/orders/new');
-    };
+    }, [router]);
 
-    const handleCancelOrder = (order: Order) => {
+    const handleCancelOrder = useCallback((order: Order) => {
         setOrderToCancel(order);
-    };
+    }, []);
 
     if (isLoading) {
         return (
@@ -103,8 +68,8 @@ export function OrderListView() {
                         Tạo đơn hàng
                     </Button>
                 </div>
-                <div className="text-center py-12 text-muted-foreground">
-                    Đang tải...
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <OrderCardSkeleton count={ORDER_CONSTANTS.UI.SKELETON_LOADING_COUNT} />
                 </div>
             </div>
         );
