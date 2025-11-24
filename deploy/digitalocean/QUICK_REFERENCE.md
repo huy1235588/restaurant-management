@@ -356,17 +356,43 @@ systemctl status docker
 
 ### Deploy Application
 ```bash
-# Run deployment script
+# Run deployment script (recommended)
 cd /opt/restaurant-management/deploy/digitalocean/scripts
-./deploy.sh
+bash deploy.sh
 
 # Manual deployment steps
 cd /opt/restaurant-management
 git pull origin main
 cd deploy
-docker-compose -f docker-compose.prod.yml build
-docker-compose -f docker-compose.prod.yml up -d
-docker exec restaurant_server_prod npx prisma migrate deploy
+docker compose -f docker-compose.prod.yml build
+docker compose -f docker-compose.prod.yml up -d
+```
+
+### Rebuild Images (Fix Prisma Runtime Error)
+
+**Error:** `Cannot find module '@prisma/client-runtime-utils'`
+
+```bash
+# 1. Run rebuild script (easiest)
+bash /opt/restaurant-management/deploy/digitalocean/scripts/rebuild-images.sh
+
+# Or manual rebuild:
+cd /opt/restaurant-management/deploy
+
+# 2. Stop containers
+docker compose -f docker-compose.prod.yml stop
+
+# 3. Rebuild images without cache
+docker compose -f docker-compose.prod.yml build --no-cache
+
+# 4. Start containers
+docker compose -f docker-compose.prod.yml up -d
+
+# 5. Run migrations
+bash /opt/restaurant-management/deploy/digitalocean/scripts/migrate.sh
+
+# 6. Check logs
+docker logs -f restaurant_server_prod
 ```
 
 ### Environment Variables
@@ -376,8 +402,8 @@ cd /opt/restaurant-management/deploy
 nano .env
 
 # Reload environment (restart containers)
-docker-compose -f docker-compose.prod.yml down
-docker-compose -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml down
+docker compose -f docker-compose.prod.yml up -d
 
 # Verify env vars loaded
 docker exec restaurant_server_prod env | grep NODE_ENV
@@ -412,7 +438,7 @@ git stash pop
 ```bash
 # Run backup script
 cd /opt/restaurant-management/deploy/digitalocean/scripts
-./backup.sh
+bash backup.sh
 
 # Manual backup
 docker exec restaurant_postgres_prod pg_dump -U restaurant_admin restaurant_db | gzip > backup_$(date +%Y%m%d_%H%M%S).sql.gz

@@ -1122,6 +1122,72 @@ docker-compose up -d
 bash deploy/digitalocean/scripts/migrate.sh
 ```
 
+#### 8. Prisma Runtime Error - Cannot find module '@prisma/client-runtime-utils'
+
+**Lỗi:**
+```
+Error: Cannot find module '@prisma/client-runtime-utils'
+```
+
+**Nguyên nhân:**
+- Docker image cũ không có Prisma Client được generate đúng cách
+- Build cache bị corrupted
+
+**Giải pháp:**
+
+```bash
+# 1. Chạy rebuild script (dễ nhất)
+bash /opt/restaurant-management/deploy/digitalocean/scripts/rebuild-images.sh
+
+# Script sẽ:
+# ✓ Stop containers
+# ✓ Rebuild images mới (no-cache)
+# ✓ Start containers
+# ✓ Run migrations
+# ✓ Check health
+```
+
+**Manual rebuild (nếu script fail):**
+
+```bash
+cd /opt/restaurant-management/deploy
+
+# 2. Stop containers
+docker compose -f docker-compose.prod.yml stop
+
+# 3. Rebuild server image without cache
+docker compose -f docker-compose.prod.yml build --no-cache server
+
+# 4. Start containers
+docker compose -f docker-compose.prod.yml up -d
+
+# 5. Wait for database
+sleep 15
+
+# 6. Run migrations
+export $(cat .env | grep -v '^#' | xargs)
+export DB_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public"
+docker exec -e DATABASE_URL="$DB_URL" \
+  restaurant_server_prod \
+  npx prisma migrate deploy --schema prisma/schema.prisma
+
+# 7. Check logs
+docker logs -f restaurant_server_prod
+```
+
+**Nếu vẫn fail:**
+
+```bash
+# Thử clean và rebuild lại
+docker compose -f docker-compose.prod.yml down
+docker image rm $(docker images | grep restaurant | awk '{print $3}')
+docker compose -f docker-compose.prod.yml build --no-cache
+docker compose -f docker-compose.prod.yml up -d
+bash /opt/restaurant-management/deploy/digitalocean/scripts/migrate.sh
+```
+
+**⏱️ Rebuild mất 5-10 phút lần đầu**
+
 ---
 
 ## Bảo Trì và Quản Lý

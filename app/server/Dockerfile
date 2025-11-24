@@ -16,10 +16,7 @@ COPY prisma ./prisma
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile
 
-# Generate Prisma Client
-RUN pnpm exec prisma generate
-
-# Stage 2: Builder
+# Stage 2: Builder with Prisma Generation
 FROM node:20-alpine AS builder
 RUN apk add --no-cache libc6-compat && \
     npm install -g pnpm
@@ -29,8 +26,11 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/package.json ./package.json
 
-# Copy source files
+# Copy source files and prisma schema
 COPY . .
+
+# Generate Prisma Client in builder stage (after dependencies installed)
+RUN pnpm exec prisma generate
 
 # Build application
 RUN pnpm run build
