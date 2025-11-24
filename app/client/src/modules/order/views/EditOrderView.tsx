@@ -6,14 +6,21 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { MenuItemSelector } from '../components/MenuItemSelector';
 import { ShoppingCart } from '../components/ShoppingCart';
 import { OrderSummaryCard } from '../components/OrderSummaryCard';
 import { OrderStatusBadge } from '../components/OrderStatusBadge';
-import { useOrderById, useAddItems } from '../hooks';
+import { useOrderById, useAddItems, useFullscreen } from '../hooks';
 import { ShoppingCartItem, OrderItem } from '../types';
 import { formatOrderNumber, formatCurrency, calculateOrderFinancials } from '../utils';
-import { ArrowLeft, Save, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Save, AlertCircle, Maximize2, Minimize2, Keyboard } from 'lucide-react';
 
 interface EditOrderViewProps {
     orderId: number;
@@ -23,9 +30,13 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
     const router = useRouter();
     const [cartItems, setCartItems] = useState<ShoppingCartItem[]>([]);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+    const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
 
     const { data: order, isLoading, error } = useOrderById(orderId);
     const addItemsMutation = useAddItems();
+
+    // Use custom fullscreen hook
+    const { isFullscreen, toggleFullscreen } = useFullscreen();
 
     // Warn about unsaved changes
     useEffect(() => {
@@ -39,6 +50,56 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
         window.addEventListener('beforeunload', handleBeforeUnload);
         return () => window.removeEventListener('beforeunload', handleBeforeUnload);
     }, [hasUnsavedChanges]);
+
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const target = e.target as HTMLElement;
+            const isInputField = ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
+
+            // Always allow Escape and F11
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                setShowKeyboardHelp(false);
+                return;
+            }
+
+            if (e.key === 'F11') {
+                e.preventDefault();
+                toggleFullscreen();
+                return;
+            }
+
+            // Prevent shortcuts when typing
+            if (isInputField) return;
+
+            switch (e.key.toLowerCase()) {
+                case 'b':
+                    e.preventDefault();
+                    handleBack();
+                    break;
+                case 's':
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        if (cartItems.length > 0) {
+                            handleSubmit();
+                        }
+                    }
+                    break;
+                case 'f':
+                    e.preventDefault();
+                    toggleFullscreen();
+                    break;
+                case '?':
+                    e.preventDefault();
+                    setShowKeyboardHelp(true);
+                    break;
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [cartItems, hasUnsavedChanges, toggleFullscreen]);
 
     const handleBack = () => {
         if (hasUnsavedChanges) {
@@ -149,6 +210,19 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
                         </p>
                     </div>
                     <OrderStatusBadge status={order.status} />
+                </div>
+                <div className="flex gap-2">
+                    <Button variant="outline" size="icon" onClick={() => setShowKeyboardHelp(true)} title="Keyboard shortcuts (?)">
+                        <Keyboard className="h-4 w-4" />
+                    </Button>
+                    <Button variant="outline" onClick={toggleFullscreen}>
+                        {isFullscreen ? (
+                            <Minimize2 className="mr-2 h-4 w-4" />
+                        ) : (
+                            <Maximize2 className="mr-2 h-4 w-4" />
+                        )}
+                        {isFullscreen ? "Exit" : "Fullscreen"}
+                    </Button>
                 </div>
             </div>
 
@@ -320,6 +394,50 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
                     </Button>
                 </div>
             </div>
+
+            {/* Keyboard Shortcuts Help Dialog */}
+            <Dialog open={showKeyboardHelp} onOpenChange={setShowKeyboardHelp}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Phím tắt - Thêm món</DialogTitle>
+                        <DialogDescription>
+                            Các phím tắt có sẵn khi thêm món vào đơn hàng
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <h4 className="font-semibold text-sm">Hành động</h4>
+                            <div className="space-y-1 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Quay lại chi tiết đơn</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">B</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Lưu thay đổi</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">Ctrl+S</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Toàn màn hình</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">F / F11</kbd>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <h4 className="font-semibold text-sm">Khác</h4>
+                            <div className="space-y-1 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Hiển thị trợ giúp này</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">?</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Đóng dialog</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">ESC</kbd>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

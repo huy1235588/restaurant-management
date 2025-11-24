@@ -35,11 +35,12 @@ export const calculateOrderTotal = (items: OrderItem[]): number => {
 
 /**
  * Calculate subtotal, tax, service charge, and final total
+ * Note: Tax and service charge removed - total = subtotal
  */
 export const calculateOrderFinancials = (
     items: OrderItem[],
-    taxRate: number = 0.1,
-    serviceChargeRate: number = 0.05
+    taxRate: number = 0,
+    serviceChargeRate: number = 0
 ): {
     subtotal: number;
     serviceCharge: number;
@@ -48,9 +49,9 @@ export const calculateOrderFinancials = (
     discount: number;
 } => {
     const subtotal = calculateOrderTotal(items);
-    const serviceCharge = subtotal * serviceChargeRate;
-    const tax = subtotal * taxRate;
-    const total = subtotal + serviceCharge + tax;
+    const serviceCharge = 0; // Removed
+    const tax = 0; // Removed
+    const total = subtotal; // No additional charges
 
     return {
         subtotal,

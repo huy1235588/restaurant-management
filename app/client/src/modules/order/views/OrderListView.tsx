@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,13 +12,20 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { OrderCard } from '../components/OrderCard';
 import { OrderCardSkeleton } from '../components/OrderCardSkeleton';
 import { CancelOrderDialog } from '../dialogs/CancelOrderDialog';
 import { useOrders, useOrderSocket, useFullscreen } from '../hooks';
 import { Order, OrderStatus } from '../types';
 import { ORDER_CONSTANTS } from '../constants';
-import { Plus, Search, Maximize2, Minimize2 } from 'lucide-react';
+import { Plus, Search, Maximize2, Minimize2, Keyboard } from 'lucide-react';
 
 export function OrderListView() {
     const router = useRouter();
@@ -27,13 +34,14 @@ export function OrderListView() {
     const [status, setStatus] = useState<OrderStatus | ''>('');
     const [search, setSearch] = useState('');
     const [orderToCancel, setOrderToCancel] = useState<Order | null>(null);
+    const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
 
     // Use custom fullscreen hook
     const { isFullscreen, toggleFullscreen } = useFullscreen({
         toastDuration: ORDER_CONSTANTS.UI.FULLSCREEN_TOAST_DURATION,
     });
 
-    const { data, isLoading, error } = useOrders({
+    const { data, isLoading, error, refetch } = useOrders({
         page,
         limit,
         status: status || undefined,
@@ -45,6 +53,77 @@ export function OrderListView() {
         enableNotifications: true,
         enableSound: false,
     });
+
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Ignore if typing in input/textarea
+            const target = e.target as HTMLElement;
+            const isInputField = ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
+
+            // Always allow Escape and F11
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                setShowKeyboardHelp(false);
+                return;
+            }
+
+            if (e.key === 'F11') {
+                e.preventDefault();
+                toggleFullscreen();
+                return;
+            }
+
+            // Prevent shortcuts when typing
+            if (isInputField && e.key !== '/') return;
+
+            switch (e.key.toLowerCase()) {
+                case 'n':
+                    if (e.shiftKey) {
+                        e.preventDefault();
+                        handleCreateOrder();
+                    }
+                    break;
+                case '/':
+                    e.preventDefault();
+                    document.querySelector<HTMLInputElement>('input[placeholder*="Tìm"]')?.focus();
+                    break;
+                case 'r':
+                    if (!e.ctrlKey && !e.metaKey) {
+                        e.preventDefault();
+                        refetch();
+                    }
+                    break;
+                case 'f':
+                    e.preventDefault();
+                    toggleFullscreen();
+                    break;
+                case '1':
+                    e.preventDefault();
+                    setStatus('');
+                    break;
+                case '2':
+                    e.preventDefault();
+                    setStatus('pending');
+                    break;
+                case '3':
+                    e.preventDefault();
+                    setStatus('confirmed');
+                    break;
+                case '4':
+                    e.preventDefault();
+                    setStatus('completed');
+                    break;
+                case '?':
+                    e.preventDefault();
+                    setShowKeyboardHelp(true);
+                    break;
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [toggleFullscreen, refetch]);
 
     // Memoize filtered orders count for display
     const ordersCount = useMemo(() => data?.data?.length || 0, [data?.data]);
@@ -100,6 +179,9 @@ export function OrderListView() {
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold">Quản lý đơn hàng</h1>
                 <div className="flex gap-2">
+                    <Button variant="outline" size="icon" onClick={() => setShowKeyboardHelp(true)} title="Keyboard shortcuts (?)">
+                        <Keyboard className="h-4 w-4" />
+                    </Button>
                     <Button variant="outline" onClick={toggleFullscreen}>
                         {isFullscreen ? (
                             <Minimize2 className="mr-2 h-4 w-4" />
@@ -188,6 +270,75 @@ export function OrderListView() {
                 onOpenChange={(open) => !open && setOrderToCancel(null)}
                 order={orderToCancel}
             />
+
+            {/* Keyboard Shortcuts Help Dialog */}
+            <Dialog open={showKeyboardHelp} onOpenChange={setShowKeyboardHelp}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Phím tắt</DialogTitle>
+                        <DialogDescription>
+                            Các phím tắt có sẵn trong trang quản lý đơn hàng
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <h4 className="font-semibold text-sm">Hành động</h4>
+                            <div className="space-y-1 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Tạo đơn hàng mới</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">Shift + N</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Tìm kiếm</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">/</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Làm mới</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">R</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Toàn màn hình</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">F / F11</kbd>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <h4 className="font-semibold text-sm">Lọc trạng thái</h4>
+                            <div className="space-y-1 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Tất cả</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">1</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Chờ xác nhận</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">2</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Đã xác nhận</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">3</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Hoàn thành</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">4</kbd>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <h4 className="font-semibold text-sm">Khác</h4>
+                            <div className="space-y-1 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Hiển thị trợ giúp này</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">?</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Đóng dialog</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">ESC</kbd>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

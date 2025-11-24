@@ -28,32 +28,19 @@ export function OrderSummaryCard({
                     <span className="font-medium">{formatCurrency(subtotal)}</span>
                 </div>
 
-                {serviceCharge > 0 && (
-                    <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Phí phục vụ</span>
-                        <span className="font-medium">
-                            {formatCurrency(serviceCharge)}
-                        </span>
-                    </div>
-                )}
-
-                {tax > 0 && (
-                    <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Thuế</span>
-                        <span className="font-medium">{formatCurrency(tax)}</span>
-                    </div>
-                )}
-
                 {discount > 0 && (
-                    <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
-                        <span>Giảm giá</span>
-                        <span className="font-medium">
-                            -{formatCurrency(discount)}
-                        </span>
-                    </div>
+                    <>
+                        <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
+                            <span>Giảm giá</span>
+                            <span className="font-medium">
+                                -{formatCurrency(discount)}
+                            </span>
+                        </div>
+                        <Separator />
+                    </>
                 )}
 
-                <Separator />
+                {!discount && <Separator />}
 
                 <div className="flex justify-between text-lg font-bold">
                     <span>Tổng cộng</span>

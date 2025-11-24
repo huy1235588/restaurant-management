@@ -11,12 +11,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { StepIndicator } from '../components/StepIndicator';
 import { TableSelector } from '../components/TableSelector';
 import { MenuItemSelector } from '../components/MenuItemSelector';
 import { ShoppingCart } from '../components/ShoppingCart';
 import { OrderSummaryCard } from '../components/OrderSummaryCard';
-import { useCreateOrder } from '../hooks';
+import { useCreateOrder, useFullscreen } from '../hooks';
 import { CreateOrderFormData, ShoppingCartItem, CreateOrderDto, OrderItem } from '../types';
 import {
     step1TableSchema,
@@ -25,7 +32,7 @@ import {
     step4ReviewSchema,
 } from '../utils/order.schemas';
 import { calculateOrderFinancials, formatCurrency } from '../utils';
-import { ArrowLeft, ArrowRight, Save, AlertCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Save, AlertCircle, Keyboard, Maximize2, Minimize2 } from 'lucide-react';
 
 const STORAGE_KEY = 'order-draft';
 const STORAGE_DEBOUNCE_DELAY = 1000;
@@ -41,6 +48,7 @@ export function CreateOrderView() {
     const [currentStep, setCurrentStep] = useState(1);
     const [cartItems, setCartItems] = useState<ShoppingCartItem[]>([]);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+    const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
     const storageTimerRef = useRef<NodeJS.Timeout | null>(null);
 
     // Step 1: Table Selection
@@ -60,8 +68,11 @@ export function CreateOrderView() {
 
     const createOrderMutation = useCreateOrder();
 
+    // Use custom fullscreen hook
+    const { isFullscreen, toggleFullscreen } = useFullscreen();
+
     // Memoize order items calculation
-    const tempOrderItems: OrderItem[] = useMemo(() => 
+    const tempOrderItems: OrderItem[] = useMemo(() =>
         cartItems.map((item, index) => ({
             orderItemId: index,
             orderId: 0,
@@ -86,8 +97,8 @@ export function CreateOrderView() {
     );
 
     // Memoize financial calculations
-    const financials = useMemo(() => 
-        calculateOrderFinancials(tempOrderItems), 
+    const financials = useMemo(() =>
+        calculateOrderFinancials(tempOrderItems),
         [tempOrderItems]
     );
 
@@ -155,6 +166,78 @@ export function CreateOrderView() {
         window.addEventListener('beforeunload', handleBeforeUnload);
         return () => window.removeEventListener('beforeunload', handleBeforeUnload);
     }, [hasUnsavedChanges]);
+
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const target = e.target as HTMLElement;
+            const isInputField = ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
+
+            // Always allow Escape
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                setShowKeyboardHelp(false);
+                return;
+            }
+
+            // Prevent shortcuts when typing
+            if (isInputField) return;
+
+            switch (e.key.toLowerCase()) {
+                case 'arrowright':
+                    if (currentStep < 4) {
+                        e.preventDefault();
+                        handleNextStep();
+                    }
+                    break;
+                case 'arrowleft':
+                    if (currentStep > 1) {
+                        e.preventDefault();
+                        handlePreviousStep();
+                    }
+                    break;
+                case 'enter':
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        if (currentStep === 4) {
+                            handleSubmit();
+                        } else {
+                            handleNextStep();
+                        }
+                    }
+                    break;
+                case 's':
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        if (currentStep === 4) {
+                            handleSubmit();
+                        }
+                    }
+                    break;
+                case 'f':
+                    e.preventDefault();
+                    toggleFullscreen();
+                    break;
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                    const step = parseInt(e.key);
+                    if (step <= currentStep) {
+                        e.preventDefault();
+                        setCurrentStep(step);
+                    }
+                    break;
+                case '?':
+                    e.preventDefault();
+                    setShowKeyboardHelp(true);
+                    break;
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [currentStep, hasUnsavedChanges, toggleFullscreen]);
 
     const handleBack = () => {
         if (hasUnsavedChanges) {
@@ -234,6 +317,19 @@ export function CreateOrderView() {
                         Quay lại
                     </Button>
                     <h1 className="text-3xl font-bold">Tạo đơn hàng mới</h1>
+                </div>
+                <div className="flex gap-2">
+                    <Button variant="outline" size="icon" onClick={() => setShowKeyboardHelp(true)} title="Keyboard shortcuts (?)">
+                        <Keyboard className="h-4 w-4" />
+                    </Button>
+                    <Button variant="outline" onClick={toggleFullscreen}>
+                        {isFullscreen ? (
+                            <Minimize2 className="mr-2 h-4 w-4" />
+                        ) : (
+                            <Maximize2 className="mr-2 h-4 w-4" />
+                        )}
+                        {isFullscreen ? "Exit" : "Fullscreen"}
+                    </Button>
                 </div>
             </div>
 
@@ -526,6 +622,75 @@ export function CreateOrderView() {
                     </Button>
                 )}
             </div>
+
+            {/* Keyboard Shortcuts Help Dialog */}
+            <Dialog open={showKeyboardHelp} onOpenChange={setShowKeyboardHelp}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Phím tắt - Tạo đơn hàng</DialogTitle>
+                        <DialogDescription>
+                            Các phím tắt có sẵn khi tạo đơn hàng mới
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <h4 className="font-semibold text-sm">Điều hướng</h4>
+                            <div className="space-y-1 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Bước tiếp theo</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">→ hoặc Ctrl+Enter</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Bước trước</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">←</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Lưu đơn hàng</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">Ctrl+S</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Toàn màn hình</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">F / F11</kbd>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <h4 className="font-semibold text-sm">Nhảy đến bước</h4>
+                            <div className="space-y-1 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Bước 1 (Chọn bàn)</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">1</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Bước 2 (Thông tin khách)</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">2</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Bước 3 (Chọn món)</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">3</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Bước 4 (Xác nhận)</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">4</kbd>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <h4 className="font-semibold text-sm">Khác</h4>
+                            <div className="space-y-1 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Hiển thị trợ giúp này</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">?</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Đóng dialog</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">ESC</kbd>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

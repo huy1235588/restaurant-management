@@ -9,8 +9,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface ShoppingCartProps {
     items: ShoppingCartItem[];
-    onUpdateQuantity: (index: number, quantity: number) => void;
-    onRemoveItem: (index: number) => void;
+    onUpdateQuantity: (menuItemId: number, quantity: number) => void;
+    onRemoveItem: (menuItemId: number) => void;
 }
 
 export function ShoppingCart({
@@ -44,11 +44,11 @@ export function ShoppingCart({
                 <CardTitle>Giỏ hàng ({items.length})</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-                <ScrollArea className="h-[400px] pr-4">
+                <ScrollArea className="max-h-[300px] pr-4">
                     <div className="space-y-3">
-                        {items.map((item, index) => (
+                        {items.map((item) => (
                             <div
-                                key={`${item.menuItemId}-${index}`}
+                                key={item.menuItemId}
                                 className="flex gap-3 rounded-lg border p-3"
                             >
                                 <div className="flex-1 space-y-1">
@@ -73,7 +73,7 @@ export function ShoppingCart({
                                             className="h-6 w-6 p-0"
                                             onClick={() =>
                                                 onUpdateQuantity(
-                                                    index,
+                                                    item.menuItemId,
                                                     Math.max(1, item.quantity - 1)
                                                 )
                                             }
@@ -89,7 +89,7 @@ export function ShoppingCart({
                                             size="sm"
                                             className="h-6 w-6 p-0"
                                             onClick={() =>
-                                                onUpdateQuantity(index, item.quantity + 1)
+                                                onUpdateQuantity(item.menuItemId, item.quantity + 1)
                                             }
                                         >
                                             <Plus className="h-3 w-3" />
@@ -100,7 +100,7 @@ export function ShoppingCart({
                                         variant="ghost"
                                         size="sm"
                                         className="h-6 px-2"
-                                        onClick={() => onRemoveItem(index)}
+                                        onClick={() => onRemoveItem(item.menuItemId)}
                                     >
                                         <Trash2 className="h-3 w-3" />
                                     </Button>

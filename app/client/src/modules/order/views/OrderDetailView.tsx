@@ -1,11 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { OrderStatusBadge } from '../components/OrderStatusBadge';
 import { KitchenStatusBadge } from '../components/KitchenStatusBadge';
 import { OrderItemList } from '../components/OrderItemList';
@@ -13,10 +20,10 @@ import { OrderSummaryCard } from '../components/OrderSummaryCard';
 import { OrderTimeline } from '../components/OrderTimeline';
 import { CancelItemDialog } from '../dialogs/CancelItemDialog';
 import { CancelOrderDialog } from '../dialogs/CancelOrderDialog';
-import { useOrderById, useOrderSocket, useUpdateOrderStatus } from '../hooks';
+import { useOrderById, useOrderSocket, useUpdateOrderStatus, useFullscreen } from '../hooks';
 import { Order, OrderItem } from '../types';
 import { formatOrderNumber, formatDateTime, canAddItems, canCancelOrder } from '../utils';
-import { ArrowLeft, Plus, XCircle, Printer, Receipt, Check } from 'lucide-react';
+import { ArrowLeft, Plus, XCircle, Printer, Receipt, Check, Keyboard, Maximize2, Minimize2 } from 'lucide-react';
 
 interface OrderDetailViewProps {
     orderId: number;
@@ -26,15 +33,87 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
     const router = useRouter();
     const [itemToCancel, setItemToCancel] = useState<OrderItem | null>(null);
     const [showCancelOrderDialog, setShowCancelOrderDialog] = useState(false);
+    const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
 
     const { data: order, isLoading, error } = useOrderById(orderId);
     const updateStatusMutation = useUpdateOrderStatus();
+
+    // Use custom fullscreen hook
+    const { isFullscreen, toggleFullscreen } = useFullscreen();
 
     // Real-time updates
     useOrderSocket({
         enableNotifications: true,
         enableSound: true,
     });
+
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const target = e.target as HTMLElement;
+            const isInputField = ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
+
+            // Always allow Escape
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                setShowKeyboardHelp(false);
+                setShowCancelOrderDialog(false);
+                setItemToCancel(null);
+                return;
+            }
+
+            // Prevent shortcuts when typing
+            if (isInputField) return;
+
+            if (!order) return;
+
+            switch (e.key.toLowerCase()) {
+                case 'b':
+                    e.preventDefault();
+                    handleBack();
+                    break;
+                case 'p':
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        handlePrint();
+                    }
+                    break;
+                case 'a':
+                    if (canAddItems(order)) {
+                        e.preventDefault();
+                        handleAddItems();
+                    }
+                    break;
+                case 'c':
+                    if (order.status === 'pending') {
+                        e.preventDefault();
+                        handleConfirmOrder();
+                    }
+                    break;
+                case 'x':
+                    if (canCancelOrder(order)) {
+                        e.preventDefault();
+                        handleCancelOrder();
+                    }
+                    break;
+                case 'r':
+                    e.preventDefault();
+                    handleCreateBill();
+                    break;
+                case 'f':
+                    e.preventDefault();
+                    toggleFullscreen();
+                    break;
+                case '?':
+                    e.preventDefault();
+                    setShowKeyboardHelp(true);
+                    break;
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [order, toggleFullscreen]);
 
     const handleBack = () => {
         router.push('/orders');
@@ -112,6 +191,17 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                     <OrderStatusBadge status={order.status} />
                 </div>
                 <div className="flex gap-2">
+                    <Button variant="outline" size="icon" onClick={() => setShowKeyboardHelp(true)} title="Keyboard shortcuts (?)">
+                        <Keyboard className="h-4 w-4" />
+                    </Button>
+                    <Button variant="outline" onClick={toggleFullscreen}>
+                        {isFullscreen ? (
+                            <Minimize2 className="mr-2 h-4 w-4" />
+                        ) : (
+                            <Maximize2 className="mr-2 h-4 w-4" />
+                        )}
+                        {isFullscreen ? "Exit" : "Fullscreen"}
+                    </Button>
                     {order.status === 'pending' && (
                         <Button
                             onClick={handleConfirmOrder}
@@ -263,6 +353,72 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                 onOpenChange={setShowCancelOrderDialog}
                 order={order}
             />
+
+            {/* Keyboard Shortcuts Help Dialog */}
+            <Dialog open={showKeyboardHelp} onOpenChange={setShowKeyboardHelp}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Phím tắt - Chi tiết đơn hàng</DialogTitle>
+                        <DialogDescription>
+                            Các phím tắt có sẵn trong trang chi tiết đơn hàng
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <h4 className="font-semibold text-sm">Hành động</h4>
+                            <div className="space-y-1 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Quay lại danh sách</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">B</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">In đơn hàng</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">Ctrl+P</kbd>
+                                </div>
+                                {canAddItems(order) && (
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Thêm món</span>
+                                        <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">A</kbd>
+                                    </div>
+                                )}
+                                {order.status === 'pending' && (
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Xác nhận đơn</span>
+                                        <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">C</kbd>
+                                    </div>
+                                )}
+                                {canCancelOrder(order) && (
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Hủy đơn hàng</span>
+                                        <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">X</kbd>
+                                    </div>
+                                )}
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Tạo hóa đơn</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">R</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Toàn màn hình</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">F / F11</kbd>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <h4 className="font-semibold text-sm">Khác</h4>
+                            <div className="space-y-1 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Hiển thị trợ giúp này</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">?</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Đóng dialog</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">ESC</kbd>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

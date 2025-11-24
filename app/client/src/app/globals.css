@@ -195,3 +195,28 @@
         @apply bg-background text-foreground;
     }
 }
+
+/* Hide TopBar and Sidebar when in fullscreen mode */
+:root:fullscreen header,
+:root:-webkit-full-screen header,
+:root:-moz-full-screen header,
+:root:-ms-fullscreen header {
+    display: none !important;
+}
+
+:root:fullscreen aside,
+:root:-webkit-full-screen aside,
+:root:-moz-full-screen aside,
+:root:-ms-fullscreen aside {
+    display: none !important;
+}
+
+/* Make main content full width in fullscreen */
+:root:fullscreen main,
+:root:-webkit-full-screen main,
+:root:-moz-full-screen main,
+:root:-ms-fullscreen main {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+}

@@ -1,8 +1,15 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { RefreshCw, Maximize2, Minimize2 } from "lucide-react";
+import { RefreshCw, Maximize2, Minimize2, Keyboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { useKitchenOrders } from "../hooks/useKitchenOrders";
 import { useKitchenSocket } from "../hooks/useKitchenSocket";
 import { useFullscreen } from "../hooks/useFullscreen";
@@ -23,6 +30,7 @@ export function KitchenDisplayView() {
     const [statusFilter, setStatusFilter] = useState<
         KitchenOrderStatus | "all"
     >("all");
+    const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
 
     // Use custom fullscreen hook
     const { isFullscreen, toggleFullscreen } = useFullscreen();
@@ -38,6 +46,67 @@ export function KitchenDisplayView() {
     const completeOrderMutation = useCompleteOrder();
     const cancelMutation = useCancelKitchenOrder();
 
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Ignore if typing in input/textarea
+            const target = e.target as HTMLElement;
+            const isInputField = ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
+
+            // Always allow Escape and F11
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                setShowKeyboardHelp(false);
+                return;
+            }
+
+            if (e.key === 'F11') {
+                e.preventDefault();
+                toggleFullscreen();
+                return;
+            }
+
+            // Prevent shortcuts when typing
+            if (isInputField) return;
+
+            switch (e.key.toLowerCase()) {
+                case 'r':
+                    if (!e.ctrlKey && !e.metaKey) {
+                        e.preventDefault();
+                        refetch();
+                    }
+                    break;
+                case 'f':
+                    e.preventDefault();
+                    toggleFullscreen();
+                    break;
+                case '1':
+                    e.preventDefault();
+                    setStatusFilter('all');
+                    break;
+                case '2':
+                    e.preventDefault();
+                    setStatusFilter(KitchenOrderStatus.PENDING);
+                    break;
+                case '3':
+                    e.preventDefault();
+                    setStatusFilter(KitchenOrderStatus.PREPARING);
+                    break;
+                case '4':
+                    e.preventDefault();
+                    setStatusFilter(KitchenOrderStatus.COMPLETED);
+                    break;
+                case '?':
+                    e.preventDefault();
+                    setShowKeyboardHelp(true);
+                    break;
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [toggleFullscreen, refetch]);
+
     // Filter and sort orders by creation time (oldest first)
     const filteredOrders = useMemo(() => {
         if (!orders) return [];
@@ -50,7 +119,7 @@ export function KitchenDisplayView() {
     // Memoize stats for orders
     const ordersStats = useMemo(() => {
         if (!orders) return { total: 0, pending: 0, preparing: 0, completed: 0 };
-        
+
         return orders.reduce((acc, order) => {
             acc.total++;
             if (order.status === 'pending') acc.pending++;
@@ -118,6 +187,17 @@ export function KitchenDisplayView() {
                         <span className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400 hidden sm:inline">
                             {currentTime}
                         </span>
+
+                        {/* Keyboard Help Button */}
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowKeyboardHelp(true)}
+                            className="h-8 md:h-9 px-2 md:px-3"
+                            title="Keyboard shortcuts (?)"
+                        >
+                            <Keyboard className="h-3 w-3 md:h-4 md:w-4" />
+                        </Button>
 
                         {/* Refresh Button */}
                         <Button
@@ -282,6 +362,67 @@ export function KitchenDisplayView() {
                     </div>
                 )}
             </div>
+
+            {/* Keyboard Shortcuts Help Dialog */}
+            <Dialog open={showKeyboardHelp} onOpenChange={setShowKeyboardHelp}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Phím tắt - Kitchen Display</DialogTitle>
+                        <DialogDescription>
+                            Các phím tắt có sẵn trong màn hình bếp
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <h4 className="font-semibold text-sm">Hành động</h4>
+                            <div className="space-y-1 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Làm mới đơn hàng</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">R</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Toàn màn hình</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">F / F11</kbd>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <h4 className="font-semibold text-sm">Lọc trạng thái</h4>
+                            <div className="space-y-1 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Tất cả đơn</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">1</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Đang chờ (Pending)</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">2</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Đang chuẩn bị (Preparing)</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">3</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Hoàn thành (Completed)</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">4</kbd>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <h4 className="font-semibold text-sm">Khác</h4>
+                            <div className="space-y-1 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Hiển thị trợ giúp này</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">?</kbd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Đóng dialog</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">ESC</kbd>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
