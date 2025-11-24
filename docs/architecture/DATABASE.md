@@ -93,18 +93,6 @@ Cơ sở dữ liệu được chia thành 8 module chính với **17 bảng**:
 - `ready` - Sẵn sàng lấy (món đã xong, chờ phục vụ)
 - `completed` - Đã lấy (phục vụ đã mang ra bàn)
 
-### OrderPriority - Độ ưu tiên đơn
-- `normal` - Đơn bình thường
-- `express` - Gấp (khách vội)
-- `vip` - VIP
-
-### StationType - Loại trạm bếp
-- `grill` - Nướng
-- `fry` - Chiên
-- `steam` - Hấp
-- `dessert` - Tráng miệng
-- `drinks` - Đồ uống
-
 ### PaymentStatus - Trạng thái thanh toán
 - `pending` - Chờ thanh toán
 - `paid` - Đã thanh toán

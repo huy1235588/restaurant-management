@@ -167,10 +167,8 @@ export function OrderListView() {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">Tất cả</SelectItem>
-                        <SelectItem value="pending">Đang chờ</SelectItem>
+                        <SelectItem value="pending">Chờ xác nhận</SelectItem>
                         <SelectItem value="confirmed">Đã xác nhận</SelectItem>
-                        <SelectItem value="ready">Sẵn sàng</SelectItem>
-                        <SelectItem value="serving">Đang phục vụ</SelectItem>
                         <SelectItem value="completed">Hoàn thành</SelectItem>
                         <SelectItem value="cancelled">Đã hủy</SelectItem>
                     </SelectContent>

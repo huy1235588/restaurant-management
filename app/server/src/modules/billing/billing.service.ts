@@ -95,10 +95,7 @@ export class BillingService {
         }
 
         // Check if order is ready for billing
-        if (
-            order.status !== OrderStatus.ready &&
-            order.status !== OrderStatus.serving
-        ) {
+        if (order.status !== OrderStatus.confirmed) {
             this.logger.warn(
                 `Order ${data.orderId} not ready for billing. Status: ${order.status}`,
             );
@@ -404,11 +401,11 @@ export class BillingService {
                 where: { billId },
             });
 
-            // Update order status back to ready if bill was paid
+            // Update order status back to confirmed if bill was paid
             if (bill.paymentStatus === PaymentStatus.paid) {
                 await tx.order.update({
                     where: { orderId: bill.orderId },
-                    data: { status: OrderStatus.ready },
+                    data: { status: OrderStatus.confirmed },
                 });
 
                 // Update table status back to occupied

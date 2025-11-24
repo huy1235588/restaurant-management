@@ -67,7 +67,7 @@ export function CancelOrderDialog({
     if (!order) return null;
 
     const hasItemsInProgress = order.orderItems.some(
-        (item) => item.status === 'active' || item.status === 'pending'
+        (item) => item.status === 'ready' || item.status === 'pending'
     );
 
     return (

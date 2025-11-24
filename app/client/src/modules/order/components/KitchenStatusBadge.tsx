@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { KitchenOrder } from '../types';
 
 interface KitchenStatusBadgeProps {
-    kitchenOrder?: KitchenOrder | null;
+    kitchenOrders?: KitchenOrder | null;
 }
 
 const statusConfig = {
@@ -14,9 +14,9 @@ const statusConfig = {
         label: 'Đang chuẩn bị',
         variant: 'default' as const,
     },
-    ready: {
-        label: 'Sẵn sàng',
-        variant: 'default' as const,
+    cancelled: {
+        label: 'Đã huỷ',
+        variant: 'outline' as const,
     },
     completed: {
         label: 'Hoàn thành',
@@ -24,8 +24,8 @@ const statusConfig = {
     },
 };
 
-export function KitchenStatusBadge({ kitchenOrder }: KitchenStatusBadgeProps) {
-    if (!kitchenOrder) {
+export function KitchenStatusBadge({ kitchenOrders }: KitchenStatusBadgeProps) {
+    if (!kitchenOrders) {
         return (
             <Badge variant="outline" className="text-muted-foreground">
                 Chưa gửi bếp
@@ -33,7 +33,7 @@ export function KitchenStatusBadge({ kitchenOrder }: KitchenStatusBadgeProps) {
         );
     }
 
-    const config = statusConfig[kitchenOrder.status];
+    const config = statusConfig[kitchenOrders.status];
 
     return (
         <Badge variant={config.variant}>

@@ -113,7 +113,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                 </div>
                 <div className="flex gap-2">
                     {order.status === 'pending' && (
-                        <Button 
+                        <Button
                             onClick={handleConfirmOrder}
                             disabled={updateStatusMutation.isPending}
                         >
@@ -187,10 +187,10 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                             <Separator />
                             <div>
                                 <p className="text-sm font-medium text-muted-foreground mb-2">Trạng thái bếp</p>
-                                <KitchenStatusBadge kitchenOrder={(order as any).kitchenOrders?.[0] || null} />
-                                {(order as any).kitchenOrders?.[0]?.chef && (
+                                <KitchenStatusBadge kitchenOrders={order.kitchenOrders?.[0] || null} />
+                                {order.kitchenOrders?.[0].chef && (
                                     <p className="text-sm text-muted-foreground mt-1">
-                                        Đầu bếp: {(order as any).kitchenOrders[0].chef.fullName}
+                                        Đầu bếp: {order.kitchenOrders?.[0].chef.fullName}
                                     </p>
                                 )}
                             </div>
@@ -215,11 +215,11 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                 <div className="space-y-6">
                     {/* Order Summary */}
                     <OrderSummaryCard
-                        subtotal={(order.orderItems || []).reduce((sum: number, item: any) => sum + Number(item.unitPrice) * item.quantity, 0)}
+                        subtotal={(order.orderItems || []).reduce((sum: number, item) => sum + Number(item.unitPrice) * item.quantity, 0)}
                         serviceCharge={0}
                         tax={0}
                         discount={0}
-                        total={(order.orderItems || []).reduce((sum: number, item: any) => sum + Number(item.unitPrice) * item.quantity, 0)}
+                        total={(order.orderItems || []).reduce((sum: number, item) => sum + Number(item.unitPrice) * item.quantity, 0)}
                     />
 
                     {/* Additional Info */}

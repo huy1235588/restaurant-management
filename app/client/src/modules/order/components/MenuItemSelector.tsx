@@ -54,7 +54,7 @@ export function MenuItemSelector({ cartItems, onAddItem }: MenuItemSelectorProps
                 >
                     <TabsList className="w-full justify-start overflow-x-auto">
                         <TabsTrigger value="all">Tất cả</TabsTrigger>
-                        {categories.map((category: any) => (
+                        {categories.map((category) => (
                             <TabsTrigger key={category.categoryId} value={category.categoryId.toString()}>
                                 {category.categoryName}
                             </TabsTrigger>

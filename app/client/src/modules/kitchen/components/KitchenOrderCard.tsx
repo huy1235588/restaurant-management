@@ -9,6 +9,7 @@ import { OrderStatusBadge } from "./OrderStatusBadge";
 import { PrepTimeIndicator } from "./PrepTimeIndicator";
 import { OrderItemsList } from "./OrderItemsList";
 import { KitchenHelpers } from "../utils/kitchen-helpers";
+import { formatOrderNumber } from "@/modules/order";
 
 interface KitchenOrderCardProps {
     order: KitchenOrder;
@@ -49,7 +50,7 @@ export function KitchenOrderCard({
                 <div className="flex items-start justify-between">
                     <div>
                         <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                            Order #{order.order.orderNumber}
+                            {formatOrderNumber(order.order.orderNumber)}
                         </h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                             Table: {KitchenHelpers.getTableDisplayName(order.order.table)}
@@ -69,8 +70,8 @@ export function KitchenOrderCard({
             <CardContent className="pb-3">
                 {/* Prep Time Indicator */}
                 <div className="mb-3">
-                    <PrepTimeIndicator 
-                        createdAt={order.createdAt} 
+                    <PrepTimeIndicator
+                        createdAt={order.createdAt}
                         status={order.status}
                         completedAt={order.completedAt}
                     />

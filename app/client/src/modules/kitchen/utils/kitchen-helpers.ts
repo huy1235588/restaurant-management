@@ -32,6 +32,17 @@ export class KitchenHelpers {
     }
 
     /**
+     * Format order number for display
+     */
+    formatOrderNumber = (orderNumber: string): string => {
+        // If UUID, show shortened version
+        if (orderNumber.includes("-")) {
+            return `ORD-${orderNumber.slice(0, 8).toUpperCase()}`;
+        }
+        return orderNumber;
+    };
+
+    /**
      * Get color class for prep time indicator
      */
     static getPrepTimeColor(elapsedMinutes: number): string {

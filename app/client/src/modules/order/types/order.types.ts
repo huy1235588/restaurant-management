@@ -98,7 +98,7 @@ export interface Order {
     updatedAt: string;
     // Relations
     orderItems: OrderItem[];
-    kitchenOrder?: KitchenOrder | null;
+    kitchenOrders?: KitchenOrder[] | null;
 }
 
 // DTOs
