@@ -263,22 +263,37 @@ fi
 
 # Check if server container is running
 if docker ps | grep -q "restaurant_server_prod"; then
-    log_info "Running Prisma migrations..."
-    
-    # Build DATABASE_URL from environment variables
-    DB_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public"
-    
-    # Run migration with explicit DATABASE_URL
-    if docker exec \
-        -e DATABASE_URL="$DB_URL" \
-        restaurant_server_prod \
-        npx prisma migrate deploy; then
-        log_info "✓ Database migrations completed"
+    # Prefer using the dedicated migrate script if available (better logging & checks)
+    MIGRATE_SCRIPT="$DEPLOY_DIR/digitalocean/scripts/migrate.sh"
+
+    if [ -f "$MIGRATE_SCRIPT" ]; then
+        log_info "Found migrate script: $MIGRATE_SCRIPT. Executing..."
+        if bash "$MIGRATE_SCRIPT" 2>&1 | tee -a "$LOG_FILE"; then
+            log_info "✓ Database migrations completed (via migrate.sh)"
+        else
+            log_error "Database migrations (migrate.sh) failed"
+            log_warn "Checking server logs for details..."
+            docker logs restaurant_server_prod | tail -20 | tee -a "$LOG_FILE"
+            log_warn "Application may not function correctly"
+        fi
     else
-        log_error "Database migrations failed"
-        log_warn "Checking server logs for details..."
-        docker logs restaurant_server_prod | tail -20 | tee -a "$LOG_FILE"
-        log_warn "Application may not function correctly"
+        log_info "No migrate script found, running prisma migrate deploy (fallback)"
+
+        # Build DATABASE_URL from environment variables
+        DB_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public"
+
+        # Run migration with explicit DATABASE_URL and explicit schema path, log output
+        if docker exec \
+            -e DATABASE_URL="$DB_URL" \
+            restaurant_server_prod \
+            sh -c "npx prisma migrate deploy --schema prisma/schema.prisma" 2>&1 | tee -a "$LOG_FILE"; then
+            log_info "✓ Database migrations completed (via docker exec)"
+        else
+            log_error "Database migrations failed (fallback)"
+            log_warn "Checking server logs for details..."
+            docker logs restaurant_server_prod | tail -20 | tee -a "$LOG_FILE"
+            log_warn "Application may not function correctly"
+        fi
     fi
 else
     log_error "Server container not running"

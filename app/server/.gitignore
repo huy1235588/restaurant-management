@@ -72,7 +72,6 @@ Thumbs.db
 # Prisma generated client
 /src/generated
 /generated
-/prisma/migrations/
 
 # Build outputs (if any)
 dist/

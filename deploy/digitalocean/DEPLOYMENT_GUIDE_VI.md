@@ -644,19 +644,14 @@ curl http://localhost:5000/api/v1/health
 curl https://yourdomain.com
 ```
 
-# Frontend
+#### Frontend
+```bash
 docker logs restaurant_client_prod
-
-# Database
-docker logs restaurant_postgres_prod
 ```
 
-#### 5.3 Seed Dữ Liệu Demo (Tùy Chọn)
-
-Thêm dữ liệu mẫu (users, menu items, tables):
-
+#### Database
 ```bash
-docker exec -it restaurant_server_prod npm run seed
+docker logs restaurant_postgres_prod
 ```
 
 ---
