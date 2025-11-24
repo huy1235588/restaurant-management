@@ -1,7 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { KitchenRepository, KitchenOrderFilters } from './kitchen.repository';
 import { PrismaService } from '@/database/prisma.service';
-import { KitchenOrderStatus, OrderStatus } from '@prisma/generated/client';
+import {
+    KitchenOrderStatus,
+    OrderItemStatus,
+    OrderStatus,
+} from '@prisma/generated/client';
 import { KitchenGateway } from './kitchen.gateway';
 import { SocketEmitterService } from '@/shared/websocket';
 import {
@@ -11,7 +15,6 @@ import {
     OrderNotConfirmedException,
     KitchenOrderNotPendingException,
     KitchenOrderAlreadyCompletedException,
-    KitchenOrderAlreadyCancelledException,
     CannotCancelCompletedOrderException,
 } from './exceptions/kitchen.exceptions';
 import { KitchenHelper } from './helpers/kitchen.helper';
@@ -245,6 +248,17 @@ export class KitchenService {
                             },
                         },
                     },
+                },
+            });
+
+            // Update all non-cancelled order items to 'ready'
+            await tx.orderItem.updateMany({
+                where: {
+                    orderId: updatedKitchen.orderId,
+                    status: { not: OrderItemStatus.cancelled },
+                },
+                data: {
+                    status: OrderItemStatus.ready,
                 },
             });
 

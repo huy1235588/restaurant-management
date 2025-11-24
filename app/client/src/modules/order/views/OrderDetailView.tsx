@@ -188,9 +188,9 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                             <div>
                                 <p className="text-sm font-medium text-muted-foreground mb-2">Trạng thái bếp</p>
                                 <KitchenStatusBadge kitchenOrders={order.kitchenOrders?.[0] || null} />
-                                {order.kitchenOrders?.[0].chef && (
+                                {order.kitchenOrders?.[0]?.chef && (
                                     <p className="text-sm text-muted-foreground mt-1">
-                                        Đầu bếp: {order.kitchenOrders?.[0].chef.fullName}
+                                        Đầu bếp: {order.kitchenOrders[0].chef.fullName}
                                     </p>
                                 )}
                             </div>
