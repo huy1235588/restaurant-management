@@ -20,7 +20,6 @@
         "**/dist": true,
         "**/build": true,
         "**/logs": true,
-        "**/prisma/migrations": true,
         "**/.next": true,
         "**/coverage": true,
         "**/.cache": true,
