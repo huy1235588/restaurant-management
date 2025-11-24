@@ -115,6 +115,27 @@ services:
             retries: 3
             start_period: 60s
 
+    # Caddy Reverse Proxy (Optional - Automatic SSL)
+    caddy:
+        image: caddy:2-alpine
+        container_name: restaurant_caddy_prod
+        restart: always
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ./digitalocean/Caddyfile:/etc/caddy/Caddyfile:ro
+            - caddy_data_prod:/data
+            - caddy_config_prod:/config
+            - ./digitalocean:/etc/caddy/digitalocean:ro
+        networks:
+            - restaurant_network
+        depends_on:
+            - client
+            - server
+        profiles:
+            - with-caddy
+
     # Nginx Reverse Proxy (Optional - for production SSL/load balancing)
     nginx:
         image: nginx:alpine
@@ -144,4 +165,8 @@ volumes:
     redis_data_prod:
         driver: local
     server_uploads_prod:
+        driver: local
+    caddy_data_prod:
+        driver: local
+    caddy_config_prod:
         driver: local
