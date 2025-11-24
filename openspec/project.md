@@ -280,20 +280,53 @@ This system manages a full-service restaurant with:
   - **Lưu ý**: Không có Redis clustering hay high-availability setup
 
 ### Deployment Options
-- **Primary (Recommended)**: Vercel (frontend) + Railway (backend)
-  - Vercel: Free tier for Next.js deployment
-  - Railway: $5/month credit includes backend, PostgreSQL, Redis
-  - Automatic HTTPS/SSL, zero server management
-  - Total cost: $0-5/month
-  - Deployment time: ~20-30 minutes
-  - Documented in: `/deploy/README.md`
 
-- **Alternative**: DigitalOcean VPS with Docker
-  - Single $6-12/month Droplet
-  - Full Docker Compose setup
-  - Complete infrastructure control
-  - For learning server administration
-  - Documented in: `/deploy/digitalocean/README.md`
+#### Primary (Recommended): Vercel + Railway
+- **Purpose**: Quick deployment for demos, student projects
+- **Frontend**: Vercel (free tier)
+- **Backend**: Railway ($5/month credit includes backend, PostgreSQL, Redis)
+- **Features**:
+  - ✅ Automatic HTTPS/SSL
+  - ✅ Zero server management
+  - ✅ Total cost: $0-5/month
+  - ✅ Deployment time: ~20-30 minutes
+- **Documentation**: `/deploy/README.md#option-a-vercel--railway-recommended`
+
+#### Alternative: DigitalOcean VPS with Docker
+- **Purpose**: Learning, full control, production-ready deployments
+- **Infrastructure**: Single Droplet ($6/month, 1GB RAM)
+- **Student Benefits**: $200 free credit via GitHub Education Pack (33 months free)
+- **Features**:
+  - ✅ Full Docker Compose setup
+  - ✅ Complete infrastructure control
+  - ✅ Production-ready with security hardening
+  - ✅ Learn server administration (Docker, Linux, UFW, SSL)
+  - ✅ Automated scripts for setup, deployment, backup, health checks
+- **Documentation**:
+  - 🇻🇳 Main guide: `/deploy/digitalocean/DEPLOYMENT_GUIDE_VI.md` (Vietnamese, comprehensive)
+  - 📋 Quick reference: `/deploy/digitalocean/QUICK_REFERENCE.md` (command cheatsheet)
+  - 💰 Cost optimization: `/deploy/digitalocean/COST_OPTIMIZATION.md` (budget tips)
+  - 🔒 Security: `/deploy/digitalocean/SECURITY_CHECKLIST.md` (production security)
+- **Automation Scripts**: `/deploy/digitalocean/scripts/`
+  - `setup-vps.sh` - VPS initialization (Docker, firewall, swap)
+  - `deploy.sh` - Deployment automation with rollback
+  - `backup.sh` - PostgreSQL backup with retention
+  - `restore.sh` - Database restoration with safety checks
+  - `health-check.sh` - Comprehensive health monitoring
+- **Configuration Templates**: `/deploy/digitalocean/`
+  - `docker-compose.override.yml` - Production resource limits
+  - `Caddyfile` - Automatic SSL with Let's Encrypt
+  - `nginx.conf` - Alternative reverse proxy
+  - `.env.example` - Production environment template (Vietnamese comments)
+
+**DigitalOcean VPS Constraints:**
+- **RAM**: 1GB RAM Droplet (resource limits configured in docker-compose.override.yml)
+  - PostgreSQL: 256MB, Redis: 128MB, Server: 512MB, Client: 384MB, Caddy: 128MB
+- **Storage**: 25GB SSD included, expandable with volumes
+- **Network**: 1TB transfer/month included
+- **SSL**: Automatic with Caddy, or manual with Certbot
+- **Firewall**: UFW configured (ports 22, 80, 443, 3000, 5000 allowed)
+- **Backup**: Automated daily backups with 7-day retention
 
 ### APIs & Integrations
 - **Socket.io**: Real-time bidirectional communication
@@ -311,11 +344,12 @@ This system manages a full-service restaurant with:
 - **Nginx**: Optional reverse proxy (--profile nginx)
 
 ### File Storage (Simplified)
-- **Development**: Files stored in `/app/server/uploads/` cho local development
-- **Cloud Storage**: Cloudflare R2 hoặc Cloudinary cho production
-- **Deployment**: Primary via Vercel + Railway, alternative via DigitalOcean
-- **Documentation**: See `/deploy/README.md` for deployment guides
-- **File Storage Guide**: See `/docs/technical/FILE_STORAGE_GUIDE.md`
+- **Development**: Files stored in `/app/server/uploads/` for local development
+- **Cloud Storage**: Cloudflare R2 (primary) or Cloudinary (legacy) for production
+- **Deployment Documentation**: 
+  - Quick start: `/deploy/README.md`
+  - DigitalOcean VPS: `/deploy/digitalocean/DEPLOYMENT_GUIDE_VI.md`
+- **File Storage Guide**: `/docs/technical/FILE_STORAGE_GUIDE.md`
 
 ### Logging (Development & Production)
 - **Winston**: Application logging cho debug (local) và production tracking

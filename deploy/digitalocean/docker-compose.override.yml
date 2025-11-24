@@ -1,0 +1,93 @@
+# Docker Compose Override for DigitalOcean VPS
+# This file contains DigitalOcean-specific configurations
+# 
+# Usage: docker-compose -f docker-compose.prod.yml -f digitalocean/docker-compose.override.yml up -d
+
+version: '3.8'
+
+services:
+  # PostgreSQL with resource limits
+  postgres:
+    mem_limit: 256M
+    mem_reservation: 128M
+    cpus: 0.5
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Redis with resource limits
+  redis:
+    mem_limit: 128M
+    mem_reservation: 64M
+    cpus: 0.25
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Backend Server with resource limits
+  server:
+    mem_limit: 512M
+    mem_reservation: 256M
+    cpus: 0.5
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Additional environment variables for production
+    environment:
+      - NODE_OPTIONS=--max-old-space-size=384
+
+  # Frontend Client with resource limits
+  client:
+    mem_limit: 384M
+    mem_reservation: 192M
+    cpus: 0.5
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Caddy reverse proxy (optional - uncomment to use)
+  caddy:
+    image: caddy:2-alpine
+    container_name: restaurant_caddy_prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"  # HTTP/3
+    volumes:
+      - ./digitalocean/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - restaurant_network
+    depends_on:
+      - client
+      - server
+    mem_limit: 128M
+    mem_reservation: 64M
+    cpus: 0.25
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    profiles:
+      - with-caddy
+
+volumes:
+  caddy_data:
+    driver: local
+  caddy_config:
+    driver: local

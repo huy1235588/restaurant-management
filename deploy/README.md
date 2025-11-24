@@ -112,10 +112,12 @@ cd app/client && pnpm dev
 
 ## Deployment Options
 
-| Option | Cost/Month | Complexity | Best For |
-|--------|-----------|------------|----------|
-| **Vercel + Railway** | $0-5 | Low | Demos, student projects |
-| **DigitalOcean VPS** | $6-12 | Medium | Full control, learning |
+| Option | Cost/Month | Complexity | Setup Time | Best For |
+|--------|-----------|------------|------------|----------|
+| **Vercel + Railway** | $0-5 | Low | 20-30 min | Demos, quick deployments |
+| **DigitalOcean VPS** | $0-8* | Medium | 60-90 min | Learning, full control, production |
+
+**\*$0 with GitHub Education Pack ($200 credit = 33 months free)**
 
 ### Recommendation
 
@@ -125,10 +127,12 @@ cd app/client && pnpm dev
 - ✅ Automatic HTTPS/SSL
 - ✅ Deploy in < 30 minutes
 
-**For learning / full control**: Use **DigitalOcean VPS** (Option B)
+**For learning / full control / production**: Use **DigitalOcean VPS** (Option B)
 - ✅ Complete infrastructure control
-- ✅ Learn server administration
+- ✅ Learn server administration (Docker, Linux, security)
 - ✅ More configuration flexibility
+- ✅ Production-ready with proper hardening
+- ✅ **Free with GitHub Education Pack**
 
 ---
 
@@ -395,16 +399,67 @@ railway logs
 
 Deploy entire stack on a single VPS using Docker Compose.
 
-See detailed guide: [deploy/digitalocean/README.md](./digitalocean/README.md)
+### 📚 Complete Documentation
 
-**Summary:**
-- Create $6/month Droplet (Ubuntu 22.04, 1GB RAM)
-- Install Docker and Docker Compose
-- Configure firewall (UFW)
-- Deploy with Docker Compose
-- Optional: Caddy for SSL/domain
+- **🇻🇳 [Hướng Dẫn Triển Khai (Tiếng Việt)](./digitalocean/DEPLOYMENT_GUIDE_VI.md)** - Chi tiết từng bước cho sinh viên
+- **📋 [Quick Reference](./digitalocean/QUICK_REFERENCE.md)** - Essential commands cheatsheet
+- **💰 [Cost Optimization](./digitalocean/COST_OPTIMIZATION.md)** - Budget tips & GitHub Education credits
+- **🔒 [Security Checklist](./digitalocean/SECURITY_CHECKLIST.md)** - Production security verification
 
-**Best for:** Learning server administration, full infrastructure control
+### 🚀 Quick Start Summary
+
+**1. Create Droplet** ($6/month, 1GB RAM, Ubuntu 22.04)
+```bash
+# Get $200 free credit with GitHub Education Pack
+# See COST_OPTIMIZATION.md for details
+```
+
+**2. Run automated setup**
+```bash
+# Copy setup script to VPS
+scp deploy/digitalocean/scripts/setup-vps.sh root@your-vps-ip:/root/
+
+# SSH and run setup
+ssh root@your-vps-ip
+bash setup-vps.sh
+```
+
+**3. Deploy application**
+```bash
+# Clone repository
+git clone <repository-url> /var/www/restaurant-management
+cd /var/www/restaurant-management
+
+# Configure environment
+cp deploy/digitalocean/.env.example .env
+nano .env  # Edit with your values
+
+# Deploy with automation script
+bash deploy/digitalocean/scripts/deploy.sh
+```
+
+**4. Configure SSL (Optional)**
+```bash
+# Option A: Automatic SSL with Caddy (Recommended)
+docker-compose -f deploy/docker-compose.prod.yml --profile caddy up -d
+
+# Option B: Manual SSL with Nginx
+# See DEPLOYMENT_GUIDE_VI.md for details
+```
+
+### ✨ Features
+
+- ✅ **Automated scripts** for setup, deployment, backup/restore, health checks
+- ✅ **Vietnamese documentation** for easy understanding
+- ✅ **Cost optimization** guide with student discounts
+- ✅ **Security hardening** with UFW firewall, SSH keys, HTTPS
+- ✅ **Docker Compose** for easy orchestration
+- ✅ **Automatic SSL** with Caddy or manual with Nginx/Certbot
+- ✅ **Resource optimization** for 1GB RAM Droplets
+- ✅ **Backup automation** with retention policies
+- ✅ **Health monitoring** and logging
+
+**Best for:** Learning server administration, full infrastructure control, production-ready deployments
 
 ---
 
@@ -500,15 +555,20 @@ docker exec -it restaurant_postgres_dev psql -U restaurant_admin -d restaurant_d
 
 | Service | Tier | Cost/Month |
 |---------|------|-----------|
-| Droplet | 1GB RAM | $6 |
-| Volume | 10GB | $1 |
+| Droplet | 1GB RAM, 25GB SSD | $6 |
+| Volume (optional) | 10GB | $1 |
 | Backup (optional) | 20% of droplet | +$1.20 |
-| **Total** | | **$7-8** |
+| **Total** | | **$6-8** |
+
+**💡 Student Benefits:**
+- **$200 free credit** via [GitHub Education Pack](https://education.github.com/pack)
+- Covers **33 months** of basic Droplet
+- See [COST_OPTIMIZATION.md](./digitalocean/COST_OPTIMIZATION.md) for details
 
 **Notes:**
 - Single server, all services in Docker
-- Student credits available (GitHub Education)
 - Full control over infrastructure
+- Production-ready with proper security
 
 ---
 

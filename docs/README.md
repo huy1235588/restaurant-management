@@ -138,30 +138,60 @@ Mỗi tài liệu tính năng bao gồm:
 
 ---
 
-### 🚀 Triển Khai (Mới!)
-**Hướng dẫn triển khai được đơn giản hóa đã chuyển sang `/deploy/`**
+### 🚀 Triển Khai
+**Hướng dẫn triển khai hoàn chỉnh - Xem `/deploy/README.md`**
 
-Tài liệu triển khai cũ (5 tệp, 2500+ dòng) đã được thay thế bằng cấu trúc đơn giản hơn:
+Hệ thống cung cấp 2 tùy chọn triển khai:
 
-- **`/deploy/README.md`** - Hướng dẫn triển khai hoàn chỉnh (< 500 dòng)
-  - Thiết lập phát triển cục bộ
-  - Tùy chọn A: Vercel + Railway (Khuyến nghị)
-  - Tùy chọn B: DigitalOcean VPS
-  - Khắc phục sự cố và Câu hỏi thường gặp
-  
-- **`/deploy/MIGRATION.md`** - Hướng dẫn di chuyển từ cấu trúc cũ
+#### **Tùy Chọn A: Vercel + Railway (Khuyến nghị cho Demo)**
+- ✅ **Miễn phí** ($0-5/tháng)
+- ✅ Triển khai trong **20-30 phút**
+- ✅ Tự động HTTPS/SSL
+- ✅ Không cần quản lý server
 
-**Tài liệu triển khai cũ:** Đã lưu trữ trong `/_archive/deployment-v1/`
-- **COST_OPTIMIZATION.md** - Chiến lược tối ưu hóa chi phí đám mây
-- **OPERATIONS.md** - Hướng dẫn vận hành hàng ngày
+**Tài liệu:** [`/deploy/README.md`](../deploy/README.md#option-a-vercel--railway-recommended)
+
+#### **Tùy Chọn B: DigitalOcean VPS (Khuyến nghị cho Học Tập & Production)**
+- ✅ **Miễn phí với GitHub Education Pack** ($200 credit = 33 tháng)
+- ✅ Toàn quyền kiểm soát hạ tầng
+- ✅ Học quản trị server (Docker, Linux, Security)
+- ✅ Production-ready với bảo mật đầy đủ
+
+**Tài liệu chính:**
+- 🇻🇳 **[Hướng Dẫn Triển Khai DigitalOcean (Tiếng Việt)](../deploy/digitalocean/DEPLOYMENT_GUIDE_VI.md)** - Hướng dẫn từng bước chi tiết
+- 📋 **[Quick Reference](../deploy/digitalocean/QUICK_REFERENCE.md)** - Lệnh thường dùng
+- 💰 **[Cost Optimization](../deploy/digitalocean/COST_OPTIMIZATION.md)** - Tối ưu chi phí & GitHub Education credits
+- 🔒 **[Security Checklist](../deploy/digitalocean/SECURITY_CHECKLIST.md)** - Kiểm tra bảo mật production
 
 **Bao gồm:**
-- Triển khai DigitalOcean
-- Thiết lập Docker Compose
-- Di chuyển cơ sở dữ liệu
-- Giám sát và ghi nhật ký
-- Sao lưu và khôi phục
-- Thực hành bảo mật tốt nhất
+- Script tự động cho setup VPS, deployment, backup/restore, health checks
+- Tài liệu tiếng Việt dễ hiểu cho sinh viên
+- Cấu hình Docker Compose production-ready
+- SSL tự động với Caddy hoặc Nginx
+- Tối ưu tài nguyên cho Droplet 1GB RAM
+- Firewall UFW, SSH keys, HTTPS
+- Monitoring và logging
+
+**Tài liệu triển khai cũ:** Đã di chuyển sang `/_archive/deployment-v1/` (lưu trữ)
+
+---
+
+### Cho Kỹ Sư DevOps
+
+1. **Triển Khai:**
+   - **Vercel + Railway:** [`/deploy/README.md`](../deploy/README.md#option-a-vercel--railway-recommended)
+   - **DigitalOcean VPS:** [`/deploy/digitalocean/DEPLOYMENT_GUIDE_VI.md`](../deploy/digitalocean/DEPLOYMENT_GUIDE_VI.md)
+
+2. **Vận Hành:**
+   - [`/deploy/digitalocean/QUICK_REFERENCE.md`](../deploy/digitalocean/QUICK_REFERENCE.md) - Lệnh hàng ngày
+   - [`/deploy/digitalocean/SECURITY_CHECKLIST.md`](../deploy/digitalocean/SECURITY_CHECKLIST.md) - Kiểm tra bảo mật
+
+3. **Tối Ưu Chi Phí:**
+   - [`/deploy/digitalocean/COST_OPTIMIZATION.md`](../deploy/digitalocean/COST_OPTIMIZATION.md)
+
+4. **Cơ Sở Hạ Tầng:**
+   - `technical/DOCKER.md` (nếu có)
+   - `architecture/DATABASE.md`
 
 ---
 
@@ -366,8 +396,8 @@ Mỗi tài liệu use case bao gồm:
 - Tham Chiếu: `use_case/` → `diagrams/`
 
 **🚀 DevOps:**
-- Bắt Đầu: `deployment/` → `technical/DOCKER.md`
-- Tham Chiếu: `architecture/DATABASE.md`
+- Bắt Đầu: [`/deploy/README.md`](../deploy/README.md) → [`/deploy/digitalocean/DEPLOYMENT_GUIDE_VI.md`](../deploy/digitalocean/DEPLOYMENT_GUIDE_VI.md)
+- Tham Chiếu: [`/deploy/digitalocean/QUICK_REFERENCE.md`](../deploy/digitalocean/QUICK_REFERENCE.md) → `architecture/DATABASE.md`
 
 ---
 
@@ -413,6 +443,6 @@ Kiểm tra phần chân trang của mỗi tài liệu để:
 
 - [Mẫu Tính Năng](templates/FEATURE_DOCUMENTATION_TEMPLATE.md)
 - [Lược Đồ Cơ Sở Dữ Liệu](architecture/DATABASE.md)
-- [Hướng Dẫn Triển Khai](deployment/DEPLOYMENT.md)
-- [Thiết Lập Docker](technical/DOCKER.md)
+- [Hướng Dẫn Triển Khai](../deploy/README.md)
+- [Triển Khai DigitalOcean (Tiếng Việt)](../deploy/digitalocean/DEPLOYMENT_GUIDE_VI.md)
 - [Trường Hợp Sử Dụng Kinh Doanh](architecture/BUSINESS_USE_CASES.md)
