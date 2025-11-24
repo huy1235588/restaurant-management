@@ -296,8 +296,18 @@ export class OrderService {
                     this.logger.log(
                         `Reopened kitchen order for ${order.orderNumber} due to new items`,
                     );
+                    // createKitchenOrder already emits kitchen:new-order event
                 } else {
-                    // Just notify kitchen about new items
+                    // Kitchen order exists but not completed - notify kitchen about new items
+                    // Re-fetch kitchen order to get updated order items
+                    const updatedKitchenOrder =
+                        await this.kitchenService.getKitchenOrderById(
+                            existingKitchenOrder.kitchenOrderId,
+                        );
+                    // Emit update event to kitchen namespace
+                    this.kitchenService.notifyKitchenOrderUpdate(
+                        updatedKitchenOrder,
+                    );
                     this.logger.log(
                         `Notified kitchen of new items for order: ${order.orderNumber}`,
                     );
@@ -308,6 +318,7 @@ export class OrderService {
                 this.logger.log(
                     `Created kitchen order for ${order.orderNumber}`,
                 );
+                // createKitchenOrder already emits kitchen:new-order event
             }
         }
 
@@ -486,31 +497,15 @@ export class OrderService {
             `Order cancelled: ${order.orderNumber}. Reason: ${data.reason}`,
         );
 
-        // Emit WebSocket event to orders namespace
+        // Emit WebSocket event to orders namespace (now broadcasts to all clients)
         this.orderGateway.emitOrderCancelled(cancelledOrder);
 
-        // Notify kitchen namespace if kitchen order exists
-        const kitchenOrder = await this.prisma.kitchenOrder.findUnique({
-            where: { orderId },
-            include: {
-                order: {
-                    include: {
-                        table: true,
-                        orderItems: {
-                            include: {
-                                menuItem: true,
-                            },
-                        },
-                    },
-                },
-            },
+        // Notify Kitchen namespace explicitly (cross-namespace communication)
+        this.kitchenGateway.emitOrderCancelled({
+            orderId: cancelledOrder.orderId,
+            orderNumber: cancelledOrder.orderNumber,
+            reason: data.reason,
         });
-        if (kitchenOrder) {
-            this.kitchenGateway.emitOrderUpdate(kitchenOrder);
-            this.logger.log(
-                `Notified kitchen of cancelled order: ${order.orderNumber}`,
-            );
-        }
 
         return cancelledOrder;
     }

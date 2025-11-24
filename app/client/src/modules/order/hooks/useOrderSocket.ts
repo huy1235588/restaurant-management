@@ -110,6 +110,9 @@ export function useOrderSocket(options: UseOrderSocketOptions = {}) {
             const handleOrderCreated = (event: OrderCreatedEvent) => {
                 console.log("[OrderSocket] New order created:", event);
 
+                // Event data is wrapped: { event, data, timestamp }
+                const eventData = (event as any).data || event;
+
                 // Invalidate and refetch orders list
                 queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
                 queryClient.invalidateQueries({
@@ -119,7 +122,7 @@ export function useOrderSocket(options: UseOrderSocketOptions = {}) {
                 // Show notification
                 if (enableNotifications) {
                     toast.success(
-                        `Đơn hàng mới #${event.orderNumber} đã được tạo`
+                        `Đơn hàng mới #${eventData.orderNumber} đã được tạo`
                     );
                 }
 
@@ -130,97 +133,112 @@ export function useOrderSocket(options: UseOrderSocketOptions = {}) {
 
                 // Custom callback
                 if (onOrderCreated) {
-                    onOrderCreated(event);
+                    onOrderCreated(eventData);
                 }
             };
 
             const handleOrderUpdated = (event: OrderUpdatedEvent) => {
                 console.log("[OrderSocket] Order updated:", event);
 
+                // Event data is wrapped: { event, data, timestamp }
+                const eventData = (event as any).data || event;
+
                 // Invalidate queries
                 queryClient.invalidateQueries({
-                    queryKey: orderKeys.detail(event.orderId),
+                    queryKey: orderKeys.detail(eventData.orderId),
                 });
                 queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
 
                 // Custom callback
                 if (onOrderUpdated) {
-                    onOrderUpdated(event);
+                    onOrderUpdated(eventData);
                 }
             };
 
             const handleStatusChanged = (event: OrderUpdatedEvent) => {
                 console.log("[OrderSocket] Order status changed:", event);
 
+                // Event data is wrapped: { event, data, timestamp }
+                const eventData = (event as any).data || event;
+
                 // Invalidate queries
                 queryClient.invalidateQueries({
-                    queryKey: orderKeys.detail(event.orderId),
+                    queryKey: orderKeys.detail(eventData.orderId),
                 });
                 queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
 
                 // Show notification
                 if (enableNotifications) {
                     toast.info(
-                        `Đơn hàng #${event.orderNumber} chuyển sang trạng thái: ${event.status}`
+                        `Đơn hàng #${eventData.orderNumber} chuyển sang trạng thái: ${eventData.status}`
                     );
                 }
 
                 // Custom callback
                 if (onOrderUpdated) {
-                    onOrderUpdated(event);
+                    onOrderUpdated(eventData);
                 }
             };
 
             const handleItemsAdded = (event: OrderItemsAddedEvent) => {
                 console.log("[OrderSocket] Items added to order:", event);
 
+                // Event data is wrapped: { event, data, timestamp }
+                const eventData = (event as any).data || event;
+
                 // Invalidate queries
                 queryClient.invalidateQueries({
-                    queryKey: orderKeys.detail(event.orderId),
+                    queryKey: orderKeys.detail(eventData.orderId),
                 });
                 queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
 
                 // Show notification
                 if (enableNotifications) {
                     toast.success(
-                        `Đã thêm ${event.items.length} món vào đơn hàng #${event.orderNumber}`
+                        `Đã thêm ${eventData.items.length} món vào đơn hàng #${eventData.orderNumber}`
                     );
                 }
 
                 // Custom callback
                 if (onItemsAdded) {
-                    onItemsAdded(event);
+                    onItemsAdded(eventData);
                 }
             };
 
             const handleItemCancelled = (event: OrderItemCancelledEvent) => {
                 console.log("[OrderSocket] Order item cancelled:", event);
 
+                // Event data is wrapped: { event, data, timestamp }
+                const eventData = (event as any).data || event;
+
                 // Invalidate queries
                 queryClient.invalidateQueries({
-                    queryKey: orderKeys.detail(event.orderId),
+                    queryKey: orderKeys.detail(eventData.orderId),
                 });
                 queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
 
                 // Show notification
                 if (enableNotifications) {
                     toast.warning(
-                        `Món trong đơn hàng #${event.orderNumber} đã bị hủy`
+                        `Món trong đơn hàng #${eventData.orderNumber} đã bị hủy`
                     );
                 }
 
                 // Custom callback
                 if (onItemCancelled) {
-                    onItemCancelled(event);
+                    onItemCancelled(eventData);
                 }
             };
 
             const handleOrderCancelled = (event: OrderCancelledEvent) => {
                 console.log("[OrderSocket] Order cancelled:", event);
 
+                // Event data is wrapped: { event, data, timestamp }
+                const eventData = (event as any).data || event;
+
                 // Invalidate queries
                 queryClient.invalidateQueries({
-                    queryKey: orderKeys.detail(event.orderId),
+                    queryKey: orderKeys.detail(eventData.orderId),
                 });
                 queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
                 queryClient.invalidateQueries({
@@ -229,28 +247,31 @@ export function useOrderSocket(options: UseOrderSocketOptions = {}) {
 
                 // Show notification
                 if (enableNotifications) {
-                    toast.error(`Đơn hàng #${event.orderNumber} đã bị hủy`);
+                    toast.error(`Đơn hàng #${eventData.orderNumber} đã bị hủy`);
                 }
 
                 // Custom callback
                 if (onOrderCancelled) {
-                    onOrderCancelled(event);
+                    onOrderCancelled(eventData);
                 }
             };
 
             const handleKitchenReady = (event: KitchenOrderReadyEvent) => {
                 console.log("[OrderSocket] Kitchen order ready:", event);
 
+                // Event data is wrapped: { event, data, timestamp }
+                const eventData = (event as any).data || event;
+
                 // Invalidate queries
                 queryClient.invalidateQueries({
-                    queryKey: orderKeys.detail(event.orderId),
+                    queryKey: orderKeys.detail(eventData.orderId),
                 });
                 queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
 
                 // Show notification
                 if (enableNotifications) {
                     toast.success(
-                        `Đơn hàng #${event.orderNumber} đã sẵn sàng để phục vụ! 🍽️`,
+                        `Đơn hàng #${eventData.orderNumber} đã sẵn sàng để phục vụ! 🍽️`,
                         {
                             duration: 5000,
                         }
@@ -264,7 +285,7 @@ export function useOrderSocket(options: UseOrderSocketOptions = {}) {
 
                 // Custom callback
                 if (onKitchenOrderReady) {
-                    onKitchenOrderReady(event);
+                    onKitchenOrderReady(eventData);
                 }
             };
 
@@ -276,49 +297,6 @@ export function useOrderSocket(options: UseOrderSocketOptions = {}) {
             socket.on("order:cancelled", handleOrderCancelled);
             socket.on("kitchen:order-ready", handleKitchenReady);
 
-            // Listen to kitchen events
-            socket.on("kitchen:preparing", (event: any) => {
-                console.log("[OrderSocket] Kitchen started preparing:", event);
-
-                // Invalidate queries to update order status
-                queryClient.invalidateQueries({
-                    queryKey: orderKeys.detail(event.data?.orderId),
-                });
-                queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
-
-                // Show notification
-                if (enableNotifications) {
-                    toast.info(
-                        `Bếp đang chuẩn bị đơn hàng #${event.data?.order?.orderNumber || ""}`,
-                    );
-                }
-            });
-
-            socket.on("kitchen:completed", (event: any) => {
-                console.log("[OrderSocket] Kitchen completed order:", event);
-
-                // Invalidate queries to update order status
-                queryClient.invalidateQueries({
-                    queryKey: orderKeys.detail(event.data?.orderId),
-                });
-                queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
-
-                // Show notification
-                if (enableNotifications) {
-                    toast.success(
-                        `Món ăn đã sẵn sàng! Đơn hàng #${event.data?.order?.orderNumber || ""} 🍽️`,
-                        {
-                            duration: 5000,
-                        }
-                    );
-                }
-
-                // Play sound
-                if (enableSound) {
-                    playNotificationSound();
-                }
-            });
-
             // Store cleanup function
             return () => {
                 socket.off("order:created", handleOrderCreated);
@@ -328,8 +306,6 @@ export function useOrderSocket(options: UseOrderSocketOptions = {}) {
                 socket.off("order:item-cancelled", handleItemCancelled);
                 socket.off("order:cancelled", handleOrderCancelled);
                 socket.off("kitchen:order-ready", handleKitchenReady);
-                socket.off("kitchen:preparing");
-                socket.off("kitchen:completed");
             };
         }
 
