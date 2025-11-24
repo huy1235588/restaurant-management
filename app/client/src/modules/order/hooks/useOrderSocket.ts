@@ -276,6 +276,49 @@ export function useOrderSocket(options: UseOrderSocketOptions = {}) {
             socket.on("order:cancelled", handleOrderCancelled);
             socket.on("kitchen:order-ready", handleKitchenReady);
 
+            // Listen to kitchen events
+            socket.on("kitchen:preparing", (event: any) => {
+                console.log("[OrderSocket] Kitchen started preparing:", event);
+
+                // Invalidate queries to update order status
+                queryClient.invalidateQueries({
+                    queryKey: orderKeys.detail(event.data?.orderId),
+                });
+                queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+
+                // Show notification
+                if (enableNotifications) {
+                    toast.info(
+                        `Bếp đang chuẩn bị đơn hàng #${event.data?.order?.orderNumber || ""}`,
+                    );
+                }
+            });
+
+            socket.on("kitchen:completed", (event: any) => {
+                console.log("[OrderSocket] Kitchen completed order:", event);
+
+                // Invalidate queries to update order status
+                queryClient.invalidateQueries({
+                    queryKey: orderKeys.detail(event.data?.orderId),
+                });
+                queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+
+                // Show notification
+                if (enableNotifications) {
+                    toast.success(
+                        `Món ăn đã sẵn sàng! Đơn hàng #${event.data?.order?.orderNumber || ""} 🍽️`,
+                        {
+                            duration: 5000,
+                        }
+                    );
+                }
+
+                // Play sound
+                if (enableSound) {
+                    playNotificationSound();
+                }
+            });
+
             // Store cleanup function
             return () => {
                 socket.off("order:created", handleOrderCreated);
@@ -285,6 +328,8 @@ export function useOrderSocket(options: UseOrderSocketOptions = {}) {
                 socket.off("order:item-cancelled", handleItemCancelled);
                 socket.off("order:cancelled", handleOrderCancelled);
                 socket.off("kitchen:order-ready", handleKitchenReady);
+                socket.off("kitchen:preparing");
+                socket.off("kitchen:completed");
             };
         }
 

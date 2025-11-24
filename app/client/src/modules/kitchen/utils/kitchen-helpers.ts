@@ -14,11 +14,12 @@ import {
 export class KitchenHelpers {
     /**
      * Calculate elapsed time from creation to now (in seconds)
+     * If endTime is provided, calculate from createdAt to endTime
      */
-    static calculateElapsedTime(createdAt: string): number {
-        const now = new Date();
+    static calculateElapsedTime(createdAt: string, endTime?: string): number {
+        const end = endTime ? new Date(endTime) : new Date();
         const created = new Date(createdAt);
-        return Math.floor((now.getTime() - created.getTime()) / 1000);
+        return Math.floor((end.getTime() - created.getTime()) / 1000);
     }
 
     /**
@@ -111,6 +112,22 @@ export class KitchenHelpers {
      */
     static canComplete(status: KitchenOrderStatus): boolean {
         return status === KitchenOrderStatus.PREPARING;
+    }
+
+    /**
+     * Get display name for table with fallback chain
+     * Priority: name → code → tableNumber → "Table #{id}"
+     */
+    static getTableDisplayName(table: { 
+        tableId: number; 
+        name?: string | null; 
+        code?: string | null; 
+        tableNumber?: number | null; 
+    }): string {
+        if (table.name) return table.name;
+        if (table.code) return table.code;
+        if (table.tableNumber) return `Table ${table.tableNumber}`;
+        return `Table #${table.tableId}`;
     }
 
     /**

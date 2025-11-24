@@ -14,7 +14,9 @@ export interface KitchenOrder {
         orderNumber: string;
         table: {
             tableId: number;
-            name: string;
+            name?: string | null;
+            code?: string | null;
+            tableNumber?: number | null;
         };
         customerName?: string;
         customerPhone?: string;

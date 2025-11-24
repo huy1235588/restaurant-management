@@ -278,6 +278,14 @@ export class OrderService {
         // Emit WebSocket event to kitchen and all clients
         this.orderGateway.emitOrderItemsAdded(updatedOrder);
 
+        // If order is confirmed, notify kitchen about new items
+        if (order.status === OrderStatus.confirmed) {
+            // Kitchen needs to know about new items added to their active orders
+            this.logger.log(
+                `Notifying kitchen of new items for confirmed order: ${order.orderNumber}`,
+            );
+        }
+
         return updatedOrder;
     }
 
@@ -461,8 +469,18 @@ export class OrderService {
             `Order cancelled: ${order.orderNumber}. Reason: ${data.reason}`,
         );
 
-        // Emit WebSocket event
+        // Emit WebSocket event to orders namespace
         this.orderGateway.emitOrderCancelled(cancelledOrder);
+
+        // Also emit to kitchen namespace if kitchen order exists
+        const kitchenOrder = await this.prisma.kitchenOrder.findUnique({
+            where: { orderId },
+        });
+        if (kitchenOrder) {
+            this.logger.log(
+                `Notifying kitchen of cancelled order: ${order.orderNumber}`,
+            );
+        }
 
         return cancelledOrder;
     }

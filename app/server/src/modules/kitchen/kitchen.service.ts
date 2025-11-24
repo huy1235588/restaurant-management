@@ -195,8 +195,13 @@ export class KitchenService {
             `Kitchen order #${kitchenOrderId} started preparing by chef ${staffId}`,
         );
 
-        // Emit WebSocket event
+        // Emit WebSocket event to kitchen namespace
         this.kitchenGateway.emitOrderUpdate(updated);
+
+        // Notify order namespace that kitchen has started preparing
+        this.logger.log(
+            `Notifying orders namespace: Kitchen started preparing order #${updated.orderId}`,
+        );
 
         return updated;
     }
@@ -260,8 +265,13 @@ export class KitchenService {
             `Kitchen order #${kitchenOrderId} completed (prep time: ${prepTimeActual} min)`,
         );
 
-        // Emit WebSocket event
+        // Emit WebSocket event to kitchen namespace
         this.kitchenGateway.emitOrderCompleted(updated as any);
+
+        // Notify order namespace that kitchen has completed the order
+        this.logger.log(
+            `Notifying orders namespace: Kitchen completed order #${updated.orderId}`,
+        );
 
         return updated;
     }

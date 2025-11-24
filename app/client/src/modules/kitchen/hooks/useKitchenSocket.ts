@@ -12,6 +12,7 @@ import {
 } from "../types/kitchen.types";
 import { KITCHEN_CONFIG } from "../constants/kitchen.constants";
 import { kitchenQueryKeys } from "../utils/kitchen-query-keys";
+import { KitchenHelpers } from "../utils/kitchen-helpers";
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
 const KITCHEN_NAMESPACE = "/kitchen";
@@ -109,8 +110,9 @@ export function useKitchenSocket() {
             debouncedInvalidateQueries(queryClient, kitchenQueryKeys.list());
 
             // Show notification
+            const tableName = KitchenHelpers.getTableDisplayName(data.data.order.table);
             toast.info(`New Order #${data.data.order.orderNumber}`, {
-                description: `Table: ${data.data.order.table.name || "N/A"} - ${
+                description: `Table: ${tableName} - ${
                     data.data.order.orderItems.length
                 } items`,
             });
@@ -156,11 +158,38 @@ export function useKitchenSocket() {
             }
         );
 
+            // Listen to order events from Order namespace
+            socket.on("order:items-added", (data: any) => {
+                console.log("[Kitchen Socket] Items added to order:", data);
+
+                // Invalidate kitchen orders to show updated items
+                debouncedInvalidateQueries(queryClient, kitchenQueryKeys.list());
+
+                // Show notification
+                toast.info("Order Updated", {
+                    description: `New items added to Order #${data.orderNumber || ""}`,
+                });
+            });
+
+            socket.on("order:cancelled", (data: any) => {
+                console.log("[Kitchen Socket] Order cancelled:", data);
+
+                // Invalidate kitchen orders to remove cancelled order
+                debouncedInvalidateQueries(queryClient, kitchenQueryKeys.list());
+
+                // Show notification
+                toast.warning("Order Cancelled", {
+                    description: `Order #${data.orderNumber || ""} has been cancelled`,
+                });
+            });
+
             // Store cleanup function for event handlers
             return () => {
                 socket.off(KitchenSocketEvents.NEW_ORDER);
                 socket.off(KitchenSocketEvents.ORDER_UPDATED);
                 socket.off(KitchenSocketEvents.ORDER_COMPLETED);
+                socket.off("order:items-added");
+                socket.off("order:cancelled");
             };
         }
 

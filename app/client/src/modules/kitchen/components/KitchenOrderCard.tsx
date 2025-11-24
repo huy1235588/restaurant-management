@@ -54,7 +54,7 @@ export function KitchenOrderCard({
                             Order #{order.order.orderNumber}
                         </h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                            Table: {order.order.table.name}
+                            Table: {KitchenHelpers.getTableDisplayName(order.order.table)}
                         </p>
                         {order.order.customerName && (
                             <p className="text-xs text-gray-500 dark:text-gray-500">
@@ -72,7 +72,11 @@ export function KitchenOrderCard({
             <CardContent className="pb-3">
                 {/* Prep Time Indicator */}
                 <div className="mb-3">
-                    <PrepTimeIndicator createdAt={order.createdAt} />
+                    <PrepTimeIndicator 
+                        createdAt={order.createdAt} 
+                        status={order.status}
+                        completedAt={order.completedAt}
+                    />
                 </div>
 
                 {/* Order Items */}
