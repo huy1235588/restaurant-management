@@ -10,12 +10,21 @@ import {
 } from '../dialogs';
 import { Reservation, ReservationFilterOptions as FilterType } from '../types';
 import { Button } from '@/components/ui/button';
-import { Plus, ChevronLeft, ChevronRight, Calendar, TrendingUp } from 'lucide-react';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Plus, ChevronLeft, ChevronRight, Calendar, TrendingUp, Keyboard, Maximize2, Minimize2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 export function ReservationListView() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [showHelpDialog, setShowHelpDialog] = useState(false);
 
     // Initialize filters from URL
     const [filters, setFilters] = useState<FilterType>(() => {
@@ -45,6 +54,67 @@ export function ReservationListView() {
     const [showCompleteDialog, setShowCompleteDialog] = useState(false);
     const [showNoShowDialog, setShowNoShowDialog] = useState(false);
     const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
+
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Don't trigger if user is typing in an input field
+            if (
+                e.target instanceof HTMLInputElement ||
+                e.target instanceof HTMLTextAreaElement ||
+                e.target instanceof HTMLSelectElement
+            ) {
+                return;
+            }
+
+            // Forward slash - focus search
+            if (e.key === '/') {
+                e.preventDefault();
+                const searchInput = document.querySelector('input[placeholder*="search"]') as HTMLInputElement;
+                if (searchInput) searchInput.focus();
+            }
+            // R - refresh list
+            else if (e.key === 'r' || e.key === 'R') {
+                e.preventDefault();
+                refetch();
+            }
+            // Escape - clear filters
+            else if (e.key === 'Escape') {
+                e.preventDefault();
+                setFilters({
+                    page: 1,
+                    limit: 12,
+                });
+            }
+            // F or F11 - fullscreen
+            else if (e.key === 'f' || e.key === 'F' || e.key === 'F11') {
+                e.preventDefault();
+                toggleFullscreen();
+            }
+            // ? - show help
+            else if (e.shiftKey && e.key === '?') {
+                e.preventDefault();
+                setShowHelpDialog(true);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [refetch]);
+
+    const toggleFullscreen = async () => {
+        try {
+            if (!isFullscreen) {
+                await document.documentElement.requestFullscreen();
+                setIsFullscreen(true);
+            } else {
+                await document.exitFullscreen();
+                setIsFullscreen(false);
+            }
+        } catch (error) {
+            console.error('Fullscreen error:', error);
+        }
+    };
 
     // Update URL when filters change
     useEffect(() => {
@@ -143,14 +213,36 @@ export function ReservationListView() {
                         )}
                     </div>
 
-                    <Button
-                        onClick={() => router.push('/reservations/create')}
-                        size="lg"
-                        className="bg-linear-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 hover:from-blue-700 hover:to-purple-700 dark:hover:from-blue-600 dark:hover:to-purple-600 shadow-xl shadow-blue-500/30 dark:shadow-blue-400/20 hover:shadow-2xl hover:shadow-blue-500/40 dark:hover:shadow-blue-400/30 transition-all duration-300 gap-2 text-base px-6 py-6"
-                    >
-                        <Plus className="w-5 h-5" />
-                        New Reservation
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            onClick={() => setShowHelpDialog(true)}
+                            variant="outline"
+                            size="lg"
+                            title="Keyboard shortcuts (Shift+?)"
+                            className="gap-2 text-base"
+                        >
+                            <Keyboard className="w-5 h-5" />
+                            <span className="hidden sm:inline">Help</span>
+                        </Button>
+                        <Button
+                            onClick={toggleFullscreen}
+                            variant="outline"
+                            size="lg"
+                            title={isFullscreen ? 'Exit fullscreen (F)' : 'Enter fullscreen (F)'}
+                            className="gap-2 text-base"
+                        >
+                            {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+                            <span className="hidden sm:inline">{isFullscreen ? 'Exit' : 'Fullscreen'}</span>
+                        </Button>
+                        <Button
+                            onClick={() => router.push('/reservations/create')}
+                            size="lg"
+                            className="bg-linear-to-r shadow-xl shadow-blue-500/30 dark:shadow-blue-400/20 hover:shadow-2xl hover:shadow-blue-500/40 dark:hover:shadow-blue-400/30 transition-all duration-300 gap-2 text-base px-6 py-6"
+                        >
+                            <Plus className="w-5 h-5" />
+                            New Reservation
+                        </Button>
+                    </div>
                 </div>
             </div>
 
@@ -292,6 +384,59 @@ export function ReservationListView() {
                 onClose={() => setShowNoShowDialog(false)}
                 onSuccess={handleSuccess}
             />
+
+            {/* Keyboard Help Dialog */}
+            <Dialog open={showHelpDialog} onOpenChange={setShowHelpDialog}>
+                <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Keyboard className="w-5 h-5" />
+                            Keyboard Shortcuts
+                        </DialogTitle>
+                        <DialogDescription>
+                            Quick keyboard shortcuts to navigate the reservations list
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Search/Filter</span>
+                            <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                /
+                            </kbd>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Refresh List</span>
+                            <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                R
+                            </kbd>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Fullscreen</span>
+                            <div className="flex items-center gap-2">
+                                <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                    F
+                                </kbd>
+                                <span className="text-xs text-gray-500">or</span>
+                                <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                    F11
+                                </kbd>
+                            </div>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Clear Filters</span>
+                            <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                Esc
+                            </kbd>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Show Help</span>
+                            <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                Shift + ?
+                            </kbd>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

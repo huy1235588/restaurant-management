@@ -13,13 +13,20 @@ import {
     FormMessage,
     FormDescription,
 } from '@/components/ui/form';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useReservationActions } from '@/modules/reservations/hooks/useReservationActions';
 import { useTableAvailability } from '@/modules/reservations/hooks/useTableAvailability';
 import { TableSelector } from '@/modules/reservations/components/TableSelector';
-import { ArrowLeft, Calendar, Users, Clock, Mail, Phone, User, FileText, Loader2 } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, Clock, Mail, Phone, User, FileText, Loader2, Keyboard, Maximize2, Minimize2 } from 'lucide-react';
 
 const reservationSchema = z.object({
     customerName: z.string().min(1, 'Name is required').max(100),
@@ -39,6 +46,8 @@ export function CreateReservationView() {
     const { createReservation, loading } = useReservationActions();
     const [availabilityParams, setAvailabilityParams] = useState<any>(null);
     const { tables, loading: loadingTables } = useTableAvailability(availabilityParams);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [showHelpDialog, setShowHelpDialog] = useState(false);
 
     const form = useForm<ReservationFormData>({
         resolver: zodResolver(reservationSchema),
@@ -69,6 +78,63 @@ export function CreateReservationView() {
             });
         }
     }, [watchDate, watchPartySize, watchDuration]);
+
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Don't trigger if user is typing in an input field
+            if (
+                e.target instanceof HTMLInputElement ||
+                e.target instanceof HTMLTextAreaElement ||
+                e.target instanceof HTMLSelectElement
+            ) {
+                return;
+            }
+
+            // Ctrl+S - submit form
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                form.handleSubmit(onSubmit)();
+            }
+            // B - back
+            else if (e.key === 'b' || e.key === 'B') {
+                e.preventDefault();
+                router.back();
+            }
+            // F or F11 - fullscreen
+            else if (e.key === 'f' || e.key === 'F' || e.key === 'F11') {
+                e.preventDefault();
+                toggleFullscreen();
+            }
+            // ? - show help
+            else if (e.shiftKey && e.key === '?') {
+                e.preventDefault();
+                setShowHelpDialog(true);
+            }
+            // Escape - cancel
+            else if (e.key === 'Escape') {
+                e.preventDefault();
+                router.back();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [form, router]);
+
+    const toggleFullscreen = async () => {
+        try {
+            if (!isFullscreen) {
+                await document.documentElement.requestFullscreen();
+                setIsFullscreen(true);
+            } else {
+                await document.exitFullscreen();
+                setIsFullscreen(false);
+            }
+        } catch (error) {
+            console.error('Fullscreen error:', error);
+        }
+    };
 
     const onSubmit = async (data: ReservationFormData) => {
         try {
@@ -101,14 +167,40 @@ export function CreateReservationView() {
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Header */}
                 <div className="mb-8">
-                    <Button
-                        variant="ghost"
-                        onClick={handleCancel}
-                        className="mb-4 gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        Back to Reservations
-                    </Button>
+                    <div className="flex items-center justify-between mb-4">
+                        <Button
+                            variant="ghost"
+                            onClick={handleCancel}
+                            className="gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                        >
+                            <ArrowLeft className="w-4 h-4" />
+                            Back to Reservations
+                        </Button>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                type="button"
+                                onClick={() => setShowHelpDialog(true)}
+                                variant="outline"
+                                size="sm"
+                                title="Keyboard shortcuts (Shift+?)"
+                                className="gap-2"
+                            >
+                                <Keyboard className="w-4 h-4" />
+                                <span className="hidden sm:inline">Help</span>
+                            </Button>
+                            <Button
+                                type="button"
+                                onClick={toggleFullscreen}
+                                variant="outline"
+                                size="sm"
+                                title={isFullscreen ? 'Exit fullscreen (F)' : 'Enter fullscreen (F)'}
+                                className="gap-2"
+                            >
+                                {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                                <span className="hidden sm:inline">{isFullscreen ? 'Exit' : 'Fullscreen'}</span>
+                            </Button>
+                        </div>
+                    </div>
 
                     <div className="flex items-center gap-4">
                         <div className="w-16 h-16 bg-linear-to-br from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 rounded-2xl flex items-center justify-center shadow-xl">
@@ -384,6 +476,65 @@ export function CreateReservationView() {
                         </div>
                     </form>
                 </Form>
+
+                {/* Keyboard Help Dialog */}
+                <Dialog open={showHelpDialog} onOpenChange={setShowHelpDialog}>
+                    <DialogContent className="max-w-2xl">
+                        <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                                <Keyboard className="w-5 h-5" />
+                                Keyboard Shortcuts
+                            </DialogTitle>
+                            <DialogDescription>
+                                Quick keyboard shortcuts to navigate the reservation creation form
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                <span className="text-sm text-gray-600 dark:text-gray-400">Submit Form</span>
+                                <div className="flex items-center gap-2">
+                                    <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                        Ctrl
+                                    </kbd>
+                                    <span className="text-xs text-gray-500">+</span>
+                                    <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                        S
+                                    </kbd>
+                                </div>
+                            </div>
+                            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                <span className="text-sm text-gray-600 dark:text-gray-400">Back</span>
+                                <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                    B
+                                </kbd>
+                            </div>
+                            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                <span className="text-sm text-gray-600 dark:text-gray-400">Fullscreen</span>
+                                <div className="flex items-center gap-2">
+                                    <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                        F
+                                    </kbd>
+                                    <span className="text-xs text-gray-500">or</span>
+                                    <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                        F11
+                                    </kbd>
+                                </div>
+                            </div>
+                            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                <span className="text-sm text-gray-600 dark:text-gray-400">Cancel</span>
+                                <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                    Esc
+                                </kbd>
+                            </div>
+                            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                <span className="text-sm text-gray-600 dark:text-gray-400">Show Help</span>
+                                <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                    Shift + ?
+                                </kbd>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </div>
         </div>
     );

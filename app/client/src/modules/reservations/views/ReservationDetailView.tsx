@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useReservation } from '../hooks/useReservations';
 import { useReservationActions } from '../hooks/useReservationActions';
 import { StatusBadge, AuditTimeline } from '../components';
@@ -18,6 +18,13 @@ import {
     getAvailableActions,
 } from '../utils';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -36,6 +43,9 @@ import {
     Loader2,
     Edit,
     MoreVertical,
+    Keyboard,
+    Maximize2,
+    Minimize2,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -46,6 +56,8 @@ interface ReservationDetailViewProps {
 export function ReservationDetailView({ reservationId }: ReservationDetailViewProps) {
     const router = useRouter();
     const { reservation, loading, refetch } = useReservation(reservationId);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [showHelpDialog, setShowHelpDialog] = useState(false);
 
     // Dialog states
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -53,6 +65,74 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
     const [showCheckInDialog, setShowCheckInDialog] = useState(false);
     const [showCompleteDialog, setShowCompleteDialog] = useState(false);
     const [showNoShowDialog, setShowNoShowDialog] = useState(false);
+
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Don't trigger if user is typing in an input field
+            if (
+                e.target instanceof HTMLInputElement ||
+                e.target instanceof HTMLTextAreaElement ||
+                e.target instanceof HTMLSelectElement
+            ) {
+                return;
+            }
+
+            // B - back
+            if (e.key === 'b' || e.key === 'B') {
+                e.preventDefault();
+                router.push('/reservations');
+            }
+            // Ctrl+P - print
+            else if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                e.preventDefault();
+                window.print();
+            }
+            // F or F11 - fullscreen
+            else if (e.key === 'f' || e.key === 'F' || e.key === 'F11') {
+                e.preventDefault();
+                toggleFullscreen();
+            }
+            // C - confirm (if available)
+            else if (e.key === 'c' || e.key === 'C') {
+                const availableActions = reservation ? getAvailableActions(reservation.status) : [];
+                if (availableActions.includes('confirm')) {
+                    e.preventDefault();
+                    setShowConfirmDialog(true);
+                }
+            }
+            // X - cancel (if available)
+            else if (e.key === 'x' || e.key === 'X') {
+                const availableActions = reservation ? getAvailableActions(reservation.status) : [];
+                if (availableActions.includes('cancel')) {
+                    e.preventDefault();
+                    setShowCancelDialog(true);
+                }
+            }
+            // ? - show help
+            else if (e.shiftKey && e.key === '?') {
+                e.preventDefault();
+                setShowHelpDialog(true);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [router, reservation]);
+
+    const toggleFullscreen = async () => {
+        try {
+            if (!isFullscreen) {
+                await document.documentElement.requestFullscreen();
+                setIsFullscreen(true);
+            } else {
+                await document.exitFullscreen();
+                setIsFullscreen(false);
+            }
+        } catch (error) {
+            console.error('Fullscreen error:', error);
+        }
+    };
 
     if (loading) {
         return (
@@ -101,12 +181,34 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                         Back
                     </Button>
 
-                    {canEditReservation(reservation.status) && (
-                        <Button variant="outline" size="sm" className="gap-2">
-                            <Edit className="w-4 h-4" />
-                            Edit
+                    <div className="flex items-center gap-2">
+                        <Button
+                            onClick={() => setShowHelpDialog(true)}
+                            variant="outline"
+                            size="sm"
+                            title="Keyboard shortcuts (Shift+?)"
+                            className="gap-2"
+                        >
+                            <Keyboard className="w-4 h-4" />
+                            <span className="hidden sm:inline">Help</span>
                         </Button>
-                    )}
+                        <Button
+                            onClick={toggleFullscreen}
+                            variant="outline"
+                            size="sm"
+                            title={isFullscreen ? 'Exit fullscreen (F)' : 'Enter fullscreen (F)'}
+                            className="gap-2"
+                        >
+                            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                            <span className="hidden sm:inline">{isFullscreen ? 'Exit' : 'Fullscreen'}</span>
+                        </Button>
+                        {canEditReservation(reservation.status) && (
+                            <Button variant="outline" size="sm" className="gap-2">
+                                <Edit className="w-4 h-4" />
+                                Edit
+                            </Button>
+                        )}
+                    </div>
                 </div>
 
                 <div className="flex items-start justify-between">
@@ -389,6 +491,71 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                 onClose={() => setShowNoShowDialog(false)}
                 onSuccess={refetch}
             />
+
+            {/* Keyboard Help Dialog */}
+            <Dialog open={showHelpDialog} onOpenChange={setShowHelpDialog}>
+                <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Keyboard className="w-5 h-5" />
+                            Keyboard Shortcuts
+                        </DialogTitle>
+                        <DialogDescription>
+                            Quick keyboard shortcuts to navigate the reservation details
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Back to List</span>
+                            <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                B
+                            </kbd>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Print</span>
+                            <div className="flex items-center gap-2">
+                                <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                    Ctrl
+                                </kbd>
+                                <span className="text-xs text-gray-500">+</span>
+                                <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                    P
+                                </kbd>
+                            </div>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Confirm Reservation</span>
+                            <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                C
+                            </kbd>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Cancel Reservation</span>
+                            <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                X
+                            </kbd>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Fullscreen</span>
+                            <div className="flex items-center gap-2">
+                                <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                    F
+                                </kbd>
+                                <span className="text-xs text-gray-500">or</span>
+                                <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                    F11
+                                </kbd>
+                            </div>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Show Help</span>
+                            <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                Shift + ?
+                            </kbd>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
