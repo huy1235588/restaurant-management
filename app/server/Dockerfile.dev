@@ -1,0 +1,39 @@
+# Development Dockerfile for NestJS Server
+# Optimized for hot reload and development workflow
+
+FROM node:20-alpine AS development
+
+RUN apk add --no-cache libc6-compat curl
+
+WORKDIR /app
+
+# Install pnpm
+RUN npm install -g pnpm
+
+# Copy package files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY prisma ./prisma
+
+# Install dependencies
+RUN pnpm install
+
+# Generate Prisma Client
+RUN pnpm exec prisma generate
+
+# Copy source code
+COPY . .
+
+# Create uploads directory
+RUN mkdir -p ./uploads
+
+EXPOSE 5000
+
+ENV PORT=5000
+ENV NODE_ENV=development
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:5000/api/v1/health || exit 1
+
+# Start in development mode with hot reload
+CMD ["sh", "-c", "pnpm exec prisma migrate deploy && pnpm run start:dev"]

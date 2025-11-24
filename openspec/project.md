@@ -222,15 +222,15 @@ This system manages a full-service restaurant with:
 
 ## Important Constraints
 
-### Technical Constraints
+### Development Constraints
 - **Node.js**: Version 20+ required
-- **Docker**: Sử dụng cho môi trường development local (không deploy production)
+- **Docker**: Sử dụng cho môi trường development local (PostgreSQL + Redis only)
 - **RAM**: Minimum 4GB cho Docker local
 - **Database**: PostgreSQL 16
 - **Platform**: 
-  - Development trên Windows với Next.js dev server
-  - Không có production deployment
-  - Không có CI/CD pipeline
+  - Development: Windows/Mac/Linux với Next.js dev server
+  - Production: Vercel + Railway (PaaS) hoặc DigitalOcean VPS
+  - Deployment documented in `/deploy/README.md`
 
 ### Business Constraints
 - **Multi-tenancy**: Single-restaurant (đồ án demo)
@@ -269,15 +269,31 @@ This system manages a full-service restaurant with:
 ### Infrastructure Services (Development)
 - **PostgreSQL 16**: Primary database cho development
   - Connection string format: `postgresql://user:password@host:port/database?schema=public`
-  - Chạy trong Docker container local
+  - Chạy trong Docker container local (via `deploy/docker-compose.yml`)
   - Default port: 5432
 
 - **Redis 7**: Caching cơ bản cho session
   - URL format: `redis://host:port`
   - Session management đơn giản
-  - Chạy trong Docker container local
+  - Chạy trong Docker container local (via `deploy/docker-compose.yml`)
   - Default port: 6379
   - **Lưu ý**: Không có Redis clustering hay high-availability setup
+
+### Deployment Options
+- **Primary (Recommended)**: Vercel (frontend) + Railway (backend)
+  - Vercel: Free tier for Next.js deployment
+  - Railway: $5/month credit includes backend, PostgreSQL, Redis
+  - Automatic HTTPS/SSL, zero server management
+  - Total cost: $0-5/month
+  - Deployment time: ~20-30 minutes
+  - Documented in: `/deploy/README.md`
+
+- **Alternative**: DigitalOcean VPS with Docker
+  - Single $6-12/month Droplet
+  - Full Docker Compose setup
+  - Complete infrastructure control
+  - For learning server administration
+  - Documented in: `/deploy/digitalocean/README.md`
 
 ### APIs & Integrations
 - **Socket.io**: Real-time bidirectional communication
@@ -296,12 +312,14 @@ This system manages a full-service restaurant with:
 
 ### File Storage (Simplified)
 - **Development**: Files stored in `/app/server/uploads/` cho local development
-- **Cloud Storage**: Cloudflare R2 hoặc Cloudinary cho demo upload cloud
-- **Lưu ý**: Không có CDN setup, backup strategy, hay disaster recovery plan
-- **Documentation**: See `/docs/FILE_STORAGE_GUIDE.md`
+- **Cloud Storage**: Cloudflare R2 hoặc Cloudinary cho production
+- **Deployment**: Primary via Vercel + Railway, alternative via DigitalOcean
+- **Documentation**: See `/deploy/README.md` for deployment guides
+- **File Storage Guide**: See `/docs/technical/FILE_STORAGE_GUIDE.md`
 
-### Logging (Development Only)
-- **Winston**: Application logging cơ bản đến `/app/server/logs/` cho debug
+### Logging (Development & Production)
+- **Winston**: Application logging cho debug (local) và production tracking
 - **Morgan**: HTTP request logging trong development
-- **Health Check**: Endpoint `/health` đơn giản để kiểm tra server
-- **Không bao gồm**: Production monitoring, alerting, performance tracking, APM tools
+- **Platform Logging**: Vercel Analytics (free), Railway Logs (built-in)
+- **Health Check**: Endpoint `/health` và `/api/health` để kiểm tra server
+- **Production**: Platform-provided logging and monitoring

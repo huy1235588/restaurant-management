@@ -22,17 +22,10 @@ docs/
 │   └── ERD.mmd                        # Sơ đồ quan hệ thực thể
 │
 ├── 🔧 technical/                      # Hướng Dẫn Kỹ Thuật
-│   ├── DOCKER.md                      # Thiết lập Docker
 │   ├── DESKTOP_DOCUMENTATION.md       # Tài liệu ứng dụng desktop
 │   ├── FILE_STORAGE_GUIDE.md          # Hướng dẫn lưu trữ tệp
-│   └── FRONTEND_DOCUMENTATION.md      # Kiến trúc frontend
-│
-├── 🚀 deployment/                     # Tài Liệu Triển Khai
-│   ├── DEPLOYMENT.md                  # Hướng dẫn triển khai chính
-│   ├── DEPLOYMENT_QUICK_REFERENCE.md  # Tham chiếu nhanh
-│   ├── DEPLOYMENT_IMPLEMENTATION_SUMMARY.md
-│   ├── COST_OPTIMIZATION.md           # Chiến lược tối ưu hóa chi phí
-│   └── OPERATIONS.md                  # Hướng dẫn vận hành
+│   ├── FRONTEND_DOCUMENTATION.md      # Kiến trúc frontend
+│   └── WEBSOCKET_INTEGRATION.md       # Tích hợp WebSocket
 │
 ├── 📊 diagrams/                       # Sơ Đồ Hệ Thống
 │   ├── AUTHENTICATION_MANAGEMENT_DIAGRAMS.md
@@ -131,24 +124,34 @@ Mỗi tài liệu tính năng bao gồm:
 ### 🔧 Kỹ Thuật (`/technical`)
 **Hướng dẫn triển khai kỹ thuật và hướng dẫn thiết lập.**
 
-- **DOCKER.md** - Thiết lập Docker và đóng gói hóa
 - **DESKTOP_DOCUMENTATION.md** - Tài liệu ứng dụng desktop (Tauri)
 - **FILE_STORAGE_GUIDE.md** - Hướng dẫn lưu trữ tệp và tải lên
 - **FRONTEND_DOCUMENTATION.md** - Kiến trúc frontend và cấu trúc thành phần
+- **WEBSOCKET_INTEGRATION.md** - Tích hợp WebSocket thời gian thực
 
 **Sử dụng cho:**
-- Thiết lập môi trường phát triển
 - Hiểu công nghệ
 - Hướng dẫn triển khai
 - Khắc phục sự cố kỹ thuật
 
+**Lưu ý:** Tài liệu triển khai cũ đã được di chuyển. Xem `/deploy/README.md` cho hướng dẫn triển khai mới.
+
 ---
 
-### 🚀 Triển Khai (`/deployment`)
-**Hướng dẫn triển khai sản xuất và vận hành.**
+### 🚀 Triển Khai (Mới!)
+**Hướng dẫn triển khai được đơn giản hóa đã chuyển sang `/deploy/`**
 
-- **DEPLOYMENT.md** - Hướng dẫn triển khai toàn diện
-- **DEPLOYMENT_QUICK_REFERENCE.md** - Tham chiếu nhanh triển khai
+Tài liệu triển khai cũ (5 tệp, 2500+ dòng) đã được thay thế bằng cấu trúc đơn giản hơn:
+
+- **`/deploy/README.md`** - Hướng dẫn triển khai hoàn chỉnh (< 500 dòng)
+  - Thiết lập phát triển cục bộ
+  - Tùy chọn A: Vercel + Railway (Khuyến nghị)
+  - Tùy chọn B: DigitalOcean VPS
+  - Khắc phục sự cố và Câu hỏi thường gặp
+  
+- **`/deploy/MIGRATION.md`** - Hướng dẫn di chuyển từ cấu trúc cũ
+
+**Tài liệu triển khai cũ:** Đã lưu trữ trong `/_archive/deployment-v1/`
 - **COST_OPTIMIZATION.md** - Chiến lược tối ưu hóa chi phí đám mây
 - **OPERATIONS.md** - Hướng dẫn vận hành hàng ngày
 

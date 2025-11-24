@@ -9,7 +9,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # Install dependencies with cache mount
-RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
+RUN --mount=type=cache,id=pnpm-client,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile
 
 # Stage 2: Builder
@@ -31,6 +31,7 @@ RUN pnpm run build
 
 # Stage 3: Runner
 FROM node:20-alpine AS runner
+RUN apk add --no-cache curl
 WORKDIR /app
 
 ENV NODE_ENV=production \
@@ -50,5 +51,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 
 EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:3000/api/health || exit 1
 
 CMD ["node", "server.js"]

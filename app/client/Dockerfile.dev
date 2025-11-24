@@ -1,7 +1,9 @@
-# Development Dockerfile with hot reload
+# Development Dockerfile for Next.js Client
+# Optimized for hot reload and development workflow
+
 FROM node:20-alpine AS development
 
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat curl
 
 WORKDIR /app
 
@@ -11,8 +13,9 @@ RUN npm install -g pnpm
 # Copy package files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-# Install dependencies
-RUN pnpm install
+# Install dependencies with cache mount
+RUN --mount=type=cache,id=pnpm-client,target=/root/.local/share/pnpm/store \
+    pnpm install
 
 # Copy source code
 COPY . .
@@ -21,9 +24,12 @@ EXPOSE 3000
 
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+ENV NODE_ENV=development
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Build the client
-RUN pnpm run build
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:3000/api/health || exit 1
 
-# Start the client in production mode
-CMD ["pnpm", "run", "start"]
+# Start in development mode with hot reload
+CMD ["pnpm", "run", "dev"]

@@ -1,4 +1,4 @@
-# Dependencies
+# Node modules
 node_modules
 .pnp
 .pnp.js
@@ -8,6 +8,7 @@ coverage
 
 # Next.js
 .next/
+.next/cache/
 out/
 
 # Production
@@ -48,9 +49,10 @@ next-env.d.ts
 .gitattributes
 
 # Docker
-Dockerfile
+Dockerfile*
 .dockerignore
 docker-compose*.yml
 
 # Documentation
-README.md
+*.md
+!README.md
