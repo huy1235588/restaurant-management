@@ -152,7 +152,7 @@ ufw default deny incoming
 ufw default allow outgoing
 
 # Allow SSH (check if custom port)
-SSH_PORT=$(grep "^Port " /etc/ssh/sshd_config | awk '{print $2}' || echo "22")
+SSH_PORT=22
 log_info "Allowing SSH on port $SSH_PORT"
 ufw allow $SSH_PORT/tcp comment 'SSH'
 
