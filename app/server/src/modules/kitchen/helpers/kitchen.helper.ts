@@ -1,8 +1,4 @@
-import {
-    KITCHEN_CONSTANTS,
-    KitchenPriority,
-    KITCHEN_STATUS_FLOW,
-} from '../constants/kitchen.constants';
+import { KITCHEN_STATUS_FLOW } from '../constants/kitchen.constants';
 import { KitchenOrderStatus } from '@prisma/generated/client';
 
 /**
@@ -67,44 +63,6 @@ export class KitchenHelper {
     //     const elapsedMinutes = this.getElapsedTime(createdAt);
     //     return elapsedMinutes > KITCHEN_CONSTANTS.AUTO_CANCEL_TIMEOUT_MINUTES;
     // }
-
-    /**
-     * Validate priority level
-     */
-    static isValidPriority(priority: string): priority is KitchenPriority {
-        return KITCHEN_CONSTANTS.PRIORITIES.includes(
-            priority as KitchenPriority,
-        );
-    }
-
-    /**
-     * Get priority weight for sorting (higher = more urgent)
-     */
-    static getPriorityWeight(priority: KitchenPriority): number {
-        const weights: Record<KitchenPriority, number> = {
-            urgent: 4,
-            high: 3,
-            normal: 2,
-            low: 1,
-        };
-        return weights[priority] || 2;
-    }
-
-    /**
-     * Compare orders by priority and creation time
-     */
-    static compareOrderPriority(
-        a: { priority: KitchenPriority; createdAt: Date },
-        b: { priority: KitchenPriority; createdAt: Date },
-    ): number {
-        const priorityDiff =
-            this.getPriorityWeight(b.priority) -
-            this.getPriorityWeight(a.priority);
-        if (priorityDiff !== 0) return priorityDiff;
-
-        // Same priority, earlier orders first
-        return a.createdAt.getTime() - b.createdAt.getTime();
-    }
 
     /**
      * Validate status transition
@@ -173,19 +131,6 @@ export class KitchenHelper {
     }
 
     /**
-     * Get priority display name
-     */
-    static getPriorityDisplayName(priority: KitchenPriority): string {
-        const displayNames: Record<KitchenPriority, string> = {
-            urgent: 'Khẩn cấp',
-            high: 'Cao',
-            normal: 'Thường',
-            low: 'Thấp',
-        };
-        return displayNames[priority] || priority;
-    }
-
-    /**
      * Format preparation time for display
      */
     static formatPrepTime(minutes: number): string {
@@ -239,13 +184,11 @@ export class KitchenHelper {
     // }
 
     /**
-     * Sort orders by priority and time
+     * Sort orders by creation time (earlier orders first)
      */
-    static sortOrdersByPriority<
-        T extends { priority: KitchenPriority; createdAt: Date },
-    >(orders: T[]): T[] {
-        return [...orders].sort((a, b) =>
-            KitchenHelper.compareOrderPriority(a, b),
+    static sortOrdersByTime<T extends { createdAt: Date }>(orders: T[]): T[] {
+        return [...orders].sort(
+            (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
         );
     }
 

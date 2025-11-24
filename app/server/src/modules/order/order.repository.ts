@@ -58,7 +58,6 @@ export class OrderRepository {
             select: {
                 kitchenOrderId: true,
                 status: true,
-                priority: true,
                 startedAt: true,
                 completedAt: true,
                 staffId: true,

@@ -11,7 +11,6 @@ import { useCompleteOrder } from "../hooks/useCompleteOrder";
 import { useCancelKitchenOrder } from "../hooks/useCancelKitchenOrder";
 import {
     KitchenOrderStatus,
-    KitchenPriority,
 } from "../types/kitchen.types";
 import { KitchenOrderCard } from "../components/KitchenOrderCard";
 import { KitchenStats } from "../components/KitchenStats";
@@ -23,9 +22,6 @@ import { KitchenHelpers } from "../utils/kitchen-helpers";
 export function KitchenDisplayView() {
     const [statusFilter, setStatusFilter] = useState<
         KitchenOrderStatus | "all"
-    >("all");
-    const [priorityFilter, setPriorityFilter] = useState<
-        KitchenPriority | "all"
     >("all");
     const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -40,17 +36,14 @@ export function KitchenDisplayView() {
     const completeOrderMutation = useCompleteOrder();
     const cancelMutation = useCancelKitchenOrder();
 
-    // Filter and sort orders with useMemo for performance
+    // Filter and sort orders by creation time (oldest first)
     const filteredOrders = useMemo(() => {
         if (!orders) return [];
-        
-        return KitchenHelpers.sortOrdersByPriority(
-            KitchenHelpers.filterOrdersByPriority(
-                KitchenHelpers.filterOrdersByStatus(orders, statusFilter),
-                priorityFilter
-            )
+
+        return KitchenHelpers.sortOrdersByTime(
+            KitchenHelpers.filterOrdersByStatus(orders, statusFilter)
         );
-    }, [orders, statusFilter, priorityFilter]);
+    }, [orders, statusFilter]);
 
     // Fullscreen toggle
     const toggleFullscreen = () => {
@@ -127,65 +120,65 @@ export function KitchenDisplayView() {
         <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
             {/* Header - Hidden in fullscreen */}
             {!isFullscreen && (
-            <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 px-3 md:px-4 py-2 md:py-3 flex items-center justify-between">
-                <div className="flex items-center gap-2 md:gap-4">
-                    <h1 className="text-lg md:text-2xl font-bold text-gray-900 dark:text-white">
-                        Kitchen Display
-                    </h1>
+                <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 px-3 md:px-4 py-2 md:py-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2 md:gap-4">
+                        <h1 className="text-lg md:text-2xl font-bold text-gray-900 dark:text-white">
+                            Kitchen Display
+                        </h1>
 
-                    {/* Connection Status */}
-                    <div className="flex items-center gap-1 md:gap-2">
-                        <div
-                            className={`w-2 h-2 rounded-full ${isConnected
+                        {/* Connection Status */}
+                        <div className="flex items-center gap-1 md:gap-2">
+                            <div
+                                className={`w-2 h-2 rounded-full ${isConnected
                                     ? "bg-green-500 animate-pulse"
                                     : "bg-red-500"
-                                }`}
-                        />
-                        <span className="text-xs md:text-sm text-gray-600 dark:text-gray-400 hidden sm:inline">
-                            {isConnected ? "Connected" : "Disconnected"}
+                                    }`}
+                            />
+                            <span className="text-xs md:text-sm text-gray-600 dark:text-gray-400 hidden sm:inline">
+                                {isConnected ? "Connected" : "Disconnected"}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 md:gap-4">
+                        {/* Current Time */}
+                        <span className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400 hidden sm:inline">
+                            {currentTime}
                         </span>
+
+                        {/* Refresh Button */}
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => refetch()}
+                            disabled={isLoading}
+                            className="h-8 md:h-9 px-2 md:px-3"
+                        >
+                            <RefreshCw
+                                className={`h-3 w-3 md:h-4 md:w-4 ${isLoading ? "animate-spin" : ""
+                                    }`}
+                            />
+                            <span className="ml-1 md:ml-2 hidden sm:inline">Refresh</span>
+                        </Button>
+
+                        {/* Fullscreen Button */}
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={toggleFullscreen}
+                            className="h-8 md:h-9 px-2 md:px-3"
+                        >
+                            {isFullscreen ? (
+                                <Minimize2 className="h-3 w-3 md:h-4 md:w-4" />
+                            ) : (
+                                <Maximize2 className="h-3 w-3 md:h-4 md:w-4" />
+                            )}
+                            <span className="ml-1 md:ml-2 hidden sm:inline">
+                                {isFullscreen ? "Exit" : "Fullscreen"}
+                            </span>
+                        </Button>
                     </div>
                 </div>
-
-                <div className="flex items-center gap-2 md:gap-4">
-                    {/* Current Time */}
-                    <span className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400 hidden sm:inline">
-                        {currentTime}
-                    </span>
-
-                    {/* Refresh Button */}
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => refetch()}
-                        disabled={isLoading}
-                        className="h-8 md:h-9 px-2 md:px-3"
-                    >
-                        <RefreshCw
-                            className={`h-3 w-3 md:h-4 md:w-4 ${isLoading ? "animate-spin" : ""
-                                }`}
-                        />
-                        <span className="ml-1 md:ml-2 hidden sm:inline">Refresh</span>
-                    </Button>
-
-                    {/* Fullscreen Button */}
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={toggleFullscreen}
-                        className="h-8 md:h-9 px-2 md:px-3"
-                    >
-                        {isFullscreen ? (
-                            <Minimize2 className="h-3 w-3 md:h-4 md:w-4" />
-                        ) : (
-                            <Maximize2 className="h-3 w-3 md:h-4 md:w-4" />
-                        )}
-                        <span className="ml-1 md:ml-2 hidden sm:inline">
-                            {isFullscreen ? "Exit" : "Fullscreen"}
-                        </span>
-                    </Button>
-                </div>
-            </div>
             )}
 
             {/* Stats Section */}
@@ -199,8 +192,8 @@ export function KitchenDisplayView() {
                     <div className="flex items-center gap-2">
                         <div
                             className={`w-2 h-2 rounded-full ${isConnected
-                                    ? "bg-green-500 animate-pulse"
-                                    : "bg-red-500"
+                                ? "bg-green-500 animate-pulse"
+                                : "bg-red-500"
                                 }`}
                         />
                         <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
@@ -282,36 +275,6 @@ export function KitchenDisplayView() {
                             className="h-7 md:h-8 text-xs md:text-sm px-2 md:px-3"
                         >
                             Completed
-                        </Button>
-                    </div>
-
-                    {/* Priority Filters */}
-                    <div className="flex gap-1 md:gap-2">
-                        <Button
-                            variant={priorityFilter === "all" ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setPriorityFilter("all")}
-                            className="h-7 md:h-8 text-xs md:text-sm px-2 md:px-3"
-                        >
-                            All Priority
-                        </Button>
-                        <Button
-                            variant={
-                                priorityFilter === "urgent" ? "default" : "outline"
-                            }
-                            size="sm"
-                            onClick={() => setPriorityFilter("urgent")}
-                            className="h-7 md:h-8 text-xs md:text-sm px-2 md:px-3"
-                        >
-                            🔥 Urgent
-                        </Button>
-                        <Button
-                            variant={priorityFilter === "high" ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setPriorityFilter("high")}
-                            className="h-7 md:h-8 text-xs md:text-sm px-2 md:px-3"
-                        >
-                            High
                         </Button>
                     </div>
                 </div>

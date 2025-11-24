@@ -139,20 +139,6 @@ export class InvalidKitchenStatusTransitionException extends BadRequestException
 }
 
 /**
- * Invalid priority level exception
- */
-export class InvalidPriorityException extends BadRequestException {
-    constructor(priority: string, validPriorities: readonly string[]) {
-        super({
-            message: KITCHEN_MESSAGES.ERROR.INVALID_PRIORITY,
-            error: 'Invalid Priority',
-            providedPriority: priority,
-            validPriorities,
-        });
-    }
-}
-
-/**
  * Kitchen queue full exception
  */
 export class KitchenQueueFullException extends BadRequestException {

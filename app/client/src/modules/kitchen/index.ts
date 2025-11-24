@@ -14,7 +14,6 @@ export * from "./services/kitchen.service";
 // Components
 export * from "./components/KitchenOrderCard";
 export * from "./components/OrderStatusBadge";
-export * from "./components/PriorityBadge";
 export * from "./components/PrepTimeIndicator";
 export * from "./components/OrderItemsList";
 export * from "./components/KitchenStats";

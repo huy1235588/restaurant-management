@@ -1,12 +1,5 @@
-import {
-    KitchenOrder,
-    KitchenOrderStatus,
-    KitchenPriority,
-} from "../types/kitchen.types";
-import {
-    PRIORITY_WEIGHTS,
-    KITCHEN_CONFIG,
-} from "../constants/kitchen.constants";
+import { KitchenOrder, KitchenOrderStatus } from "../types/kitchen.types";
+import { KITCHEN_CONFIG } from "../constants/kitchen.constants";
 
 /**
  * Kitchen helper utility functions
@@ -52,30 +45,14 @@ export class KitchenHelpers {
     }
 
     /**
-     * Get priority weight for sorting
+     * Sort orders by creation time (ASC - oldest first)
      */
-    static getPriorityWeight(priority: KitchenPriority): number {
-        return PRIORITY_WEIGHTS[priority];
-    }
-
-    /**
-     * Sort orders by priority (DESC) then by creation time (ASC)
-     */
-    static sortOrdersByPriority(orders: KitchenOrder[]): KitchenOrder[] {
-        return [...orders].sort((a, b) => {
-            // First by priority (higher weight first)
-            const priorityDiff =
-                this.getPriorityWeight(b.priority) -
-                this.getPriorityWeight(a.priority);
-
-            if (priorityDiff !== 0) return priorityDiff;
-
-            // Then by creation time (oldest first)
-            return (
+    static sortOrdersByTime(orders: KitchenOrder[]): KitchenOrder[] {
+        return [...orders].sort(
+            (a, b) =>
                 new Date(a.createdAt).getTime() -
                 new Date(b.createdAt).getTime()
-            );
-        });
+        );
     }
 
     /**
@@ -87,17 +64,6 @@ export class KitchenHelpers {
     ): KitchenOrder[] {
         if (status === "all") return orders;
         return orders.filter((order) => order.status === status);
-    }
-
-    /**
-     * Filter orders by priority
-     */
-    static filterOrdersByPriority(
-        orders: KitchenOrder[],
-        priority: KitchenPriority | "all"
-    ): KitchenOrder[] {
-        if (priority === "all") return orders;
-        return orders.filter((order) => order.priority === priority);
     }
 
     /**
@@ -118,11 +84,11 @@ export class KitchenHelpers {
      * Get display name for table with fallback chain
      * Priority: name → code → tableNumber → "Table #{id}"
      */
-    static getTableDisplayName(table: { 
-        tableId: number; 
-        name?: string | null; 
-        code?: string | null; 
-        tableNumber?: number | null; 
+    static getTableDisplayName(table: {
+        tableId: number;
+        name?: string | null;
+        code?: string | null;
+        tableNumber?: number | null;
     }): string {
         if (table.name) return table.name;
         if (table.code) return table.code;

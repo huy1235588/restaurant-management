@@ -58,13 +58,6 @@ enum OrderPriority {
     vip // VIP customer
 }
 
-enum KitchenPriority {
-    low // Low priority
-    normal // Standard priority
-    high // High priority
-    urgent // Urgent, rush order
-}
-
 enum StationType {
     grill
     fry
@@ -394,7 +387,6 @@ model KitchenOrder {
     kitchenOrderId Int                @id @default(autoincrement())
     orderId        Int                @unique // One-to-one with Order
     staffId        Int? // chef assigned
-    priority       KitchenPriority    @default(normal)
     status         KitchenOrderStatus @default(pending)
     prepTimeActual Int? // actual prep time in minutes
     startedAt      DateTime?
@@ -408,7 +400,6 @@ model KitchenOrder {
     @@index([orderId])
     @@index([staffId])
     @@index([status])
-    @@index([priority])
     @@index([createdAt])
     @@map("kitchen_orders")
 }

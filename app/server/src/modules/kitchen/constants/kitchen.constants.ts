@@ -12,10 +12,6 @@ export const KITCHEN_CONSTANTS = {
     DEFAULT_LIMIT: 50,
     MAX_LIMIT: 200,
 
-    // Priority levels
-    PRIORITIES: ['low', 'normal', 'high', 'urgent'] as const,
-    DEFAULT_PRIORITY: 'normal' as const,
-
     // Business rules
     MAX_NOTES_LENGTH: 1000,
     MAX_SPECIAL_INSTRUCTIONS_LENGTH: 500,
@@ -58,9 +54,6 @@ export const KITCHEN_MESSAGES = {
         // Queue errors
         QUEUE_FULL: 'Kitchen queue is full, cannot accept more orders',
         NO_CHEF_AVAILABLE: 'No chef available to prepare order',
-
-        // Priority errors
-        INVALID_PRIORITY: 'Invalid priority level',
     },
     WARNING: {
         SLOW_PREPARATION: 'Order preparation is taking longer than expected',
@@ -68,11 +61,6 @@ export const KITCHEN_MESSAGES = {
         ORDER_WAITING_TOO_LONG: 'Order has been waiting too long',
     },
 } as const;
-
-/**
- * Priority levels type
- */
-export type KitchenPriority = (typeof KITCHEN_CONSTANTS.PRIORITIES)[number];
 
 /**
  * Status flow validation

@@ -3,7 +3,6 @@ import { KitchenRepository, KitchenOrderFilters } from './kitchen.repository';
 import { PrismaService } from '@/database/prisma.service';
 import { KitchenOrderStatus, OrderStatus } from '@prisma/generated/client';
 import { KitchenGateway } from './kitchen.gateway';
-import { KITCHEN_CONSTANTS } from './constants/kitchen.constants';
 import {
     KitchenOrderNotFoundException,
     KitchenOrderAlreadyExistsException,
@@ -108,13 +107,12 @@ export class KitchenService {
             throw new KitchenOrderAlreadyExistsException(orderId);
         }
 
-        // Create kitchen order with default priority
+        // Create kitchen order
         const kitchenOrder = await this.kitchenRepository.create({
             order: {
                 connect: { orderId },
             },
             status: KitchenOrderStatus.pending,
-            priority: KITCHEN_CONSTANTS.DEFAULT_PRIORITY,
         });
 
         this.logger.log(

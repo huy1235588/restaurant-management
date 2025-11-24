@@ -48,7 +48,6 @@ export interface Staff {
 export interface KitchenOrder {
     kitchenOrderId: number;
     status: 'pending' | 'preparing' | 'completed' | 'cancelled';
-    priority: 'low' | 'normal' | 'high' | 'urgent';
     startedAt?: string | null;
     completedAt?: string | null;
     chefId?: number | null;

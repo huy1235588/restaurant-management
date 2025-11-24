@@ -1,4 +1,4 @@
-import { KitchenOrderStatus, KitchenPriority } from "../types/kitchen.types";
+import { KitchenOrderStatus } from "../types/kitchen.types";
 
 /**
  * Status colors for kitchen orders
@@ -26,35 +26,6 @@ export const STATUS_COLORS: Record<
         bg: "bg-red-100",
         text: "text-red-800",
         border: "border-red-300",
-    },
-};
-
-/**
- * Priority colors for kitchen orders
- */
-export const PRIORITY_COLORS: Record<
-    KitchenPriority,
-    { bg: string; text: string; border: string }
-> = {
-    urgent: {
-        bg: "bg-red-100",
-        text: "text-red-800",
-        border: "border-red-300",
-    },
-    high: {
-        bg: "bg-orange-100",
-        text: "text-orange-800",
-        border: "border-orange-300",
-    },
-    normal: {
-        bg: "bg-blue-100",
-        text: "text-blue-800",
-        border: "border-blue-300",
-    },
-    low: {
-        bg: "bg-gray-100",
-        text: "text-gray-800",
-        border: "border-gray-300",
     },
 };
 
@@ -105,14 +76,4 @@ export const KITCHEN_CONFIG = {
 export const SOUND_URLS = {
     NEW_ORDER: "/sounds/kitchen/new-order.mp3",
     ORDER_READY: "/sounds/kitchen/order-ready.mp3",
-};
-
-/**
- * Priority weights for sorting
- */
-export const PRIORITY_WEIGHTS: Record<KitchenPriority, number> = {
-    urgent: 4,
-    high: 3,
-    normal: 2,
-    low: 1,
 };

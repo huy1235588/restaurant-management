@@ -5,8 +5,6 @@ export enum KitchenOrderStatus {
     CANCELLED = "cancelled",
 }
 
-export type KitchenPriority = "low" | "normal" | "high" | "urgent";
-
 export interface KitchenOrder {
     kitchenOrderId: number;
     orderId: number;
@@ -23,7 +21,6 @@ export interface KitchenOrder {
         orderItems: OrderItem[];
     };
     status: KitchenOrderStatus;
-    priority: KitchenPriority;
     chefId?: number;
     chef?: {
         staffId: number;
@@ -49,7 +46,6 @@ export interface OrderItem {
 
 export interface KitchenOrderFilters {
     status?: KitchenOrderStatus;
-    priority?: KitchenPriority;
 }
 
 export interface NewOrderEvent {

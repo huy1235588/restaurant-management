@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { KitchenOrder } from "../types/kitchen.types";
 import { OrderStatusBadge } from "./OrderStatusBadge";
-import { PriorityBadge } from "./PriorityBadge";
 import { PrepTimeIndicator } from "./PrepTimeIndicator";
 import { OrderItemsList } from "./OrderItemsList";
 import { KitchenHelpers } from "../utils/kitchen-helpers";
@@ -44,7 +43,6 @@ export function KitchenOrderCard({
             className={`
         transition-all duration-300
         ${isNew ? "ring-2 ring-red-500 animate-pulse" : ""}
-        ${order.priority === "urgent" ? "bg-red-50 dark:bg-red-950/20" : ""}
       `}
         >
             <CardHeader className="pb-3">
@@ -64,7 +62,6 @@ export function KitchenOrderCard({
                     </div>
                     <div className="flex flex-col items-end gap-2">
                         <OrderStatusBadge status={order.status} />
-                        <PriorityBadge priority={order.priority} />
                     </div>
                 </div>
             </CardHeader>
