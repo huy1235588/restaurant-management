@@ -119,11 +119,14 @@ export class SocketEmitterService {
      */
     emitOrderCancelled(order: OrderEventData): void {
         this.logger.log(`Order cancelled: ${order.orderNumber}`);
+        // Emit to kitchen room
         this.emitToRoom(
             SOCKET_ROOMS.KITCHEN,
             SOCKET_EVENTS.ORDER_CANCELLED,
             order,
         );
+        // Also emit to all clients so Order Module can receive it
+        this.emitToAll(SOCKET_EVENTS.ORDER_CANCELLED, order);
     }
 
     /**

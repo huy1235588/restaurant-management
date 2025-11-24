@@ -130,4 +130,25 @@ export class KitchenGateway
             `Emitted order completed: Kitchen Order #${order.kitchenOrderId}`,
         );
     }
+
+    /**
+     * Emit event when order is cancelled
+     * Broadcast to kitchen room to notify about cancellation
+     * @param data - Order cancellation data
+     */
+    emitOrderCancelled(data: {
+        orderId: number;
+        orderNumber: string;
+        reason: string;
+    }) {
+        this.server.to('kitchen').emit('order:cancelled', {
+            event: 'order:cancelled',
+            data,
+            timestamp: new Date().toISOString(),
+            source: 'kitchen',
+        });
+        this.logger.log(
+            `Emitted order cancelled to kitchen: Order #${data.orderNumber}`,
+        );
+    }
 }

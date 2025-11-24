@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { KitchenRepository, KitchenOrderFilters } from './kitchen.repository';
 import { PrismaService } from '@/database/prisma.service';
 import {
+    KitchenOrder,
     KitchenOrderStatus,
     OrderItemStatus,
     OrderStatus,
@@ -106,10 +107,22 @@ export class KitchenService {
         const existing = await this.kitchenRepository.findByOrderId(orderId);
 
         if (existing) {
-            this.logger.warn(
-                `Kitchen order already exists for order ${orderId}`,
-            );
-            throw new KitchenOrderAlreadyExistsException(orderId);
+            // If existing kitchen order is completed, delete it and create new one (reopen)
+            if (existing.status === KitchenOrderStatus.completed) {
+                this.logger.log(
+                    `Deleting completed kitchen order ${existing.kitchenOrderId} to reopen for order ${orderId}`,
+                );
+                await this.kitchenRepository.delete(existing.kitchenOrderId);
+                this.logger.log(
+                    `Kitchen order reopened for order #${order.orderNumber} (new items added)`,
+                );
+            } else {
+                // Kitchen order exists and not completed - cannot create new one
+                this.logger.warn(
+                    `Kitchen order already exists for order ${orderId} with status ${existing.status}`,
+                );
+                throw new KitchenOrderAlreadyExistsException(orderId);
+            }
         }
 
         // Create kitchen order
@@ -131,6 +144,17 @@ export class KitchenService {
         this.kitchenGateway.emitNewOrder(kitchenOrderWithDetails);
 
         return kitchenOrder;
+    }
+
+    /**
+     * Notify kitchen about order update (e.g., new items added)
+     * Public method for Order service to call
+     */
+    notifyKitchenOrderUpdate(kitchenOrder: KitchenOrder): void {
+        this.logger.log(
+            `Notifying kitchen of update for kitchen order #${kitchenOrder.kitchenOrderId}`,
+        );
+        this.kitchenGateway.emitOrderUpdate(kitchenOrder);
     }
 
     /**
@@ -275,9 +299,16 @@ export class KitchenService {
         // Emit WebSocket event to kitchen namespace
         this.kitchenGateway.emitOrderCompleted(updated as any);
 
-        // Notify order namespace that kitchen has completed the order
+        // Emit global event to notify all clients (especially Order Module)
+        this.socketEmitter.emitKitchenOrderReady({
+            kitchenOrderId: updated.kitchenOrderId,
+            orderId: updated.orderId,
+            orderNumber: updated.order.orderNumber,
+            status: updated.status,
+        } as any);
+
         this.logger.log(
-            `Notifying orders namespace: Kitchen completed order #${updated.orderId}`,
+            `Notified all clients: Kitchen completed order #${updated.orderId}`,
         );
 
         return updated;
@@ -317,9 +348,10 @@ export class KitchenService {
             `Kitchen order #${kitchenOrderId} deleted, main order cancelled`,
         );
 
-        // Emit WebSocket event to notify about cancellation
+        // Emit WebSocket event to notify about cancellation (broadcasts to all clients)
         this.socketEmitter.emitOrderCancelled({
             orderId: kitchenOrder.orderId,
+            orderNumber: (kitchenOrder as any).order?.orderNumber || 'Unknown',
             reason: 'Cancelled by kitchen',
         } as any);
     }

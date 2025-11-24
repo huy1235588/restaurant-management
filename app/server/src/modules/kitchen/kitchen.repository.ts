@@ -155,4 +155,10 @@ export class KitchenRepository {
             },
         });
     }
+
+    async delete(kitchenOrderId: number): Promise<KitchenOrder> {
+        return this.prisma.kitchenOrder.delete({
+            where: { kitchenOrderId },
+        });
+    }
 }

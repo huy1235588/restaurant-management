@@ -14,7 +14,8 @@ import { KITCHEN_CONFIG } from "../constants/kitchen.constants";
 import { kitchenQueryKeys } from "../utils/kitchen-query-keys";
 import { KitchenHelpers } from "../utils/kitchen-helpers";
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
+const SOCKET_URL =
+    process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
 const KITCHEN_NAMESPACE = "/kitchen";
 const MAX_RECONNECT_ATTEMPTS = 5;
 const DEBOUNCE_DELAY = 500; // Debounce query invalidation by 500ms
@@ -68,7 +69,7 @@ function debouncedInvalidateQueries(
     if (invalidationTimer) {
         clearTimeout(invalidationTimer);
     }
-    
+
     invalidationTimer = setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: queryKey as unknown[] });
         invalidationTimer = null;
@@ -103,83 +104,120 @@ export function useKitchenSocket() {
         // Register event handlers only once per component instance
         if (!handlersRegistered.current) {
             handlersRegistered.current = true;
-        socket.on(KitchenSocketEvents.NEW_ORDER, (data: NewOrderEvent) => {
-            console.log("[Kitchen Socket] New order:", data.data);
+            socket.on(KitchenSocketEvents.NEW_ORDER, (data: NewOrderEvent) => {
+                console.log("[Kitchen Socket] New order:", data.data);
 
-            // Debounced invalidation for better performance
-            debouncedInvalidateQueries(queryClient, kitchenQueryKeys.list());
-
-            // Show notification
-            const tableName = KitchenHelpers.getTableDisplayName(data.data.order.table);
-            toast.info(`New Order #${data.data.order.orderNumber}`, {
-                description: `Table: ${tableName} - ${
-                    data.data.order.orderItems.length
-                } items`,
-            });
-
-            // Play audio notification (if audio system is implemented)
-            if (KITCHEN_CONFIG.AUDIO_ENABLED) {
-                playNewOrderSound();
-            }
-        });
-
-        socket.on(
-            KitchenSocketEvents.ORDER_UPDATED,
-            (data: OrderUpdateEvent) => {
-                console.log("[Kitchen Socket] Order updated:", data.data);
-
-                // Debounced invalidation for list
-                debouncedInvalidateQueries(queryClient, kitchenQueryKeys.list());
-                
-                // Immediate invalidation for detail view
-                queryClient.invalidateQueries({
-                    queryKey: kitchenQueryKeys.detail(data.data.kitchenOrderId),
-                });
-            }
-        );
-
-        socket.on(
-            KitchenSocketEvents.ORDER_COMPLETED,
-            (data: OrderCompletedEvent) => {
-                console.log("[Kitchen Socket] Order completed:", data.data);
-
-                // Debounced invalidation for list
-                debouncedInvalidateQueries(queryClient, kitchenQueryKeys.list());
-                
-                // Immediate invalidation for detail view
-                queryClient.invalidateQueries({
-                    queryKey: kitchenQueryKeys.detail(data.data.kitchenOrderId),
-                });
-
-                // Show success notification
-                toast.success("Order Completed", {
-                    description: `Order #${data.data.order.orderNumber} has been completed`,
-                });
-            }
-        );
-
-            // Listen to order events from Order namespace
-            socket.on("order:items-added", (data: any) => {
-                console.log("[Kitchen Socket] Items added to order:", data);
-
-                // Invalidate kitchen orders to show updated items
-                debouncedInvalidateQueries(queryClient, kitchenQueryKeys.list());
+                // Debounced invalidation for better performance
+                debouncedInvalidateQueries(
+                    queryClient,
+                    kitchenQueryKeys.list()
+                );
 
                 // Show notification
-                toast.info("Order Updated", {
-                    description: `New items added to Order #${data.orderNumber || ""}`,
+                const tableName = KitchenHelpers.getTableDisplayName(
+                    data.data.order.table
+                );
+                toast.info(`New Order #${data.data.order.orderNumber}`, {
+                    description: `Table: ${tableName} - ${data.data.order.orderItems.length} items`,
                 });
+
+                // Play audio notification (if audio system is implemented)
+                if (KITCHEN_CONFIG.AUDIO_ENABLED) {
+                    playNewOrderSound();
+                }
             });
 
+            socket.on(
+                KitchenSocketEvents.ORDER_UPDATED,
+                (data: OrderUpdateEvent) => {
+                    console.log("[Kitchen Socket] Order updated:", data.data);
+
+                    // Debounced invalidation for list
+                    debouncedInvalidateQueries(
+                        queryClient,
+                        kitchenQueryKeys.list()
+                    );
+
+                    // Immediate invalidation for detail view
+                    queryClient.invalidateQueries({
+                        queryKey: kitchenQueryKeys.detail(
+                            data.data.kitchenOrderId
+                        ),
+                    });
+
+                    // Show notification for order updates (e.g., items added)
+                    toast.info("Order Updated", {
+                        description: `Order #${
+                            data.data.order?.orderNumber || ""
+                        } has been updated`,
+                    });
+                }
+            );
+
+            socket.on(
+                KitchenSocketEvents.ORDER_COMPLETED,
+                (data: OrderCompletedEvent) => {
+                    console.log("[Kitchen Socket] Order completed:", data.data);
+
+                    // Debounced invalidation for list
+                    debouncedInvalidateQueries(
+                        queryClient,
+                        kitchenQueryKeys.list()
+                    );
+
+                    // Immediate invalidation for detail view
+                    queryClient.invalidateQueries({
+                        queryKey: kitchenQueryKeys.detail(
+                            data.data.kitchenOrderId
+                        ),
+                    });
+
+                    // Show success notification
+                    toast.success("Order Completed", {
+                        description: `Order #${data.data.order.orderNumber} has been completed`,
+                    });
+                }
+            );
+
+            // Listen to order cancellation from Order namespace
             socket.on("order:cancelled", (data: any) => {
                 console.log("[Kitchen Socket] Order cancelled:", data);
 
-                // Invalidate kitchen orders to remove cancelled order
-                debouncedInvalidateQueries(queryClient, kitchenQueryKeys.list());
+                // Event data is wrapped: { event, data, timestamp }
+                const eventData = data.data || data;
+
+                // Invalidate kitchen orders to remove cancelled order from list
+                debouncedInvalidateQueries(
+                    queryClient,
+                    kitchenQueryKeys.list()
+                );
 
                 // Show notification
                 toast.warning("Order Cancelled", {
-                    description: `Order #${data.orderNumber || ""} has been cancelled`,
+                    description: `Order #${
+                        eventData.orderNumber || ""
+                    } has been cancelled`,
+                });
+            });
+
+            // Listen to kitchen-specific order cancelled event
+            socket.on("kitchen:order-cancelled", (data: any) => {
+                console.log("[Kitchen Socket] Kitchen order cancelled:", data);
+
+                // Event data is wrapped: { event, data, timestamp }
+                const eventData = data.data || data;
+
+                // Invalidate kitchen orders to remove cancelled order from list
+                debouncedInvalidateQueries(
+                    queryClient,
+                    kitchenQueryKeys.list()
+                );
+
+                // Show notification
+                toast.warning("Order Cancelled", {
+                    description: `Order #${
+                        eventData.orderNumber || ""
+                    } has been cancelled`,
                 });
             });
 
@@ -188,8 +226,8 @@ export function useKitchenSocket() {
                 socket.off(KitchenSocketEvents.NEW_ORDER);
                 socket.off(KitchenSocketEvents.ORDER_UPDATED);
                 socket.off(KitchenSocketEvents.ORDER_COMPLETED);
-                socket.off("order:items-added");
                 socket.off("order:cancelled");
+                socket.off("kitchen:order-cancelled");
             };
         }
 
