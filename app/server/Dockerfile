@@ -11,6 +11,7 @@ WORKDIR /app
 # Copy package files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY prisma ./prisma
+COPY prisma.config.ts .
 
 # Install dependencies with cache mount
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
@@ -56,6 +57,7 @@ COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nestjs:nodejs /app/package.json ./package.json
 COPY --from=builder --chown=nestjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nestjs:nodejs /app/prisma.config.ts .
 
 # Create uploads directory for file storage
 RUN mkdir -p ./uploads && \
