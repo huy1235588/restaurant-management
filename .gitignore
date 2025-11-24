@@ -49,7 +49,6 @@ docs/.obsidian/themes/AnuPpuccin/theme.css
 app/server/uploads/
 data/*
 docs/reports/*
-app/server/prisma/migrations/*
 
 .private/*
 _archive/*
