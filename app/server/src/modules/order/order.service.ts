@@ -3,6 +3,7 @@ import { PrismaService } from '@/database/prisma.service';
 import { OrderRepository, FindOrdersOptions } from './order.repository';
 import { OrderGateway } from './order.gateway';
 import { KitchenService } from '@/modules/kitchen/kitchen.service';
+import { KitchenGateway } from '@/modules/kitchen/kitchen.gateway';
 import {
     CreateOrderDto,
     AddItemsDto,
@@ -47,6 +48,8 @@ export class OrderService {
         private readonly orderGateway: OrderGateway,
         @Inject(forwardRef(() => KitchenService))
         private readonly kitchenService: KitchenService,
+        @Inject(forwardRef(() => KitchenGateway))
+        private readonly kitchenGateway: KitchenGateway,
     ) {}
 
     /**
@@ -203,12 +206,7 @@ export class OrderService {
             throw new CannotAddItemsToServingOrderException(orderId);
         }
 
-        // Check if order can be modified
-        if (order.status === OrderStatus.completed) {
-            this.logger.warn(`Cannot add items to completed order: ${orderId}`);
-            throw new CannotModifyCompletedOrderException('add items to');
-        }
-
+        // Check if order can be modified - allow completed orders to be reopened
         if (order.status === OrderStatus.cancelled) {
             this.logger.warn(`Cannot add items to cancelled order: ${orderId}`);
             throw new CannotModifyCancelledOrderException('add items to');
@@ -252,13 +250,30 @@ export class OrderService {
                 0,
             );
 
-            // Update order totals
+            // Prepare update data - if order was completed, reopen it
+            const updateData: {
+                totalAmount: number;
+                finalAmount: number;
+                status?: OrderStatus;
+                completedAt?: null;
+            } = {
+                totalAmount: newTotal,
+                finalAmount: newTotal,
+            };
+
+            // If order was completed, change status to confirmed to send to kitchen
+            if (order.status === OrderStatus.completed) {
+                updateData.status = OrderStatus.confirmed;
+                updateData.completedAt = null;
+                this.logger.log(
+                    `Reopening completed order ${order.orderNumber} due to new items`,
+                );
+            }
+
+            // Update order totals and status
             return tx.order.update({
                 where: { orderId },
-                data: {
-                    totalAmount: newTotal,
-                    finalAmount: newTotal,
-                },
+                data: updateData,
                 include: {
                     orderItems: {
                         include: {
@@ -267,6 +282,7 @@ export class OrderService {
                     },
                     table: true,
                     staff: true,
+                    kitchenOrders: true,
                 },
             });
         });
@@ -278,12 +294,33 @@ export class OrderService {
         // Emit WebSocket event to kitchen and all clients
         this.orderGateway.emitOrderItemsAdded(updatedOrder);
 
-        // If order is confirmed, notify kitchen about new items
-        if (order.status === OrderStatus.confirmed) {
-            // Kitchen needs to know about new items added to their active orders
-            this.logger.log(
-                `Notifying kitchen of new items for confirmed order: ${order.orderNumber}`,
-            );
+        // If order was completed and now confirmed, or already confirmed, create/update kitchen order
+        if (updatedOrder.status === OrderStatus.confirmed) {
+            // Check if kitchen order exists
+            const existingKitchenOrder = updatedOrder.kitchenOrders?.[0];
+
+            if (existingKitchenOrder) {
+                // If kitchen order was completed, reopen it to pending
+                if (
+                    existingKitchenOrder.status === KitchenOrderStatus.completed
+                ) {
+                    await this.kitchenService.createKitchenOrder(orderId);
+                    this.logger.log(
+                        `Reopened kitchen order for ${order.orderNumber} due to new items`,
+                    );
+                } else {
+                    // Just notify kitchen about new items
+                    this.logger.log(
+                        `Notified kitchen of new items for order: ${order.orderNumber}`,
+                    );
+                }
+            } else {
+                // Create new kitchen order
+                await this.kitchenService.createKitchenOrder(orderId);
+                this.logger.log(
+                    `Created kitchen order for ${order.orderNumber}`,
+                );
+            }
         }
 
         return updatedOrder;
@@ -472,13 +509,26 @@ export class OrderService {
         // Emit WebSocket event to orders namespace
         this.orderGateway.emitOrderCancelled(cancelledOrder);
 
-        // Also emit to kitchen namespace if kitchen order exists
+        // Notify kitchen namespace if kitchen order exists
         const kitchenOrder = await this.prisma.kitchenOrder.findUnique({
             where: { orderId },
+            include: {
+                order: {
+                    include: {
+                        table: true,
+                        orderItems: {
+                            include: {
+                                menuItem: true,
+                            },
+                        },
+                    },
+                },
+            },
         });
         if (kitchenOrder) {
+            this.kitchenGateway.emitOrderUpdate(kitchenOrder);
             this.logger.log(
-                `Notifying kitchen of cancelled order: ${order.orderNumber}`,
+                `Notified kitchen of cancelled order: ${order.orderNumber}`,
             );
         }
 

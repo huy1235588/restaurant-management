@@ -3,6 +3,7 @@ import { KitchenRepository, KitchenOrderFilters } from './kitchen.repository';
 import { PrismaService } from '@/database/prisma.service';
 import { KitchenOrderStatus, OrderStatus } from '@prisma/generated/client';
 import { KitchenGateway } from './kitchen.gateway';
+import { SocketEmitterService } from '@/shared/websocket';
 import {
     KitchenOrderNotFoundException,
     KitchenOrderAlreadyExistsException,
@@ -23,6 +24,7 @@ export class KitchenService {
         private readonly kitchenRepository: KitchenRepository,
         private readonly prisma: PrismaService,
         private readonly kitchenGateway: KitchenGateway,
+        private readonly socketEmitter: SocketEmitterService,
     ) {}
 
     /**
@@ -290,14 +292,51 @@ export class KitchenService {
             }
         }
 
-        const updated = await this.kitchenRepository.update(kitchenOrderId, {
-            status: KitchenOrderStatus.cancelled,
+        // Cancel kitchen order and update main order status
+        const updated = await this.prisma.$transaction(async (tx) => {
+            // Update kitchen order status
+            const updatedKitchen = await tx.kitchenOrder.update({
+                where: { kitchenOrderId },
+                data: { status: KitchenOrderStatus.cancelled },
+                include: {
+                    order: {
+                        include: {
+                            table: true,
+                            orderItems: {
+                                include: {
+                                    menuItem: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+
+            // Update main order status to cancelled
+            await tx.order.update({
+                where: { orderId: kitchenOrder.orderId },
+                data: {
+                    status: OrderStatus.cancelled,
+                    cancelledAt: new Date(),
+                    cancellationReason: 'Cancelled by kitchen',
+                },
+            });
+
+            return updatedKitchen;
         });
 
-        this.logger.log(`Kitchen order #${kitchenOrderId} cancelled`);
+        this.logger.log(
+            `Kitchen order #${kitchenOrderId} cancelled, main order also cancelled`,
+        );
 
-        // Emit WebSocket event
+        // Emit WebSocket event to kitchen namespace
         this.kitchenGateway.emitOrderUpdate(updated);
+
+        // Notify order namespace that kitchen cancelled the order
+        this.socketEmitter.emitOrderCancelled(updated.order as any);
+        this.logger.log(
+            `Notified orders namespace: Kitchen cancelled order #${updated.orderId}`,
+        );
 
         return updated;
     }

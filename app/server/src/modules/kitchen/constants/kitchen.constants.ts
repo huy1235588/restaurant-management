@@ -28,7 +28,6 @@ export const KITCHEN_MESSAGES = {
         PREPARATION_STARTED: 'Order preparation started',
         ORDER_COMPLETED: 'Order completed successfully',
         ORDER_CANCELLED: 'Kitchen order cancelled',
-        PRIORITY_UPDATED: 'Order priority updated',
         CHEF_ASSIGNED: 'Chef assigned to order',
     },
     ERROR: {

@@ -52,12 +52,6 @@ enum KitchenOrderStatus {
     cancelled // Order cancelled
 }
 
-enum OrderPriority {
-    normal // Standard order
-    express // Rush order (customer in hurry)
-    vip // VIP customer
-}
-
 enum StationType {
     grill
     fry
