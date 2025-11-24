@@ -1,5 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
-import { toast } from 'sonner';
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { toast } from "sonner";
 
 interface UseFullscreenOptions {
     showToast?: boolean;
@@ -52,7 +54,10 @@ export function useFullscreen(options: UseFullscreenOptions = {}) {
 
         document.addEventListener("fullscreenchange", handleFullscreenChange);
         return () => {
-            document.removeEventListener("fullscreenchange", handleFullscreenChange);
+            document.removeEventListener(
+                "fullscreenchange",
+                handleFullscreenChange
+            );
         };
     }, []);
 

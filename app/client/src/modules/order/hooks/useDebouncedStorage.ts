@@ -1,4 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+"use client";
+
+import { useState, useEffect, useCallback, useRef } from "react";
 
 interface UseDebouncedStorageOptions<T> {
     key: string;
@@ -77,7 +79,10 @@ export function useDebouncedStorage<T>(
                 localStorage.setItem(key, serialize(value));
                 setIsDirty(false);
             } catch (error) {
-                console.error(`Failed to save to localStorage (${key}):`, error);
+                console.error(
+                    `Failed to save to localStorage (${key}):`,
+                    error
+                );
             }
             timerRef.current = null;
         }, delay);
