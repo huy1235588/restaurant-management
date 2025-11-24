@@ -14,8 +14,9 @@ import {
 } from "../types";
 import { orderKeys } from "./useOrders";
 
-const SOCKET_URL =
-    process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
+// Default to empty so socket.io connects to same-origin via the proxy.
+// If you need a custom socket host, set `NEXT_PUBLIC_SOCKET_URL`.
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "";
 const ORDER_NAMESPACE = "/orders";
 
 interface UseOrderSocketOptions {

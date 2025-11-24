@@ -14,8 +14,9 @@ import { KITCHEN_CONFIG } from "../constants/kitchen.constants";
 import { kitchenQueryKeys } from "../utils/kitchen-query-keys";
 import { KitchenHelpers } from "../utils/kitchen-helpers";
 
-const SOCKET_URL =
-    process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
+// Default to empty so socket.io connects to same-origin via the proxy.
+// If you need a custom socket host, set `NEXT_PUBLIC_SOCKET_URL`.
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "";
 const KITCHEN_NAMESPACE = "/kitchen";
 const MAX_RECONNECT_ATTEMPTS = 5;
 const DEBOUNCE_DELAY = 500; // Debounce query invalidation by 500ms

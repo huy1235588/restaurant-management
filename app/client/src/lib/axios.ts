@@ -2,7 +2,9 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from 'sonner';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+// Use relative API path by default so the client talks to the reverse proxy (Caddy)
+// In production the reverse proxy should forward `/api/*` to the backend service.
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
 // Create axios instance
 export const axiosInstance = axios.create({
