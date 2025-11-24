@@ -272,7 +272,7 @@ if docker ps | grep -q "restaurant_server_prod"; then
     if docker exec \
         -e DATABASE_URL="$DB_URL" \
         restaurant_server_prod \
-        npx prisma migrate deploy --schema prisma/schema.prisma; then
+        npx prisma migrate deploy; then
         log_info "✓ Database migrations completed"
     else
         log_error "Database migrations failed"
