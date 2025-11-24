@@ -314,9 +314,15 @@ ELAPSED=0
 
 while [ $ELAPSED -lt $TIMEOUT ]; do
     # Check if all containers are running
-    RUNNING=$(docker compose -f docker-compose.prod.yml ps --status running | grep -c "running" || echo "0")
-    TOTAL=$(docker compose -f docker-compose.prod.yml ps | grep -c "restaurant" || echo "0")
-    
+    RUNNING_RAW=$(docker compose -f docker-compose.prod.yml ps --status running 2>/dev/null | grep -c "running" || echo "0")
+    TOTAL_RAW=$(docker compose -f docker-compose.prod.yml ps 2>/dev/null | grep -c "restaurant" || echo "0")
+
+    # Sanitize outputs to digits only to avoid '[ integer expression expected ]' errors
+    RUNNING=$(echo "$RUNNING_RAW" | tr -cd '0-9')
+    TOTAL=$(echo "$TOTAL_RAW" | tr -cd '0-9')
+    RUNNING=${RUNNING:-0}
+    TOTAL=${TOTAL:-0}
+
     if [ "$RUNNING" -eq "$TOTAL" ] && [ "$RUNNING" -gt 0 ]; then
         log_info "✓ All containers are running"
         break
