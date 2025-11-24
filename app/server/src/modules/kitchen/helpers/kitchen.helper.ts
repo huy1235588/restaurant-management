@@ -1,5 +1,5 @@
 import { KITCHEN_STATUS_FLOW } from '../constants/kitchen.constants';
-import { KitchenOrderStatus } from '@prisma/generated/client';
+import { KitchenOrderStatus } from '@/lib/prisma';
 
 /**
  * Kitchen Helper Functions

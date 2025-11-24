@@ -30,7 +30,11 @@ COPY --from=deps /app/package.json ./package.json
 COPY . .
 
 # Generate Prisma Client in builder stage (after dependencies installed)
-RUN pnpm exec prisma generate
+# Use a dummy DATABASE_URL for generation since we don't need actual DB connection
+RUN DATABASE_URL="postgresql://user:password@localhost:5432/dummy" pnpm exec prisma generate
+
+# Ensure all dependencies are properly installed (includes Prisma runtime utilities)
+RUN pnpm install --frozen-lockfile
 
 # Build application
 RUN pnpm run build

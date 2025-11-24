@@ -70,7 +70,8 @@ Thumbs.db
 .idea/
 
 # Prisma generated client
-/src/generated/prisma
+/src/generated
+/generated
 /prisma/migrations/
 
 # Build outputs (if any)

@@ -1,4 +1,4 @@
-import { ReservationStatus } from '@prisma/generated/client';
+import { ReservationStatus } from '@/lib/prisma';
 import { RESERVATION_CONSTANTS } from '../constants/reservation.constants';
 
 /**

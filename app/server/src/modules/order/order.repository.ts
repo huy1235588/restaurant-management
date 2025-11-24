@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/database/prisma.service';
-import { Prisma, OrderStatus } from '@prisma/generated/client';
+import { Prisma, OrderStatus } from '@/lib/prisma';
 import { OrderQueryHelper } from './helpers/order-query.helper';
 
 export interface OrderFilters {

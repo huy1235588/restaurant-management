@@ -7,7 +7,7 @@ import {
     Min,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { PaymentMethod } from '@prisma/generated/client';
+import { PaymentMethod } from '@/lib/prisma';
 
 export class ProcessPaymentDto {
     @ApiProperty({

@@ -1,4 +1,4 @@
-import { OrderStatus, OrderItemStatus } from '@prisma/generated/client';
+import { OrderStatus, OrderItemStatus } from '@/lib/prisma';
 
 /**
  * Order Module Helper Functions

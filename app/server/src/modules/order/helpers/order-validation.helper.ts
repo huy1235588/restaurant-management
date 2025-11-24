@@ -4,7 +4,7 @@ import {
     MenuItemNotAvailableException,
     MenuItemNotActiveException,
 } from '../exceptions/order.exceptions';
-import { OrderItemStatus } from '@prisma/generated/client';
+import { OrderItemStatus } from '@/lib/prisma';
 
 /**
  * Order Validation Helper
@@ -117,6 +117,10 @@ export class OrderValidationHelper {
             },
         });
 
-        return this.calculateTotalAmount(items);
+        return this.calculateTotalAmount(
+            items.map((item) => ({
+                totalPrice: Number(item.totalPrice),
+            })),
+        );
     }
 }

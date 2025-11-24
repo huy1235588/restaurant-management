@@ -9,7 +9,7 @@ import {
     IsEnum,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Role } from '@prisma/generated/client';
+import { Role } from '@/lib/prisma';
 
 export class CreateStaffWithAccountDto {
     @ApiProperty({ example: 'john_doe', description: 'Username' })

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, ReservationAudit } from '@prisma/generated/client';
+import { Prisma, ReservationAudit } from '@/lib/prisma';
 import { ReservationAuditRepository } from './reservation-audit.repository';
 
 @Injectable()

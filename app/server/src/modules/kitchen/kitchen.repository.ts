@@ -4,7 +4,7 @@ import {
     Prisma,
     KitchenOrder,
     KitchenOrderStatus,
-} from '@prisma/generated/client';
+} from '@/lib/prisma';
 import { KitchenQueryHelper } from './helpers/kitchen-query.helper';
 
 export interface KitchenOrderFilters {

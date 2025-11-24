@@ -1,6 +1,6 @@
 import { IsEnum, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { OrderStatus } from '@prisma/generated/client';
+import { OrderStatus } from '@/lib/prisma';
 
 /**
  * DTO for updating order status

@@ -16,7 +16,7 @@ import {
     OrderItemStatus,
     TableStatus,
     KitchenOrderStatus,
-} from '@prisma/generated/client';
+} from '@/lib/prisma';
 import {
     OrderNotFoundException,
     OrderItemNotFoundException,

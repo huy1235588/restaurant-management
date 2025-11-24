@@ -15,7 +15,7 @@ import {
     RegisterDto,
     CreateStaffWithAccountDto,
 } from '@/modules/auth/dto';
-import { Prisma } from '@prisma/generated/client';
+import { Prisma } from '@/lib/prisma';
 import { StaffRepository } from '@/modules/staff/staff.repository';
 
 @Injectable()

@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/generated/client';
+import { Prisma } from '@/lib/prisma';
 
 /**
  * Common Prisma query includes for Kitchen module

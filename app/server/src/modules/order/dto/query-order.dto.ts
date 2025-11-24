@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { OrderStatus } from '@prisma/generated/client';
+import { OrderStatus } from '@/lib/prisma';
 
 export class QueryOrderDto {
     @ApiPropertyOptional({

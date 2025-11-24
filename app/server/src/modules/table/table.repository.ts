@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/database/prisma.service';
-import { Prisma, RestaurantTable, TableStatus } from '@prisma/generated/client';
+import { Prisma, RestaurantTable, TableStatus } from '@/lib/prisma';
 
 export interface TableFilters {
     floor?: number;

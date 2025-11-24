@@ -1,6 +1,6 @@
 import { IsEnum, IsOptional } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { KitchenOrderStatus } from '@prisma/generated/client';
+import { KitchenOrderStatus } from '@/lib/prisma';
 
 export class KitchenOrderFiltersDto {
     @ApiPropertyOptional({

@@ -6,7 +6,7 @@ import {
     KitchenOrderStatus,
     OrderItemStatus,
     OrderStatus,
-} from '@prisma/generated/client';
+} from '@/lib/prisma';
 import { KitchenGateway } from './kitchen.gateway';
 import { SocketEmitterService } from '@/shared/websocket';
 import {

@@ -5,7 +5,7 @@ import {
     Bill,
     PaymentStatus,
     PaymentMethod,
-} from '@prisma/generated/client';
+} from '@/lib/prisma';
 
 export interface BillFilters {
     paymentStatus?: PaymentStatus;

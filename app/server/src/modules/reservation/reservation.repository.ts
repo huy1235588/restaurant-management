@@ -4,7 +4,7 @@ import {
     Prisma,
     Reservation,
     ReservationStatus,
-} from '@prisma/generated/client';
+} from '@/lib/prisma';
 
 export interface ReservationFilters {
     status?: ReservationStatus;

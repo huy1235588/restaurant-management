@@ -2,7 +2,7 @@ import {
     BILLING_CONSTANTS,
     PaymentMethod,
 } from '../constants/billing.constants';
-import { PaymentStatus } from '@prisma/generated/client';
+import { PaymentStatus } from '@/lib/prisma';
 
 /**
  * Billing Helper Functions

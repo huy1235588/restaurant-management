@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { ReservationStatus } from '@prisma/generated/client';
+import { ReservationStatus } from '@/lib/prisma';
 
 export class QueryReservationDto {
     @ApiPropertyOptional({ description: 'Page number', example: 1, minimum: 1 })

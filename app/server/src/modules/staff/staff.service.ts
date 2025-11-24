@@ -4,7 +4,7 @@ import {
     BadRequestException,
     Logger,
 } from '@nestjs/common';
-import { Role } from '@prisma/generated/client';
+import { Role } from '@/lib/prisma';
 import { StaffRepository, FindOptions } from './staff.repository';
 import { CreateStaffDto, UpdateStaffDto } from './dto';
 import { PrismaService } from '@/database/prisma.service';

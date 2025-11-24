@@ -30,7 +30,7 @@ import {
     UpdateOrderStatusDto,
 } from './dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
-import { OrderStatus } from '@prisma/generated/client';
+import { OrderStatus } from '@/lib/prisma';
 import { ORDER_MESSAGES, ORDER_CONSTANTS } from './constants/order.constants';
 
 /**

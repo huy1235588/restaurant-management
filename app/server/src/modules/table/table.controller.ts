@@ -28,7 +28,7 @@ import {
     BulkUpdateStatusDto,
 } from '@/modules/table/dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
-import { TableStatus } from '@prisma/generated/client';
+import { TableStatus } from '@/lib/prisma';
 
 @ApiTags('table')
 @Controller('table')

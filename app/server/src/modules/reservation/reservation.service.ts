@@ -16,7 +16,7 @@ import {
     RestaurantTable,
     TableStatus,
     OrderStatus,
-} from '@prisma/generated/client';
+} from '@/lib/prisma';
 import {
     ReservationNotFoundException,
     TableNotAvailableException,

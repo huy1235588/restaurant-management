@@ -7,7 +7,7 @@ import {
     PaymentStatus,
     OrderStatus,
     TableStatus,
-} from '@prisma/generated/client';
+} from '@/lib/prisma';
 import { ConfigService } from '@nestjs/config';
 import {
     BILLING_CONSTANTS,

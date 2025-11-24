@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/database/prisma.service';
-import { Prisma, Staff, Role } from '@prisma/generated/client';
+import { Prisma, Staff, Role } from '@/lib/prisma';
 
 export interface StaffFilters {
     role?: Role;

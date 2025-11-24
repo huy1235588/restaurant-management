@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/database/prisma.service';
-import { Prisma, MenuItem } from '@prisma/generated/client';
+import { Prisma, MenuItem } from '@/lib/prisma';
 
 export interface MenuItemFilters {
     categoryId?: number;
