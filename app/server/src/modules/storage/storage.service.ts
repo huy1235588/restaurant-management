@@ -84,7 +84,11 @@ export class StorageService {
         file: Express.Multer.File,
         folder?: string,
     ): Promise<UploadResult> {
+        // Sanitize filename before validation/upload
+        file.originalname = this.sanitizeFileName(file.originalname);
+
         this.validateFile(file);
+
         return this.storageService.uploadFile(file, folder);
     }
 
@@ -141,5 +145,34 @@ export class StorageService {
                 `File type ${file.mimetype} is not allowed`,
             );
         }
+    }
+
+    /**
+     * Sanitize filename: trim, remove diacritics, replace spaces with underscores,
+     * remove unsafe chars, collapse multiple underscores, and lowercase.
+     */
+    private sanitizeFileName(originalName: string): string {
+        if (!originalName) return originalName;
+
+        const lastDot = originalName.lastIndexOf('.');
+        const namePart =
+            lastDot === -1 ? originalName : originalName.slice(0, lastDot);
+        const extPart = lastDot === -1 ? '' : originalName.slice(lastDot);
+
+        // Remove diacritics and normalize
+        let sanitized = namePart
+            .normalize('NFD')
+            .replace(/[\u0300-\u036F]/g, ''); // Remove combining diacritical marks
+
+        // Replace whitespace and non-safe characters with hyphen
+        sanitized = sanitized
+            .replace(/\s+/g, '-')
+            .replace(/[^a-zA-Z0-9._-]/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
+            .toLowerCase();
+
+        const ext = extPart ? extPart.toLowerCase() : '';
+        return sanitized + ext;
     }
 }
