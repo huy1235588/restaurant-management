@@ -33,7 +33,7 @@ export default () => ({
 
     // Storage
     storage: {
-        provider: process.env['STORAGE_PROVIDER'] || 'local', // 'local', 'r2', 'cloudinary'
+        provider: process.env['STORAGE_TYPE'] || 'local', // 'local', 'r2', 'cloudinary'
         uploadDir: process.env['UPLOAD_DIR'] || './uploads',
         maxFileSize: parseInt(process.env['MAX_FILE_SIZE'] || '10485760', 10), // 10MB
         allowedMimetypes: process.env['ALLOWED_MIMETYPES']
