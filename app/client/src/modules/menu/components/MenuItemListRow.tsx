@@ -62,10 +62,11 @@ export function MenuItemListRow({
             <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                     <h4 className="font-semibold line-clamp-1">{item.itemName}</h4>
-                    {item.isVegetarian && <span className="text-xs">🌱</span>}
+                    {/* TODO */}
+                    {/* {item.isVegetarian && <span className="text-xs">🌱</span>}
                     {item.spicyLevel != undefined && item.spicyLevel > 0 && (
                         <span className="text-xs">{getSpicyLevelEmoji(item.spicyLevel)}</span>
-                    )}
+                    )} */}
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <span>{item.itemCode}</span>

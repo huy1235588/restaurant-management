@@ -171,9 +171,9 @@ export function MenuItemList({
         const isSorted = sortBy === field;
         const isAsc = isSorted && sortOrder === 'asc';
         const isDesc = isSorted && sortOrder === 'desc';
-        
+
         return (
-            <TableHead 
+            <TableHead
                 className={`${align === 'right' ? 'text-right' : ''} ${onSort ? 'cursor-pointer hover:bg-muted/50 select-none' : ''}`}
                 onClick={() => onSort && onSort(field)}
             >
@@ -217,11 +217,12 @@ export function MenuItemList({
                             <TableCell className="font-mono text-sm">{item.itemCode}</TableCell>
                             <TableCell>
                                 <div className="flex items-center gap-2">
-                                    <span className="font-medium">{item.itemName}</span>
+                                    {/* TODO */}
+                                    {/* <span className="font-medium">{item.itemName}</span>
                                     {item.isVegetarian && <span className="text-xs">🌱</span>}
                                     {item.spicyLevel != undefined && item.spicyLevel > 0 && (
                                         <span className="text-xs">{getSpicyLevelEmoji(item.spicyLevel)}</span>
-                                    )}
+                                    )} */}
                                 </div>
                             </TableCell>
                             <TableCell>{item.category?.categoryName || '-'}</TableCell>

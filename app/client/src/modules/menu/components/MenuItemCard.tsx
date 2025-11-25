@@ -64,7 +64,8 @@ export function MenuItemCard({
                             {item.category.categoryName}
                         </Badge>
                     )}
-                    {item.isVegetarian && (
+                    {/* TODO */}
+                    {/* {item.isVegetarian && (
                         <Badge variant="outline" className="text-xs bg-green-50 dark:bg-green-950 text-green-900 dark:text-green-300">
                             🌱 Vegan
                         </Badge>
@@ -73,7 +74,7 @@ export function MenuItemCard({
                         <Badge variant="outline" className="text-xs bg-red-50 dark:bg-red-950 text-red-900 dark:text-red-300">
                             {getSpicyLevelEmoji(item.spicyLevel)}
                         </Badge>
-                    )}
+                    )} */}
                 </div>
                 {!item.isActive && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">

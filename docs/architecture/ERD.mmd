@@ -33,7 +33,7 @@ erDiagram
     %% Kitchen
     KitchenOrder }o--|| Order : "prepares"
     Staff ||--o{ KitchenOrder : "cooks"
-    KitchenStation ||--o{ KitchenOrder : "uses"
+    
     
     %% Billing
     Bill ||--o{ BillItem : "contains"
@@ -223,14 +223,6 @@ erDiagram
         datetime updatedAt
     }
     
-    KitchenStation {
-        int stationId PK
-        string name
-        enum type
-        boolean isActive
-        datetime createdAt
-        datetime updatedAt
-    }
     
     Bill {
         int billId PK

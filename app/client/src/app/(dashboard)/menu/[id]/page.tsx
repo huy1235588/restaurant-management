@@ -140,12 +140,13 @@ export default function MenuItemDetailPage({
                     <div>
                         <div className="flex items-center gap-2">
                             <h1 className="text-3xl font-bold">{menuItem.itemName}</h1>
-                            {menuItem.isVegetarian && <span className="text-2xl">🌱</span>}
+                            {/* TODO */}
+                            {/* {menuItem.isVegetarian && <span className="text-2xl">🌱</span>}
                             {menuItem.spicyLevel != undefined && menuItem.spicyLevel > 0 && (
                                 <span className="text-xl">
                                     {getSpicyLevelEmoji(menuItem.spicyLevel)}
                                 </span>
-                            )}
+                            )} */}
                         </div>
                         <p className="text-muted-foreground mt-1 font-mono">{menuItem.itemCode}</p>
                     </div>

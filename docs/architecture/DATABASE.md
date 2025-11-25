@@ -57,7 +57,7 @@ Cơ sở dữ liệu được chia thành 8 module chính với **18 bảng**:
 | 4   | **Table Management**       | restaurant_tables                           | Quản lý bàn ăn          |
 | 5   | **Reservation & Customer** | reservations, customers, reservation_audits | Đặt bàn & quản lý khách |
 | 6   | **Order Management**       | orders, order_items                         | Quản lý đơn hàng        |
-| 7   | **Kitchen Management**     | kitchen_orders, kitchen_stations            | Quản lý bếp             |
+| 7   | **Kitchen Management**     | kitchen_orders                              | Quản lý bếp             |
 | 8   | **Billing & Payment**      | bills, bill_items, payments                 | Thanh toán và hóa đơn   |
 
 ---
@@ -429,21 +429,7 @@ Chi tiết đơn hàng.
 
 ---
 
-#### KitchenStation (kitchen_stations)
-
-Trạm bếp.
-
-| Trường    | Kiểu              | Ràng buộc     | Mô tả          |
-| --------- | ----------------- | ------------- | -------------- |
-| stationId | INT               | PK, Auto      | ID trạm bếp    |
-| name      | VARCHAR(100)      | NOT NULL      | Tên trạm       |
-| type      | ENUM(StationType) | NOT NULL      | Loại trạm      |
-| isActive  | BOOLEAN           | DEFAULT true  | Đang hoạt động |
-| createdAt | TIMESTAMP         | DEFAULT now() | Ngày tạo       |
-| updatedAt | TIMESTAMP         | AUTO UPDATE   | Ngày cập nhật  |
-
-**Indexes**: `type`, `isActive`  
-**Quan hệ**: 1:N với `kitchen_orders`
+<!-- KitchenStation removed from schema -->
 
 ---
 
@@ -548,7 +534,7 @@ Complete Business Flow:
                  │
   Reservation ───┼─→ Order ──→ OrderItem ──→ MenuItem
                  │              │
-  Staff ─────────┘              ├─→ KitchenOrder ──→ KitchenStation
+  Staff ─────────┘              ├─→ KitchenOrder
                                 │       │
                                 │       └─→ Staff (chef)
                                 │
@@ -618,7 +604,6 @@ Tất cả foreign keys và fields thường xuyên trong WHERE clauses:
 -   orders: orderNumber, tableId, staffId, status, orderTime, createdAt
 -   order_items: orderId, itemId, status
 -   kitchen_orders: orderId, staffId, status, createdAt
--   kitchen_stations: type, isActive
 -   bills: billNumber, orderId, paymentStatus, createdAt
 -   bill_items: billId
 -   payments: billId, transactionId
