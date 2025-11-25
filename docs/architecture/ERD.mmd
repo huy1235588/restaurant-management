@@ -15,7 +15,11 @@ erDiagram
     RestaurantTable ||--o{ Bill : "generates"
     
     %% Reservation
+    Customer ||--o{ Reservation : "makes"
     Reservation ||--o{ Order : "creates"
+    Reservation }o--|| RestaurantTable : "reserves"
+    Reservation }o--o| Staff : "created_by"
+    Reservation ||--o{ ReservationAudit : "logs"
     
     %% Order Management
     Order ||--o{ OrderItem : "contains"
@@ -27,7 +31,9 @@ erDiagram
     MenuItem ||--o{ OrderItem : "ordered_as"
     
     %% Kitchen
-    Staff ||--o{ KitchenOrder : "prepares"
+    KitchenOrder }o--|| Order : "prepares"
+    Staff ||--o{ KitchenOrder : "cooks"
+    KitchenStation ||--o{ KitchenOrder : "uses"
     
     %% Billing
     Bill ||--o{ BillItem : "contains"
@@ -119,23 +125,53 @@ erDiagram
         datetime updatedAt
     }
     
+    Customer {
+        int customerId PK
+        string name
+        string phoneNumber UK
+        string email UK
+        date birthday
+        json preferences
+        text notes
+        boolean isVip
+        datetime createdAt
+        datetime updatedAt
+    }
+    
     Reservation {
         int reservationId PK
         string reservationCode UK
         string customerName
         string phoneNumber
         string email
+        int customerId FK
         int tableId FK
         date reservationDate
         time reservationTime
         int duration
-        int headCount
-        string specialRequest
+        int partySize
+        text specialRequest
         decimal depositAmount
         enum status
-        string notes
+        text notes
+        array tags
+        int createdBy FK
+        datetime confirmedAt
+        datetime seatedAt
+        datetime completedAt
+        datetime cancelledAt
+        text cancellationReason
         datetime createdAt
         datetime updatedAt
+    }
+    
+    ReservationAudit {
+        int auditId PK
+        int reservationId FK
+        string action
+        int userId FK
+        json changes
+        datetime createdAt
     }
     
     Order {
@@ -146,12 +182,18 @@ erDiagram
         int reservationId FK
         string customerName
         string customerPhone
-        int headCount
+        int partySize
         enum status
-        string notes
+        text notes
+        decimal totalAmount
+        decimal discountAmount
+        decimal taxAmount
+        decimal finalAmount
         datetime orderTime
         datetime confirmedAt
         datetime completedAt
+        datetime cancelledAt
+        text cancellationReason
         datetime createdAt
         datetime updatedAt
     }
@@ -171,14 +213,21 @@ erDiagram
     
     KitchenOrder {
         int kitchenOrderId PK
-        int orderId FK
+        int orderId FK "UK"
         int staffId FK
-        int priority
         enum status
+        int prepTimeActual
         datetime startedAt
         datetime completedAt
-        int estimatedTime
-        string notes
+        datetime createdAt
+        datetime updatedAt
+    }
+    
+    KitchenStation {
+        int stationId PK
+        string name
+        enum type
+        boolean isActive
         datetime createdAt
         datetime updatedAt
     }

@@ -7,6 +7,7 @@ import * as cookieParser from 'cookie-parser';
 import * as compression from 'compression';
 import helmet from 'helmet';
 import { join } from 'path';
+import type { Request, Response, NextFunction } from 'express';
 import { AppModule } from '@/app.module';
 import { AllExceptionsFilter } from '@/common/filters/all-exceptions.filter';
 
@@ -54,6 +55,25 @@ async function bootstrap() {
 
     // Cookie parser
     app.use(cookieParser.default());
+
+    // Request logging middleware — captures timestamp, path, ip, user-agent, method and headers
+    app.use((request: Request, response: Response, next: NextFunction) => {
+        try {
+            console.log({
+                timestamp: new Date().toISOString(),
+                path: request.path,
+                ip: request.ip,
+                userAgent: request.headers['user-agent'],
+                method: request.method,
+                headers: request.headers,
+            });
+        } catch (err) {
+            // If logging fails, don't break the request flow
+            // Use Nest logger fallback
+            console.error('Request logging failed', err);
+        }
+        next();
+    });
 
     // Static file serving for uploads
     app.useStaticAssets(join(__dirname, '..', 'uploads'), {

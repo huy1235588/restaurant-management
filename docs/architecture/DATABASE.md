@@ -5,19 +5,19 @@
 
 ## Mục lục
 
-- [1. Tổng quan](#1-tổng-quan)
-- [2. Các Enum Types](#2-các-enum-types)
-- [3. Mô tả chi tiết các bảng](#3-mô-tả-chi-tiết-các-bảng)
-  - [3.1 Authentication & User Management](#31-authentication--user-management)
-  - [3.2 Menu & Category Management](#32-menu--category-management)
-  - [3.3 Table Management](#33-table-management)
-  - [3.4 Reservation & Customer Management](#34-reservation--customer-management)
-  - [3.5 Order Management](#35-order-management)
-  - [3.6 Kitchen Management](#36-kitchen-management)
-  - [3.7 Billing & Payment](#37-billing--payment)
-- [4. Mối quan hệ giữa các bảng](#4-mối-quan-hệ-giữa-các-bảng)
-- [5. Chiến lược đánh chỉ mục](#5-chiến-lược-đánh-chỉ-mục)
-- [6. Các truy vấn thường dùng](#6-các-truy-vấn-thường-dùng)
+-   [1. Tổng quan](#1-tổng-quan)
+-   [2. Các Enum Types](#2-các-enum-types)
+-   [3. Mô tả chi tiết các bảng](#3-mô-tả-chi-tiết-các-bảng)
+    -   [3.1 Authentication & User Management](#31-authentication--user-management)
+    -   [3.2 Menu & Category Management](#32-menu--category-management)
+    -   [3.3 Table Management](#33-table-management)
+    -   [3.4 Reservation & Customer Management](#34-reservation--customer-management)
+    -   [3.5 Order Management](#35-order-management)
+    -   [3.6 Kitchen Management](#36-kitchen-management)
+    -   [3.7 Billing & Payment](#37-billing--payment)
+-   [4. Mối quan hệ giữa các bảng](#4-mối-quan-hệ-giữa-các-bảng)
+-   [5. Chiến lược đánh chỉ mục](#5-chiến-lược-đánh-chỉ-mục)
+-   [6. Các truy vấn thường dùng](#6-các-truy-vấn-thường-dùng)
 
 ---
 
@@ -28,90 +28,99 @@
 Đây là tài liệu cơ sở dữ liệu cho **dự án tốt nghiệp** về hệ thống quản lý nhà hàng. Hệ thống được thiết kế để hỗ trợ các nghiệp vụ cốt lõi của nhà hàng:
 
 ✅ **Các chức năng chính:**
-- Quản lý tài khoản và phân quyền nhân viên
-- Quản lý thực đơn và danh mục món ăn
-- Quản lý bàn ăn
-- Hệ thống đặt bàn trực tuyến
-- Quản lý khách hàng
-- Quản lý đơn hàng và bếp (Kitchen Display System)
-- Quản lý thanh toán và hóa đơn
+
+-   Quản lý tài khoản và phân quyền nhân viên
+-   Quản lý thực đơn và danh mục món ăn
+-   Quản lý bàn ăn
+-   Hệ thống đặt bàn trực tuyến
+-   Quản lý khách hàng
+-   Quản lý đơn hàng và bếp (Kitchen Display System)
+-   Quản lý thanh toán và hóa đơn
 
 ### 1.2. Công nghệ sử dụng
 
-- **Database**: PostgreSQL 16
-- **ORM**: Prisma
-- **Language**: TypeScript
-- **Backend**: Node.js + NestJS
-- **Frontend**: Next.js 16 + React 19
+-   **Database**: PostgreSQL 16
+-   **ORM**: Prisma
+-   **Language**: TypeScript
+-   **Backend**: Node.js + NestJS
+-   **Frontend**: Next.js 16 + React 19
 
 ### 1.3. Cấu trúc tổng thể
 
-Cơ sở dữ liệu được chia thành 8 module chính với **17 bảng**:
+Cơ sở dữ liệu được chia thành 8 module chính với **18 bảng**:
 
-| STT | Module                      | Bảng chính                                      | Mô tả                           |
-| --- | --------------------------- | ----------------------------------------------- | ------------------------------- |
-| 1   | **Authentication**          | accounts, refresh_tokens                        | Xác thực và bảo mật             |
-| 2   | **Staff Management**        | staff                                           | Quản lý nhân viên               |
-| 3   | **Menu Management**         | categories, menu_items                          | Quản lý thực đơn                |
-| 4   | **Table Management**        | restaurant_tables                               | Quản lý bàn ăn                  |
-| 5   | **Reservation & Customer**  | reservations, customers, reservation_audits    | Đặt bàn & quản lý khách         |
-| 6   | **Order Management**        | orders, order_items                             | Quản lý đơn hàng                |
-| 7   | **Kitchen Management**      | kitchen_orders, kitchen_stations                | Quản lý bếp                     |
-| 8   | **Billing & Payment**       | bills, bill_items, payments                     | Thanh toán và hóa đơn           |
+| STT | Module                     | Bảng chính                                  | Mô tả                   |
+| --- | -------------------------- | ------------------------------------------- | ----------------------- |
+| 1   | **Authentication**         | accounts, refresh_tokens                    | Xác thực và bảo mật     |
+| 2   | **Staff Management**       | staff                                       | Quản lý nhân viên       |
+| 3   | **Menu Management**        | categories, menu_items                      | Quản lý thực đơn        |
+| 4   | **Table Management**       | restaurant_tables                           | Quản lý bàn ăn          |
+| 5   | **Reservation & Customer** | reservations, customers, reservation_audits | Đặt bàn & quản lý khách |
+| 6   | **Order Management**       | orders, order_items                         | Quản lý đơn hàng        |
+| 7   | **Kitchen Management**     | kitchen_orders, kitchen_stations            | Quản lý bếp             |
+| 8   | **Billing & Payment**      | bills, bill_items, payments                 | Thanh toán và hóa đơn   |
 
 ---
 
 ## 2. Các Enum Types
 
 ### Role - Vai trò nhân viên
-- `admin` - Quản trị viên (toàn quyền)
-- `manager` - Quản lý (quản lý nhân viên, báo cáo)
-- `waiter` - Nhân viên phục vụ (nhận đơn, phục vụ)
-- `chef` - Đầu bếp (xử lý đơn bếp)
-- `cashier` - Thu ngân (xử lý thanh toán)
+
+-   `admin` - Quản trị viên (toàn quyền)
+-   `manager` - Quản lý (quản lý nhân viên, báo cáo)
+-   `waiter` - Nhân viên phục vụ (nhận đơn, phục vụ)
+-   `chef` - Đầu bếp (xử lý đơn bếp)
+-   `cashier` - Thu ngân (xử lý thanh toán)
 
 ### TableStatus - Trạng thái bàn
-- `available` - Có sẵn (bàn trống)
-- `occupied` - Đang sử dụng (có khách)
-- `reserved` - Đã đặt (được đặt trước)
-- `maintenance` - Đang bảo trì (không dùng)
+
+-   `available` - Có sẵn (bàn trống)
+-   `occupied` - Đang sử dụng (có khách)
+-   `reserved` - Đã đặt (được đặt trước)
+-   `maintenance` - Đang bảo trì (không dùng)
 
 ### OrderStatus - Trạng thái đơn hàng
-- `pending` - Chờ xác nhận (mới tạo, chưa gửi bếp)
-- `confirmed` - Đã xác nhận (đã gửi bếp, đang xử lý)
-- `completed` - Hoàn thành (đã thanh toán)
-- `cancelled` - Đã hủy
+
+-   `pending` - Chờ xác nhận (mới tạo, chưa gửi bếp)
+-   `confirmed` - Đã xác nhận (đã gửi bếp, đang xử lý)
+-   `completed` - Hoàn thành (đã thanh toán)
+-   `cancelled` - Đã hủy
 
 ### OrderItemStatus - Trạng thái chi tiết đơn
-- `pending` - Chưa sẵn sàng (đang chờ hoặc đang nấu)
-- `ready` - Đã sẵn sàng (món đã xong)
-- `cancelled` - Đã hủy
+
+-   `pending` - Chưa sẵn sàng (đang chờ hoặc đang nấu)
+-   `ready` - Đã sẵn sàng (món đã xong)
+-   `cancelled` - Đã hủy
 
 ### KitchenOrderStatus - Trạng thái đơn bếp
-- `pending` - Đơn mới, chờ đầu bếp bắt đầu
-- `preparing` - Đang nấu
-- `ready` - Sẵn sàng lấy (món đã xong, chờ phục vụ)
-- `completed` - Đã lấy (phục vụ đã mang ra bàn)
+
+-   `pending` - Đơn mới, chờ đầu bếp bắt đầu
+-   `preparing` - Đang nấu
+-   `ready` - Sẵn sàng lấy (món đã xong, chờ phục vụ)
+-   `completed` - Đã lấy (phục vụ đã mang ra bàn)
 
 ### PaymentStatus - Trạng thái thanh toán
-- `pending` - Chờ thanh toán
-- `paid` - Đã thanh toán
-- `refunded` - Đã hoàn tiền
-- `cancelled` - Đã hủy
+
+-   `pending` - Chờ thanh toán
+-   `paid` - Đã thanh toán
+-   `refunded` - Đã hoàn tiền
+-   `cancelled` - Đã hủy
 
 ### PaymentMethod - Phương thức thanh toán
-- `cash` - Tiền mặt
-- `card` - Thẻ ngân hàng
-- `momo` - Ví MoMo
-- `bank_transfer` - Chuyển khoản
+
+-   `cash` - Tiền mặt
+-   `card` - Thẻ ngân hàng
+-   `momo` - Ví MoMo
+-   `bank_transfer` - Chuyển khoản
 
 ### ReservationStatus - Trạng thái đặt bàn
-- `pending` - Chờ xác nhận
-- `confirmed` - Đã xác nhận
-- `seated` - Đã ngồi vào bàn
-- `completed` - Hoàn thành
-- `cancelled` - Đã hủy
-- `no_show` - Không đến
+
+-   `pending` - Chờ xác nhận
+-   `confirmed` - Đã xác nhận
+-   `seated` - Đã ngồi vào bàn
+-   `completed` - Hoàn thành
+-   `cancelled` - Đã hủy
+-   `no_show` - Không đến
 
 ---
 
@@ -144,17 +153,17 @@ Lưu trữ thông tin đăng nhập.
 
 Quản lý refresh tokens cho JWT.
 
-| Trường     | Kiểu         | Ràng buộc        | Mô tả             |
-| ---------- | ------------ | ---------------- | ----------------- |
-| tokenId    | INT          | PK, Auto         | ID token          |
-| accountId  | INT          | FK, NOT NULL     | ID tài khoản      |
-| token      | TEXT         | UNIQUE, NOT NULL | Token string      |
-| expiresAt  | TIMESTAMP    | NOT NULL         | Thời gian hết hạn |
+| Trường     | Kiểu         | Ràng buộc        | Mô tả              |
+| ---------- | ------------ | ---------------- | ------------------ |
+| tokenId    | INT          | PK, Auto         | ID token           |
+| accountId  | INT          | FK, NOT NULL     | ID tài khoản       |
+| token      | TEXT         | UNIQUE, NOT NULL | Token string       |
+| expiresAt  | TIMESTAMP    | NOT NULL         | Thời gian hết hạn  |
 | deviceInfo | VARCHAR(500) | NULL             | Thông tin thiết bị |
-| ipAddress  | VARCHAR(45)  | NULL             | Địa chỉ IP        |
-| isRevoked  | BOOLEAN      | DEFAULT false    | Đã thu hồi        |
-| createdAt  | TIMESTAMP    | DEFAULT now()    | Ngày tạo          |
-| revokedAt  | TIMESTAMP    | NULL             | Ngày thu hồi      |
+| ipAddress  | VARCHAR(45)  | NULL             | Địa chỉ IP         |
+| isRevoked  | BOOLEAN      | DEFAULT false    | Đã thu hồi         |
+| createdAt  | TIMESTAMP    | DEFAULT now()    | Ngày tạo           |
+| revokedAt  | TIMESTAMP    | NULL             | Ngày thu hồi       |
 
 **Indexes**: `accountId`, `token`, `expiresAt`  
 **Quan hệ**: N:1 với `accounts` (CASCADE DELETE)
@@ -177,7 +186,7 @@ Thông tin chi tiết nhân viên.
 | role        | ENUM(Role)    | NOT NULL             | Vai trò       |
 | isActive    | BOOLEAN       | DEFAULT true         | Đang làm việc |
 | createdAt   | TIMESTAMP     | DEFAULT now()        | Ngày tạo      |
-| updatedAt   | TIMESTAMP    | AUTO UPDATE          | Ngày cập nhật |
+| updatedAt   | TIMESTAMP     | AUTO UPDATE          | Ngày cập nhật |
 
 **Indexes**: `role`, `isActive`  
 **Quan hệ**: 1:1 với `accounts` (CASCADE DELETE); 1:N với `orders`; 1:N với `bills`; 1:N với `kitchen_orders`; 1:N với `reservations`
@@ -268,18 +277,18 @@ Quản lý bàn ăn.
 
 Quản lý khách hàng.
 
-| Trường      | Kiểu         | Ràng buộc        | Mô tả          |
-| ----------- | ------------ | ---------------- | -------------- |
-| customerId  | INT          | PK, Auto         | ID khách hàng  |
-| name        | VARCHAR(255) | NOT NULL         | Tên khách      |
-| phoneNumber | VARCHAR(20)  | UNIQUE, NOT NULL | Số điện thoại  |
-| email       | VARCHAR(255) | UNIQUE, NULL     | Email          |
-| birthday    | DATE         | NULL             | Ngày sinh      |
-| preferences | JSON         | NULL             | Sở thích       |
-| notes       | TEXT         | NULL             | Ghi chú        |
-| isVip       | BOOLEAN      | DEFAULT false    | Là VIP         |
-| createdAt   | TIMESTAMP    | DEFAULT now()    | Ngày tạo       |
-| updatedAt   | TIMESTAMP    | AUTO UPDATE      | Ngày cập nhật  |
+| Trường      | Kiểu         | Ràng buộc        | Mô tả         |
+| ----------- | ------------ | ---------------- | ------------- |
+| customerId  | INT          | PK, Auto         | ID khách hàng |
+| name        | VARCHAR(255) | NOT NULL         | Tên khách     |
+| phoneNumber | VARCHAR(20)  | UNIQUE, NOT NULL | Số điện thoại |
+| email       | VARCHAR(255) | UNIQUE, NULL     | Email         |
+| birthday    | DATE         | NULL             | Ngày sinh     |
+| preferences | JSON         | NULL             | Sở thích      |
+| notes       | TEXT         | NULL             | Ghi chú       |
+| isVip       | BOOLEAN      | DEFAULT false    | Là VIP        |
+| createdAt   | TIMESTAMP    | DEFAULT now()    | Ngày tạo      |
+| updatedAt   | TIMESTAMP    | AUTO UPDATE      | Ngày cập nhật |
 
 **Indexes**: `name`  
 **Quan hệ**: 1:N với `reservations`
@@ -290,32 +299,32 @@ Quản lý khách hàng.
 
 Quản lý đặt bàn.
 
-| Trường             | Kiểu                    | Ràng buộc       | Mô tả                  |
-| ------------------ | ----------------------- | --------------- | ---------------------- |
-| reservationId      | INT                     | PK, Auto        | ID đặt bàn             |
-| reservationCode    | VARCHAR(50)             | UNIQUE, UUID    | Mã đặt bàn             |
-| customerName       | VARCHAR(255)            | NOT NULL        | Tên khách              |
-| phoneNumber        | VARCHAR(20)             | NOT NULL        | SĐT khách              |
-| email              | VARCHAR(255)            | NULL            | Email khách            |
-| customerId         | INT                     | FK, NULL        | ID khách hàng          |
-| tableId            | INT                     | FK, NOT NULL    | ID bàn                 |
-| reservationDate    | DATE                    | NOT NULL        | Ngày đặt               |
-| reservationTime    | TIME                    | NOT NULL        | Giờ đặt                |
-| duration           | INT                     | DEFAULT 120     | Thời lượng (phút)      |
-| headCount          | INT                     | NOT NULL        | Số người               |
-| specialRequest     | TEXT                    | NULL            | Yêu cầu đặc biệt       |
-| depositAmount      | DECIMAL(10,2)           | NULL            | Tiền cọc               |
-| status             | ENUM(ReservationStatus) | DEFAULT pending | Trạng thái             |
-| notes              | TEXT                    | NULL            | Ghi chú                |
-| tags               | TEXT[]                  | DEFAULT []      | Tags                   |
-| createdBy          | INT                     | FK, NULL        | Tạo bởi (staff)        |
-| confirmedAt        | TIMESTAMP               | NULL            | Thời gian xác nhận     |
-| seatedAt           | TIMESTAMP               | NULL            | Thời gian ngồi vào     |
-| completedAt        | TIMESTAMP               | NULL            | Thời gian hoàn thành   |
-| cancelledAt        | TIMESTAMP               | NULL            | Thời gian hủy          |
-| cancellationReason | TEXT                    | NULL            | Lý do hủy              |
-| createdAt          | TIMESTAMP               | DEFAULT now()   | Ngày tạo               |
-| updatedAt          | TIMESTAMP               | AUTO UPDATE     | Ngày cập nhật          |
+| Trường             | Kiểu                    | Ràng buộc       | Mô tả                |
+| ------------------ | ----------------------- | --------------- | -------------------- |
+| reservationId      | INT                     | PK, Auto        | ID đặt bàn           |
+| reservationCode    | VARCHAR(50)             | UNIQUE, UUID    | Mã đặt bàn           |
+| customerName       | VARCHAR(255)            | NOT NULL        | Tên khách            |
+| phoneNumber        | VARCHAR(20)             | NOT NULL        | SĐT khách            |
+| email              | VARCHAR(255)            | NULL            | Email khách          |
+| customerId         | INT                     | FK, NULL        | ID khách hàng        |
+| tableId            | INT                     | FK, NOT NULL    | ID bàn               |
+| reservationDate    | DATE                    | NOT NULL        | Ngày đặt             |
+| reservationTime    | TIME                    | NOT NULL        | Giờ đặt              |
+| duration           | INT                     | DEFAULT 120     | Thời lượng (phút)    |
+| partySize          | INT                     | NOT NULL        | Số người             |
+| specialRequest     | TEXT                    | NULL            | Yêu cầu đặc biệt     |
+| depositAmount      | DECIMAL(10,2)           | NULL            | Tiền cọc             |
+| status             | ENUM(ReservationStatus) | DEFAULT pending | Trạng thái           |
+| notes              | TEXT                    | NULL            | Ghi chú              |
+| tags               | TEXT[]                  | DEFAULT []      | Tags                 |
+| createdBy          | INT                     | FK, NULL        | Tạo bởi (staff)      |
+| confirmedAt        | TIMESTAMP               | NULL            | Thời gian xác nhận   |
+| seatedAt           | TIMESTAMP               | NULL            | Thời gian ngồi vào   |
+| completedAt        | TIMESTAMP               | NULL            | Thời gian hoàn thành |
+| cancelledAt        | TIMESTAMP               | NULL            | Thời gian hủy        |
+| cancellationReason | TEXT                    | NULL            | Lý do hủy            |
+| createdAt          | TIMESTAMP               | DEFAULT now()   | Ngày tạo             |
+| updatedAt          | TIMESTAMP               | AUTO UPDATE     | Ngày cập nhật        |
 
 **Indexes**: `reservationDate`, `reservationTime`, `status`, `phoneNumber`, `tableId`, `customerId`  
 **Quan hệ**: N:1 với `restaurant_tables` (RESTRICT); N:1 với `customers` (SET NULL); N:1 với `staff` (SET NULL); 1:N với `orders`; 1:N với `reservation_audits`
@@ -326,14 +335,14 @@ Quản lý đặt bàn.
 
 Audit log cho đặt bàn.
 
-| Trường        | Kiểu      | Ràng buộc       | Mô tả            |
-| ------------- | --------- | --------------- | ---------------- |
-| auditId       | INT       | PK, Auto        | ID audit         |
-| reservationId | INT       | FK, NOT NULL    | ID đặt bàn       |
-| action        | VARCHAR   | NOT NULL        | Hành động         |
-| userId        | INT       | FK, NULL        | ID nhân viên      |
-| changes       | JSON      | NULL            | Thay đổi          |
-| createdAt     | TIMESTAMP | DEFAULT now()   | Ngày tạo          |
+| Trường        | Kiểu      | Ràng buộc     | Mô tả        |
+| ------------- | --------- | ------------- | ------------ |
+| auditId       | INT       | PK, Auto      | ID audit     |
+| reservationId | INT       | FK, NOT NULL  | ID đặt bàn   |
+| action        | VARCHAR   | NOT NULL      | Hành động    |
+| userId        | INT       | FK, NULL      | ID nhân viên |
+| changes       | JSON      | NULL          | Thay đổi     |
+| createdAt     | TIMESTAMP | DEFAULT now() | Ngày tạo     |
 
 **Indexes**: `reservationId`, `createdAt`  
 **Quan hệ**: N:1 với `reservations` (CASCADE); N:1 với `staff` (SET NULL)
@@ -355,7 +364,7 @@ Audit log cho đặt bàn.
 | reservationId      | INT               | FK, NULL        | ID đặt bàn           |
 | customerName       | VARCHAR(255)      | NULL            | Tên khách            |
 | customerPhone      | VARCHAR(20)       | NULL            | SĐT khách            |
-| headCount          | INT               | DEFAULT 1       | Số người             |
+| partySize          | INT               | DEFAULT 1       | Số người             |
 | status             | ENUM(OrderStatus) | DEFAULT pending | Trạng thái           |
 | notes              | TEXT              | NULL            | Ghi chú              |
 | totalAmount        | DECIMAL(12,2)     | DEFAULT 0       | Tổng tiền hàng       |
@@ -403,24 +412,20 @@ Chi tiết đơn hàng.
 
 Đơn bếp.
 
-| Trường             | Kiểu                    | Ràng buộc       | Mô tả                       |
-| ------------------ | ----------------------- | --------------- | --------------------------- |
-| kitchenOrderId     | INT                     | PK, Auto        | ID đơn bếp                  |
-| orderId            | INT                     | FK, UNIQUE      | ID đơn hàng (1:1)           |
-| staffId            | INT                     | FK, NULL        | ID đầu bếp                  |
-| stationId          | INT                     | FK, NULL        | ID trạm bếp                 |
-| priority           | ENUM(OrderPriority)     | DEFAULT normal  | Độ ưu tiên                  |
-| status             | ENUM(KitchenOrderStatus)| DEFAULT pending | Trạng thái                  |
-| prepTimeEstimated  | INT                     | NULL            | Thời gian ước tính (phút)   |
-| prepTimeActual     | INT                     | NULL            | Thời gian thực tế (phút)    |
-| startedAt          | TIMESTAMP               | NULL            | Giờ bắt đầu                 |
-| completedAt        | TIMESTAMP               | NULL            | Giờ hoàn thành              |
-| notes              | TEXT                    | NULL            | Ghi chú                     |
-| createdAt          | TIMESTAMP               | DEFAULT now()   | Ngày tạo                    |
-| updatedAt          | TIMESTAMP               | AUTO UPDATE     | Ngày cập nhật               |
+| Trường         | Kiểu                     | Ràng buộc       | Mô tả                    |
+| -------------- | ------------------------ | --------------- | ------------------------ |
+| kitchenOrderId | INT                      | PK, Auto        | ID đơn bếp               |
+| orderId        | INT                      | FK, UNIQUE      | ID đơn hàng (1:1)        |
+| staffId        | INT                      | FK, NULL        | ID đầu bếp               |
+| status         | ENUM(KitchenOrderStatus) | DEFAULT pending | Trạng thái               |
+| prepTimeActual | INT                      | NULL            | Thời gian thực tế (phút) |
+| startedAt      | TIMESTAMP                | NULL            | Giờ bắt đầu              |
+| completedAt    | TIMESTAMP                | NULL            | Giờ hoàn thành           |
+| createdAt      | TIMESTAMP                | DEFAULT now()   | Ngày tạo                 |
+| updatedAt      | TIMESTAMP                | AUTO UPDATE     | Ngày cập nhật            |
 
-**Indexes**: `orderId`, `staffId`, `stationId`, `status`, `priority`, `createdAt`  
-**Quan hệ**: 1:1 với `orders` (CASCADE); N:1 với `staff` (SET NULL); N:1 với `kitchen_stations` (SET NULL)
+**Indexes**: `orderId`, `staffId`, `status`, `createdAt`  
+**Quan hệ**: 1:1 với `orders` (CASCADE); N:1 với `staff` (SET NULL)
 
 ---
 
@@ -428,14 +433,14 @@ Chi tiết đơn hàng.
 
 Trạm bếp.
 
-| Trường    | Kiểu             | Ràng buộc       | Mô tả         |
-| --------- | ---------------- | --------------- | ------------- |
-| stationId | INT              | PK, Auto        | ID trạm bếp   |
-| name      | VARCHAR(100)     | NOT NULL        | Tên trạm      |
-| type      | ENUM(StationType)| NOT NULL        | Loại trạm     |
-| isActive  | BOOLEAN          | DEFAULT true    | Đang hoạt động|
-| createdAt | TIMESTAMP        | DEFAULT now()   | Ngày tạo      |
-| updatedAt | TIMESTAMP        | AUTO UPDATE     | Ngày cập nhật |
+| Trường    | Kiểu              | Ràng buộc     | Mô tả          |
+| --------- | ----------------- | ------------- | -------------- |
+| stationId | INT               | PK, Auto      | ID trạm bếp    |
+| name      | VARCHAR(100)      | NOT NULL      | Tên trạm       |
+| type      | ENUM(StationType) | NOT NULL      | Loại trạm      |
+| isActive  | BOOLEAN           | DEFAULT true  | Đang hoạt động |
+| createdAt | TIMESTAMP         | DEFAULT now() | Ngày tạo       |
+| updatedAt | TIMESTAMP         | AUTO UPDATE   | Ngày cập nhật  |
 
 **Indexes**: `type`, `isActive`  
 **Quan hệ**: 1:N với `kitchen_orders`
@@ -554,36 +559,36 @@ Complete Business Flow:
 
 ### 4.2. Foreign Key Constraints
 
-| Bảng con          | Khóa ngoại    | Bảng cha          | Hành động xóa |
-| ----------------- | ------------- | ----------------- | ------------- |
-| staff             | accountId     | accounts          | CASCADE       |
-| refresh_tokens    | accountId     | accounts          | CASCADE       |
-| menu_items        | categoryId    | categories        | RESTRICT      |
-| reservations      | tableId       | restaurant_tables | RESTRICT      |
-| reservations      | customerId    | customers         | SET NULL      |
-| reservations      | createdBy     | staff             | SET NULL      |
-| reservation_audits| reservationId | reservations      | CASCADE       |
-| reservation_audits| userId        | staff             | SET NULL      |
-| orders            | tableId       | restaurant_tables | RESTRICT      |
-| orders            | staffId       | staff             | SET NULL      |
-| orders            | reservationId | reservations      | SET NULL      |
-| order_items       | orderId       | orders            | CASCADE       |
-| order_items       | itemId        | menu_items        | RESTRICT      |
-| kitchen_orders    | orderId       | orders            | CASCADE       |
-| kitchen_orders    | staffId       | staff             | SET NULL      |
-| kitchen_orders    | stationId     | kitchen_stations  | SET NULL      |
-| bills             | orderId       | orders            | RESTRICT      |
-| bills             | tableId       | restaurant_tables | RESTRICT      |
-| bills             | staffId       | staff             | SET NULL      |
-| bill_items        | billId        | bills             | CASCADE       |
-| bill_items        | itemId        | menu_items        | RESTRICT      |
-| payments          | billId        | bills             | CASCADE       |
+| Bảng con           | Khóa ngoại    | Bảng cha          | Hành động xóa |
+| ------------------ | ------------- | ----------------- | ------------- |
+| staff              | accountId     | accounts          | CASCADE       |
+| refresh_tokens     | accountId     | accounts          | CASCADE       |
+| menu_items         | categoryId    | categories        | RESTRICT      |
+| reservations       | tableId       | restaurant_tables | RESTRICT      |
+| reservations       | customerId    | customers         | SET NULL      |
+| reservations       | createdBy     | staff             | SET NULL      |
+| reservation_audits | reservationId | reservations      | CASCADE       |
+| reservation_audits | userId        | staff             | SET NULL      |
+| orders             | tableId       | restaurant_tables | RESTRICT      |
+| orders             | staffId       | staff             | SET NULL      |
+| orders             | reservationId | reservations      | SET NULL      |
+| order_items        | orderId       | orders            | CASCADE       |
+| order_items        | itemId        | menu_items        | RESTRICT      |
+| kitchen_orders     | orderId       | orders            | CASCADE       |
+| kitchen_orders     | staffId       | staff             | SET NULL      |
+| bills              | orderId       | orders            | RESTRICT      |
+| bills              | tableId       | restaurant_tables | RESTRICT      |
+| bills              | staffId       | staff             | SET NULL      |
+| bill_items         | billId        | bills             | CASCADE       |
+| bill_items         | itemId        | menu_items        | RESTRICT      |
+| payments           | billId        | bills             | CASCADE       |
 
 ---
 
 ## 5. Chiến lược đánh chỉ mục
 
 ### Unique Indexes
+
 ```sql
 accounts: username, email, phoneNumber
 refresh_tokens: token
@@ -599,29 +604,32 @@ kitchen_orders: orderId
 ```
 
 ### Regular Indexes
+
 Tất cả foreign keys và fields thường xuyên trong WHERE clauses:
-- accounts: email, username
-- refresh_tokens: accountId, token, expiresAt
-- staff: role, isActive
-- categories: isActive
-- menu_items: categoryId, isAvailable, isActive
-- customers: name
-- reservations: reservationDate, reservationTime, status, phoneNumber, tableId, customerId
-- restaurant_tables: status, floor, isActive
-- orders: orderNumber, tableId, staffId, status, orderTime, createdAt
-- order_items: orderId, itemId, status
-- kitchen_orders: orderId, staffId, stationId, status, priority, createdAt
-- kitchen_stations: type, isActive
-- bills: billNumber, orderId, paymentStatus, createdAt
-- bill_items: billId
-- payments: billId, transactionId
-- reservation_audits: reservationId, createdAt
+
+-   accounts: email, username
+-   refresh_tokens: accountId, token, expiresAt
+-   staff: role, isActive
+-   categories: isActive
+-   menu_items: categoryId, isAvailable, isActive
+-   customers: name
+-   reservations: reservationDate, reservationTime, status, phoneNumber, tableId, customerId
+-   restaurant_tables: status, floor, isActive
+-   orders: orderNumber, tableId, staffId, status, orderTime, createdAt
+-   order_items: orderId, itemId, status
+-   kitchen_orders: orderId, staffId, status, createdAt
+-   kitchen_stations: type, isActive
+-   bills: billNumber, orderId, paymentStatus, createdAt
+-   bill_items: billId
+-   payments: billId, transactionId
+-   reservation_audits: reservationId, createdAt
 
 ---
 
 ## 6. Các truy vấn thường dùng
 
 ### Đăng nhập
+
 ```sql
 SELECT a.*, s.staffId, s.role, s.fullName
 FROM accounts a
@@ -630,8 +638,9 @@ WHERE a.email = $1 AND a.isActive = true;
 ```
 
 ### Lấy thực đơn theo danh mục
+
 ```sql
-SELECT c.categoryId, c.categoryName, 
+SELECT c.categoryId, c.categoryName,
   json_agg(json_build_object('itemId', m.itemId, 'itemName', m.itemName, 'price', m.price)) as items
 FROM categories c
 LEFT JOIN menu_items m ON c.categoryId = m.categoryId AND m.isActive = true
@@ -641,6 +650,7 @@ ORDER BY c.displayOrder;
 ```
 
 ### Kiểm tra bàn trống
+
 ```sql
 WITH ActiveReservations AS (
   SELECT tableId, reservationTime, reservationTime + (duration || ' minutes')::interval as endTime
@@ -657,6 +667,7 @@ AND t.capacity >= $4 AND t.isActive = true;
 ```
 
 ### Danh sách đơn hàng đang hoạt động
+
 ```sql
 SELECT o.*, t.tableNumber, s.fullName as waiterName,
   COUNT(oi.orderItemId) as itemCount, SUM(oi.totalPrice) as totalAmount
@@ -670,6 +681,7 @@ ORDER BY o.orderTime DESC;
 ```
 
 ### Doanh thu theo ngày
+
 ```sql
 SELECT DATE(createdAt) as date,
   COUNT(*) as totalBills,
@@ -682,6 +694,7 @@ ORDER BY date DESC;
 ```
 
 ### Món ăn bán chạy
+
 ```sql
 SELECT m.itemId, m.itemName, COUNT(oi.orderItemId) as orderCount,
   SUM(oi.quantity) as totalQuantity, SUM(oi.totalPrice) as totalRevenue
@@ -695,5 +708,5 @@ ORDER BY totalQuantity DESC;
 
 ---
 
-**Tài liệu được cập nhật lần cuối: 20/11/2025**  
+**Tài liệu được cập nhật lần cuối: 25/11/2025**  
 **Dựa trên schema.prisma từ dự án**
