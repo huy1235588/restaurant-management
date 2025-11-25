@@ -10,6 +10,7 @@ import {
     BadRequestException,
     HttpCode,
     HttpStatus,
+    Get,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import {
@@ -21,12 +22,44 @@ import {
     ApiBody,
 } from '@nestjs/swagger';
 import { StorageService } from '@/modules/storage/storage.service';
+import { ChangeStorageProviderDto } from '@/modules/storage/dtos/change-storage-provider.dto';
+import { StorageProvider } from '@/modules/storage/enums';
 
 @ApiTags('storage')
 @Controller('storage')
 @ApiBearerAuth()
 export class StorageController {
     constructor(private readonly storageService: StorageService) {}
+
+    @Get('provider')
+    getProvider() {
+        const provider = this.storageService.getProvider();
+
+        return {
+            message: 'Current storage provider',
+            data: provider,
+        };
+    }
+
+    @Post('provider')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Change current storage provider' })
+    @ApiResponse({ status: 200, description: 'Provider changed successfully' })
+    @ApiResponse({ status: 400, description: 'Bad request' })
+    changeProvider(@Body() body: ChangeStorageProviderDto) {
+        const { provider } = body;
+
+        if (!provider || !Object.values(StorageProvider).includes(provider)) {
+            throw new BadRequestException('Invalid storage provider');
+        }
+
+        this.storageService.setProvider(provider);
+
+        return {
+            message: 'Storage provider changed successfully',
+            data: provider,
+        };
+    }
 
     @Post('upload')
     @HttpCode(HttpStatus.OK)

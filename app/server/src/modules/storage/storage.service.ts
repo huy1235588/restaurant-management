@@ -12,8 +12,8 @@ import { CloudinaryStorageService } from '@/modules/storage/services/cloudinary-
 @Injectable()
 export class StorageService {
     private readonly logger = new Logger(StorageService.name);
-    private readonly storageService: IStorageService;
-    private readonly provider: StorageProvider;
+    private storageService: IStorageService;
+    private provider: StorageProvider;
 
     constructor(
         private readonly configService: ConfigService,
@@ -41,6 +41,40 @@ export class StorageService {
         }
 
         this.logger.log(`Using storage provider: ${this.provider}`);
+    }
+
+    /**
+     * Return current storage provider
+     */
+    getProvider(): StorageProvider {
+        return this.provider;
+    }
+
+    /**
+     * Change storage provider at runtime
+     */
+    setProvider(provider: StorageProvider): void {
+        if (this.provider === provider) {
+            this.logger.log(`Storage provider already set to ${provider}`);
+            return;
+        }
+
+        this.provider = provider;
+
+        switch (this.provider) {
+            case StorageProvider.R2:
+                this.storageService = this.r2StorageService;
+                break;
+            case StorageProvider.CLOUDINARY:
+                this.storageService = this.cloudinaryStorageService;
+                break;
+            case StorageProvider.LOCAL:
+            default:
+                this.storageService = this.localStorageService;
+                break;
+        }
+
+        this.logger.log(`Switched storage provider to: ${this.provider}`);
     }
 
     /**
