@@ -83,9 +83,10 @@ export function useAuth(requiredRole?: UserRole | UserRole[]) {
         } catch (error) {
             console.error('Logout error:', error);
         } finally {
+            // Clear store once (avoid duplicate clears)
             logoutStore();
-            clearAuth();
-            router.push('/login');
+            // Use replace to avoid leaving login in history
+            router.replace('/login');
         }
     };
 
@@ -96,9 +97,9 @@ export function useAuth(requiredRole?: UserRole | UserRole[]) {
         } catch (error) {
             console.error('Logout all error:', error);
         } finally {
+            // Clear store once (avoid duplicate clears)
             logoutStore();
-            clearAuth();
-            router.push('/login');
+            router.replace('/login');
         }
     };
 
@@ -153,7 +154,7 @@ export function useAuth(requiredRole?: UserRole | UserRole[]) {
 }
 
 export function useAuthActions() {
-    const { setAuth, clearAuth } = useAuthStore();
+    const { setAuth, logout: logoutStore } = useAuthStore();
     const router = useRouter();
 
     const login = async (username: string, password: string) => {
@@ -173,8 +174,8 @@ export function useAuthActions() {
         } catch (error) {
             console.error('Logout error:', error);
         } finally {
-            clearAuth();
-            router.push('/login');
+            logoutStore();
+            router.replace('/login');
         }
     };
 

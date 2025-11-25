@@ -165,7 +165,7 @@ export default function LoginPage() {
                     </form>
 
                     {/* Demo Accounts Info */}
-                    <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    {/* <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                         <p className="text-xs text-center text-gray-500 mb-3">Demo Accounts:</p>
                         <div className="grid grid-cols-2 gap-2 text-xs">
                             <div className="p-2 bg-slate-50 dark:bg-slate-800 rounded">
@@ -185,7 +185,7 @@ export default function LoginPage() {
                                 <p className="text-gray-600 dark:text-gray-400">chef / chef123</p>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
                 </CardContent>
             </Card>
         </div>

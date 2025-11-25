@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 
 import { useAuthStore } from '@/stores/authStore';
+import { authApi } from '@/services/auth.service';
 import { hasPermission } from '@/types/permissions';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
 import { DashboardSidebar, NavItem, NavGroup } from '@/components/layouts/DashboardSidebar';
@@ -140,7 +141,12 @@ export default function DashboardLayout({
         }
     }, [isAuthenticated, isLoading, router]);
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
+        try {
+            await authApi.logout();
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
         logout();
         router.replace('/login');
     };
