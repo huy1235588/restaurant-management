@@ -32,7 +32,7 @@ export const useCreateBill = () => {
             toast.success(t("billing.messages.billCreated"));
 
             // Navigate to bill detail
-            router.push(`/billing/${bill.billId}`);
+            router.push(`/bills/${bill.billId}`);
         },
         onError: (error: any) => {
             toast.error(

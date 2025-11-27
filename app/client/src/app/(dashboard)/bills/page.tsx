@@ -1,4 +1,4 @@
-import { BillListView } from '@/modules/billing';
+import { BillListView } from '@/modules/bills';
 
 export default function BillsPage() {
     return <BillListView />;

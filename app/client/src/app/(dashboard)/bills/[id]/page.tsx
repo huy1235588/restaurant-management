@@ -1,4 +1,4 @@
-import { BillDetailView } from '@/modules/billing';
+import { BillDetailView } from '@/modules/bills';
 
 interface PageProps {
     params: Promise<{ id: string }>;

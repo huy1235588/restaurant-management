@@ -6,9 +6,9 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useCreateBill } from '@/modules/billing/hooks';
+import { useCreateBill } from '@/modules/bills/hooks';
 import { useOrderById } from '@/modules/order/hooks';
-import { formatCurrency } from '@/modules/billing/utils';
+import { formatCurrency } from '@/modules/bills/utils';
 import { ArrowLeft, Receipt, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 

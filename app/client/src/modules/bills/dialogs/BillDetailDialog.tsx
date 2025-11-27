@@ -34,7 +34,7 @@ export function BillDetailDialog({
 
     const handleViewFullDetail = () => {
         onOpenChange(false);
-        router.push(`/billing/${bill.billId}`);
+        router.push(`/bills/${bill.billId}`);
     };
 
     return (

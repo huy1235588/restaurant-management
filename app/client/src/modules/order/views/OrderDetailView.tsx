@@ -22,7 +22,7 @@ import { CancelItemDialog } from '../dialogs/CancelItemDialog';
 import { CancelOrderDialog } from '../dialogs/CancelOrderDialog';
 import { useOrderById, useOrderSocket, useUpdateOrderStatus, useFullscreen } from '../hooks';
 import { Order, OrderItem } from '../types';
-import { formatOrderNumber, formatDateTime, canAddItems, canCancelOrder } from '../utils';
+import { formatOrderNumber, formatDateTime, canAddItems, canCancelOrder, canCreateBill } from '../utils';
 import { ArrowLeft, Plus, XCircle, Printer, Receipt, Check, Keyboard, Maximize2, Minimize2 } from 'lucide-react';
 
 interface OrderDetailViewProps {
@@ -85,7 +85,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                     }
                     break;
                 case 'c':
-                    if (order.status === 'pending') {
+                    if (order && canCreateBill(order)) {
                         e.preventDefault();
                         handleConfirmOrder();
                     }
@@ -97,8 +97,10 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                     }
                     break;
                 case 'r':
-                    e.preventDefault();
-                    handleCreateBill();
+                    if (order.status === 'completed') {
+                        e.preventDefault();
+                        handleCreateBill();
+                    }
                     break;
                 case 'f':
                     e.preventDefault();
@@ -140,7 +142,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
 
     const handleCreateBill = () => {
         // TODO: Integrate with billing module
-        router.push(`/billing/create?orderId=${orderId}`);
+        router.push(`/bills/create?orderId=${orderId}`);
     };
 
     if (isLoading) {
@@ -227,7 +229,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                         <Printer className="mr-2 h-4 w-4" />
                         In
                     </Button>
-                    {order.status === 'completed' && (
+                    {canCreateBill(order) && (
                         <Button variant="outline" onClick={handleCreateBill}>
                             <Receipt className="mr-2 h-4 w-4" />
                             Tạo hóa đơn
