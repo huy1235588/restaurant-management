@@ -19,6 +19,7 @@ import {
     ApiResponse,
     ApiBearerAuth,
     ApiParam,
+    ApiQuery,
 } from '@nestjs/swagger';
 import { BillingService } from './billing.service';
 import {
@@ -30,6 +31,10 @@ import {
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { RolesGuard } from '@/common/guards/roles.guard';
+import {
+    BILLING_CONSTANTS,
+    BILLING_MESSAGES,
+} from './constants/billing.constants';
 
 @ApiTags('billing')
 @Controller('bills')
@@ -40,68 +45,143 @@ export class BillingController {
 
     @Get()
     @ApiOperation({ summary: 'Get all bills with filters' })
-    @ApiResponse({ status: 200, description: 'Bills retrieved successfully' })
+    @ApiQuery({
+        name: 'page',
+        required: false,
+        type: Number,
+        description: `Page number (default: ${BILLING_CONSTANTS.DEFAULT_PAGE})`,
+    })
+    @ApiQuery({
+        name: 'limit',
+        required: false,
+        type: Number,
+        description: `Items per page (default: ${BILLING_CONSTANTS.DEFAULT_LIMIT})`,
+    })
+    @ApiResponse({
+        status: 200,
+        description: BILLING_MESSAGES.SUCCESS.BILLS_RETRIEVED,
+    })
     async getAllBills(@Query() filters: BillFiltersDto) {
         const { page = 1, limit = 20, ...filterData } = filters;
         const skip = (page - 1) * limit;
 
-        return this.billingService.getAllBills({
+        const result = await this.billingService.getAllBills({
             filters: filterData,
             skip,
             take: limit,
         });
+
+        return {
+            message: BILLING_MESSAGES.SUCCESS.BILLS_RETRIEVED,
+            ...result,
+        };
     }
 
     @Get(':id')
     @ApiOperation({ summary: 'Get bill by ID' })
     @ApiParam({ name: 'id', description: 'Bill ID' })
-    @ApiResponse({ status: 200, description: 'Bill retrieved successfully' })
-    @ApiResponse({ status: 404, description: 'Bill not found' })
+    @ApiResponse({
+        status: 200,
+        description: BILLING_MESSAGES.SUCCESS.BILL_RETRIEVED,
+    })
+    @ApiResponse({
+        status: 404,
+        description: BILLING_MESSAGES.ERROR.BILL_NOT_FOUND,
+    })
     async getBillById(@Param('id', ParseIntPipe) id: number) {
-        return this.billingService.getBillById(id);
+        const bill = await this.billingService.getBillById(id);
+
+        return {
+            message: BILLING_MESSAGES.SUCCESS.BILL_RETRIEVED,
+            data: bill,
+        };
     }
 
     @Post()
     @ApiOperation({ summary: 'Create bill from order' })
-    @ApiResponse({ status: 201, description: 'Bill created successfully' })
+    @ApiResponse({
+        status: 201,
+        description: BILLING_MESSAGES.SUCCESS.BILL_CREATED,
+    })
     @ApiResponse({ status: 400, description: 'Bad request' })
-    @ApiResponse({ status: 404, description: 'Order not found' })
+    @ApiResponse({
+        status: 404,
+        description: BILLING_MESSAGES.ERROR.ORDER_NOT_FOUND,
+    })
     async createBill(
         @Body() createBillDto: CreateBillDto,
         @Request() req: { user?: { staffId?: number } },
     ) {
         const staffId = req.user?.staffId;
-        return this.billingService.createBill(createBillDto, staffId);
+        const bill = await this.billingService.createBill(
+            createBillDto,
+            staffId,
+        );
+
+        return {
+            message: BILLING_MESSAGES.SUCCESS.BILL_CREATED,
+            data: bill,
+        };
     }
 
     @Patch(':id/discount')
     @ApiOperation({ summary: 'Apply discount to bill' })
     @ApiParam({ name: 'id', description: 'Bill ID' })
-    @ApiResponse({ status: 200, description: 'Discount applied successfully' })
+    @ApiResponse({
+        status: 200,
+        description: BILLING_MESSAGES.SUCCESS.DISCOUNT_APPLIED,
+    })
     @ApiResponse({ status: 400, description: 'Bad request' })
-    @ApiResponse({ status: 404, description: 'Bill not found' })
+    @ApiResponse({
+        status: 404,
+        description: BILLING_MESSAGES.ERROR.BILL_NOT_FOUND,
+    })
     async applyDiscount(
         @Param('id', ParseIntPipe) id: number,
         @Body() discountDto: ApplyDiscountDto,
         @Request() req: { user?: { staffId?: number } },
     ) {
         const userId = req.user?.staffId;
-        return this.billingService.applyDiscount(id, discountDto, userId);
+        const bill = await this.billingService.applyDiscount(
+            id,
+            discountDto,
+            userId,
+        );
+
+        return {
+            message: BILLING_MESSAGES.SUCCESS.DISCOUNT_APPLIED,
+            data: bill,
+        };
     }
 
     @Post(':id/payment')
     @ApiOperation({ summary: 'Process payment for bill' })
     @ApiParam({ name: 'id', description: 'Bill ID' })
-    @ApiResponse({ status: 200, description: 'Payment processed successfully' })
+    @ApiResponse({
+        status: 200,
+        description: BILLING_MESSAGES.SUCCESS.PAYMENT_PROCESSED,
+    })
     @ApiResponse({ status: 400, description: 'Bad request' })
-    @ApiResponse({ status: 404, description: 'Bill not found' })
+    @ApiResponse({
+        status: 404,
+        description: BILLING_MESSAGES.ERROR.BILL_NOT_FOUND,
+    })
     async processPayment(
         @Param('id', ParseIntPipe) id: number,
         @Body() paymentDto: ProcessPaymentDto,
         @Request() req: { user?: { staffId?: number } },
     ) {
         const staffId = req.user?.staffId;
-        return this.billingService.processPayment(id, paymentDto, staffId);
+        const result = await this.billingService.processPayment(
+            id,
+            paymentDto,
+            staffId,
+        );
+
+        return {
+            message: BILLING_MESSAGES.SUCCESS.PAYMENT_PROCESSED,
+            data: result,
+        };
     }
 
     @Delete(':id')
@@ -110,16 +190,26 @@ export class BillingController {
     @ApiOperation({ summary: 'Void/delete bill (admin only)' })
     @ApiParam({ name: 'id', description: 'Bill ID' })
     @HttpCode(HttpStatus.OK)
-    @ApiResponse({ status: 200, description: 'Bill voided successfully' })
+    @ApiResponse({
+        status: 200,
+        description: BILLING_MESSAGES.SUCCESS.BILL_VOIDED,
+    })
     @ApiResponse({ status: 400, description: 'Bad request' })
     @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
-    @ApiResponse({ status: 404, description: 'Bill not found' })
+    @ApiResponse({
+        status: 404,
+        description: BILLING_MESSAGES.ERROR.BILL_NOT_FOUND,
+    })
     async voidBill(
         @Param('id', ParseIntPipe) id: number,
         @Body('reason') reason: string,
         @Request() req: { user?: { staffId?: number } },
     ) {
         const userId = req.user?.staffId;
-        return this.billingService.voidBill(id, reason, userId);
+        await this.billingService.voidBill(id, reason, userId);
+
+        return {
+            message: BILLING_MESSAGES.SUCCESS.BILL_VOIDED,
+        };
     }
 }

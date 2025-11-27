@@ -11,8 +11,9 @@ import {
     formatOrderNumber,
     canAddItems,
     canCancelOrder,
+    canCreateBill,
 } from '../utils';
-import { Eye, Plus, X } from 'lucide-react';
+import { Eye, Plus, X, Receipt } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface OrderCardProps {
@@ -36,6 +37,10 @@ export const OrderCard = memo(function OrderCard({ order, onCancelOrder }: Order
             onCancelOrder(order);
         }
     }, [onCancelOrder, order]);
+
+    const handleCreateBill = useCallback(() => {
+        router.push(`/bills/create?orderId=${order.orderId}`);
+    }, [router, order.orderId]);
 
     return (
         <Card>
@@ -109,6 +114,16 @@ export const OrderCard = memo(function OrderCard({ order, onCancelOrder }: Order
                                 onClick={handleAddItems}
                             >
                                 <Plus className="h-4 w-4" />
+                            </Button>
+                        )}
+                        {canCreateBill(order) && (
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={handleCreateBill}
+                                title="Tạo hóa đơn"
+                            >
+                                <Receipt className="h-4 w-4" />
                             </Button>
                         )}
                         {canCancelOrder(order) && (

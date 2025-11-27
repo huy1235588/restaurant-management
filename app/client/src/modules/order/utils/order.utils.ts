@@ -138,6 +138,18 @@ export const canCancelOrder = (order: Order): boolean => {
 };
 
 /**
+ * Check if a bill can be created from this order
+ * Bill can be created when order is confirmed and has items
+ */
+export const canCreateBill = (order: Order): boolean => {
+    // Order must be confirmed or completed (not pending or cancelled)
+    const validStatus = ["confirmed", "completed"].includes(order.status);
+    // Order must have items
+    const hasItems = order.orderItems && order.orderItems.length > 0;
+    return validStatus && hasItems;
+};
+
+/**
  * Check if items can be added to order
  */
 export const canAddItems = (order: Order): boolean => {
