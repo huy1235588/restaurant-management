@@ -123,7 +123,7 @@ export const useVoidBill = () => {
             toast.success(t("billing.messages.billVoided"));
 
             // Navigate back to bills list
-            router.push("/billing");
+            router.push("/bills");
         },
         onError: (error: any) => {
             toast.error(

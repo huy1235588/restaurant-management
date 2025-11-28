@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ import {
 import { BillStatusBadge } from '../components/BillStatusBadge';
 import { BillItemList } from '../components/BillItemList';
 import { BillSummary } from '../components/BillSummary';
+import { PrintableBill } from '../components/PrintableBill';
 import { ApplyDiscountDialog } from '../dialogs/ApplyDiscountDialog';
 import { ProcessPaymentDialog } from '../dialogs/ProcessPaymentDialog';
 import { VoidBillDialog } from '../dialogs/VoidBillDialog';
@@ -39,10 +40,12 @@ interface BillDetailViewProps {
 export function BillDetailView({ billId }: BillDetailViewProps) {
     const { t } = useTranslation();
     const router = useRouter();
+    const printRef = useRef<HTMLDivElement>(null);
     const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
     const [showDiscountDialog, setShowDiscountDialog] = useState(false);
     const [showPaymentDialog, setShowPaymentDialog] = useState(false);
     const [showVoidDialog, setShowVoidDialog] = useState(false);
+    const [showPrintPreview, setShowPrintPreview] = useState(false);
 
     const { data: bill, isLoading, error } = useBill(billId);
 
@@ -59,6 +62,7 @@ export function BillDetailView({ billId }: BillDetailViewProps) {
                 setShowDiscountDialog(false);
                 setShowPaymentDialog(false);
                 setShowVoidDialog(false);
+                setShowPrintPreview(false);
                 return;
             }
 
@@ -111,10 +115,14 @@ export function BillDetailView({ billId }: BillDetailViewProps) {
     }, [bill, router]);
 
     const handleBack = () => {
-        router.push('/billing');
+        router.push('/bills');
     };
 
     const handlePrint = () => {
+        setShowPrintPreview(true);
+    };
+
+    const handleConfirmPrint = () => {
         window.print();
     };
 
@@ -496,6 +504,48 @@ export function BillDetailView({ billId }: BillDetailViewProps) {
                     </div>
                 </DialogContent>
             </Dialog>
+
+            {/* Print Preview Dialog */}
+            <Dialog open={showPrintPreview} onOpenChange={setShowPrintPreview}>
+                <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Printer className="h-5 w-5" />
+                            {t('billing.printPreview', 'Xem trước hóa đơn')}
+                        </DialogTitle>
+                        <DialogDescription>
+                            {t('billing.printPreviewDescription', 'Xem trước hóa đơn trước khi in')}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {/* Print Preview Content */}
+                    <div className="border rounded-lg overflow-hidden bg-white">
+                        <PrintableBill
+                            ref={printRef}
+                            bill={bill}
+                        />
+                    </div>
+
+                    {/* Print Actions */}
+                    <div className="flex gap-2 justify-end mt-4">
+                        <Button
+                            variant="outline"
+                            onClick={() => setShowPrintPreview(false)}
+                        >
+                            {t('common.cancel', 'Hủy')}
+                        </Button>
+                        <Button onClick={handleConfirmPrint}>
+                            <Printer className="mr-2 h-4 w-4" />
+                            {t('common.print', 'In')}
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Hidden Printable Bill for actual printing */}
+            <div className="hidden print:block">
+                <PrintableBill ref={printRef} bill={bill} />
+            </div>
         </div>
     );
 }

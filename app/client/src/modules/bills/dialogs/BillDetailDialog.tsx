@@ -1,10 +1,12 @@
 "use client";
 
+import { useState, useRef } from "react";
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -12,9 +14,11 @@ import { Bill } from "../types";
 import { BillStatusBadge } from "../components/BillStatusBadge";
 import { BillItemList } from "../components/BillItemList";
 import { BillSummary } from "../components/BillSummary";
+import { PrintableBill } from "../components/PrintableBill";
 import { formatDateTime, getPaymentMethodLabel } from "../utils";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
+import { Printer, Eye } from "lucide-react";
 
 interface BillDetailDialogProps {
     open: boolean;
@@ -29,6 +33,8 @@ export function BillDetailDialog({
 }: BillDetailDialogProps) {
     const { t } = useTranslation();
     const router = useRouter();
+    const printRef = useRef<HTMLDivElement>(null);
+    const [showPrintPreview, setShowPrintPreview] = useState(false);
 
     if (!bill) return null;
 
@@ -36,6 +42,67 @@ export function BillDetailDialog({
         onOpenChange(false);
         router.push(`/bills/${bill.billId}`);
     };
+
+    const handlePrint = () => {
+        setShowPrintPreview(true);
+    };
+
+    const handleConfirmPrint = () => {
+        window.print();
+    };
+
+    // Print Preview Dialog
+    if (showPrintPreview) {
+        return (
+            <>
+                <Dialog open={open} onOpenChange={(isOpen) => {
+                    if (!isOpen) {
+                        setShowPrintPreview(false);
+                    }
+                    onOpenChange(isOpen);
+                }}>
+                    <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                                <Printer className="h-5 w-5" />
+                                {t('billing.printPreview', 'Xem trước hóa đơn')}
+                            </DialogTitle>
+                            <DialogDescription>
+                                {t('billing.printPreviewDescription', 'Xem trước hóa đơn trước khi in')}
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        {/* Print Preview Content */}
+                        <div className="border rounded-lg overflow-hidden bg-white">
+                            <PrintableBill
+                                ref={printRef}
+                                bill={bill}
+                            />
+                        </div>
+
+                        {/* Print Actions */}
+                        <div className="flex gap-2 justify-end mt-4">
+                            <Button
+                                variant="outline"
+                                onClick={() => setShowPrintPreview(false)}
+                            >
+                                {t('common.back', 'Quay lại')}
+                            </Button>
+                            <Button onClick={handleConfirmPrint}>
+                                <Printer className="mr-2 h-4 w-4" />
+                                {t('common.print', 'In')}
+                            </Button>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+
+                {/* Hidden Printable Bill for actual printing */}
+                <div className="hidden print:block">
+                    <PrintableBill ref={printRef} bill={bill} />
+                </div>
+            </>
+        );
+    }
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -122,7 +189,12 @@ export function BillDetailDialog({
                     <Button variant="outline" onClick={() => onOpenChange(false)}>
                         {t("common.close")}
                     </Button>
+                    <Button variant="outline" onClick={handlePrint}>
+                        <Printer className="mr-2 h-4 w-4" />
+                        {t("common.print", "In")}
+                    </Button>
                     <Button onClick={handleViewFullDetail}>
+                        <Eye className="mr-2 h-4 w-4" />
                         {t("billing.viewFullDetails")}
                     </Button>
                 </div>

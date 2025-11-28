@@ -220,3 +220,113 @@
     height: 100vh !important;
     max-width: 100vw !important;
 }
+
+/* ========================================
+   PRINT STYLES FOR BILL/INVOICE
+   ======================================== */
+@media print {
+    /* Hide everything except print content */
+    body * {
+        visibility: hidden;
+    }
+
+    /* Show only printable bill */
+    .print-bill,
+    .print-bill * {
+        visibility: visible !important;
+    }
+
+    .print-bill {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 80mm !important;
+        max-width: 80mm !important;
+        margin: 0 !important;
+        padding: 4mm !important;
+        background: white !important;
+        color: black !important;
+        font-family: "Courier New", Courier, monospace !important;
+        font-size: 11px !important;
+        line-height: 1.3 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* Hide navigation elements */
+    header,
+    aside,
+    nav,
+    footer,
+    .no-print,
+    button,
+    [role="dialog"],
+    .sidebar,
+    .topbar {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    /* Page setup */
+    @page {
+        size: 80mm auto;
+        margin: 0;
+    }
+
+    /* Ensure proper text colors */
+    .print-bill {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Border styles for print */
+    .print-bill .border-dashed {
+        border-style: dashed !important;
+        border-color: black !important;
+    }
+
+    .print-bill .border-double {
+        border-style: double !important;
+        border-color: black !important;
+    }
+
+    /* Font sizing adjustments */
+    .print-bill .text-xs {
+        font-size: 10px !important;
+    }
+
+    .print-bill .text-sm {
+        font-size: 11px !important;
+    }
+
+    .print-bill .text-base {
+        font-size: 12px !important;
+    }
+
+    .print-bill .text-lg {
+        font-size: 13px !important;
+    }
+
+    .print-bill .text-2xl {
+        font-size: 16px !important;
+    }
+
+    /* Ensure bold text is visible */
+    .print-bill .font-bold {
+        font-weight: 700 !important;
+    }
+
+    .print-bill .font-medium {
+        font-weight: 500 !important;
+    }
+
+    /* Green text for discounts */
+    .print-bill .text-green-700 {
+        color: #15803d !important;
+    }
+
+    /* Gray text */
+    .print-bill .text-gray-600 {
+        color: #4b5563 !important;
+    }
+}
