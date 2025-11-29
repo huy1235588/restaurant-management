@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import {
     Form,
@@ -42,6 +43,7 @@ const reservationSchema = z.object({
 type ReservationFormData = z.infer<typeof reservationSchema>;
 
 export function CreateReservationView() {
+    const { t } = useTranslation();
     const router = useRouter();
     const { createReservation, loading } = useReservationActions();
     const [availabilityParams, setAvailabilityParams] = useState<any>(null);

@@ -1,11 +1,11 @@
+'use client';
+
+import { useParams } from 'next/navigation';
 import { BillDetailView } from '@/modules/bills';
 
-interface PageProps {
-    params: Promise<{ id: string }>;
-}
-
-export default async function BillDetailPage({ params }: PageProps) {
-    const { id } = await params;
+export default function BillDetailPage() {
+    const params = useParams();
+    const id = params.id as string;
     const billId = parseInt(id, 10);
 
     if (isNaN(billId)) {

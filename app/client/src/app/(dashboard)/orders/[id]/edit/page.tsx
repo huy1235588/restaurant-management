@@ -1,11 +1,11 @@
+'use client';
+
+import { useParams } from 'next/navigation';
 import { EditOrderView } from '@/modules/order';
 
-interface PageProps {
-    params: Promise<{ id: string }>;
-}
-
-export default async function EditOrderPage({ params }: PageProps) {
-    const { id } = await params;
+export default function EditOrderPage() {
+    const params = useParams();
+    const id = params.id as string;
     const orderId = parseInt(id, 10);
 
     if (isNaN(orderId)) {

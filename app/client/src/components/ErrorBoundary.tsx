@@ -3,7 +3,14 @@
 import React, { Component, ErrorInfo, ReactNode } from "react";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import i18n from "@/lib/i18n";
+
+// Fallback translations for when i18n is not available
+const fallbackTranslations = {
+    'errors.somethingWentWrong': 'Something went wrong',
+    'errors.unexpectedError': 'An unexpected error occurred',
+    'common.tryAgain': 'Try Again',
+    'errors.reloadPage': 'Reload Page',
+};
 
 interface Props {
     children: ReactNode;
@@ -34,7 +41,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
     componentDidCatch(error: Error, errorInfo: ErrorInfo) {
         console.error("ErrorBoundary caught an error:", error, errorInfo);
-        
+
         // Call custom error handler if provided
         if (this.props.onError) {
             this.props.onError(error, errorInfo);
@@ -55,7 +62,8 @@ export class ErrorBoundary extends Component<Props, State> {
                 return this.props.fallback;
             }
 
-            const t = i18n.t.bind(i18n);
+            // Use fallback translations (i18n may not be available in SSR)
+            const t = (key: string) => fallbackTranslations[key as keyof typeof fallbackTranslations] || key;
 
             // Default error UI
             return (

@@ -48,12 +48,14 @@ import {
     Minimize2,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 
 interface ReservationDetailViewProps {
     reservationId: number;
 }
 
 export function ReservationDetailView({ reservationId }: ReservationDetailViewProps) {
+    const { t } = useTranslation();
     const router = useRouter();
     const { reservation, loading, refetch } = useReservation(reservationId);
     const [isFullscreen, setIsFullscreen] = useState(false);

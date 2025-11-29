@@ -1,11 +1,11 @@
+'use client';
+
+import { useParams } from 'next/navigation';
 import { OrderDetailView } from '@/modules/order';
 
-interface PageProps {
-    params: Promise<{ id: string }>;
-}
-
-export default async function OrderDetailPage({ params }: PageProps) {
-    const { id } = await params;
+export default function OrderDetailPage() {
+    const params = useParams();
+    const id = params.id as string;
     const orderId = parseInt(id, 10);
 
     if (isNaN(orderId)) {
