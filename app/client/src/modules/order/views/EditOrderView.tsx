@@ -21,6 +21,7 @@ import { useOrderById, useAddItems, useFullscreen } from '../hooks';
 import { ShoppingCartItem, OrderItem } from '../types';
 import { formatOrderNumber, formatCurrency, calculateOrderFinancials } from '../utils';
 import { ArrowLeft, Save, AlertCircle, Maximize2, Minimize2, Keyboard } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface EditOrderViewProps {
     orderId: number;
@@ -28,6 +29,7 @@ interface EditOrderViewProps {
 
 export function EditOrderView({ orderId }: EditOrderViewProps) {
     const router = useRouter();
+    const { t } = useTranslation();
     const [cartItems, setCartItems] = useState<ShoppingCartItem[]>([]);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
     const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
@@ -103,7 +105,7 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
 
     const handleBack = () => {
         if (hasUnsavedChanges) {
-            const confirmed = confirm('Bạn có thay đổi chưa lưu. Bạn có chắc chắn muốn rời đi?');
+            const confirmed = confirm(t('orders.unsavedChangesWarning'));
             if (!confirmed) return;
         }
         router.push(`/orders/${orderId}`);
@@ -111,7 +113,7 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
 
     const handleSubmit = async () => {
         if (cartItems.length === 0) {
-            alert('Vui lòng thêm ít nhất một món');
+            alert(t('orders.pleaseAddItem'));
             return;
         }
 
@@ -134,10 +136,10 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
             <div className="space-y-6">
                 <Button variant="ghost" onClick={handleBack}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Quay lại
+                    {t('orders.back')}
                 </Button>
                 <div className="text-center py-12 text-muted-foreground">
-                    Đang tải...
+                    {t('orders.loading')}
                 </div>
             </div>
         );
@@ -148,10 +150,10 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
             <div className="space-y-6">
                 <Button variant="ghost" onClick={handleBack}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Quay lại
+                    {t('orders.back')}
                 </Button>
                 <div className="text-center py-12 text-destructive">
-                    {error?.message || 'Không tìm thấy đơn hàng'}
+                    {error?.message || t('orders.orderNotFound')}
                 </div>
             </div>
         );
@@ -199,20 +201,20 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
                 <div className="flex items-center gap-4">
                     <Button variant="ghost" onClick={handleBack}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        Quay lại
+                        {t('orders.back')}
                     </Button>
                     <div>
                         <h1 className="text-3xl font-bold">
-                            Thêm món - {formatOrderNumber(order.orderNumber)}
+                            {t('orders.addItemsTitle', { orderNumber: formatOrderNumber(order.orderNumber) })}
                         </h1>
                         <p className="text-sm text-muted-foreground">
-                            Bàn {order.table?.tableNumber || 'N/A'}
+                            {t('orders.table', { number: order.table?.tableNumber || 'N/A' })}
                         </p>
                     </div>
                     <OrderStatusBadge status={order.status} />
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" size="icon" onClick={() => setShowKeyboardHelp(true)} title="Keyboard shortcuts (?)">
+                    <Button variant="outline" size="icon" onClick={() => setShowKeyboardHelp(true)} title={t('common.keyboardShortcuts')}>
                         <Keyboard className="h-4 w-4" />
                     </Button>
                     <Button variant="outline" onClick={toggleFullscreen}>
@@ -232,9 +234,9 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
                     {/* Current Order Summary */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Đơn hàng hiện tại</CardTitle>
+                            <CardTitle>{t('orders.currentOrder')}</CardTitle>
                             <CardDescription>
-                                {order.orderItems?.length || 0} món - Tổng: {formatCurrency(currentFinancials.total)}
+                                {order.orderItems?.length || 0} {t('orders.items')} - {t('orders.total')}: {formatCurrency(currentFinancials.total)}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -264,9 +266,9 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
                     {/* Add Items */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Thêm món mới</CardTitle>
+                            <CardTitle>{t('orders.addNewItems')}</CardTitle>
                             <CardDescription>
-                                Chọn món ăn để thêm vào đơn hàng
+                                {t('orders.selectFoodToAdd')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -296,11 +298,11 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
                     {cartItems.length > 0 && (
                         <Card>
                             <CardHeader>
-                                <CardTitle>Tổng quan thay đổi</CardTitle>
+                                <CardTitle>{t('orders.changesSummary')}</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div>
-                                    <h4 className="font-medium mb-2">Món mới ({cartItems.length})</h4>
+                                    <h4 className="font-medium mb-2">{t('orders.newItems')} ({cartItems.length})</h4>
                                     <div className="space-y-1">
                                         {cartItems.map((item) => (
                                             <div
@@ -322,16 +324,16 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
 
                                 <div className="space-y-2">
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Tổng hiện tại:</span>
+                                        <span className="text-muted-foreground">{t('orders.currentTotal')}</span>
                                         <span>{formatCurrency(currentFinancials.total)}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Thêm:</span>
+                                        <span className="text-muted-foreground">{t('orders.add')}</span>
                                         <span>{formatCurrency(newItemsSubtotal)}</span>
                                     </div>
                                     <Separator />
                                     <div className="flex justify-between font-semibold">
-                                        <span>Tổng mới:</span>
+                                        <span>{t('orders.newTotal')}</span>
                                         <span>{formatCurrency(newFinancials.total)}</span>
                                     </div>
                                 </div>
@@ -343,7 +345,7 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
                         <Alert variant="destructive">
                             <AlertCircle className="h-4 w-4" />
                             <AlertDescription>
-                                {addItemsMutation.error?.message || 'Đã xảy ra lỗi'}
+                                {addItemsMutation.error?.message || t('orders.errorOccurred')}
                             </AlertDescription>
                         </Alert>
                     )}
@@ -390,7 +392,7 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
                         disabled={cartItems.length === 0 || addItemsMutation.isPending}
                     >
                         <Save className="mr-2 h-4 w-4" />
-                        {addItemsMutation.isPending ? 'Đang lưu...' : 'Thêm món'}
+                        {addItemsMutation.isPending ? t('orders.saving') : t('orders.addItems')}
                     </Button>
                 </div>
             </div>
@@ -399,38 +401,38 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
             <Dialog open={showKeyboardHelp} onOpenChange={setShowKeyboardHelp}>
                 <DialogContent className="max-w-md">
                     <DialogHeader>
-                        <DialogTitle>Phím tắt - Thêm món</DialogTitle>
+                        <DialogTitle>{t('orders.keyboardShortcutsAddItems')}</DialogTitle>
                         <DialogDescription>
-                            Các phím tắt có sẵn khi thêm món vào đơn hàng
+                            {t('orders.keyboardShortcutsAddItemsDesc')}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <h4 className="font-semibold text-sm">Hành động</h4>
+                            <h4 className="font-semibold text-sm">{t('orders.actions')}</h4>
                             <div className="space-y-1 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Quay lại chi tiết đơn</span>
+                                    <span className="text-muted-foreground">{t('orders.backToDetail')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">B</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Lưu thay đổi</span>
+                                    <span className="text-muted-foreground">{t('orders.saveChanges')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">Ctrl+S</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Toàn màn hình</span>
+                                    <span className="text-muted-foreground">{t('orders.fullscreen')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">F / F11</kbd>
                                 </div>
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <h4 className="font-semibold text-sm">Khác</h4>
+                            <h4 className="font-semibold text-sm">{t('orders.other')}</h4>
                             <div className="space-y-1 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Hiển thị trợ giúp này</span>
+                                    <span className="text-muted-foreground">{t('orders.showHelp')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">?</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Đóng dialog</span>
+                                    <span className="text-muted-foreground">{t('orders.closeDialog')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">ESC</kbd>
                                 </div>
                             </div>

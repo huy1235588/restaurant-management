@@ -11,6 +11,7 @@ import { MenuItem as MenuItemType } from '@/types';
 import { ShoppingCartItem } from '../types';
 import { formatCurrency } from '../utils';
 import { Plus, Search } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface MenuItemSelectorProps {
     cartItems: ShoppingCartItem[];
@@ -18,6 +19,7 @@ interface MenuItemSelectorProps {
 }
 
 export function MenuItemSelector({ cartItems, onAddItem }: MenuItemSelectorProps) {
+    const { t } = useTranslation();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
@@ -56,7 +58,7 @@ export function MenuItemSelector({ cartItems, onAddItem }: MenuItemSelectorProps
             <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                    placeholder="Tìm món ăn..."
+                    placeholder={t('orders.searchFood')}
                     value={searchQuery}
                     onChange={handleSearchChange}
                     className="pl-9"
@@ -70,7 +72,7 @@ export function MenuItemSelector({ cartItems, onAddItem }: MenuItemSelectorProps
                     onValueChange={handleCategoryChange}
                 >
                     <TabsList className="w-full justify-start overflow-x-auto">
-                        <TabsTrigger value="all">Tất cả</TabsTrigger>
+                        <TabsTrigger value="all">{t('orders.all')}</TabsTrigger>
                         {categories.map((category) => (
                             <TabsTrigger key={category.categoryId} value={category.categoryId.toString()}>
                                 {category.categoryName}
@@ -83,11 +85,11 @@ export function MenuItemSelector({ cartItems, onAddItem }: MenuItemSelectorProps
             {/* Menu Items Grid */}
             {isLoading ? (
                 <div className="p-8 text-center text-muted-foreground">
-                    Đang tải...
+                    {t('orders.loading')}
                 </div>
             ) : menuItems.length === 0 ? (
                 <div className="p-8 text-center text-muted-foreground">
-                    Không tìm thấy món nào
+                    {t('orders.noItemsFound')}
                 </div>
             ) : (
                 <ScrollArea className="h-[500px]">
@@ -114,6 +116,8 @@ interface MenuItemCardProps {
 }
 
 const MenuItemCard = memo(function MenuItemCard({ item, onAdd, cartQuantity }: MenuItemCardProps) {
+    const { t } = useTranslation();
+    
     const handleAdd = useCallback(() => {
         onAdd({
             menuItemId: item.itemId,
@@ -168,7 +172,7 @@ const MenuItemCard = memo(function MenuItemCard({ item, onAdd, cartQuantity }: M
 
                 {!item.isAvailable && (
                     <Badge variant="destructive" className="absolute top-2 right-2">
-                        Hết
+                        {t('orders.soldOut')}
                     </Badge>
                 )}
             </div>

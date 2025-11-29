@@ -10,6 +10,7 @@ import { PrepTimeIndicator } from "./PrepTimeIndicator";
 import { OrderItemsList } from "./OrderItemsList";
 import { KitchenHelpers } from "../utils/kitchen-helpers";
 import { formatOrderNumber } from "@/modules/order";
+import { useTranslation } from "react-i18next";
 
 interface KitchenOrderCardProps {
     order: KitchenOrder;
@@ -24,6 +25,7 @@ export const KitchenOrderCard = memo(function KitchenOrderCard({
     onCompleteOrder,
     onCancel,
 }: KitchenOrderCardProps) {
+    const { t } = useTranslation();
     const [isNew, setIsNew] = useState(false);
 
     // Flash effect for new orders (< 5 seconds old)
@@ -53,7 +55,7 @@ export const KitchenOrderCard = memo(function KitchenOrderCard({
                             {formatOrderNumber(order.order.orderNumber)}
                         </h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                            Table: {KitchenHelpers.getTableDisplayName(order.order.table)}
+                            {t('kitchen.table')}: {KitchenHelpers.getTableDisplayName(order.order.table)}
                         </p>
                         {order.order.customerName && (
                             <p className="text-xs text-gray-500 dark:text-gray-500">
@@ -84,7 +86,7 @@ export const KitchenOrderCard = memo(function KitchenOrderCard({
                 {order.chef && (
                     <div className="mt-3 flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
                         <Clock className="h-3 w-3" />
-                        <span>Chef: {order.chef.fullName}</span>
+                        <span>{t('common.chef')}: {order.chef.fullName}</span>
                     </div>
                 )}
             </CardContent>
@@ -97,7 +99,7 @@ export const KitchenOrderCard = memo(function KitchenOrderCard({
                         onClick={() => onStartPreparing(order.kitchenOrderId)}
                         size="lg"
                     >
-                        Start Preparing
+                        {t('kitchen.startPreparing')}
                     </Button>
                 )}
 
@@ -108,7 +110,7 @@ export const KitchenOrderCard = memo(function KitchenOrderCard({
                         onClick={() => onCompleteOrder(order.kitchenOrderId)}
                         size="lg"
                     >
-                        Complete Order
+                        {t('kitchen.completeOrder')}
                     </Button>
                 )}
 
@@ -120,7 +122,7 @@ export const KitchenOrderCard = memo(function KitchenOrderCard({
                         onClick={() => onCancel(order.kitchenOrderId)}
                         size="sm"
                     >
-                        Cancel
+                        {t('common.cancel')}
                     </Button>
                 )}
             </CardFooter>

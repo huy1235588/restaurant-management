@@ -18,6 +18,7 @@ import { Order } from '../types';
 import { useCancelOrder } from '../hooks';
 import { formatCurrency, formatOrderNumber } from '../utils';
 import { AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface CancelOrderDialogProps {
     open: boolean;
@@ -25,22 +26,23 @@ interface CancelOrderDialogProps {
     order: Order | null;
 }
 
-const CANCEL_REASONS = [
-    { value: 'customer_cancelled', label: 'Khách hủy đơn' },
-    { value: 'wrong_order', label: 'Tạo nhầm đơn hàng' },
-    { value: 'customer_left', label: 'Khách bỏ đi không chờ' },
-    { value: 'restaurant_issue', label: 'Sự cố nhà hàng' },
-    { value: 'other', label: 'Lý do khác' },
-];
-
 export function CancelOrderDialog({
     open,
     onOpenChange,
     order,
 }: CancelOrderDialogProps) {
+    const { t } = useTranslation();
     const [reason, setReason] = useState('customer_cancelled');
     const [customReason, setCustomReason] = useState('');
     const cancelOrderMutation = useCancelOrder();
+
+    const CANCEL_REASONS = [
+        { value: 'customer_cancelled', label: t('orders.cancelDialog.reasons.customerCancelled') },
+        { value: 'wrong_order', label: t('orders.cancelDialog.reasons.wrongOrder') },
+        { value: 'customer_left', label: t('orders.cancelDialog.reasons.customerLeft') },
+        { value: 'restaurant_issue', label: t('orders.cancelDialog.reasons.restaurantIssue') },
+        { value: 'other', label: t('orders.cancelDialog.reasons.other') },
+    ];
 
     const handleSubmit = async () => {
         if (!order) return;
@@ -74,10 +76,9 @@ export function CancelOrderDialog({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Hủy đơn hàng</DialogTitle>
+                    <DialogTitle>{t('orders.cancelDialog.title')}</DialogTitle>
                     <DialogDescription>
-                        Bạn có chắc chắn muốn hủy đơn hàng này không? Hành động này không thể
-                        hoàn tác.
+                        {t('orders.cancelDialog.description')}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -88,22 +89,22 @@ export function CancelOrderDialog({
                         </h4>
                         <div className="grid grid-cols-2 gap-2 text-sm">
                             <div>
-                                <span className="text-muted-foreground">Bàn: </span>
+                                <span className="text-muted-foreground">{t('orders.cancelDialog.table')} </span>
                                 <span className="font-medium">{order.table.tableNumber}</span>
                             </div>
                             <div>
-                                <span className="text-muted-foreground">Số người: </span>
+                                <span className="text-muted-foreground">{t('orders.cancelDialog.partySize')} </span>
                                 <span className="font-medium">{order.partySize}</span>
                             </div>
                         </div>
                         <div className="text-sm">
-                            <span className="text-muted-foreground">Số món: </span>
+                            <span className="text-muted-foreground">{t('orders.cancelDialog.itemCount')} </span>
                             <span className="font-medium">
-                                {order.orderItems.length} món
+                                {t('orders.cancelDialog.itemCountValue', { count: order.orderItems.length })}
                             </span>
                         </div>
                         <div className="text-sm font-bold">
-                            <span className="text-muted-foreground">Tổng tiền: </span>
+                            <span className="text-muted-foreground">{t('orders.cancelDialog.totalAmount')} </span>
                             <span>{formatCurrency(parseFloat(order.finalAmount))}</span>
                         </div>
                     </div>
@@ -112,14 +113,13 @@ export function CancelOrderDialog({
                         <Alert variant="destructive">
                             <AlertCircle className="h-4 w-4" />
                             <AlertDescription>
-                                Một số món đang được chế biến. Hủy đơn có thể gây lãng phí
-                                nguyên liệu.
+                                {t('orders.cancelDialog.warningItemsInProgress')}
                             </AlertDescription>
                         </Alert>
                     )}
 
                     <div className="space-y-3">
-                        <Label>Lý do hủy *</Label>
+                        <Label>{t('orders.cancelDialog.cancelReason')}</Label>
                         <RadioGroup value={reason} onValueChange={setReason}>
                             {CANCEL_REASONS.map((r) => (
                                 <div key={r.value} className="flex items-center space-x-2">
@@ -133,7 +133,7 @@ export function CancelOrderDialog({
 
                         {reason === 'other' && (
                             <Textarea
-                                placeholder="Nhập lý do..."
+                                placeholder={t('orders.cancelDialog.enterReason')}
                                 value={customReason}
                                 onChange={(e) => setCustomReason(e.target.value)}
                                 rows={3}
@@ -148,7 +148,7 @@ export function CancelOrderDialog({
                         onClick={() => onOpenChange(false)}
                         disabled={cancelOrderMutation.isPending}
                     >
-                        Hủy bỏ
+                        {t('orders.cancelDialog.cancel')}
                     </Button>
                     <Button
                         variant="destructive"
@@ -159,8 +159,8 @@ export function CancelOrderDialog({
                         }
                     >
                         {cancelOrderMutation.isPending
-                            ? 'Đang xử lý...'
-                            : 'Xác nhận hủy đơn'}
+                            ? t('orders.cancelDialog.processing')
+                            : t('orders.cancelDialog.confirmCancel')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/form';
 import { ImageUploadField } from '@/components/shared/ImageUploadField';
 import { Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface CategoryFormProps {
     category?: Category | null;
@@ -31,6 +32,7 @@ interface CategoryFormProps {
 }
 
 export function CategoryForm({ category, onSubmit, onCancel, loading = false }: CategoryFormProps) {
+    const { t } = useTranslation();
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     
     const form = useForm<CategoryFormData>({
@@ -63,10 +65,10 @@ export function CategoryForm({ category, onSubmit, onCancel, loading = false }: 
                     name="categoryName"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Category Name *</FormLabel>
+                            <FormLabel>{t('categories.categoryName')} *</FormLabel>
                             <FormControl>
                                 <Input
-                                    placeholder="e.g., Appetizers, Main Course"
+                                    placeholder={t('categories.categoryNamePlaceholder')}
                                     {...field}
                                     disabled={loading}
                                 />
@@ -81,10 +83,10 @@ export function CategoryForm({ category, onSubmit, onCancel, loading = false }: 
                     name="description"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Description</FormLabel>
+                            <FormLabel>{t('categories.description')}</FormLabel>
                             <FormControl>
                                 <Textarea
-                                    placeholder="Brief description of this category..."
+                                    placeholder={t('categories.descriptionPlaceholder')}
                                     rows={3}
                                     {...field}
                                     value={field.value || ''}
@@ -92,7 +94,7 @@ export function CategoryForm({ category, onSubmit, onCancel, loading = false }: 
                                 />
                             </FormControl>
                             <FormDescription>
-                                Optional description to help customers understand this category
+                                {t('categories.descriptionHelper')}
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
@@ -104,7 +106,7 @@ export function CategoryForm({ category, onSubmit, onCancel, loading = false }: 
                     name="imageUrl"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Category Image</FormLabel>
+                            <FormLabel>{t('categories.categoryImage')}</FormLabel>
                             <FormControl>
                                 <ImageUploadField
                                     value={field.value}
@@ -131,7 +133,7 @@ export function CategoryForm({ category, onSubmit, onCancel, loading = false }: 
                     name="displayOrder"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Display Order</FormLabel>
+                            <FormLabel>{t('categories.displayOrder')}</FormLabel>
                             <FormControl>
                                 <Input
                                     type="number"
@@ -144,7 +146,7 @@ export function CategoryForm({ category, onSubmit, onCancel, loading = false }: 
                                 />
                             </FormControl>
                             <FormDescription>
-                                Lower numbers appear first in the menu
+                                {t('categories.displayOrderHelper')}
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
@@ -157,9 +159,9 @@ export function CategoryForm({ category, onSubmit, onCancel, loading = false }: 
                     render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                             <div className="space-y-0.5">
-                                <FormLabel className="text-base">Active Status</FormLabel>
+                                <FormLabel className="text-base">{t('categories.activeStatus')}</FormLabel>
                                 <FormDescription>
-                                    Inactive categories won't be visible to customers
+                                    {t('categories.activeStatusHelper')}
                                 </FormDescription>
                             </div>
                             <FormControl>
@@ -175,11 +177,11 @@ export function CategoryForm({ category, onSubmit, onCancel, loading = false }: 
 
                 <div className="flex justify-end gap-2 pt-4">
                     <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
-                        Cancel
+                        {t('common.cancel')}
                     </Button>
                     <Button type="submit" disabled={loading}>
                         {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                        {category ? 'Update Category' : 'Create Category'}
+                        {category ? t('categories.updateCategory') : t('categories.createCategory')}
                     </Button>
                 </div>
             </form>

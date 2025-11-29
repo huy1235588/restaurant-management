@@ -7,6 +7,7 @@ import {
     isUpcoming,
 } from '../utils';
 import { Calendar, Clock, Users, Phone, MapPin, CheckCircle, XCircle, LogIn } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ReservationCardProps {
     reservation: Reservation;
@@ -25,6 +26,7 @@ export function ReservationCard({
     onCancel,
     onCheckIn,
 }: ReservationCardProps) {
+    const { t } = useTranslation();
     const upcoming = isUpcoming(reservation.reservationDate);
 
     return (
@@ -49,7 +51,7 @@ export function ReservationCard({
                             {upcoming && (
                                 <span className="flex items-center gap-1 text-xs font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900 px-2.5 py-1 rounded-full">
                                     <Clock className="w-3 h-3" />
-                                    Upcoming
+                                    {t('reservations.upcoming')}
                                 </span>
                             )}
                         </div>
@@ -85,7 +87,7 @@ export function ReservationCard({
                             <div className="flex items-center justify-center w-8 h-8 bg-green-50 dark:bg-green-950 rounded-lg">
                                 <Users className="w-4 h-4 text-green-600 dark:text-green-400" />
                             </div>
-                            <span className="font-medium">{reservation.partySize} guests</span>
+                            <span className="font-medium">{reservation.partySize} {t('reservations.guests')}</span>
                         </div>
                     </div>
 
@@ -95,7 +97,7 @@ export function ReservationCard({
                             <div className="flex items-center justify-center w-8 h-8 bg-orange-50 dark:bg-orange-950 rounded-lg">
                                 <MapPin className="w-4 h-4 text-orange-600 dark:text-orange-400" />
                             </div>
-                            <span className="font-medium">Table {reservation.table.tableNumber}</span>
+                            <span className="font-medium">{t('reservations.table')} {reservation.table.tableNumber}</span>
                         </div>
                     )}
 
@@ -131,7 +133,7 @@ export function ReservationCard({
                                 className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-linear-to-r from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 rounded-lg hover:from-blue-700 hover:to-blue-800 dark:hover:from-blue-600 dark:hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
                             >
                                 <CheckCircle className="w-4 h-4" />
-                                Confirm
+                                {t('common.confirm')}
                             </button>
                         )}
                         {reservation.status === 'confirmed' && onCheckIn && (
@@ -143,7 +145,7 @@ export function ReservationCard({
                                 className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-linear-to-r from-green-600 to-green-700 dark:from-green-500 dark:to-green-600 rounded-lg hover:from-green-700 hover:to-green-800 dark:hover:from-green-600 dark:hover:to-green-700 transition-all duration-200 shadow-sm hover:shadow-md"
                             >
                                 <LogIn className="w-4 h-4" />
-                                Check In
+                                {t('reservations.checkIn')}
                             </button>
                         )}
                         {['pending', 'confirmed'].includes(reservation.status) && onCancel && (
@@ -155,7 +157,7 @@ export function ReservationCard({
                                 className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950 rounded-lg hover:bg-red-100 dark:hover:bg-red-900 transition-all duration-200 border border-red-200 dark:border-red-800"
                             >
                                 <XCircle className="w-4 h-4" />
-                                Cancel
+                                {t('common.cancel')}
                             </button>
                         )}
                     </div>

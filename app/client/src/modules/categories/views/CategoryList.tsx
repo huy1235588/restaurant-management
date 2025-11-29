@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
 import { AlertCircle, PackageX } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useTranslation } from 'react-i18next';
 
 interface CategoryListProps {
     categories: Category[];
@@ -24,6 +25,8 @@ export function CategoryList({
     onDelete,
     onViewDetails,
 }: CategoryListProps) {
+    const { t } = useTranslation();
+
     if (loading) {
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -46,7 +49,7 @@ export function CategoryList({
         return (
             <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>{t('common.error')}</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
             </Alert>
         );
@@ -58,9 +61,9 @@ export function CategoryList({
                 <div className="flex flex-col items-center justify-center text-center space-y-4">
                     <PackageX className="w-16 h-16 text-muted-foreground/50" />
                     <div>
-                        <h3 className="text-lg font-semibold mb-1">No categories found</h3>
+                        <h3 className="text-lg font-semibold mb-1">{t('categories.noCategories')}</h3>
                         <p className="text-sm text-muted-foreground">
-                            Get started by creating your first category
+                            {t('categories.noCategoriesDescription')}
                         </p>
                     </div>
                 </div>

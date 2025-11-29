@@ -6,6 +6,7 @@ import { ShoppingCartItem } from '../types';
 import { formatCurrency } from '../utils';
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useTranslation } from 'react-i18next';
 
 interface ShoppingCartProps {
     items: ShoppingCartItem[];
@@ -18,6 +19,7 @@ export function ShoppingCart({
     onUpdateQuantity,
     onRemoveItem,
 }: ShoppingCartProps) {
+    const { t } = useTranslation();
     const subtotal = items.reduce(
         (sum, item) => sum + item.price * item.quantity,
         0
@@ -27,11 +29,11 @@ export function ShoppingCart({
         return (
             <Card className="sticky top-4">
                 <CardHeader>
-                    <CardTitle>Giỏ hàng (0)</CardTitle>
+                    <CardTitle>{t('orders.shoppingCartCount', { count: 0 })}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p className="text-center text-sm text-muted-foreground py-8">
-                        Chưa có món nào
+                        {t('orders.noItemsYet')}
                     </p>
                 </CardContent>
             </Card>
@@ -41,7 +43,7 @@ export function ShoppingCart({
     return (
         <Card className="sticky top-4">
             <CardHeader>
-                <CardTitle>Giỏ hàng ({items.length})</CardTitle>
+                <CardTitle>{t('orders.shoppingCartCount', { count: items.length })}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
                 <ScrollArea className="max-h-[300px] pr-4">
@@ -112,11 +114,11 @@ export function ShoppingCart({
 
                 <div className="border-t pt-4 space-y-2">
                     <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Tạm tính</span>
+                        <span className="text-muted-foreground">{t('orders.subtotal')}</span>
                         <span className="font-medium">{formatCurrency(subtotal)}</span>
                     </div>
                     <div className="flex justify-between text-lg font-bold">
-                        <span>Tổng cộng</span>
+                        <span>{t('orders.total')}</span>
                         <span>{formatCurrency(subtotal)}</span>
                     </div>
                 </div>

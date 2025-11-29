@@ -1,10 +1,13 @@
 import { OrderItem } from "../types/kitchen.types";
+import { useTranslation } from "react-i18next";
 
 interface OrderItemsListProps {
     items: OrderItem[];
 }
 
 export function OrderItemsList({ items }: OrderItemsListProps) {
+    const { t } = useTranslation();
+
     return (
         <div className="space-y-2">
             {items.map((item) => (
@@ -23,7 +26,7 @@ export function OrderItemsList({ items }: OrderItemsListProps) {
                         </div>
                         {item.specialRequest && (
                             <p className="text-xs text-orange-600 dark:text-orange-400 mt-1 italic">
-                                Note: {item.specialRequest}
+                                {t('common.note')}: {item.specialRequest}
                             </p>
                         )}
                     </div>

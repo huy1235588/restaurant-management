@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Clock, CheckCircle2, XCircle } from "lucide-react";
 import { KitchenHelpers } from "../utils/kitchen-helpers";
 import { KitchenOrderStatus } from "../types/kitchen.types";
+import { useTranslation } from "react-i18next";
 
 interface PrepTimeIndicatorProps {
     createdAt: string;
@@ -12,6 +13,7 @@ interface PrepTimeIndicatorProps {
 }
 
 export function PrepTimeIndicator({ createdAt, status, completedAt }: PrepTimeIndicatorProps) {
+    const { t } = useTranslation();
     // Calculate initial elapsed time
     const isTerminal = status === KitchenOrderStatus.COMPLETED;
     const finalTime = completedAt || createdAt;
@@ -59,7 +61,7 @@ export function PrepTimeIndicator({ createdAt, status, completedAt }: PrepTimeIn
                 {formattedTime}
             </span>
             <span className="text-xs text-gray-500 dark:text-gray-400">
-                {isTerminal ? "completed in" : "elapsed"}
+                {isTerminal ? t('kitchen.completedIn') : t('kitchen.elapsed')}
             </span>
         </div>
     );

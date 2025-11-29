@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, Edit, Trash2, Copy } from 'lucide-react';
 import { formatPrice, getSpicyLevelEmoji } from '../utils';
+import { useTranslation } from 'react-i18next';
 
 interface MenuItemListRowProps {
     item: MenuItem;
@@ -31,6 +32,8 @@ export function MenuItemListRow({
     onToggleAvailability,
     onClick,
 }: MenuItemListRowProps) {
+    const { t } = useTranslation();
+
     const handleToggleAvailability = async (checked: boolean) => {
         await onToggleAvailability(item, checked);
     };
@@ -89,7 +92,7 @@ export function MenuItemListRow({
                 <div className="text-right">
                     <p className="font-semibold">{formatPrice(item.price)}</p>
                     <Badge variant={item.isAvailable ? 'default' : 'destructive'} className="text-xs">
-                        {item.isAvailable ? 'Available' : 'Out'}
+                        {item.isAvailable ? t('menu.available') : t('menu.out')}
                     </Badge>
                 </div>
 
@@ -110,18 +113,18 @@ export function MenuItemListRow({
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => onEdit(item)}>
                             <Edit className="w-4 h-4 mr-2" />
-                            Edit
+                            {t('common.edit')}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onDuplicate(item)}>
                             <Copy className="w-4 h-4 mr-2" />
-                            Duplicate
+                            {t('common.duplicate')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             onClick={() => onDelete(item)}
                             className="text-destructive"
                         >
                             <Trash2 className="w-4 h-4 mr-2" />
-                            Delete
+                            {t('common.delete')}
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

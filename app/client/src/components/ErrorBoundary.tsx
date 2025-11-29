@@ -3,6 +3,7 @@
 import React, { Component, ErrorInfo, ReactNode } from "react";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import i18n from "@/lib/i18n";
 
 interface Props {
     children: ReactNode;
@@ -54,17 +55,19 @@ export class ErrorBoundary extends Component<Props, State> {
                 return this.props.fallback;
             }
 
+            const t = i18n.t.bind(i18n);
+
             // Default error UI
             return (
                 <div className="flex min-h-[400px] flex-col items-center justify-center p-8">
                     <div className="text-center max-w-md">
                         <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                            Something went wrong
+                            {t('errors.somethingWentWrong')}
                         </h2>
                         <p className="text-gray-600 dark:text-gray-400 mb-6">
                             {this.state.error?.message ||
-                                "An unexpected error occurred"}
+                                t('errors.unexpectedError')}
                         </p>
                         <div className="flex gap-3 justify-center">
                             <Button
@@ -73,13 +76,13 @@ export class ErrorBoundary extends Component<Props, State> {
                                 className="gap-2"
                             >
                                 <RefreshCw className="h-4 w-4" />
-                                Try Again
+                                {t('common.tryAgain')}
                             </Button>
                             <Button
                                 onClick={() => window.location.reload()}
                                 variant="default"
                             >
-                                Reload Page
+                                {t('errors.reloadPage')}
                             </Button>
                         </div>
                     </div>

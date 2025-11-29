@@ -186,7 +186,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                             onClick={() => setShowHelpDialog(true)}
                             variant="outline"
                             size="sm"
-                            title="Keyboard shortcuts (Shift+?)"
+                            title={t('common.keyboardShortcuts')}
                             className="gap-2"
                         >
                             <Keyboard className="w-4 h-4" />

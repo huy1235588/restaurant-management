@@ -24,6 +24,7 @@ import { useOrderById, useOrderSocket, useUpdateOrderStatus, useFullscreen } fro
 import { Order, OrderItem } from '../types';
 import { formatOrderNumber, formatDateTime, canAddItems, canCancelOrder, canCreateBill } from '../utils';
 import { ArrowLeft, Plus, XCircle, Printer, Receipt, Check, Keyboard, Maximize2, Minimize2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface OrderDetailViewProps {
     orderId: number;
@@ -31,6 +32,7 @@ interface OrderDetailViewProps {
 
 export function OrderDetailView({ orderId }: OrderDetailViewProps) {
     const router = useRouter();
+    const { t } = useTranslation();
     const [itemToCancel, setItemToCancel] = useState<OrderItem | null>(null);
     const [showCancelOrderDialog, setShowCancelOrderDialog] = useState(false);
     const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
@@ -150,10 +152,10 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
             <div className="space-y-6">
                 <Button variant="ghost" onClick={handleBack}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Quay lại
+                    {t('orders.back')}
                 </Button>
                 <div className="text-center py-12 text-muted-foreground">
-                    Đang tải...
+                    {t('orders.loading')}
                 </div>
             </div>
         );
@@ -164,10 +166,10 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
             <div className="space-y-6">
                 <Button variant="ghost" onClick={handleBack}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Quay lại
+                    {t('orders.back')}
                 </Button>
                 <div className="text-center py-12 text-destructive">
-                    {error?.message || 'Không tìm thấy đơn hàng'}
+                    {error?.message || t('orders.orderNotFound')}
                 </div>
             </div>
         );
@@ -180,7 +182,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                 <div className="flex items-center gap-4">
                     <Button variant="ghost" onClick={handleBack}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        Quay lại
+                        {t('orders.back')}
                     </Button>
                     <div>
                         <h1 className="text-3xl font-bold">
@@ -193,7 +195,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                     <OrderStatusBadge status={order.status} />
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" size="icon" onClick={() => setShowKeyboardHelp(true)} title="Keyboard shortcuts (?)">
+                    <Button variant="outline" size="icon" onClick={() => setShowKeyboardHelp(true)} title={t('common.keyboardShortcuts')}>
                         <Keyboard className="h-4 w-4" />
                     </Button>
                     <Button variant="outline" onClick={toggleFullscreen}>
@@ -210,29 +212,29 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                             disabled={updateStatusMutation.isPending}
                         >
                             <Check className="mr-2 h-4 w-4" />
-                            {updateStatusMutation.isPending ? 'Đang xác nhận...' : 'Xác nhận đơn'}
+                            {updateStatusMutation.isPending ? t('orders.confirming') : t('orders.confirmOrder')}
                         </Button>
                     )}
                     {canAddItems(order) && (
                         <Button onClick={handleAddItems} variant="outline">
                             <Plus className="mr-2 h-4 w-4" />
-                            Thêm món
+                            {t('orders.addItems')}
                         </Button>
                     )}
                     {canCancelOrder(order) && (
                         <Button variant="destructive" onClick={handleCancelOrder}>
                             <XCircle className="mr-2 h-4 w-4" />
-                            Hủy đơn
+                            {t('orders.cancelOrder')}
                         </Button>
                     )}
                     <Button variant="outline" onClick={handlePrint}>
                         <Printer className="mr-2 h-4 w-4" />
-                        In
+                        {t('orders.print')}
                     </Button>
                     {canCreateBill(order) && (
                         <Button variant="outline" onClick={handleCreateBill}>
                             <Receipt className="mr-2 h-4 w-4" />
-                            Tạo hóa đơn
+                            {t('orders.createBill')}
                         </Button>
                     )}
                 </div>
@@ -244,18 +246,18 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                     {/* Order Information */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Thông tin đơn hàng</CardTitle>
+                            <CardTitle>{t('orders.orderInfo')}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="grid gap-4 md:grid-cols-2">
                                 <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Bàn</p>
+                                    <p className="text-sm font-medium text-muted-foreground">{t('orders.tableLabel')}</p>
                                     <p className="text-lg font-semibold">
                                         {order.table?.tableNumber || 'N/A'}
                                     </p>
                                 </div>
                                 <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Nhân viên</p>
+                                    <p className="text-sm font-medium text-muted-foreground">{t('orders.staffLabel')}</p>
                                     <p className="text-lg">
                                         {order.staff?.fullName || 'N/A'}
                                     </p>
@@ -264,25 +266,25 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                             <Separator />
                             <div className="grid gap-4 md:grid-cols-2">
                                 <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Khách hàng</p>
+                                    <p className="text-sm font-medium text-muted-foreground">{t('orders.customerLabel')}</p>
                                     <p className="text-lg">
-                                        {order.customerName || 'Khách vãng lai'}
+                                        {order.customerName || t('orders.walkInCustomer')}
                                     </p>
                                 </div>
                                 <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Số điện thoại</p>
+                                    <p className="text-sm font-medium text-muted-foreground">{t('orders.phoneLabel')}</p>
                                     <p className="text-lg">
-                                        {order.customerPhone || 'Không có'}
+                                        {order.customerPhone || t('orders.noPhone')}
                                     </p>
                                 </div>
                             </div>
                             <Separator />
                             <div>
-                                <p className="text-sm font-medium text-muted-foreground mb-2">Trạng thái bếp</p>
+                                <p className="text-sm font-medium text-muted-foreground mb-2">{t('orders.kitchenStatusLabel')}</p>
                                 <KitchenStatusBadge kitchenOrders={order.kitchenOrders?.[0] || null} />
                                 {order.kitchenOrders?.[0]?.chef && (
                                     <p className="text-sm text-muted-foreground mt-1">
-                                        Đầu bếp: {order.kitchenOrders[0].chef.fullName}
+                                        {t('orders.chef')} {order.kitchenOrders[0].chef.fullName}
                                     </p>
                                 )}
                             </div>
@@ -292,7 +294,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                     {/* Order Items */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Món ăn ({order.orderItems?.length || 0})</CardTitle>
+                            <CardTitle>{t('orders.items')} ({order.orderItems?.length || 0})</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <OrderItemList
@@ -317,23 +319,23 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                     {/* Additional Info */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Thông tin bổ sung</CardTitle>
+                            <CardTitle>{t('orders.additionalInfo')}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3">
                             <div>
-                                <p className="text-sm font-medium text-muted-foreground">Mã đơn</p>
+                                <p className="text-sm font-medium text-muted-foreground">{t('orders.orderCode')}</p>
                                 <p className="text-sm font-mono">{order.orderNumber}</p>
                             </div>
                             <Separator />
                             <div>
-                                <p className="text-sm font-medium text-muted-foreground">Ngày tạo</p>
+                                <p className="text-sm font-medium text-muted-foreground">{t('orders.createdDate')}</p>
                                 <p className="text-sm">{formatDateTime(order.createdAt)}</p>
                             </div>
                             {order.updatedAt && (
                                 <>
                                     <Separator />
                                     <div>
-                                        <p className="text-sm font-medium text-muted-foreground">Cập nhật lần cuối</p>
+                                        <p className="text-sm font-medium text-muted-foreground">{t('orders.lastUpdated')}</p>
                                         <p className="text-sm">{formatDateTime(order.updatedAt)}</p>
                                     </div>
                                 </>
@@ -360,60 +362,60 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
             <Dialog open={showKeyboardHelp} onOpenChange={setShowKeyboardHelp}>
                 <DialogContent className="max-w-md">
                     <DialogHeader>
-                        <DialogTitle>Phím tắt - Chi tiết đơn hàng</DialogTitle>
+                        <DialogTitle>{t('orders.keyboardShortcutsDetail')}</DialogTitle>
                         <DialogDescription>
-                            Các phím tắt có sẵn trong trang chi tiết đơn hàng
+                            {t('orders.keyboardShortcutsDetailDesc')}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <h4 className="font-semibold text-sm">Hành động</h4>
+                            <h4 className="font-semibold text-sm">{t('orders.actions')}</h4>
                             <div className="space-y-1 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Quay lại danh sách</span>
+                                    <span className="text-muted-foreground">{t('orders.backToList')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">B</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">In đơn hàng</span>
+                                    <span className="text-muted-foreground">{t('orders.printOrder')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">Ctrl+P</kbd>
                                 </div>
                                 {canAddItems(order) && (
                                     <div className="flex justify-between">
-                                        <span className="text-muted-foreground">Thêm món</span>
+                                        <span className="text-muted-foreground">{t('orders.addItems')}</span>
                                         <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">A</kbd>
                                     </div>
                                 )}
                                 {order.status === 'pending' && (
                                     <div className="flex justify-between">
-                                        <span className="text-muted-foreground">Xác nhận đơn</span>
+                                        <span className="text-muted-foreground">{t('orders.confirmOrder')}</span>
                                         <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">C</kbd>
                                     </div>
                                 )}
                                 {canCancelOrder(order) && (
                                     <div className="flex justify-between">
-                                        <span className="text-muted-foreground">Hủy đơn hàng</span>
+                                        <span className="text-muted-foreground">{t('orders.cancelOrder')}</span>
                                         <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">X</kbd>
                                     </div>
                                 )}
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Tạo hóa đơn</span>
+                                    <span className="text-muted-foreground">{t('orders.createBill')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">R</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Toàn màn hình</span>
+                                    <span className="text-muted-foreground">{t('orders.fullscreen')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">F / F11</kbd>
                                 </div>
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <h4 className="font-semibold text-sm">Khác</h4>
+                            <h4 className="font-semibold text-sm">{t('orders.other')}</h4>
                             <div className="space-y-1 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Hiển thị trợ giúp này</span>
+                                    <span className="text-muted-foreground">{t('orders.showHelp')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">?</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Đóng dialog</span>
+                                    <span className="text-muted-foreground">{t('orders.closeDialog')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">ESC</kbd>
                                 </div>
                             </div>

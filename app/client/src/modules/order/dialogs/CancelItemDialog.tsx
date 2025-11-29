@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     Dialog,
     DialogContent,
@@ -24,13 +25,13 @@ interface CancelItemDialogProps {
     orderId: number;
 }
 
-const CANCEL_REASONS = [
-    { value: 'customer_changed_mind', label: 'Khách thay đổi ý định' },
-    { value: 'out_of_stock', label: 'Hết nguyên liệu' },
-    { value: 'wrong_order', label: 'Đặt nhầm món' },
-    { value: 'customer_wait', label: 'Khách không muốn chờ' },
-    { value: 'other', label: 'Lý do khác' },
-];
+const CANCEL_REASON_KEYS = [
+    { value: 'customer_changed_mind', key: 'customerChangedMind' },
+    { value: 'out_of_stock', key: 'outOfStock' },
+    { value: 'wrong_order', key: 'wrongOrder' },
+    { value: 'customer_wait', key: 'customerWait' },
+    { value: 'other', key: 'other' },
+] as const;
 
 export function CancelItemDialog({
     open,
@@ -38,6 +39,7 @@ export function CancelItemDialog({
     item,
     orderId,
 }: CancelItemDialogProps) {
+    const { t } = useTranslation();
     const [reason, setReason] = useState('customer_changed_mind');
     const [customReason, setCustomReason] = useState('');
     const cancelItemMutation = useCancelItem();
@@ -48,7 +50,7 @@ export function CancelItemDialog({
         const finalReason =
             reason === 'other'
                 ? customReason
-                : CANCEL_REASONS.find((r) => r.value === reason)?.label || reason;
+                : t(`orders.cancelItemDialog.reasons.${CANCEL_REASON_KEYS.find((r) => r.value === reason)?.key}`) || reason;
 
         if (reason === 'other' && !customReason.trim()) {
             return;
@@ -71,9 +73,9 @@ export function CancelItemDialog({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Hủy món</DialogTitle>
+                    <DialogTitle>{t('orders.cancelItemDialog.title')}</DialogTitle>
                     <DialogDescription>
-                        Bạn có chắc chắn muốn hủy món này không?
+                        {t('orders.cancelItemDialog.description')}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -93,13 +95,13 @@ export function CancelItemDialog({
                     </div>
 
                     <div className="space-y-3">
-                        <Label>Lý do hủy *</Label>
+                        <Label>{t('orders.cancelItemDialog.cancelReason')}</Label>
                         <RadioGroup value={reason} onValueChange={setReason}>
-                            {CANCEL_REASONS.map((r) => (
+                            {CANCEL_REASON_KEYS.map((r) => (
                                 <div key={r.value} className="flex items-center space-x-2">
                                     <RadioGroupItem value={r.value} id={r.value} />
                                     <Label htmlFor={r.value} className="font-normal">
-                                        {r.label}
+                                        {t(`orders.cancelItemDialog.reasons.${r.key}`)}
                                     </Label>
                                 </div>
                             ))}
@@ -107,7 +109,7 @@ export function CancelItemDialog({
 
                         {reason === 'other' && (
                             <Textarea
-                                placeholder="Nhập lý do..."
+                                placeholder={t('orders.cancelItemDialog.enterReason')}
                                 value={customReason}
                                 onChange={(e) => setCustomReason(e.target.value)}
                                 rows={3}
@@ -122,7 +124,7 @@ export function CancelItemDialog({
                         onClick={() => onOpenChange(false)}
                         disabled={cancelItemMutation.isPending}
                     >
-                        Hủy bỏ
+                        {t('orders.cancelItemDialog.cancel')}
                     </Button>
                     <Button
                         variant="destructive"
@@ -132,7 +134,7 @@ export function CancelItemDialog({
                             (reason === 'other' && !customReason.trim())
                         }
                     >
-                        {cancelItemMutation.isPending ? 'Đang xử lý...' : 'Xác nhận hủy'}
+                        {cancelItemMutation.isPending ? t('orders.cancelItemDialog.processing') : t('orders.cancelItemDialog.confirmCancel')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

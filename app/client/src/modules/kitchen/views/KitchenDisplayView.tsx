@@ -25,8 +25,10 @@ import { LoadingState } from "../components/LoadingState";
 import { ErrorState } from "../components/ErrorState";
 import { EmptyState } from "../components/EmptyState";
 import { KitchenHelpers } from "../utils/kitchen-helpers";
+import { useTranslation } from "react-i18next";
 
 export function KitchenDisplayView() {
+    const { t } = useTranslation();
     const [statusFilter, setStatusFilter] = useState<
         KitchenOrderStatus | "all"
     >("all");
@@ -165,7 +167,7 @@ export function KitchenDisplayView() {
                 <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 px-3 md:px-4 py-2 md:py-3 flex items-center justify-between">
                     <div className="flex items-center gap-2 md:gap-4">
                         <h1 className="text-lg md:text-2xl font-bold text-gray-900 dark:text-white">
-                            Kitchen Display
+                            {t('kitchen.title')}
                         </h1>
 
                         {/* Connection Status */}
@@ -177,7 +179,7 @@ export function KitchenDisplayView() {
                                     }`}
                             />
                             <span className="text-xs md:text-sm text-gray-600 dark:text-gray-400 hidden sm:inline">
-                                {isConnected ? "Connected" : "Disconnected"}
+                                {isConnected ? t('common.connected') : t('common.disconnected')}
                             </span>
                         </div>
                     </div>
@@ -194,7 +196,7 @@ export function KitchenDisplayView() {
                             size="sm"
                             onClick={() => setShowKeyboardHelp(true)}
                             className="h-8 md:h-9 px-2 md:px-3"
-                            title="Keyboard shortcuts (?)"
+                            title={t('common.keyboardShortcuts')}
                         >
                             <Keyboard className="h-3 w-3 md:h-4 md:w-4" />
                         </Button>
@@ -211,7 +213,7 @@ export function KitchenDisplayView() {
                                 className={`h-3 w-3 md:h-4 md:w-4 ${isLoading ? "animate-spin" : ""
                                     }`}
                             />
-                            <span className="ml-1 md:ml-2 hidden sm:inline">Refresh</span>
+                            <span className="ml-1 md:ml-2 hidden sm:inline">{t('common.refresh')}</span>
                         </Button>
 
                         {/* Fullscreen Button */}
@@ -227,7 +229,7 @@ export function KitchenDisplayView() {
                                 <Maximize2 className="h-3 w-3 md:h-4 md:w-4" />
                             )}
                             <span className="ml-1 md:ml-2 hidden sm:inline">
-                                {isFullscreen ? "Exit" : "Fullscreen"}
+                                {isFullscreen ? t('common.exitFullscreen') : t('common.fullscreen')}
                             </span>
                         </Button>
                     </div>
@@ -287,7 +289,7 @@ export function KitchenDisplayView() {
                             onClick={() => setStatusFilter("all")}
                             className="h-7 md:h-8 text-xs md:text-sm px-2 md:px-3"
                         >
-                            All
+                            {t('kitchen.filter.all')}
                         </Button>
                         <Button
                             variant={
@@ -301,7 +303,7 @@ export function KitchenDisplayView() {
                             }
                             className="h-7 md:h-8 text-xs md:text-sm px-2 md:px-3"
                         >
-                            Pending
+                            {t('kitchen.filter.pending')}
                         </Button>
                         <Button
                             variant={
@@ -313,7 +315,7 @@ export function KitchenDisplayView() {
                             onClick={() => setStatusFilter(KitchenOrderStatus.PREPARING)}
                             className="h-7 md:h-8 text-xs md:text-sm px-2 md:px-3"
                         >
-                            Preparing
+                            {t('kitchen.filter.preparing')}
                         </Button>
                         <Button
                             variant={
@@ -327,7 +329,7 @@ export function KitchenDisplayView() {
                             }
                             className="h-7 md:h-8 text-xs md:text-sm px-2 md:px-3"
                         >
-                            Completed
+                            {t('kitchen.filter.completed')}
                         </Button>
                     </div>
                 </div>
@@ -339,7 +341,7 @@ export function KitchenDisplayView() {
 
                 {isError && (
                     <ErrorState
-                        message="Failed to load kitchen orders"
+                        message={t('kitchen.failedToLoad')}
                         onRetry={() => refetch()}
                     />
                 )}
@@ -367,55 +369,55 @@ export function KitchenDisplayView() {
             <Dialog open={showKeyboardHelp} onOpenChange={setShowKeyboardHelp}>
                 <DialogContent className="max-w-md">
                     <DialogHeader>
-                        <DialogTitle>Phím tắt - Kitchen Display</DialogTitle>
+                        <DialogTitle>{t('kitchen.keyboard.title')}</DialogTitle>
                         <DialogDescription>
-                            Các phím tắt có sẵn trong màn hình bếp
+                            {t('kitchen.keyboard.description')}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <h4 className="font-semibold text-sm">Hành động</h4>
+                            <h4 className="font-semibold text-sm">{t('kitchen.keyboard.actions')}</h4>
                             <div className="space-y-1 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Làm mới đơn hàng</span>
+                                    <span className="text-muted-foreground">{t('kitchen.keyboard.refreshOrders')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">R</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Toàn màn hình</span>
+                                    <span className="text-muted-foreground">{t('kitchen.keyboard.toggleFullscreen')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">F / F11</kbd>
                                 </div>
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <h4 className="font-semibold text-sm">Lọc trạng thái</h4>
+                            <h4 className="font-semibold text-sm">{t('kitchen.keyboard.filterStatus')}</h4>
                             <div className="space-y-1 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Tất cả đơn</span>
+                                    <span className="text-muted-foreground">{t('kitchen.keyboard.allOrders')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">1</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Đang chờ (Pending)</span>
+                                    <span className="text-muted-foreground">{t('kitchen.keyboard.pendingOrders')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">2</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Đang chuẩn bị (Preparing)</span>
+                                    <span className="text-muted-foreground">{t('kitchen.keyboard.preparingOrders')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">3</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Hoàn thành (Completed)</span>
+                                    <span className="text-muted-foreground">{t('kitchen.keyboard.completedOrders')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">4</kbd>
                                 </div>
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <h4 className="font-semibold text-sm">Khác</h4>
+                            <h4 className="font-semibold text-sm">{t('common.other')}</h4>
                             <div className="space-y-1 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Hiển thị trợ giúp này</span>
+                                    <span className="text-muted-foreground">{t('common.showHelp')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">?</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Đóng dialog</span>
+                                    <span className="text-muted-foreground">{t('common.closeDialog')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">ESC</kbd>
                                 </div>
                             </div>

@@ -8,6 +8,7 @@ import { useAvailableTables } from '@/modules/tables/hooks';
 import { Table } from '@/types';
 import { Users, CheckCircle2, Loader2, MapPin, Building2, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface TableSelectorProps {
     selectedTableId: number | null;
@@ -16,6 +17,7 @@ interface TableSelectorProps {
 }
 
 export function TableSelector({ selectedTableId, onSelect, capacity }: TableSelectorProps) {
+    const { t } = useTranslation();
     const { data: availableTables, isLoading } = useAvailableTables(capacity);
 
     const tables = useMemo(() => (availableTables as Table[] | undefined) || [], [availableTables]);
@@ -64,17 +66,17 @@ export function TableSelector({ selectedTableId, onSelect, capacity }: TableSele
                         <CheckCircle2 className="w-5 h-5 text-primary-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <CardTitle className="text-xl">Chọn bàn</CardTitle>
+                        <CardTitle className="text-xl">{t('orders.selectTable')}</CardTitle>
                         <CardDescription>
                             {isLoading ? (
-                                'Đang tải...'
+                                t('orders.loading')
                             ) : tables.length > 0 ? (
                                 <>
-                                    {tables.length} bàn trống
-                                    {capacity && ` (phù hợp ${capacity} người)`}
+                                    {tables.length} {t('orders.availableTables')}
+                                    {capacity && ` (${t('orders.availableTablesForCapacity', { capacity })})`}
                                 </>
                             ) : (
-                                'Không có bàn trống'
+                                t('orders.noAvailableTables')
                             )}
                         </CardDescription>
                     </div>
@@ -82,16 +84,16 @@ export function TableSelector({ selectedTableId, onSelect, capacity }: TableSele
                         <div className="text-right shrink-0">
                             <Badge variant="default" className="bg-primary px-3 py-1.5 mb-1">
                                 <CheckCircle2 className="w-3 h-3 inline mr-1" />
-                                Bàn {selectedTable.tableNumber}
+                                {t('orders.table', { number: selectedTable.tableNumber })}
                             </Badge>
                             <div className="text-xs text-muted-foreground flex items-center gap-2 justify-end mt-1">
                                 <span className="flex items-center gap-1">
                                     <Building2 className="w-3 h-3" />
-                                    Tầng {selectedTable.floor}
+                                    {t('orders.floorNumber', { number: selectedTable.floor })}
                                 </span>
                                 <span className="flex items-center gap-1">
                                     <Users className="w-3 h-3" />
-                                    {selectedTable.capacity} chỗ
+                                    {selectedTable.capacity} {t('orders.seats')}
                                 </span>
                             </div>
                         </div>
@@ -104,7 +106,7 @@ export function TableSelector({ selectedTableId, onSelect, capacity }: TableSele
                         <div className="text-center">
                             <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-primary" />
                             <p className="text-sm text-muted-foreground">
-                                Đang kiểm tra bàn trống...
+                                {t('orders.checkingAvailableTables')}
                             </p>
                         </div>
                     </div>
@@ -112,8 +114,7 @@ export function TableSelector({ selectedTableId, onSelect, capacity }: TableSele
                     <div className="flex flex-col items-center justify-center py-12 text-center">
                         <Info className="w-12 h-12 text-muted-foreground mb-3" />
                         <p className="text-muted-foreground">
-                            Không có bàn trống
-                            {capacity && ` cho ${capacity} người`}
+                            {capacity ? t('orders.noAvailableTablesForCapacity', { capacity }) : t('orders.noAvailableTables')}
                         </p>
                     </div>
                 ) : floors.length > 1 ? (
@@ -122,14 +123,14 @@ export function TableSelector({ selectedTableId, onSelect, capacity }: TableSele
                             <Building2 className="w-5 h-5 text-muted-foreground shrink-0" />
                             <Select value={String(selectedFloor)} onValueChange={(val) => setSelectedFloor(Number(val))}>
                                 <SelectTrigger className="w-[200px] h-11">
-                                    <SelectValue placeholder="Chọn tầng" />
+                                    <SelectValue placeholder={t('orders.selectFloor')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {floors.map((floor) => (
                                         <SelectItem key={floor} value={String(floor)}>
                                             <div className="flex items-center gap-2">
                                                 <MapPin className="w-4 h-4" />
-                                                Tầng {floor}
+                                                {t('orders.floorNumber', { number: floor })}
                                                 <Badge variant="secondary" className="ml-1">
                                                     {tablesByFloor[floor].length}
                                                 </Badge>
@@ -139,7 +140,7 @@ export function TableSelector({ selectedTableId, onSelect, capacity }: TableSele
                                 </SelectContent>
                             </Select>
                             <span className="text-sm text-muted-foreground">
-                                {tablesByFloor[selectedFloor]?.length || 0} bàn tại tầng này
+                                {tablesByFloor[selectedFloor]?.length || 0} {t('orders.tablesOnFloor')}
                             </span>
                         </div>
                         <TableGrid
@@ -167,6 +168,8 @@ interface TableGridProps {
 }
 
 function TableGrid({ tables, selectedTableId, onSelectTable }: TableGridProps) {
+    const { t } = useTranslation();
+    
     // Group by section if available
     const tablesBySection = useMemo(() => {
         const hasSection = tables.some((t) => t.section);
@@ -175,7 +178,7 @@ function TableGrid({ tables, selectedTableId, onSelectTable }: TableGridProps) {
         }
 
         return tables.reduce((acc, table) => {
-            const section = table.section || 'Khu vực chính';
+            const section = table.section || t('orders.mainArea');
             if (!acc[section]) {
                 acc[section] = [];
             }

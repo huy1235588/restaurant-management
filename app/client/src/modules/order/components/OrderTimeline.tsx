@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatDateTime, getRelativeTime } from '../utils';
 import { Circle, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface TimelineEvent {
     id: string;
@@ -32,15 +33,17 @@ function getEventIcon(type: TimelineEvent['type']) {
 }
 
 export function OrderTimeline({ events }: OrderTimelineProps) {
+    const { t } = useTranslation();
+
     if (events.length === 0) {
         return (
             <Card>
                 <CardHeader>
-                    <CardTitle>Lịch sử đơn hàng</CardTitle>
+                    <CardTitle>{t('orders.orderHistory')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p className="text-sm text-muted-foreground text-center py-4">
-                        Chưa có sự kiện nào
+                        {t('orders.noEventsYet')}
                     </p>
                 </CardContent>
             </Card>
@@ -50,7 +53,7 @@ export function OrderTimeline({ events }: OrderTimelineProps) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Lịch sử đơn hàng</CardTitle>
+                <CardTitle>{t('orders.orderHistory')}</CardTitle>
             </CardHeader>
             <CardContent>
                 <div className="space-y-4">
@@ -75,7 +78,7 @@ export function OrderTimeline({ events }: OrderTimelineProps) {
                                         )}
                                         {event.user && (
                                             <p className="text-xs text-muted-foreground mt-1">
-                                                Bởi {event.user}
+                                                {t('orders.by')} {event.user}
                                             </p>
                                         )}
                                     </div>

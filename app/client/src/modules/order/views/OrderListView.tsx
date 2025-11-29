@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -28,6 +29,7 @@ import { ORDER_CONSTANTS } from '../constants';
 import { Plus, Search, Maximize2, Minimize2, Keyboard } from 'lucide-react';
 
 export function OrderListView() {
+    const { t } = useTranslation();
     const router = useRouter();
     const [page, setPage] = useState(1);
     const [limit] = useState(ORDER_CONSTANTS.DEFAULT_PAGE_SIZE);
@@ -141,10 +143,10 @@ export function OrderListView() {
         return (
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-3xl font-bold">Quản lý đơn hàng</h1>
+                    <h1 className="text-3xl font-bold">{t('orders.title')}</h1>
                     <Button onClick={handleCreateOrder}>
                         <Plus className="mr-2 h-4 w-4" />
-                        Tạo đơn hàng
+                        {t('orders.createOrder')}
                     </Button>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -158,14 +160,14 @@ export function OrderListView() {
         return (
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-3xl font-bold">Quản lý đơn hàng</h1>
+                    <h1 className="text-3xl font-bold">{t('orders.title')}</h1>
                     <Button onClick={handleCreateOrder}>
                         <Plus className="mr-2 h-4 w-4" />
-                        Tạo đơn hàng
+                        {t('orders.createOrder')}
                     </Button>
                 </div>
                 <div className="text-center py-12 text-destructive">
-                    Lỗi: {error.message}
+                    {t('common.error')}: {error.message}
                 </div>
             </div>
         );
@@ -177,9 +179,9 @@ export function OrderListView() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold">Quản lý đơn hàng</h1>
+                <h1 className="text-3xl font-bold">{t('orders.title')}</h1>
                 <div className="flex gap-2">
-                    <Button variant="outline" size="icon" onClick={() => setShowKeyboardHelp(true)} title="Keyboard shortcuts (?)">
+                    <Button variant="outline" size="icon" onClick={() => setShowKeyboardHelp(true)} title={t('common.keyboardShortcuts')}>
                         <Keyboard className="h-4 w-4" />
                     </Button>
                     <Button variant="outline" onClick={toggleFullscreen}>
@@ -188,11 +190,11 @@ export function OrderListView() {
                         ) : (
                             <Maximize2 className="mr-2 h-4 w-4" />
                         )}
-                        {isFullscreen ? "Exit" : "Fullscreen"}
+                        {isFullscreen ? t('common.exitFullscreen') : t('common.fullscreen')}
                     </Button>
                     <Button onClick={handleCreateOrder}>
                         <Plus className="mr-2 h-4 w-4" />
-                        Tạo đơn hàng
+                        {t('orders.createOrder')}
                     </Button>
                 </div>
             </div>
@@ -202,7 +204,7 @@ export function OrderListView() {
                 <div className="relative flex-1 max-w-sm">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
-                        placeholder="Tìm theo mã đơn, tên, SĐT..."
+                        placeholder={t('orders.searchPlaceholder')}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         className="pl-9"
@@ -210,14 +212,14 @@ export function OrderListView() {
                 </div>
                 <Select value={status} onValueChange={(value) => setStatus(value === "all" ? '' : value as OrderStatus | '')}>
                     <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Trạng thái" />
+                        <SelectValue placeholder={t('common.status')} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">Tất cả</SelectItem>
-                        <SelectItem value="pending">Chờ xác nhận</SelectItem>
-                        <SelectItem value="confirmed">Đã xác nhận</SelectItem>
-                        <SelectItem value="completed">Hoàn thành</SelectItem>
-                        <SelectItem value="cancelled">Đã hủy</SelectItem>
+                        <SelectItem value="all">{t('orders.status.all')}</SelectItem>
+                        <SelectItem value="pending">{t('orders.status.pending')}</SelectItem>
+                        <SelectItem value="confirmed">{t('orders.status.confirmed')}</SelectItem>
+                        <SelectItem value="completed">{t('orders.status.completed')}</SelectItem>
+                        <SelectItem value="cancelled">{t('orders.status.cancelled')}</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
@@ -225,7 +227,7 @@ export function OrderListView() {
             {/* Order List */}
             {orders.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
-                    Không tìm thấy đơn hàng nào
+                    {t('orders.noOrdersFound')}
                 </div>
             ) : (
                 <>
@@ -247,17 +249,17 @@ export function OrderListView() {
                                 onClick={() => setPage(Math.max(1, page - 1))}
                                 disabled={page === 1}
                             >
-                                Trước
+                                {t('common.previous')}
                             </Button>
                             <span className="text-sm text-muted-foreground">
-                                Trang {page} / {totalPages}
+                                {t('common.page')} {page} / {totalPages}
                             </span>
                             <Button
                                 variant="outline"
                                 onClick={() => setPage(Math.min(totalPages, page + 1))}
                                 disabled={page === totalPages}
                             >
-                                Sau
+                                {t('common.next')}
                             </Button>
                         </div>
                     )}
@@ -275,63 +277,63 @@ export function OrderListView() {
             <Dialog open={showKeyboardHelp} onOpenChange={setShowKeyboardHelp}>
                 <DialogContent className="max-w-md">
                     <DialogHeader>
-                        <DialogTitle>Phím tắt</DialogTitle>
+                        <DialogTitle>{t('common.keyboardShortcuts')}</DialogTitle>
                         <DialogDescription>
-                            Các phím tắt có sẵn trong trang quản lý đơn hàng
+                            {t('orders.keyboardHelpDescription')}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <h4 className="font-semibold text-sm">Hành động</h4>
+                            <h4 className="font-semibold text-sm">{t('common.actions')}</h4>
                             <div className="space-y-1 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Tạo đơn hàng mới</span>
+                                    <span className="text-muted-foreground">{t('orders.createNew')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">Shift + N</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Tìm kiếm</span>
+                                    <span className="text-muted-foreground">{t('common.search')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">/</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Làm mới</span>
+                                    <span className="text-muted-foreground">{t('common.refresh')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">R</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Toàn màn hình</span>
+                                    <span className="text-muted-foreground">{t('common.fullscreen')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">F / F11</kbd>
                                 </div>
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <h4 className="font-semibold text-sm">Lọc trạng thái</h4>
+                            <h4 className="font-semibold text-sm">{t('orders.filterByStatus')}</h4>
                             <div className="space-y-1 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Tất cả</span>
+                                    <span className="text-muted-foreground">{t('orders.status.all')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">1</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Chờ xác nhận</span>
+                                    <span className="text-muted-foreground">{t('orders.status.pending')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">2</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Đã xác nhận</span>
+                                    <span className="text-muted-foreground">{t('orders.status.confirmed')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">3</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Hoàn thành</span>
+                                    <span className="text-muted-foreground">{t('orders.status.completed')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">4</kbd>
                                 </div>
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <h4 className="font-semibold text-sm">Khác</h4>
+                            <h4 className="font-semibold text-sm">{t('common.other')}</h4>
                             <div className="space-y-1 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Hiển thị trợ giúp này</span>
+                                    <span className="text-muted-foreground">{t('common.showHelp')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">?</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Đóng dialog</span>
+                                    <span className="text-muted-foreground">{t('common.closeDialog')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">ESC</kbd>
                                 </div>
                             </div>

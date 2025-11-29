@@ -3,6 +3,7 @@
 import { ViewMode } from '../types';
 import { Button } from '@/components/ui/button';
 import { Grid3x3, List, Table } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ViewModeSwitcherProps {
     value: ViewMode;
@@ -10,10 +11,12 @@ interface ViewModeSwitcherProps {
 }
 
 export function ViewModeSwitcher({ value, onChange }: ViewModeSwitcherProps) {
+    const { t } = useTranslation();
+
     const modes: { value: ViewMode; icon: React.ReactNode; label: string }[] = [
-        { value: 'table', icon: <Table className="w-4 h-4" />, label: 'Table' },
-        { value: 'list', icon: <List className="w-4 h-4" />, label: 'List' },
-        { value: 'grid', icon: <Grid3x3 className="w-4 h-4" />, label: 'Grid' },
+        { value: 'table', icon: <Table className="w-4 h-4" />, label: t('menu.viewTable') },
+        { value: 'list', icon: <List className="w-4 h-4" />, label: t('menu.viewList') },
+        { value: 'grid', icon: <Grid3x3 className="w-4 h-4" />, label: t('menu.viewGrid') },
     ];
 
     return (

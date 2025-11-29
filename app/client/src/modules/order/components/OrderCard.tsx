@@ -15,6 +15,7 @@ import {
 } from '../utils';
 import { Eye, Plus, X, Receipt } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 
 interface OrderCardProps {
     order: Order;
@@ -23,6 +24,7 @@ interface OrderCardProps {
 
 export const OrderCard = memo(function OrderCard({ order, onCancelOrder }: OrderCardProps) {
     const router = useRouter();
+    const { t } = useTranslation();
 
     const handleViewDetails = useCallback(() => {
         router.push(`/orders/${order.orderId}`);
@@ -51,7 +53,7 @@ export const OrderCard = memo(function OrderCard({ order, onCancelOrder }: Order
                             {formatOrderNumber(order.orderNumber)}
                         </CardTitle>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <span>Bàn {order.table.tableNumber}</span>
+                            <span>{t('orders.table', { number: order.table.tableNumber })}</span>
                             {order.table.tableName && (
                                 <span>• {order.table.tableName}</span>
                             )}
@@ -67,9 +69,9 @@ export const OrderCard = memo(function OrderCard({ order, onCancelOrder }: Order
                 <div className="space-y-3">
                     <div className="grid grid-cols-2 gap-2 text-sm">
                         <div>
-                            <p className="text-muted-foreground">Khách</p>
+                            <p className="text-muted-foreground">{t('orders.customer')}</p>
                             <p className="font-medium">
-                                {order.customerName || 'Không có tên'}
+                                {order.customerName || t('orders.noName')}
                             </p>
                             {order.customerPhone && (
                                 <p className="text-xs text-muted-foreground">
@@ -78,8 +80,8 @@ export const OrderCard = memo(function OrderCard({ order, onCancelOrder }: Order
                             )}
                         </div>
                         <div>
-                            <p className="text-muted-foreground">Số người</p>
-                            <p className="font-medium">{order.partySize} người</p>
+                            <p className="text-muted-foreground">{t('orders.partySize')}</p>
+                            <p className="font-medium">{order.partySize} {t('orders.people')}</p>
                         </div>
                     </div>
 
@@ -89,7 +91,7 @@ export const OrderCard = memo(function OrderCard({ order, onCancelOrder }: Order
                                 {formatDateTime(order.orderTime)}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                                {order.orderItems.length} món
+                                {order.orderItems.length} {t('orders.items')}
                             </p>
                         </div>
                         <p className="text-lg font-bold">
@@ -105,7 +107,7 @@ export const OrderCard = memo(function OrderCard({ order, onCancelOrder }: Order
                             className="flex-1"
                         >
                             <Eye className="mr-2 h-4 w-4" />
-                            Xem chi tiết
+                            {t('orders.viewDetails')}
                         </Button>
                         {canAddItems(order) && (
                             <Button
@@ -121,7 +123,7 @@ export const OrderCard = memo(function OrderCard({ order, onCancelOrder }: Order
                                 variant="secondary"
                                 size="sm"
                                 onClick={handleCreateBill}
-                                title="Tạo hóa đơn"
+                                title={t('orders.createBill')}
                             >
                                 <Receipt className="h-4 w-4" />
                             </Button>

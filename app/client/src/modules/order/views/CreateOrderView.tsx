@@ -33,23 +33,25 @@ import {
 } from '../utils/order.schemas';
 import { calculateOrderFinancials, formatCurrency } from '../utils';
 import { ArrowLeft, ArrowRight, Save, AlertCircle, Keyboard, Maximize2, Minimize2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const STORAGE_KEY = 'order-draft';
 const STORAGE_DEBOUNCE_DELAY = 1000;
-const STEPS = [
-    { id: 1, name: 'Chọn bàn' },
-    { id: 2, name: 'Thông tin khách' },
-    { id: 3, name: 'Chọn món' },
-    { id: 4, name: 'Xác nhận' },
-];
-
 export function CreateOrderView() {
     const router = useRouter();
+    const { t } = useTranslation();
     const [currentStep, setCurrentStep] = useState(1);
     const [cartItems, setCartItems] = useState<ShoppingCartItem[]>([]);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
     const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
     const storageTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+    const STEPS = [
+        { id: 1, name: t('orders.create.steps.selectTable') },
+        { id: 2, name: t('orders.create.steps.customerInfo') },
+        { id: 3, name: t('orders.create.steps.selectItems') },
+        { id: 4, name: t('orders.create.steps.confirm') },
+    ];
 
     // Step 1: Table Selection
     const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
@@ -241,7 +243,7 @@ export function CreateOrderView() {
 
     const handleBack = () => {
         if (hasUnsavedChanges) {
-            const confirmed = confirm('Bạn có thay đổi chưa lưu. Bạn có chắc chắn muốn rời đi?');
+            const confirmed = confirm(t('orders.create.unsavedChangesWarning'));
             if (!confirmed) return;
         }
         localStorage.removeItem(STORAGE_KEY);
@@ -258,7 +260,7 @@ export function CreateOrderView() {
     const handleNextStep = () => {
         if (currentStep === 1) {
             if (!selectedTableId) {
-                alert('Vui lòng chọn bàn');
+                alert(t('orders.create.pleaseSelectTable'));
                 return;
             }
             setCurrentStep(2);
@@ -270,7 +272,7 @@ export function CreateOrderView() {
             })();
         } else if (currentStep === 3) {
             if (cartItems.length === 0) {
-                alert('Vui lòng thêm ít nhất một món');
+                alert(t('orders.create.pleaseAddItem'));
                 return;
             }
             setCurrentStep(4);
@@ -314,12 +316,12 @@ export function CreateOrderView() {
                 <div className="flex items-center gap-4">
                     <Button variant="ghost" onClick={handleBack}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        Quay lại
+                        {t('orders.back')}
                     </Button>
-                    <h1 className="text-3xl font-bold">Tạo đơn hàng mới</h1>
+                    <h1 className="text-3xl font-bold">{t('orders.create.title')}</h1>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" size="icon" onClick={() => setShowKeyboardHelp(true)} title="Keyboard shortcuts (?)">
+                    <Button variant="outline" size="icon" onClick={() => setShowKeyboardHelp(true)} title={t('common.keyboardShortcuts')}>
                         <Keyboard className="h-4 w-4" />
                     </Button>
                     <Button variant="outline" onClick={toggleFullscreen}>
@@ -347,9 +349,9 @@ export function CreateOrderView() {
                     {currentStep === 1 && (
                         <Card>
                             <CardHeader>
-                                <CardTitle>Chọn bàn</CardTitle>
+                                <CardTitle>{t('orders.create.selectTableTitle')}</CardTitle>
                                 <CardDescription>
-                                    Chọn bàn để tạo đơn hàng
+                                    {t('orders.create.selectTableDesc')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -364,18 +366,18 @@ export function CreateOrderView() {
                     {currentStep === 2 && (
                         <Card>
                             <CardHeader>
-                                <CardTitle>Thông tin khách hàng</CardTitle>
+                                <CardTitle>{t('orders.create.customerInfoTitle')}</CardTitle>
                                 <CardDescription>
-                                    Nhập thông tin khách hàng (tùy chọn)
+                                    {t('orders.create.customerInfoDesc')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="grid gap-4 md:grid-cols-2">
                                     <div className="space-y-2">
-                                        <Label htmlFor="customerName">Tên khách hàng</Label>
+                                        <Label htmlFor="customerName">{t('orders.create.customerName')}</Label>
                                         <Input
                                             id="customerName"
-                                            placeholder="Nguyễn Văn A"
+                                            placeholder={t('orders.create.customerNamePlaceholder')}
                                             {...customerForm.register('customerName')}
                                         />
                                         {customerForm.formState.errors.customerName && (
@@ -385,10 +387,10 @@ export function CreateOrderView() {
                                         )}
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="customerPhone">Số điện thoại</Label>
+                                        <Label htmlFor="customerPhone">{t('orders.create.phone')}</Label>
                                         <Input
                                             id="customerPhone"
-                                            placeholder="0912345678"
+                                            placeholder={t('orders.create.phonePlaceholder')}
                                             {...customerForm.register('customerPhone')}
                                         />
                                         {customerForm.formState.errors.customerPhone && (
@@ -399,7 +401,7 @@ export function CreateOrderView() {
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="partySize">Số người</Label>
+                                    <Label htmlFor="partySize">{t('orders.create.partySize')}</Label>
                                     <Input
                                         id="partySize"
                                         type="number"
@@ -415,10 +417,10 @@ export function CreateOrderView() {
                                     )}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="specialRequests">Yêu cầu đặc biệt</Label>
+                                    <Label htmlFor="specialRequests">{t('orders.create.specialRequests')}</Label>
                                     <Textarea
                                         id="specialRequests"
-                                        placeholder="Ví dụ: Không hành, ít cay..."
+                                        placeholder={t('orders.create.specialRequestsPlaceholder')}
                                         rows={3}
                                         {...customerForm.register('specialRequests')}
                                     />
@@ -435,9 +437,9 @@ export function CreateOrderView() {
                     {currentStep === 3 && (
                         <Card>
                             <CardHeader>
-                                <CardTitle>Chọn món</CardTitle>
+                                <CardTitle>{t('orders.create.selectItemsTitle')}</CardTitle>
                                 <CardDescription>
-                                    Thêm món ăn vào đơn hàng
+                                    {t('orders.create.selectItemsDesc')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -468,47 +470,47 @@ export function CreateOrderView() {
                         <div className="space-y-6">
                             <Card>
                                 <CardHeader>
-                                    <CardTitle>Xác nhận đơn hàng</CardTitle>
+                                    <CardTitle>{t('orders.create.confirmTitle')}</CardTitle>
                                     <CardDescription>
-                                        Kiểm tra lại thông tin trước khi tạo đơn
+                                        {t('orders.create.confirmDesc')}
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div>
-                                        <h3 className="font-semibold mb-2">Thông tin bàn</h3>
+                                        <h3 className="font-semibold mb-2">{t('orders.create.tableInfo')}</h3>
                                         <p className="text-sm text-muted-foreground">
-                                            Bàn số: {selectedTableId}
+                                            {t('orders.create.tableNumber')} {selectedTableId}
                                         </p>
                                         <Button
                                             variant="link"
                                             className="h-auto p-0"
                                             onClick={() => setCurrentStep(1)}
                                         >
-                                            Chỉnh sửa
+                                            {t('orders.create.edit')}
                                         </Button>
                                     </div>
 
                                     <div>
-                                        <h3 className="font-semibold mb-2">Thông tin khách hàng</h3>
+                                        <h3 className="font-semibold mb-2">{t('orders.create.customerInfoSection')}</h3>
                                         {customerForm.getValues().customerName && (
                                             <p className="text-sm">
-                                                <span className="text-muted-foreground">Tên: </span>
+                                                <span className="text-muted-foreground">{t('orders.create.name')} </span>
                                                 {customerForm.getValues().customerName}
                                             </p>
                                         )}
                                         {customerForm.getValues().customerPhone && (
                                             <p className="text-sm">
-                                                <span className="text-muted-foreground">SĐT: </span>
+                                                <span className="text-muted-foreground">{t('orders.create.phone')}: </span>
                                                 {customerForm.getValues().customerPhone}
                                             </p>
                                         )}
                                         <p className="text-sm">
-                                            <span className="text-muted-foreground">Số người: </span>
+                                            <span className="text-muted-foreground">{t('orders.create.partySizeLabel')} </span>
                                             {customerForm.getValues().partySize}
                                         </p>
                                         {customerForm.getValues().specialRequests && (
                                             <p className="text-sm">
-                                                <span className="text-muted-foreground">Yêu cầu: </span>
+                                                <span className="text-muted-foreground">{t('orders.create.specialRequestsLabel')} </span>
                                                 {customerForm.getValues().specialRequests}
                                             </p>
                                         )}
@@ -517,12 +519,12 @@ export function CreateOrderView() {
                                             className="h-auto p-0"
                                             onClick={() => setCurrentStep(2)}
                                         >
-                                            Chỉnh sửa
+                                            {t('orders.create.edit')}
                                         </Button>
                                     </div>
 
                                     <div>
-                                        <h3 className="font-semibold mb-2">Món ăn ({cartItems.length})</h3>
+                                        <h3 className="font-semibold mb-2">{t('orders.items')} ({cartItems.length})</h3>
                                         <div className="space-y-2">
                                             {cartItems.map((item) => (
                                                 <div
@@ -543,7 +545,7 @@ export function CreateOrderView() {
                                             className="h-auto p-0"
                                             onClick={() => setCurrentStep(3)}
                                         >
-                                            Chỉnh sửa
+                                            {t('orders.create.edit')}
                                         </Button>
                                     </div>
                                 </CardContent>
@@ -553,7 +555,7 @@ export function CreateOrderView() {
                                 <Alert variant="destructive">
                                     <AlertCircle className="h-4 w-4" />
                                     <AlertDescription>
-                                        {createOrderMutation.error?.message || 'Đã xảy ra lỗi'}
+                                        {createOrderMutation.error?.message || t('orders.create.errorOccurred')}
                                     </AlertDescription>
                                 </Alert>
                             )}
@@ -605,11 +607,11 @@ export function CreateOrderView() {
                     disabled={currentStep === 1}
                 >
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Quay lại
+                    {t('orders.create.previous')}
                 </Button>
                 {currentStep < 4 ? (
                     <Button onClick={handleNextStep}>
-                        Tiếp theo
+                        {t('orders.create.next')}
                         <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                 ) : (
@@ -618,7 +620,7 @@ export function CreateOrderView() {
                         disabled={createOrderMutation.isPending}
                     >
                         <Save className="mr-2 h-4 w-4" />
-                        {createOrderMutation.isPending ? 'Đang tạo...' : 'Tạo đơn hàng'}
+                        {createOrderMutation.isPending ? t('orders.create.creating') : t('orders.create.createOrder')}
                     </Button>
                 )}
             </div>
@@ -627,63 +629,63 @@ export function CreateOrderView() {
             <Dialog open={showKeyboardHelp} onOpenChange={setShowKeyboardHelp}>
                 <DialogContent className="max-w-md">
                     <DialogHeader>
-                        <DialogTitle>Phím tắt - Tạo đơn hàng</DialogTitle>
+                        <DialogTitle>{t('orders.create.keyboard.title')}</DialogTitle>
                         <DialogDescription>
-                            Các phím tắt có sẵn khi tạo đơn hàng mới
+                            {t('orders.create.keyboard.description')}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <h4 className="font-semibold text-sm">Điều hướng</h4>
+                            <h4 className="font-semibold text-sm">{t('orders.create.keyboard.navigation')}</h4>
                             <div className="space-y-1 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Bước tiếp theo</span>
-                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">→ hoặc Ctrl+Enter</kbd>
+                                    <span className="text-muted-foreground">{t('orders.create.keyboard.nextStep')}</span>
+                                    <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">{t('orders.create.keyboard.nextStepKey')}</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Bước trước</span>
+                                    <span className="text-muted-foreground">{t('orders.create.keyboard.prevStep')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">←</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Lưu đơn hàng</span>
+                                    <span className="text-muted-foreground">{t('orders.create.keyboard.saveOrder')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">Ctrl+S</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Toàn màn hình</span>
+                                    <span className="text-muted-foreground">{t('common.fullscreen')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">F / F11</kbd>
                                 </div>
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <h4 className="font-semibold text-sm">Nhảy đến bước</h4>
+                            <h4 className="font-semibold text-sm">{t('orders.create.keyboard.jumpToStep')}</h4>
                             <div className="space-y-1 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Bước 1 (Chọn bàn)</span>
+                                    <span className="text-muted-foreground">{t('orders.create.keyboard.step1')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">1</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Bước 2 (Thông tin khách)</span>
+                                    <span className="text-muted-foreground">{t('orders.create.keyboard.step2')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">2</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Bước 3 (Chọn món)</span>
+                                    <span className="text-muted-foreground">{t('orders.create.keyboard.step3')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">3</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Bước 4 (Xác nhận)</span>
+                                    <span className="text-muted-foreground">{t('orders.create.keyboard.step4')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">4</kbd>
                                 </div>
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <h4 className="font-semibold text-sm">Khác</h4>
+                            <h4 className="font-semibold text-sm">{t('common.other')}</h4>
                             <div className="space-y-1 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Hiển thị trợ giúp này</span>
+                                    <span className="text-muted-foreground">{t('common.showHelp')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">?</kbd>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Đóng dialog</span>
+                                    <span className="text-muted-foreground">{t('common.closeDialog')}</span>
                                     <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">ESC</kbd>
                                 </div>
                             </div>

@@ -180,7 +180,7 @@ export default function DashboardLayout({
     if (isLoading) {
         return (
             <div className="flex h-screen items-center justify-center">
-                <LoadingSpinner size="lg" message="Verifying session..." />
+                <LoadingSpinner size="lg" message={t('auth.verifyingSession')} />
             </div>
         );
     }

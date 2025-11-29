@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, Edit, Trash2, Eye } from 'lucide-react';
 import { truncateText } from '../utils';
+import { useTranslation } from 'react-i18next';
 
 interface CategoryCardProps {
     category: Category;
@@ -22,6 +23,7 @@ interface CategoryCardProps {
 }
 
 export function CategoryCard({ category, onEdit, onDelete, onViewDetails }: CategoryCardProps) {
+    const { t } = useTranslation();
     const itemCount = category.menuItems?.length || 0;
 
     return (
@@ -44,7 +46,7 @@ export function CategoryCard({ category, onEdit, onDelete, onViewDetails }: Cate
                 )}
                 <div className="absolute top-2 right-2 flex gap-2">
                     <Badge variant={category.isActive ? 'default' : 'secondary'}>
-                        {category.isActive ? 'Active' : 'Inactive'}
+                        {category.isActive ? t('categories.active') : t('categories.inactive')}
                     </Badge>
                 </div>
             </div>
@@ -61,7 +63,7 @@ export function CategoryCard({ category, onEdit, onDelete, onViewDetails }: Cate
                     )}
                 </div>
                 <Badge variant="outline">
-                    {itemCount} {itemCount === 1 ? 'item' : 'items'}
+                    {itemCount} {itemCount === 1 ? t('common.item') : t('common.items')}
                 </Badge>
             </CardContent>
 
@@ -75,7 +77,7 @@ export function CategoryCard({ category, onEdit, onDelete, onViewDetails }: Cate
                     }}
                 >
                     <Eye className="w-4 h-4 mr-1" />
-                    View Items
+                    {t('common.viewItems')}
                 </Button>
 
                 <DropdownMenu>
@@ -87,14 +89,14 @@ export function CategoryCard({ category, onEdit, onDelete, onViewDetails }: Cate
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => onEdit(category)}>
                             <Edit className="w-4 h-4 mr-2" />
-                            Edit
+                            {t('common.edit')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             onClick={() => onDelete(category)}
                             className="text-destructive"
                         >
                             <Trash2 className="w-4 h-4 mr-2" />
-                            Delete
+                            {t('common.delete')}
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

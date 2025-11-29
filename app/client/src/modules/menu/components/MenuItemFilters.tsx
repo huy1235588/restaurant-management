@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { X, Filter, ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface MenuItemFiltersProps {
     filters: MenuFiltersType;
@@ -25,6 +26,7 @@ export function MenuItemFilters({
     onChange,
     onClear,
 }: MenuItemFiltersProps) {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
 
     const updateFilter = (key: keyof MenuFiltersType, value: any) => {
@@ -47,11 +49,11 @@ export function MenuItemFilters({
         switch (key) {
             case 'categoryId':
                 const category = categories.find((c) => c.categoryId === value);
-                return category ? `Category: ${category.categoryName}` : '';
+                return category ? `${t('menu.category')}: ${category.categoryName}` : '';
             case 'isAvailable':
-                return value === true ? 'Available' : 'Out of Stock';
+                return value === true ? t('menu.available') : t('menu.outOfStock');
             case 'isActive':
-                return value === true ? 'Active' : 'Inactive';
+                return value === true ? t('common.active') : t('common.inactive');
             default:
                 return '';
         }
@@ -74,7 +76,7 @@ export function MenuItemFilters({
                     <CollapsibleTrigger asChild>
                         <Button variant="outline" className="gap-2">
                             <Filter className="w-4 h-4" />
-                            Filters
+                            {t('menu.filters')}
                             {activeFilterCount > 0 && (
                                 <Badge variant="secondary" className="ml-1">
                                     {activeFilterCount}
@@ -86,7 +88,7 @@ export function MenuItemFilters({
 
                     {activeFilterCount > 0 && (
                         <Button variant="ghost" size="sm" onClick={onClear}>
-                            Clear All
+                            {t('menu.clearAll')}
                         </Button>
                     )}
                 </div>
@@ -94,7 +96,7 @@ export function MenuItemFilters({
                 <CollapsibleContent className="space-y-4 pt-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
-                            <Label>Category</Label>
+                            <Label>{t('menu.category')}</Label>
                             <Select
                                 value={filters.categoryId?.toString() || 'all'}
                                 onValueChange={(value) =>
@@ -102,10 +104,10 @@ export function MenuItemFilters({
                                 }
                             >
                                 <SelectTrigger>
-                                    <SelectValue placeholder="All categories" />
+                                    <SelectValue placeholder={t('menu.allCategories')} />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">All categories</SelectItem>
+                                    <SelectItem value="all">{t('menu.allCategories')}</SelectItem>
                                     {categories.map((category) => (
                                         <SelectItem
                                             key={category.categoryId}
@@ -119,7 +121,7 @@ export function MenuItemFilters({
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Availability</Label>
+                            <Label>{t('menu.availability')}</Label>
                             <Select
                                 value={
                                     filters.isAvailable === undefined
@@ -136,18 +138,18 @@ export function MenuItemFilters({
                                 }
                             >
                                 <SelectTrigger>
-                                    <SelectValue placeholder="All" />
+                                    <SelectValue placeholder={t('menu.allItems')} />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">All</SelectItem>
-                                    <SelectItem value="available">Available</SelectItem>
-                                    <SelectItem value="out-of-stock">Out of Stock</SelectItem>
+                                    <SelectItem value="all">{t('menu.allItems')}</SelectItem>
+                                    <SelectItem value="available">{t('menu.available')}</SelectItem>
+                                    <SelectItem value="out-of-stock">{t('menu.outOfStock')}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Status</Label>
+                            <Label>{t('common.status')}</Label>
                             <Select
                                 value={
                                     filters.isActive === undefined
@@ -164,12 +166,12 @@ export function MenuItemFilters({
                                 }
                             >
                                 <SelectTrigger>
-                                    <SelectValue placeholder="All" />
+                                    <SelectValue placeholder={t('menu.allItems')} />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">All</SelectItem>
-                                    <SelectItem value="active">Active</SelectItem>
-                                    <SelectItem value="inactive">Inactive</SelectItem>
+                                    <SelectItem value="all">{t('menu.allItems')}</SelectItem>
+                                    <SelectItem value="active">{t('common.active')}</SelectItem>
+                                    <SelectItem value="inactive">{t('common.inactive')}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

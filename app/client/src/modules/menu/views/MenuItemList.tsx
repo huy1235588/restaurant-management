@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, Edit, Trash2, Copy } from 'lucide-react';
 import { formatPrice, formatMargin, getSpicyLevelEmoji } from '../utils';
+import { useTranslation } from 'react-i18next';
 
 interface MenuItemListProps {
     items: MenuItem[];
@@ -50,6 +51,8 @@ export function MenuItemList({
     onViewDetails,
     onToggleAvailability,
 }: MenuItemListProps) {
+    const { t } = useTranslation();
+
     if (loading) {
         if (viewMode === 'grid') {
             return (
@@ -90,7 +93,7 @@ export function MenuItemList({
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            {['Code', 'Name', 'Category', 'Price', 'Cost', 'Margin', 'Available', 'Status', 'Actions'].map(
+                            {[t('menu.code'), t('common.name'), t('menu.category'), t('menu.price'), t('menu.cost'), t('common.margin'), t('menu.available'), t('common.status'), t('common.actions')].map(
                                 (header) => (
                                     <TableHead key={header}>
                                         <Skeleton className="h-4 w-20" />
@@ -108,7 +111,7 @@ export function MenuItemList({
         return (
             <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>{t('common.error')}</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
             </Alert>
         );
@@ -120,9 +123,9 @@ export function MenuItemList({
                 <div className="flex flex-col items-center justify-center text-center space-y-4">
                     <PackageX className="w-16 h-16 text-muted-foreground/50" />
                     <div>
-                        <h3 className="text-lg font-semibold mb-1">No menu items found</h3>
+                        <h3 className="text-lg font-semibold mb-1">{t('menu.noItemsFound')}</h3>
                         <p className="text-sm text-muted-foreground">
-                            Try adjusting your filters or create a new menu item
+                            {t('menu.noItemsDescription')}
                         </p>
                     </div>
                 </div>
@@ -196,15 +199,15 @@ export function MenuItemList({
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <SortableHeader field="itemCode" label="Code" />
-                        <SortableHeader field="itemName" label="Name" />
-                        <SortableHeader field="categoryId" label="Category" />
-                        <SortableHeader field="price" label="Price" align="right" />
-                        <TableHead className="text-right">Cost</TableHead>
-                        <TableHead className="text-right">Margin</TableHead>
-                        <TableHead>Available</TableHead>
-                        <SortableHeader field="isActive" label="Status" />
-                        <TableHead className="text-right">Actions</TableHead>
+                        <SortableHeader field="itemCode" label={t('menu.code')} />
+                        <SortableHeader field="itemName" label={t('common.name')} />
+                        <SortableHeader field="categoryId" label={t('menu.category')} />
+                        <SortableHeader field="price" label={t('menu.price')} align="right" />
+                        <TableHead className="text-right">{t('menu.cost')}</TableHead>
+                        <TableHead className="text-right">{t('common.margin')}</TableHead>
+                        <TableHead>{t('menu.available')}</TableHead>
+                        <SortableHeader field="isActive" label={t('common.status')} />
+                        <TableHead className="text-right">{t('common.actions')}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -244,7 +247,7 @@ export function MenuItemList({
                             </TableCell>
                             <TableCell>
                                 <Badge variant={item.isActive ? 'default' : 'secondary'}>
-                                    {item.isActive ? 'Active' : 'Inactive'}
+                                    {item.isActive ? t('common.active') : t('common.inactive')}
                                 </Badge>
                             </TableCell>
                             <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
@@ -257,18 +260,18 @@ export function MenuItemList({
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem onClick={() => onEdit(item)}>
                                             <Edit className="w-4 h-4 mr-2" />
-                                            Edit
+                                            {t('common.edit')}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onClick={() => onDuplicate(item)}>
                                             <Copy className="w-4 h-4 mr-2" />
-                                            Duplicate
+                                            {t('common.duplicate')}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onClick={() => onDelete(item)}
                                             className="text-destructive"
                                         >
                                             <Trash2 className="w-4 h-4 mr-2" />
-                                            Delete
+                                            {t('common.delete')}
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>

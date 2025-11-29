@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, Edit, Trash2, Copy, Eye } from 'lucide-react';
 import { formatPrice, getSpicyLevelEmoji } from '../utils';
+import { useTranslation } from 'react-i18next';
 
 interface MenuItemCardProps {
     item: MenuItem;
@@ -32,6 +33,8 @@ export function MenuItemCard({
     onViewDetails,
     onToggleAvailability,
 }: MenuItemCardProps) {
+    const { t } = useTranslation();
+
     const handleToggleAvailability = async (checked: boolean) => {
         await onToggleAvailability(item, checked);
     };
@@ -78,7 +81,7 @@ export function MenuItemCard({
                 </div>
                 {!item.isActive && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                        <Badge variant="secondary">Inactive</Badge>
+                        <Badge variant="secondary">{t('common.inactive')}</Badge>
                     </div>
                 )}
             </div>
@@ -92,7 +95,7 @@ export function MenuItemCard({
                         <p className="text-xs text-muted-foreground">{item.itemCode}</p>
                     </div>
                     <Badge variant={item.isAvailable ? 'default' : 'destructive'} className="ml-2 shrink-0">
-                        {item.isAvailable ? 'Available' : 'Out of Stock'}
+                        {item.isAvailable ? t('menu.available') : t('menu.outOfStock')}
                     </Badge>
                 </div>
                 <p className="text-lg font-bold text-primary">{formatPrice(item.price)}</p>
@@ -110,7 +113,7 @@ export function MenuItemCard({
                         onCheckedChange={handleToggleAvailability}
                         disabled={!item.isActive}
                     />
-                    <span className="text-xs text-muted-foreground">Available</span>
+                    <span className="text-xs text-muted-foreground">{t('menu.available')}</span>
                 </div>
 
                 <DropdownMenu>
@@ -122,22 +125,22 @@ export function MenuItemCard({
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => onViewDetails(item)}>
                             <Eye className="w-4 h-4 mr-2" />
-                            View Details
+                            {t('menu.viewDetails')}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onEdit(item)}>
                             <Edit className="w-4 h-4 mr-2" />
-                            Edit
+                            {t('common.edit')}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onDuplicate(item)}>
                             <Copy className="w-4 h-4 mr-2" />
-                            Duplicate
+                            {t('common.duplicate')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             onClick={() => onDelete(item)}
                             className="text-destructive"
                         >
                             <Trash2 className="w-4 h-4 mr-2" />
-                            Delete
+                            {t('common.delete')}
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

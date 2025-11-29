@@ -12,6 +12,7 @@ import {
 } from '../utils';
 import { Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface OrderItemListProps {
     items: OrderItem[];
@@ -26,10 +27,12 @@ export function OrderItemList({
     onMarkServed,
     readOnly = false,
 }: OrderItemListProps) {
+    const { t } = useTranslation();
+
     if (items.length === 0) {
         return (
             <div className="text-center py-8 text-muted-foreground">
-                Không có món nào
+                {t('orders.noItems')}
             </div>
         );
     }
@@ -65,7 +68,7 @@ export function OrderItemList({
                             </p>
                         )}
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <span>{formatCurrency(item.unitPrice)} / món</span>
+                            <span>{formatCurrency(item.unitPrice)} {t('orders.perItem')}</span>
                             <span className="font-medium text-foreground">
                                 {formatCurrency(item.totalPrice)}
                             </span>
@@ -81,7 +84,7 @@ export function OrderItemList({
                                     onClick={() => onMarkServed(item)}
                                 >
                                     <Check className="h-4 w-4 mr-1" />
-                                    Đã phục vụ
+                                    {t('orders.served')}
                                 </Button>
                             )}
                             {canCancelOrderItem(item) && onCancelItem && (
