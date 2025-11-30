@@ -4,7 +4,6 @@ import {
     IsOptional,
     IsBoolean,
     IsNumber,
-    IsUrl,
     MaxLength,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -29,14 +28,6 @@ export class CreateCategoryDto {
     @IsNumber()
     @IsOptional()
     displayOrder?: number;
-
-    @ApiPropertyOptional({
-        example: 'https://example.com/image.jpg',
-        description: 'Category image URL',
-    })
-    @IsUrl()
-    @IsOptional()
-    imageUrl?: string;
 
     @ApiPropertyOptional({
         example: 'categories/image.jpg',

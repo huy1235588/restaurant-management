@@ -14,6 +14,7 @@ import {
 import { MoreHorizontal, Edit, Trash2, Copy } from 'lucide-react';
 import { formatPrice, getSpicyLevelEmoji } from '../utils';
 import { useTranslation } from 'react-i18next';
+import { getImageUrl } from '@/lib/utils';
 
 interface MenuItemListRowProps {
     item: MenuItem;
@@ -44,9 +45,9 @@ export function MenuItemListRow({
             onClick={() => onClick(item)}
         >
             <div className="relative w-16 h-16 rounded-md overflow-hidden shrink-0 bg-muted">
-                {item.imageUrl ? (
+                {getImageUrl(item.imagePath) ? (
                     <Image
-                        src={item.imageUrl}
+                        src={getImageUrl(item.imagePath)!}
                         alt={item.itemName}
                         fill
                         className="object-cover"

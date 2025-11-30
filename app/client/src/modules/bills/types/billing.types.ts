@@ -9,7 +9,7 @@ export interface MenuItem {
     itemId: number;
     itemName: string;
     itemCode?: string;
-    imageUrl?: string | null;
+    imagePath?: string | null;
     price: number;
 }
 

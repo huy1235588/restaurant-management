@@ -34,7 +34,6 @@ export function useResourceHandlers({
     const handleCreate = useCallback(
         async (data: any, imageFile?: File | null) => {
             try {
-                let imageUrl = data.imageUrl;
                 let imagePath = data.imagePath;
 
                 if (imageFile) {
@@ -42,13 +41,11 @@ export function useResourceHandlers({
                         imageFile,
                         uploadFolder
                     );
-                    imageUrl = uploadedFile.url;
                     imagePath = uploadedFile.path;
                 }
 
                 await onCreate?.({
                     ...data,
-                    imageUrl,
                     imagePath,
                 });
 
@@ -70,7 +67,6 @@ export function useResourceHandlers({
             imageFile?: File | null
         ) => {
             try {
-                let imageUrl = data.imageUrl;
                 let imagePath = data.imagePath;
 
                 if (imageFile) {
@@ -78,7 +74,6 @@ export function useResourceHandlers({
                         imageFile,
                         uploadFolder
                     );
-                    imageUrl = uploadedFile.url;
                     imagePath = uploadedFile.path;
 
                     if (currentResource?.imagePath) {
@@ -97,7 +92,6 @@ export function useResourceHandlers({
 
                 await onUpdate?.(id, {
                     ...data,
-                    imageUrl,
                     imagePath,
                 });
 

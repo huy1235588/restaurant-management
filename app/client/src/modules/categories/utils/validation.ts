@@ -18,5 +18,5 @@ export const categoryFormSchema = z.object({
         .optional()
         .nullable(),
     isActive: z.boolean(),
-    imageUrl: z.string().url('Invalid image URL').optional().nullable().or(z.literal('')),
+    imagePath: z.string().optional().nullable().or(z.literal('')),
 });

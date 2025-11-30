@@ -27,7 +27,7 @@ export const menuItemFormSchema = z.object({
         .max(1000, 'Description must be at most 1000 characters')
         .optional()
         .nullable(),
-    imageUrl: z.string().url('Invalid image URL').optional().nullable().or(z.literal('')),
+    imagePath: z.string().optional().nullable().or(z.literal('')),
     isAvailable: z.boolean(),
     isActive: z.boolean(),
     preparationTime: z.number()

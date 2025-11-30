@@ -24,7 +24,7 @@ export interface MenuItemFormData {
     price: number;
     cost?: number | null;
     description?: string | null;
-    imageUrl?: string | null;
+    imagePath?: string | null;
     isAvailable: boolean;
     isActive: boolean;
     preparationTime?: number | null;

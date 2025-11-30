@@ -42,7 +42,7 @@ export function CategoryForm({ category, onSubmit, onCancel, loading = false }: 
             description: category?.description || '',
             displayOrder: category?.displayOrder || 0,
             isActive: category?.isActive ?? true,
-            imageUrl: category?.imageUrl || '',
+            imagePath: category?.imagePath || '',
         },
         mode: 'onChange',
     });
@@ -103,7 +103,7 @@ export function CategoryForm({ category, onSubmit, onCancel, loading = false }: 
 
                 <FormField
                     control={form.control}
-                    name="imageUrl"
+                    name="imagePath"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>{t('categories.categoryImage')}</FormLabel>

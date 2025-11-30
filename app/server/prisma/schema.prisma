@@ -150,7 +150,6 @@ model Category {
     description  String?  @db.VarChar(500)
     displayOrder Int      @default(0)
     isActive     Boolean  @default(true)
-    imageUrl     String?  @db.VarChar(500)
     imagePath    String?  @db.VarChar(500)
     createdAt    DateTime @default(now())
     updatedAt    DateTime @updatedAt
@@ -169,7 +168,6 @@ model MenuItem {
     price           Decimal  @db.Decimal(10, 2)
     cost            Decimal? @db.Decimal(10, 2)
     description     String?  @db.VarChar(1000)
-    imageUrl        String?  @db.VarChar(500)
     imagePath       String?  @db.VarChar(500)
     isAvailable     Boolean  @default(true)
     isActive        Boolean  @default(true)

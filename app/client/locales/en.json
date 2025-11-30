@@ -165,8 +165,6 @@
         "image": "Image",
         "uploadImage": "Upload Image",
         "imageDescription": "Upload and crop your image. The image will be optimized automatically.",
-        "imageUrl": "Image URL",
-        "imageUrlDescription": "Enter a URL for the item image",
         "available": "Available",
         "unavailable": "Unavailable",
         "active": "Active",

@@ -6,5 +6,5 @@ export interface CategoryFormData {
     description?: string | null;
     displayOrder?: number | null;
     isActive: boolean;
-    imageUrl?: string | null;
+    imagePath?: string | null;
 }

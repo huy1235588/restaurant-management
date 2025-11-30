@@ -85,7 +85,7 @@ export function CreateOrderView() {
                 price: item.price,
                 categoryId: 0,
                 description: null,
-                imageUrl: null,
+                imagePath: null,
                 isAvailable: true,
             },
             quantity: item.quantity,

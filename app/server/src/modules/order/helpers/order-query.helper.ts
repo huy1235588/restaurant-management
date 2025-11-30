@@ -34,7 +34,7 @@ export class OrderQueryHelper {
                         itemName: true,
                         itemCode: true,
                         price: true,
-                        imageUrl: true,
+                        imagePath: true,
                         categoryId: true,
                     },
                 },

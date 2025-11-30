@@ -14,6 +14,7 @@ import {
 import { MoreHorizontal, Edit, Trash2, Eye } from 'lucide-react';
 import { truncateText } from '../utils';
 import { useTranslation } from 'react-i18next';
+import { getImageUrl } from '@/lib/utils';
 
 interface CategoryCardProps {
     category: Category;
@@ -29,9 +30,9 @@ export function CategoryCard({ category, onEdit, onDelete, onViewDetails }: Cate
     return (
         <Card className="py-0 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
             <div className="relative aspect-video bg-muted transition-all duration-300 group-hover:brightness-110" onClick={() => onViewDetails(category)}>
-                {category.imageUrl ? (
+                {getImageUrl(category.imagePath) ? (
                     <Image
-                        src={category.imageUrl}
+                        src={getImageUrl(category.imagePath)!}
                         alt={category.categoryName}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-300"

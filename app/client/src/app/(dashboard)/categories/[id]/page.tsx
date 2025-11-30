@@ -30,6 +30,7 @@ import {
 } from '@/modules/categories';
 import { MenuItem } from '@/types';
 import { MenuItemCard } from '@/modules/menu/components/MenuItemCard';
+import { getImageUrl } from '@/lib/utils';
 
 export default function CategoryDetailPage({
     params,
@@ -187,10 +188,10 @@ export default function CategoryDetailPage({
                 <CardContent className="pt-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            {category.imageUrl ? (
+                            {getImageUrl(category.imagePath) ? (
                                 <div className="relative aspect-video rounded-lg overflow-hidden">
                                     <Image
-                                        src={category.imageUrl}
+                                        src={getImageUrl(category.imagePath)!}
                                         alt={category.categoryName}
                                         fill
                                         className="object-cover"

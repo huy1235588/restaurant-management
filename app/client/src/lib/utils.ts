@@ -40,3 +40,6 @@ export {
     isNewDateFormat,
     isNewTimeFormat,
 } from './utils/date';
+
+// Re-export image utilities
+export { getImageUrl, hasImagePath } from './utils/image';

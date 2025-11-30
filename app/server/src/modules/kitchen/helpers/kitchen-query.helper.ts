@@ -27,7 +27,7 @@ export class KitchenQueryHelper {
                                 itemName: true,
                                 itemCode: true,
                                 price: true,
-                                imageUrl: true,
+                                imagePath: true,
                             },
                         },
                     },

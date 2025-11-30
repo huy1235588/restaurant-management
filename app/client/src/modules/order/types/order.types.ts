@@ -16,7 +16,8 @@ export interface MenuItem {
     itemId: number;
     itemName: string;
     itemCode?: string;
-    imageUrl?: string | null;
+    imagePath?: string | null;
+    description?: string | null;
     price: number;
     categoryId: number;
     isAvailable: boolean;

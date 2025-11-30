@@ -37,6 +37,7 @@ import {
     getSpicyLevelLabel,
     getSpicyLevelEmoji,
 } from '@/modules/menu/utils';
+import { getImageUrl } from '@/lib/utils';
 
 export default function MenuItemDetailPage({
     params,
@@ -172,10 +173,10 @@ export default function MenuItemDetailPage({
                 <div className="lg:col-span-2 space-y-6">
                     <Card>
                         <CardContent className="pt-6">
-                            {menuItem.imageUrl ? (
+                            {getImageUrl(menuItem.imagePath) ? (
                                 <div className="relative aspect-video rounded-lg overflow-hidden mb-6">
                                     <Image
-                                        src={menuItem.imageUrl}
+                                        src={getImageUrl(menuItem.imagePath)!}
                                         alt={menuItem.itemName}
                                         fill
                                         className="object-cover"

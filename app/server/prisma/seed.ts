@@ -304,6 +304,7 @@ async function main() {
                 spicyLevel: 0,
                 isVegetarian: false,
                 calories: 150,
+                imagePath: 'menu/goi-cuon-tom-thit.jpg',
             },
             {
                 itemCode: 'KV002',
@@ -317,6 +318,7 @@ async function main() {
                 spicyLevel: 0,
                 isVegetarian: false,
                 calories: 200,
+                imagePath: 'menu/cha-gio-chien.jpg',
             },
             {
                 itemCode: 'KV003',
@@ -330,19 +332,7 @@ async function main() {
                 spicyLevel: 1,
                 isVegetarian: false,
                 calories: 180,
-            },
-            {
-                itemCode: 'KV004',
-                itemName: 'Gỏi cuốn chay',
-                categoryId: categories[0].categoryId,
-                price: 40000,
-                cost: 18000,
-                description: 'Gỏi cuốn chay với đậu hũ và rau củ',
-                isAvailable: true,
-                preparationTime: 5,
-                spicyLevel: 0,
-                isVegetarian: true,
-                calories: 120,
+                imagePath: 'menu/nem-nuong.jpg',
             },
         ],
     });
@@ -361,6 +351,7 @@ async function main() {
                 preparationTime: 15,
                 spicyLevel: 0,
                 isVegetarian: false,
+                imagePath: 'menu/sup-cua.jpg',
             },
             {
                 itemCode: 'SP002',
@@ -373,18 +364,7 @@ async function main() {
                 preparationTime: 15,
                 spicyLevel: 0,
                 isVegetarian: false,
-            },
-            {
-                itemCode: 'SP003',
-                itemName: 'Súp gà nấm',
-                categoryId: categories[1].categoryId,
-                price: 60000,
-                cost: 28000,
-                description: 'Súp gà nấm bổ dưỡng',
-                isAvailable: true,
-                preparationTime: 15,
-                spicyLevel: 0,
-                isVegetarian: false,
+                imagePath: 'menu/sup-hai-san.jpg',
             },
         ],
     });
@@ -402,6 +382,7 @@ async function main() {
                 isAvailable: true,
                 preparationTime: 8,
                 isVegetarian: false,
+                imagePath: 'menu/salad-caesar.jpg',
             },
             {
                 itemCode: 'SL002',
@@ -413,6 +394,7 @@ async function main() {
                 isAvailable: true,
                 preparationTime: 8,
                 isVegetarian: true,
+                imagePath: 'menu/salad-rau-cu.jpg',
             },
             {
                 itemCode: 'SL003',
@@ -424,6 +406,7 @@ async function main() {
                 isAvailable: true,
                 preparationTime: 10,
                 isVegetarian: false,
+                imagePath: 'menu/salad-tom.jpg',
             },
         ],
     });
@@ -441,6 +424,7 @@ async function main() {
                 isAvailable: true,
                 preparationTime: 20,
                 spicyLevel: 1,
+                imagePath: 'menu/bo-luc-lac.jpg',
             },
             {
                 itemCode: 'MC002',
@@ -452,6 +436,7 @@ async function main() {
                 isAvailable: true,
                 preparationTime: 25,
                 spicyLevel: 0,
+                imagePath: 'menu/ga-nuong-mat-ong.jpg',
             },
             {
                 itemCode: 'MC003',
@@ -463,6 +448,7 @@ async function main() {
                 isAvailable: true,
                 preparationTime: 30,
                 spicyLevel: 1,
+                imagePath: 'menu/suon-nuong-bbq.jpg',
             },
             {
                 itemCode: 'MC004',
@@ -474,6 +460,7 @@ async function main() {
                 isAvailable: true,
                 preparationTime: 25,
                 spicyLevel: 0,
+                imagePath: 'menu/bit-tet-bo-uc.jpg',
             },
             {
                 itemCode: 'MC005',
@@ -485,6 +472,7 @@ async function main() {
                 isAvailable: true,
                 preparationTime: 35,
                 spicyLevel: 0,
+                imagePath: 'menu/vit-quay-bac-kinh.jpg',
             },
         ],
     });
@@ -502,6 +490,7 @@ async function main() {
                 isAvailable: true,
                 preparationTime: 30,
                 spicyLevel: 0,
+                imagePath: 'menu/tom-hum-nuong.jpg',
             },
             {
                 itemCode: 'HS002',
@@ -513,6 +502,7 @@ async function main() {
                 isAvailable: true,
                 preparationTime: 25,
                 spicyLevel: 2,
+                imagePath: 'menu/cua-rang-me.jpg',
             },
             {
                 itemCode: 'HS003',
@@ -524,6 +514,7 @@ async function main() {
                 isAvailable: true,
                 preparationTime: 20,
                 spicyLevel: 0,
+                imagePath: 'menu/ca-hoi-nuong.jpg',
             },
             {
                 itemCode: 'HS004',
@@ -535,6 +526,7 @@ async function main() {
                 isAvailable: true,
                 preparationTime: 15,
                 spicyLevel: 3,
+                imagePath: 'menu/muc-xao-sa-te.jpg',
             },
             {
                 itemCode: 'HS005',
@@ -546,6 +538,7 @@ async function main() {
                 isAvailable: true,
                 preparationTime: 15,
                 spicyLevel: 2,
+                imagePath: 'menu/ngheu-hap-sa.jpg',
             },
         ],
     });
@@ -563,6 +556,7 @@ async function main() {
                 isAvailable: true,
                 preparationTime: 12,
                 spicyLevel: 0,
+                imagePath: 'menu/com-chien-duong-chau.jpg',
             },
             {
                 itemCode: 'MR002',
@@ -574,6 +568,7 @@ async function main() {
                 isAvailable: true,
                 preparationTime: 15,
                 spicyLevel: 0,
+                imagePath: 'menu/pho-bo-dac-biet.jpg',
             },
             {
                 itemCode: 'MR003',
@@ -585,6 +580,7 @@ async function main() {
                 isAvailable: true,
                 preparationTime: 15,
                 spicyLevel: 1,
+                imagePath: 'menu/mi-xao-hai-san.jpg',
             },
             {
                 itemCode: 'MR004',
@@ -596,6 +592,7 @@ async function main() {
                 isAvailable: true,
                 preparationTime: 20,
                 spicyLevel: 0,
+                imagePath: 'menu/com-ga-hai-nam.jpg',
             },
             {
                 itemCode: 'MR005',
@@ -607,6 +604,7 @@ async function main() {
                 isAvailable: true,
                 preparationTime: 15,
                 spicyLevel: 3,
+                imagePath: 'menu/bun-bo-hue.jpg',
             },
         ],
     });
@@ -625,6 +623,7 @@ async function main() {
                 preparationTime: 5,
                 isVegetarian: true,
                 calories: 180,
+                imagePath: 'menu/banh-flan-caramel.jpg',
             },
             {
                 itemCode: 'TM002',
@@ -637,6 +636,7 @@ async function main() {
                 preparationTime: 5,
                 isVegetarian: true,
                 calories: 200,
+                imagePath: 'menu/kem-dua.jpg',
             },
             {
                 itemCode: 'TM003',
@@ -649,6 +649,7 @@ async function main() {
                 preparationTime: 5,
                 isVegetarian: true,
                 calories: 150,
+                imagePath: 'menu/che-ba-mau.jpg',
             },
             {
                 itemCode: 'TM004',
@@ -661,6 +662,7 @@ async function main() {
                 preparationTime: 5,
                 isVegetarian: true,
                 calories: 250,
+                imagePath: 'menu/tiramisu.jpg',
             },
         ],
     });
@@ -679,6 +681,7 @@ async function main() {
                 preparationTime: 2,
                 isVegetarian: true,
                 calories: 0,
+                imagePath: 'menu/tra-da.jpg',
             },
             {
                 itemCode: 'DU002',
@@ -691,6 +694,7 @@ async function main() {
                 preparationTime: 3,
                 isVegetarian: true,
                 calories: 50,
+                imagePath: 'menu/nuoc-chanh.jpg',
             },
             {
                 itemCode: 'DU003',
@@ -703,6 +707,7 @@ async function main() {
                 preparationTime: 5,
                 isVegetarian: true,
                 calories: 5,
+                imagePath: 'menu/ca-phe-den.jpg',
             },
             {
                 itemCode: 'DU004',
@@ -715,6 +720,7 @@ async function main() {
                 preparationTime: 5,
                 isVegetarian: true,
                 calories: 120,
+                imagePath: 'menu/ca-phe-sua.jpg',
             },
             {
                 itemCode: 'DU005',
@@ -727,6 +733,7 @@ async function main() {
                 preparationTime: 5,
                 isVegetarian: true,
                 calories: 110,
+                imagePath: 'menu/nuoc-cam.jpg',
             },
             {
                 itemCode: 'DU006',
@@ -739,6 +746,7 @@ async function main() {
                 preparationTime: 5,
                 isVegetarian: true,
                 calories: 220,
+                imagePath: 'menu/sinh-to-bo.jpg',
             },
             {
                 itemCode: 'DU007',
@@ -751,6 +759,7 @@ async function main() {
                 preparationTime: 5,
                 isVegetarian: true,
                 calories: 180,
+                imagePath: 'menu/tra-sua-truyen-thong.jpg',
             },
         ],
     });
@@ -769,6 +778,7 @@ async function main() {
                 preparationTime: 2,
                 isVegetarian: true,
                 calories: 150,
+                imagePath: 'menu/bia-heineken.jpg',
             },
             {
                 itemCode: 'RB002',
@@ -781,6 +791,7 @@ async function main() {
                 preparationTime: 2,
                 isVegetarian: true,
                 calories: 140,
+                imagePath: 'menu/bia-tiger.jpg',
             },
             {
                 itemCode: 'RB003',
@@ -793,6 +804,7 @@ async function main() {
                 preparationTime: 2,
                 isVegetarian: true,
                 calories: 135,
+                imagePath: 'menu/bia-sai-gon.jpg',
             },
             {
                 itemCode: 'RB004',
@@ -805,6 +817,7 @@ async function main() {
                 preparationTime: 3,
                 isVegetarian: true,
                 calories: 600,
+                imagePath: 'menu/ruou-vang-do.jpg',
             },
             {
                 itemCode: 'RB005',
@@ -817,6 +830,7 @@ async function main() {
                 preparationTime: 3,
                 isVegetarian: true,
                 calories: 580,
+                imagePath: 'menu/ruou-vang-trang.jpg',
             },
         ],
     });

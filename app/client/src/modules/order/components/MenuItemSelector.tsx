@@ -12,6 +12,7 @@ import { ShoppingCartItem } from '../types';
 import { formatCurrency } from '../utils';
 import { Plus, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { getImageUrl } from '@/lib/utils';
 
 interface MenuItemSelectorProps {
     cartItems: ShoppingCartItem[];
@@ -131,10 +132,10 @@ const MenuItemCard = memo(function MenuItemCard({ item, onAdd, cartQuantity }: M
     return (
         <div className="relative border rounded-lg overflow-hidden hover:shadow-md transition-shadow">
             {/* Image */}
-            {item.imageUrl && (
+            {getImageUrl(item.imagePath) && (
                 <div className="aspect-square bg-muted">
                     <img
-                        src={item.imageUrl}
+                        src={getImageUrl(item.imagePath)}
                         alt={item.itemName}
                         className="w-full h-full object-cover"
                     />

@@ -3,7 +3,6 @@ import {
     IsNumber,
     IsOptional,
     IsBoolean,
-    IsUrl,
     Min,
     Max,
     MaxLength,
@@ -48,14 +47,6 @@ export class UpdateMenuItemDto {
     @IsOptional()
     @MaxLength(1000)
     description?: string;
-
-    @ApiPropertyOptional({
-        example: 'https://example.com/image.jpg',
-        description: 'Item image URL',
-    })
-    @IsUrl()
-    @IsOptional()
-    imageUrl?: string;
 
     @ApiPropertyOptional({
         example: 'menu/image.jpg',

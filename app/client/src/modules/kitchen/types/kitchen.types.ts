@@ -38,7 +38,7 @@ export interface OrderItem {
     menuItem: {
         itemId: number;
         itemName: string;
-        imageUrl?: string;
+        imagePath?: string;
     };
     quantity: number;
     specialRequest?: string;

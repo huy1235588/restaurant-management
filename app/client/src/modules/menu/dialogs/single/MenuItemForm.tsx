@@ -53,7 +53,7 @@ export function MenuItemForm({
             price: Number(menuItem?.price) || 0,
             cost: menuItem?.cost ? Number(menuItem.cost) : undefined,
             description: menuItem?.description || '',
-            imageUrl: menuItem?.imageUrl || '',
+            imagePath: menuItem?.imagePath || '',
             isAvailable: menuItem?.isAvailable ?? true,
             isActive: menuItem?.isActive ?? true,
             preparationTime: menuItem?.preparationTime ? Number(menuItem.preparationTime) : undefined,
@@ -478,7 +478,7 @@ export function MenuItemForm({
                             <CardContent>
                                 <FormField
                                     control={form.control}
-                                    name="imageUrl"
+                                    name="imagePath"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormControl>

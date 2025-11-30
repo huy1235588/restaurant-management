@@ -8,7 +8,6 @@ export interface MenuItem {
     price: number;
     cost?: number;
     description?: string;
-    imageUrl?: string;
     imagePath?: string;
     isAvailable: boolean;
     isActive: boolean;
@@ -27,7 +26,6 @@ export interface Category {
     description?: string;
     displayOrder?: number;
     isActive: boolean;
-    imageUrl?: string;
     imagePath?: string;
     menuItems?: MenuItem[];
     createdAt: string;

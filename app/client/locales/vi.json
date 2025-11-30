@@ -165,8 +165,6 @@
         "image": "Hình ảnh",
         "uploadImage": "Tải lên hình ảnh",
         "imageDescription": "Tải lên và cắt hình ảnh. Hình ảnh sẽ được tối ưu hóa tự động.",
-        "imageUrl": "URL Hình Ảnh",
-        "imageUrlDescription": "Nhập đường dẫn URL cho hình ảnh món ăn",
         "available": "Còn hàng",
         "unavailable": "Hết hàng",
         "active": "Hoạt động",

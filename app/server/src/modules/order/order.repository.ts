@@ -44,7 +44,7 @@ export class OrderRepository {
                         itemName: true,
                         itemCode: true,
                         price: true,
-                        imageUrl: true,
+                        imagePath: true,
                     },
                 },
             },

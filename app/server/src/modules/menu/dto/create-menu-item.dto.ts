@@ -50,14 +50,6 @@ export class CreateMenuItemDto {
     description?: string;
 
     @ApiPropertyOptional({
-        example: 'https://example.com/image.jpg',
-        description: 'Item image URL',
-    })
-    @IsString()
-    @IsOptional()
-    imageUrl?: string;
-
-    @ApiPropertyOptional({
         example: 'menu/image.jpg',
         description: 'Item image path (relative or storage identifier)',
     })
