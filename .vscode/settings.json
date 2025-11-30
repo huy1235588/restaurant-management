@@ -27,6 +27,8 @@
         "**/package-lock.json": true,
         "**/yarn.lock": true,
         "**/pnpm-lock.yaml": true,
-        "**/tauri/src-tauri/Cargo.lock": true
+        "**/tauri/src-tauri/Cargo.lock": true,
+        "**/tauri/src-tauri/target": true,
+        "**/tauri/src-tauri/gen": true
     }
 }
