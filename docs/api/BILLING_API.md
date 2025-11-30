@@ -8,6 +8,16 @@ API để quản lý hóa đơn và thanh toán trong hệ thống nhà hàng.
 
 **Authentication**: Bearer Token (JWT) required for all endpoints
 
+**Authorization (RBAC)**:
+| Endpoint | Roles Allowed |
+|----------|---------------|
+| GET /bills | admin, manager, waiter, cashier |
+| GET /bills/:id | admin, manager, waiter, cashier |
+| POST /bills | admin, manager, waiter, cashier |
+| PATCH /bills/:id/discount | admin, manager |
+| POST /bills/:id/payment | admin, manager, cashier |
+| DELETE /bills/:id | admin |
+
 ---
 
 ## Endpoints

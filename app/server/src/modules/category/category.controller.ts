@@ -22,6 +22,8 @@ import {
 import { CategoryService } from '@/modules/category/category.service';
 import { CreateCategoryDto, UpdateCategoryDto } from '@/modules/category/dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
 
 @ApiTags('categories')
 @Controller('categories')
@@ -102,10 +104,13 @@ export class CategoryController {
     }
 
     @Post()
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager')
     @HttpCode(HttpStatus.CREATED)
-    @ApiOperation({ summary: 'Create a new category' })
+    @ApiOperation({ summary: 'Create a new category (admin/manager only)' })
     @ApiResponse({ status: 201, description: 'Category created successfully' })
     @ApiResponse({ status: 400, description: 'Bad request' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
     async create(@Body() createCategoryDto: CreateCategoryDto) {
         const category =
             await this.categoryService.createCategory(createCategoryDto);
@@ -116,8 +121,11 @@ export class CategoryController {
     }
 
     @Put(':id')
-    @ApiOperation({ summary: 'Update a category' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager')
+    @ApiOperation({ summary: 'Update a category (admin/manager only)' })
     @ApiResponse({ status: 200, description: 'Category updated successfully' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
     @ApiResponse({ status: 404, description: 'Category not found' })
     async update(
         @Param('id', ParseIntPipe) id: number,
@@ -134,8 +142,11 @@ export class CategoryController {
     }
 
     @Delete(':id')
-    @ApiOperation({ summary: 'Delete a category' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager')
+    @ApiOperation({ summary: 'Delete a category (admin/manager only)' })
     @ApiResponse({ status: 200, description: 'Category deleted successfully' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
     @ApiResponse({ status: 404, description: 'Category not found' })
     async delete(@Param('id', ParseIntPipe) id: number) {
         await this.categoryService.deleteCategory(id);

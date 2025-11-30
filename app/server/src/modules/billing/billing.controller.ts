@@ -44,7 +44,9 @@ export class BillingController {
     constructor(private readonly billingService: BillingService) {}
 
     @Get()
-    @ApiOperation({ summary: 'Get all bills with filters' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager', 'waiter', 'cashier')
+    @ApiOperation({ summary: 'Get all bills with filters (admin/manager/waiter/cashier only)' })
     @ApiQuery({
         name: 'page',
         required: false,
@@ -78,12 +80,15 @@ export class BillingController {
     }
 
     @Get(':id')
-    @ApiOperation({ summary: 'Get bill by ID' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager', 'waiter', 'cashier')
+    @ApiOperation({ summary: 'Get bill by ID (admin/manager/waiter/cashier only)' })
     @ApiParam({ name: 'id', description: 'Bill ID' })
     @ApiResponse({
         status: 200,
         description: BILLING_MESSAGES.SUCCESS.BILL_RETRIEVED,
     })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({
         status: 404,
         description: BILLING_MESSAGES.ERROR.BILL_NOT_FOUND,
@@ -98,12 +103,15 @@ export class BillingController {
     }
 
     @Post()
-    @ApiOperation({ summary: 'Create bill from order' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager', 'waiter', 'cashier')
+    @ApiOperation({ summary: 'Create bill from order (admin/manager/waiter/cashier only)' })
     @ApiResponse({
         status: 201,
         description: BILLING_MESSAGES.SUCCESS.BILL_CREATED,
     })
     @ApiResponse({ status: 400, description: 'Bad request' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({
         status: 404,
         description: BILLING_MESSAGES.ERROR.ORDER_NOT_FOUND,
@@ -125,13 +133,16 @@ export class BillingController {
     }
 
     @Patch(':id/discount')
-    @ApiOperation({ summary: 'Apply discount to bill' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager')
+    @ApiOperation({ summary: 'Apply discount to bill (admin/manager only)' })
     @ApiParam({ name: 'id', description: 'Bill ID' })
     @ApiResponse({
         status: 200,
         description: BILLING_MESSAGES.SUCCESS.DISCOUNT_APPLIED,
     })
     @ApiResponse({ status: 400, description: 'Bad request' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
     @ApiResponse({
         status: 404,
         description: BILLING_MESSAGES.ERROR.BILL_NOT_FOUND,
@@ -155,13 +166,16 @@ export class BillingController {
     }
 
     @Post(':id/payment')
-    @ApiOperation({ summary: 'Process payment for bill' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager', 'cashier')
+    @ApiOperation({ summary: 'Process payment for bill (admin/manager/cashier only)' })
     @ApiParam({ name: 'id', description: 'Bill ID' })
     @ApiResponse({
         status: 200,
         description: BILLING_MESSAGES.SUCCESS.PAYMENT_PROCESSED,
     })
     @ApiResponse({ status: 400, description: 'Bad request' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager/Cashier only' })
     @ApiResponse({
         status: 404,
         description: BILLING_MESSAGES.ERROR.BILL_NOT_FOUND,

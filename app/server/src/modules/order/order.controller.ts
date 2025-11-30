@@ -30,6 +30,8 @@ import {
     UpdateOrderStatusDto,
 } from './dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
 import { OrderStatus } from '@/lib/prisma';
 import { ORDER_MESSAGES, ORDER_CONSTANTS } from './constants/order.constants';
 
@@ -173,8 +175,10 @@ export class OrderController {
     }
 
     @Post()
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager', 'waiter')
     @ApiOperation({
-        summary: 'Create new order',
+        summary: 'Create new order (admin/manager/waiter only)',
         description: 'Create a new order for a table with items',
     })
     @ApiResponse({
@@ -182,6 +186,7 @@ export class OrderController {
         description: ORDER_MESSAGES.SUCCESS.ORDER_CREATED,
     })
     @ApiResponse({ status: 400, description: 'Bad request' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager/Waiter only' })
     @ApiResponse({
         status: 404,
         description: 'Table or menu item not found',
@@ -207,8 +212,10 @@ export class OrderController {
     }
 
     @Patch(':id/items')
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager', 'waiter')
     @ApiOperation({
-        summary: 'Add items to order',
+        summary: 'Add items to order (admin/manager/waiter only)',
         description: 'Add additional items to an existing order',
     })
     @ApiParam({ name: 'id', description: 'Order ID' })
@@ -217,6 +224,7 @@ export class OrderController {
         description: ORDER_MESSAGES.SUCCESS.ITEMS_ADDED,
     })
     @ApiResponse({ status: 400, description: 'Bad request' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager/Waiter only' })
     @ApiResponse({
         status: 404,
         description: 'Order or menu item not found',
@@ -234,8 +242,10 @@ export class OrderController {
     }
 
     @Delete(':id/items/:itemId')
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager', 'waiter')
     @ApiOperation({
-        summary: 'Cancel order item',
+        summary: 'Cancel order item (admin/manager/waiter only)',
         description: 'Cancel a specific item in the order',
     })
     @ApiParam({ name: 'id', description: 'Order ID' })
@@ -246,6 +256,7 @@ export class OrderController {
         description: ORDER_MESSAGES.SUCCESS.ITEM_CANCELLED,
     })
     @ApiResponse({ status: 400, description: 'Bad request' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager/Waiter only' })
     @ApiResponse({ status: 404, description: 'Order or item not found' })
     async cancelItem(
         @Param('id', ParseIntPipe) id: number,
@@ -265,8 +276,10 @@ export class OrderController {
     }
 
     @Delete(':id')
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager')
     @ApiOperation({
-        summary: 'Cancel order',
+        summary: 'Cancel order (admin/manager only)',
         description: 'Cancel entire order and release table',
     })
     @ApiParam({ name: 'id', description: 'Order ID' })
@@ -276,6 +289,7 @@ export class OrderController {
         description: ORDER_MESSAGES.SUCCESS.ORDER_CANCELLED,
     })
     @ApiResponse({ status: 400, description: 'Bad request' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
     @ApiResponse({
         status: 404,
         description: ORDER_MESSAGES.ERROR.ORDER_NOT_FOUND,
@@ -293,8 +307,10 @@ export class OrderController {
     }
 
     @Patch(':id/status')
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager')
     @ApiOperation({
-        summary: 'Update order status',
+        summary: 'Update order status (admin/manager only)',
         description: 'Change the status of an order',
     })
     @ApiParam({ name: 'id', description: 'Order ID' })
@@ -302,6 +318,7 @@ export class OrderController {
         status: 200,
         description: ORDER_MESSAGES.SUCCESS.ORDER_STATUS_UPDATED,
     })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
     @ApiResponse({
         status: 404,
         description: ORDER_MESSAGES.ERROR.ORDER_NOT_FOUND,
@@ -322,8 +339,10 @@ export class OrderController {
     }
 
     @Patch(':id/items/:itemId/serve')
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager', 'waiter')
     @ApiOperation({
-        summary: 'Mark order item as served',
+        summary: 'Mark order item as served (admin/manager/waiter only)',
         description: 'Mark a specific item in the order as served to customer',
     })
     @ApiParam({ name: 'id', description: 'Order ID' })
@@ -332,6 +351,7 @@ export class OrderController {
         status: 200,
         description: ORDER_MESSAGES.SUCCESS.ITEM_SERVED,
     })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager/Waiter only' })
     @ApiResponse({
         status: 404,
         description: 'Order or item not found',

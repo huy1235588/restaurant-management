@@ -8,6 +8,19 @@ API để quản lý đơn hàng trong nhà hàng, từ tạo đơn đến hoàn
 
 **Authentication**: Bearer Token (JWT) required for all endpoints
 
+**Authorization (RBAC)**:
+| Endpoint | Roles Allowed |
+|----------|---------------|
+| GET /orders | All authenticated users |
+| GET /orders/count | All authenticated users |
+| GET /orders/:id | All authenticated users |
+| POST /orders | admin, manager, waiter |
+| PATCH /orders/:id/items | admin, manager, waiter |
+| DELETE /orders/:id/items/:itemId | admin, manager, waiter |
+| DELETE /orders/:id | admin, manager |
+| PATCH /orders/:id/status | admin, manager |
+| PATCH /orders/:id/items/:itemId/serve | admin, manager, waiter |
+
 **WebSocket**: Real-time updates available at `/orders` namespace
 
 ---

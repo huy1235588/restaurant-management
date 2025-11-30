@@ -27,6 +27,8 @@ import {
     UpdateAvailabilityDto,
 } from '@/modules/menu/dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
 
 @ApiTags('menu')
 @Controller('menu')
@@ -168,10 +170,13 @@ export class MenuController {
     }
 
     @Post()
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager')
     @HttpCode(HttpStatus.CREATED)
-    @ApiOperation({ summary: 'Create a new menu item' })
+    @ApiOperation({ summary: 'Create a new menu item (admin/manager only)' })
     @ApiResponse({ status: 201, description: 'Menu item created successfully' })
     @ApiResponse({ status: 400, description: 'Bad request' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
     async create(@Body() createMenuItemDto: CreateMenuItemDto) {
         const menuItem =
             await this.menuService.createMenuItem(createMenuItemDto);
@@ -182,8 +187,11 @@ export class MenuController {
     }
 
     @Put(':id')
-    @ApiOperation({ summary: 'Update a menu item' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager')
+    @ApiOperation({ summary: 'Update a menu item (admin/manager only)' })
     @ApiResponse({ status: 200, description: 'Menu item updated successfully' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
     @ApiResponse({ status: 404, description: 'Menu item not found' })
     async update(
         @Param('id', ParseIntPipe) id: number,
@@ -200,11 +208,14 @@ export class MenuController {
     }
 
     @Patch(':id/availability')
-    @ApiOperation({ summary: 'Update menu item availability' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager')
+    @ApiOperation({ summary: 'Update menu item availability (admin/manager only)' })
     @ApiResponse({
         status: 200,
         description: 'Menu item availability updated successfully',
     })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
     async updateAvailability(
         @Param('id', ParseIntPipe) id: number,
         @Body() updateAvailabilityDto: UpdateAvailabilityDto,
@@ -220,8 +231,11 @@ export class MenuController {
     }
 
     @Delete(':id')
-    @ApiOperation({ summary: 'Delete a menu item' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager')
+    @ApiOperation({ summary: 'Delete a menu item (admin/manager only)' })
     @ApiResponse({ status: 200, description: 'Menu item deleted successfully' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
     @ApiResponse({ status: 404, description: 'Menu item not found' })
     async delete(@Param('id', ParseIntPipe) id: number) {
         await this.menuService.deleteMenuItem(id);

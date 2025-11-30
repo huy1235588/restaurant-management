@@ -27,10 +27,18 @@ import { useOrders, useOrderSocket, useFullscreen } from '../hooks';
 import { Order, OrderStatus } from '../types';
 import { ORDER_CONSTANTS } from '../constants';
 import { Plus, Search, Maximize2, Minimize2, Keyboard } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { hasPermission } from '@/types/permissions';
 
 export function OrderListView() {
     const { t } = useTranslation();
     const router = useRouter();
+    const { user } = useAuth();
+
+    // Permission checks
+    const canCreate = user ? hasPermission(user.role, 'orders.create') : false;
+    const canCancel = user ? hasPermission(user.role, 'orders.delete') : false;
+
     const [page, setPage] = useState(1);
     const [limit] = useState(ORDER_CONSTANTS.DEFAULT_PAGE_SIZE);
     const [status, setStatus] = useState<OrderStatus | ''>('');
@@ -144,10 +152,12 @@ export function OrderListView() {
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <h1 className="text-3xl font-bold">{t('orders.title')}</h1>
-                    <Button onClick={handleCreateOrder}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        {t('orders.createOrder')}
-                    </Button>
+                    {canCreate && (
+                        <Button onClick={handleCreateOrder}>
+                            <Plus className="mr-2 h-4 w-4" />
+                            {t('orders.createOrder')}
+                        </Button>
+                    )}
                 </div>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     <OrderCardSkeleton count={ORDER_CONSTANTS.UI.SKELETON_LOADING_COUNT} />
@@ -161,10 +171,12 @@ export function OrderListView() {
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <h1 className="text-3xl font-bold">{t('orders.title')}</h1>
-                    <Button onClick={handleCreateOrder}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        {t('orders.createOrder')}
-                    </Button>
+                    {canCreate && (
+                        <Button onClick={handleCreateOrder}>
+                            <Plus className="mr-2 h-4 w-4" />
+                            {t('orders.createOrder')}
+                        </Button>
+                    )}
                 </div>
                 <div className="text-center py-12 text-destructive">
                     {t('common.error')}: {error.message}
@@ -192,10 +204,12 @@ export function OrderListView() {
                         )}
                         {isFullscreen ? t('common.exitFullscreen') : t('common.fullscreen')}
                     </Button>
-                    <Button onClick={handleCreateOrder}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        {t('orders.createOrder')}
-                    </Button>
+                    {canCreate && (
+                        <Button onClick={handleCreateOrder}>
+                            <Plus className="mr-2 h-4 w-4" />
+                            {t('orders.createOrder')}
+                        </Button>
+                    )}
                 </div>
             </div>
 
@@ -236,7 +250,7 @@ export function OrderListView() {
                             <OrderCard
                                 key={order.orderId}
                                 order={order}
-                                onCancelOrder={handleCancelOrder}
+                                onCancelOrder={canCancel ? handleCancelOrder : undefined}
                             />
                         ))}
                     </div>

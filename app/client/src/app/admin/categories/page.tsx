@@ -29,9 +29,18 @@ import {
 } from '@/modules/admin/categories';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useAuth } from '@/hooks/useAuth';
+import { hasPermission } from '@/types/permissions';
 
 export default function CategoriesPage() {
     const router = useRouter();
+    const { user } = useAuth();
+
+    // Permission checks - admin/manager only for write operations
+    const canCreate = user ? hasPermission(user.role, 'category.create') : false;
+    const canUpdate = user ? hasPermission(user.role, 'category.update') : false;
+    const canDelete = user ? hasPermission(user.role, 'category.delete') : false;
+
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<boolean | undefined>(undefined);
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -144,10 +153,12 @@ export default function CategoriesPage() {
                         Organize your menu items into categories
                     </p>
                 </div>
-                <Button onClick={() => setCreateDialogOpen(true)}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Category
-                </Button>
+                {canCreate && (
+                    <Button onClick={() => setCreateDialogOpen(true)}>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Category
+                    </Button>
+                )}
             </div>
 
             {/* Statistics */}
@@ -203,8 +214,8 @@ export default function CategoriesPage() {
                 categories={filteredCategories}
                 loading={loading}
                 error={error}
-                onEdit={handleEdit}
-                onDelete={handleDeleteClick}
+                onEdit={canUpdate ? handleEdit : undefined}
+                onDelete={canDelete ? handleDeleteClick : undefined}
                 onViewDetails={handleViewDetails}
             />
 

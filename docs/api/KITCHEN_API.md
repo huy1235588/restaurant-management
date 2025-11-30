@@ -8,6 +8,16 @@ API để quản lý hoạt động bếp, xử lý đơn hàng từ khi nhận 
 
 **Authentication**: Bearer Token (JWT) required for all endpoints
 
+**Authorization (RBAC)**:
+| Endpoint | Roles Allowed |
+|----------|---------------|
+| GET /kitchen/orders | admin, manager, chef, waiter |
+| GET /kitchen/orders/:id | admin, manager, chef, waiter |
+| PATCH /kitchen/orders/:id/start | admin, manager, chef |
+| PATCH /kitchen/orders/:id/ready | admin, manager, chef |
+| PATCH /kitchen/orders/:id/complete | admin, manager, chef |
+| PATCH /kitchen/orders/:id/cancel | admin, manager, chef |
+
 **WebSocket**: Real-time updates available at `/kitchen` namespace
 
 ---

@@ -24,6 +24,8 @@ import { Role } from '@/lib/prisma';
 import { StaffService } from './staff.service';
 import { CreateStaffDto, UpdateStaffDto, UpdateStaffRoleDto } from './dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
 
 @ApiTags('staff')
 @Controller('staff')
@@ -33,7 +35,9 @@ export class StaffController {
     constructor(private readonly staffService: StaffService) {}
 
     @Get()
-    @ApiOperation({ summary: 'Get all staff with pagination' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager')
+    @ApiOperation({ summary: 'Get all staff with pagination (admin/manager only)' })
     @ApiQuery({ name: 'page', required: false, type: Number })
     @ApiQuery({ name: 'limit', required: false, type: Number })
     @ApiQuery({ name: 'role', required: false, enum: Role })
@@ -78,11 +82,14 @@ export class StaffController {
     }
 
     @Get('available-accounts')
-    @ApiOperation({ summary: 'Get accounts without staff profile' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager')
+    @ApiOperation({ summary: 'Get accounts without staff profile (admin/manager only)' })
     @ApiResponse({
         status: 200,
         description: 'Available accounts retrieved successfully',
     })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
     async getAvailableAccounts() {
         const accounts = await this.staffService.getAvailableAccounts();
         return {
@@ -92,8 +99,11 @@ export class StaffController {
     }
 
     @Get('role/:role')
-    @ApiOperation({ summary: 'Get staff by role' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager')
+    @ApiOperation({ summary: 'Get staff by role (admin/manager only)' })
     @ApiResponse({ status: 200, description: 'Staff retrieved successfully' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
     async getByRole(@Param('role') role: Role) {
         const staff = await this.staffService.getStaffByRole(role);
         return {
@@ -115,13 +125,16 @@ export class StaffController {
     }
 
     @Get(':id/performance')
-    @ApiOperation({ summary: 'Get staff performance' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager')
+    @ApiOperation({ summary: 'Get staff performance (admin/manager only)' })
     @ApiQuery({ name: 'startDate', required: false, type: String })
     @ApiQuery({ name: 'endDate', required: false, type: String })
     @ApiResponse({
         status: 200,
         description: 'Staff performance retrieved successfully',
     })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
     async getPerformance(
         @Param('id', ParseIntPipe) id: number,
         @Query('startDate') startDate?: string,
@@ -139,10 +152,13 @@ export class StaffController {
     }
 
     @Post()
+    @UseGuards(RolesGuard)
+    @Roles('admin')
     @HttpCode(HttpStatus.CREATED)
-    @ApiOperation({ summary: 'Create a new staff member' })
+    @ApiOperation({ summary: 'Create a new staff member (admin only)' })
     @ApiResponse({ status: 201, description: 'Staff created successfully' })
     @ApiResponse({ status: 400, description: 'Bad request' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
     async create(@Body() createStaffDto: CreateStaffDto) {
         const staff = await this.staffService.createStaff(createStaffDto);
         return {
@@ -152,8 +168,11 @@ export class StaffController {
     }
 
     @Put(':id')
-    @ApiOperation({ summary: 'Update a staff member' })
+    @UseGuards(RolesGuard)
+    @Roles('admin')
+    @ApiOperation({ summary: 'Update a staff member (admin only)' })
     @ApiResponse({ status: 200, description: 'Staff updated successfully' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
     @ApiResponse({ status: 404, description: 'Staff not found' })
     async update(
         @Param('id', ParseIntPipe) id: number,
@@ -167,8 +186,11 @@ export class StaffController {
     }
 
     @Patch(':id/deactivate')
-    @ApiOperation({ summary: 'Deactivate a staff member' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager')
+    @ApiOperation({ summary: 'Deactivate a staff member (admin/manager only)' })
     @ApiResponse({ status: 200, description: 'Staff deactivated successfully' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
     @ApiResponse({ status: 404, description: 'Staff not found' })
     async deactivate(@Param('id', ParseIntPipe) id: number) {
         const staff = await this.staffService.deactivateStaff(id);
@@ -179,8 +201,11 @@ export class StaffController {
     }
 
     @Patch(':id/activate')
-    @ApiOperation({ summary: 'Activate a staff member' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager')
+    @ApiOperation({ summary: 'Activate a staff member (admin/manager only)' })
     @ApiResponse({ status: 200, description: 'Staff activated successfully' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
     @ApiResponse({ status: 404, description: 'Staff not found' })
     async activate(@Param('id', ParseIntPipe) id: number) {
         const staff = await this.staffService.activateStaff(id);
@@ -191,11 +216,14 @@ export class StaffController {
     }
 
     @Patch(':id/role')
-    @ApiOperation({ summary: 'Update staff role' })
+    @UseGuards(RolesGuard)
+    @Roles('admin')
+    @ApiOperation({ summary: 'Update staff role (admin only)' })
     @ApiResponse({
         status: 200,
         description: 'Staff role updated successfully',
     })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
     @ApiResponse({ status: 404, description: 'Staff not found' })
     async updateRole(
         @Param('id', ParseIntPipe) id: number,
@@ -212,8 +240,11 @@ export class StaffController {
     }
 
     @Delete(':id')
-    @ApiOperation({ summary: 'Delete a staff member' })
+    @UseGuards(RolesGuard)
+    @Roles('admin')
+    @ApiOperation({ summary: 'Delete a staff member (admin only)' })
     @ApiResponse({ status: 200, description: 'Staff deleted successfully' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
     @ApiResponse({ status: 404, description: 'Staff not found' })
     async delete(@Param('id', ParseIntPipe) id: number) {
         await this.staffService.deleteStaff(id);

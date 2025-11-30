@@ -17,10 +17,10 @@ interface TableListViewProps {
     sortOrder: 'asc' | 'desc';
     selectedTableIds?: number[];
     onSort: (field: any) => void;
-    onEdit: (table: TableType) => void;
-    onChangeStatus: (table: TableType) => void;
-    onDelete: (table: TableType) => void;
-    onAssignOrder: (table: TableType) => void;
+    onEdit?: (table: TableType) => void;
+    onChangeStatus?: (table: TableType) => void;
+    onDelete?: (table: TableType) => void;
+    onAssignOrder?: (table: TableType) => void;
     onSelectionChange?: (selectedIds: number[]) => void;
     onRowClick?: (table: TableType) => void;
 }
@@ -223,27 +223,33 @@ export function TableListView({
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onClick={() => onEdit(table)}>
-                                            <Edit className="mr-2 h-4 w-4" />
-                                            {t('common.edit', 'Edit')}
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => onChangeStatus(table)}>
-                                            <CircleDot className="mr-2 h-4 w-4" />
-                                            {t('tables.changeStatus', 'Change Status')}
-                                        </DropdownMenuItem>
+                                        {onEdit && (
+                                            <DropdownMenuItem onClick={() => onEdit(table)}>
+                                                <Edit className="mr-2 h-4 w-4" />
+                                                {t('common.edit', 'Edit')}
+                                            </DropdownMenuItem>
+                                        )}
+                                        {onChangeStatus && (
+                                            <DropdownMenuItem onClick={() => onChangeStatus(table)}>
+                                                <CircleDot className="mr-2 h-4 w-4" />
+                                                {t('tables.changeStatus', 'Change Status')}
+                                            </DropdownMenuItem>
+                                        )}
                                         {onAssignOrder && (
                                             <DropdownMenuItem onClick={() => onAssignOrder(table)}>
                                                 <ArrowRightLeft className="mr-2 h-4 w-4" />
                                                 {t('tables.assignOrder', 'Assign to Order')}
                                             </DropdownMenuItem>
                                         )}
-                                        <DropdownMenuItem
-                                            onClick={() => onDelete(table)}
-                                            className="text-destructive"
-                                        >
-                                            <Trash2 className="mr-2 h-4 w-4" />
-                                            {t('common.delete', 'Delete')}
-                                        </DropdownMenuItem>
+                                        {onDelete && (
+                                            <DropdownMenuItem
+                                                onClick={() => onDelete(table)}
+                                                className="text-destructive"
+                                            >
+                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                {t('common.delete', 'Delete')}
+                                            </DropdownMenuItem>
+                                        )}
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </TableCell>

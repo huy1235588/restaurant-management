@@ -8,6 +8,23 @@ API để quản lý đặt bàn trong nhà hàng, từ book → confirm → sea
 
 **Authentication**: Bearer Token (JWT) required for all endpoints
 
+**Authorization (RBAC)**:
+| Endpoint | Roles Allowed |
+|----------|---------------|
+| GET /reservations | admin, manager, waiter |
+| GET /reservations/count | admin, manager, waiter |
+| GET /reservations/availability | admin, manager, waiter |
+| GET /reservations/:id | admin, manager, waiter |
+| GET /reservations/phone/:phone | admin, manager, waiter |
+| GET /reservations/code/:code | admin, manager, waiter |
+| POST /reservations | admin, manager, waiter |
+| PATCH /reservations/:id | admin, manager, waiter |
+| PATCH /reservations/:id/confirm | admin, manager, waiter |
+| PATCH /reservations/:id/seated | admin, manager, waiter |
+| PATCH /reservations/:id/complete | admin, manager, waiter |
+| PATCH /reservations/:id/cancel | admin, manager |
+| PATCH /reservations/:id/no-show | admin, manager |
+
 **WebSocket**: Real-time updates available at `/reservations` namespace
 
 ---

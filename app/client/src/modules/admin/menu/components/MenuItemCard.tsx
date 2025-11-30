@@ -19,11 +19,11 @@ import { getImageUrl } from '@/lib/utils';
 
 interface MenuItemCardProps {
     item: MenuItem;
-    onEdit: (item: MenuItem) => void;
-    onDelete: (item: MenuItem) => void;
-    onDuplicate: (item: MenuItem) => void;
+    onEdit?: (item: MenuItem) => void;
+    onDelete?: (item: MenuItem) => void;
+    onDuplicate?: (item: MenuItem) => void;
     onViewDetails: (item: MenuItem) => void;
-    onToggleAvailability: (item: MenuItem, isAvailable: boolean) => Promise<void>;
+    onToggleAvailability?: (item: MenuItem, isAvailable: boolean) => Promise<void>;
 }
 
 export function MenuItemCard({
@@ -37,7 +37,9 @@ export function MenuItemCard({
     const { t } = useTranslation();
 
     const handleToggleAvailability = async (checked: boolean) => {
-        await onToggleAvailability(item, checked);
+        if (onToggleAvailability) {
+            await onToggleAvailability(item, checked);
+        }
     };
 
     return (
@@ -112,7 +114,7 @@ export function MenuItemCard({
                     <Switch
                         checked={item.isAvailable}
                         onCheckedChange={handleToggleAvailability}
-                        disabled={!item.isActive}
+                        disabled={!item.isActive || !onToggleAvailability}
                     />
                     <span className="text-xs text-muted-foreground">{t('menu.available')}</span>
                 </div>
@@ -128,21 +130,27 @@ export function MenuItemCard({
                             <Eye className="w-4 h-4 mr-2" />
                             {t('menu.viewDetails')}
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onEdit(item)}>
-                            <Edit className="w-4 h-4 mr-2" />
-                            {t('common.edit')}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onDuplicate(item)}>
-                            <Copy className="w-4 h-4 mr-2" />
-                            {t('common.duplicate')}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                            onClick={() => onDelete(item)}
-                            className="text-destructive"
-                        >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            {t('common.delete')}
-                        </DropdownMenuItem>
+                        {onEdit && (
+                            <DropdownMenuItem onClick={() => onEdit(item)}>
+                                <Edit className="w-4 h-4 mr-2" />
+                                {t('common.edit')}
+                            </DropdownMenuItem>
+                        )}
+                        {onDuplicate && (
+                            <DropdownMenuItem onClick={() => onDuplicate(item)}>
+                                <Copy className="w-4 h-4 mr-2" />
+                                {t('common.duplicate')}
+                            </DropdownMenuItem>
+                        )}
+                        {onDelete && (
+                            <DropdownMenuItem
+                                onClick={() => onDelete(item)}
+                                className="text-destructive"
+                            >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                {t('common.delete')}
+                            </DropdownMenuItem>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             </CardFooter>

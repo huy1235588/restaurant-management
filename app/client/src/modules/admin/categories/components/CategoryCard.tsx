@@ -18,8 +18,8 @@ import { getImageUrl } from '@/lib/utils';
 
 interface CategoryCardProps {
     category: Category;
-    onEdit: (category: Category) => void;
-    onDelete: (category: Category) => void;
+    onEdit?: (category: Category) => void;
+    onDelete?: (category: Category) => void;
     onViewDetails: (category: Category) => void;
 }
 
@@ -88,17 +88,21 @@ export function CategoryCard({ category, onEdit, onDelete, onViewDetails }: Cate
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onEdit(category)}>
-                            <Edit className="w-4 h-4 mr-2" />
-                            {t('common.edit')}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                            onClick={() => onDelete(category)}
-                            className="text-destructive"
-                        >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            {t('common.delete')}
-                        </DropdownMenuItem>
+                        {onEdit && (
+                            <DropdownMenuItem onClick={() => onEdit(category)}>
+                                <Edit className="w-4 h-4 mr-2" />
+                                {t('common.edit')}
+                            </DropdownMenuItem>
+                        )}
+                        {onDelete && (
+                            <DropdownMenuItem
+                                onClick={() => onDelete(category)}
+                                className="text-destructive"
+                            >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                {t('common.delete')}
+                            </DropdownMenuItem>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             </CardFooter>

@@ -19,6 +19,8 @@ import {
     TableHistoryDialog,
     KeyboardShortcutsDialog,
 } from '@/modules/admin/tables/dialogs';
+import { useAuth } from '@/hooks/useAuth';
+import { hasPermission } from '@/types/permissions';
 
 type SortField = 'tableNumber' | 'capacity' | 'floor' | 'status';
 type SortOrder = 'asc' | 'desc';
@@ -27,6 +29,12 @@ export default function TablesPage() {
     const { t } = useTranslation();
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { user } = useAuth();
+
+    // Permission checks - admin/manager only for write operations
+    const canCreate = user ? hasPermission(user.role, 'tables.create') : false;
+    const canUpdate = user ? hasPermission(user.role, 'tables.update') : false;
+    const canDelete = user ? hasPermission(user.role, 'tables.delete') : false;
 
     // Store state
     const {
@@ -181,23 +189,39 @@ export default function TablesPage() {
     }, [updateURL]);
 
     const handleCreateTable = useCallback(() => {
+        if (!canCreate) {
+            toast.error(t('common.noPermission', 'You do not have permission to perform this action'));
+            return;
+        }
         setShowCreateDialog(true);
-    }, []);
+    }, [canCreate, t]);
 
     const handleEditTable = useCallback((table: Table) => {
+        if (!canUpdate) {
+            toast.error(t('common.noPermission', 'You do not have permission to perform this action'));
+            return;
+        }
         setSelectedTable(table);
         setShowEditDialog(true);
-    }, []);
+    }, [canUpdate, t]);
 
     const handleChangeStatus = useCallback((table: Table) => {
+        if (!canUpdate) {
+            toast.error(t('common.noPermission', 'You do not have permission to perform this action'));
+            return;
+        }
         setSelectedTable(table);
         setShowStatusDialog(true);
-    }, []);
+    }, [canUpdate, t]);
 
     const handleDeleteTable = useCallback((table: Table) => {
+        if (!canDelete) {
+            toast.error(t('common.noPermission', 'You do not have permission to perform this action'));
+            return;
+        }
         setSelectedTable(table);
         setShowDeleteDialog(true);
-    }, []);
+    }, [canDelete, t]);
 
     const handleAssignOrder = useCallback((table: Table) => {
         // Navigate to orders page with table pre-selected
@@ -282,7 +306,7 @@ export default function TablesPage() {
         <div className="container mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
             <TableHeader
                 tables={tables}
-                onCreateTable={handleCreateTable}
+                onCreateTable={canCreate ? handleCreateTable : undefined}
                 onRefresh={handleRefresh}
             />
 
@@ -311,17 +335,19 @@ export default function TablesPage() {
                 onActiveFilterChange={handleActiveFilter}
             />
             <div className="animate-in fade-in duration-500">
-                {selectedTableIds.length > 0 && (
+                    {selectedTableIds.length > 0 && (canUpdate || canDelete) && (
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-blue-100 border border-blue-200 rounded-lg p-4 animate-in slide-in-from-top-2 duration-300">
                         <span className="text-sm font-medium text-blue-900">
                             {t('tables.selectedCount', '{{count}} tables selected', { count: selectedTableIds.length })}
                         </span>
                         <div className="flex flex-wrap gap-2">
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => setShowBulkStatusDialog(true)}
-                            >
+                            {canUpdate && (
+                                <>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => setShowBulkStatusDialog(true)}
+                                    >
                                         {t('tables.changeBulkStatus', 'Change Status')}
                                     </Button>
                                     <Button
@@ -331,27 +357,31 @@ export default function TablesPage() {
                                     >
                                         {t('tables.toggleActive', 'Toggle Active')}
                                     </Button>
-                                    <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => setShowBulkExportDialog(true)}
-                                    >
-                                        {t('tables.bulkExport', 'Export Selected')}
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        variant="destructive"
-                                        onClick={() => setShowBulkDeleteDialog(true)}
-                                    >
-                                        {t('tables.bulkDelete', 'Delete Selected')}
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => setSelectedTableIds([])}
-                                    >
-                                        {t('common.clear', 'Clear')}
-                                    </Button>
+                                </>
+                            )}
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setShowBulkExportDialog(true)}
+                            >
+                                {t('tables.bulkExport', 'Export Selected')}
+                            </Button>
+                            {canDelete && (
+                                <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={() => setShowBulkDeleteDialog(true)}
+                                >
+                                    {t('tables.bulkDelete', 'Delete Selected')}
+                                </Button>
+                            )}
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setSelectedTableIds([])}
+                            >
+                                {t('common.clear', 'Clear')}
+                            </Button>
                                 </div>
                             </div>
                         )}
@@ -362,9 +392,9 @@ export default function TablesPage() {
                             sortOrder={sortOrder}
                             selectedTableIds={selectedTableIds}
                             onSort={handleSort}
-                            onEdit={handleEditTable}
-                            onChangeStatus={handleChangeStatus}
-                            onDelete={handleDeleteTable}
+                            onEdit={canUpdate ? handleEditTable : undefined}
+                            onChangeStatus={canUpdate ? handleChangeStatus : undefined}
+                            onDelete={canDelete ? handleDeleteTable : undefined}
                             onAssignOrder={handleAssignOrder}
                             onSelectionChange={handleSelectionChange}
                             onRowClick={setSelectedTable}

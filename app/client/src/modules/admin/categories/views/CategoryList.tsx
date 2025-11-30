@@ -12,8 +12,8 @@ interface CategoryListProps {
     categories: Category[];
     loading: boolean;
     error: string | null;
-    onEdit: (category: Category) => void;
-    onDelete: (category: Category) => void;
+    onEdit?: (category: Category) => void;
+    onDelete?: (category: Category) => void;
     onViewDetails: (category: Category) => void;
 }
 

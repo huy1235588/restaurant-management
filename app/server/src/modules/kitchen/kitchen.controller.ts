@@ -19,6 +19,8 @@ import {
 import { KitchenService } from './kitchen.service';
 import { KitchenOrderFiltersDto } from './dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
 
 @ApiTags('kitchen')
 @Controller('kitchen')
@@ -28,7 +30,9 @@ export class KitchenController {
     constructor(private readonly kitchenService: KitchenService) {}
 
     @Get('orders')
-    @ApiOperation({ summary: 'Get all kitchen orders' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager', 'chef', 'waiter')
+    @ApiOperation({ summary: 'Get all kitchen orders (admin/manager/chef/waiter only)' })
     @ApiQuery({
         name: 'status',
         required: false,
@@ -40,6 +44,7 @@ export class KitchenController {
         status: 200,
         description: 'Kitchen orders retrieved successfully',
     })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
     async getAllKitchenOrders(
         @Query() filters: KitchenOrderFiltersDto,
         @Query('page') page?: number,
@@ -53,22 +58,28 @@ export class KitchenController {
     }
 
     @Get('orders/:id')
-    @ApiOperation({ summary: 'Get kitchen order by ID' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager', 'chef', 'waiter')
+    @ApiOperation({ summary: 'Get kitchen order by ID (admin/manager/chef/waiter only)' })
     @ApiParam({ name: 'id', description: 'Kitchen order ID' })
     @ApiResponse({
         status: 200,
         description: 'Kitchen order retrieved successfully',
     })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Kitchen order not found' })
     async getKitchenOrderById(@Param('id', ParseIntPipe) id: number) {
         return this.kitchenService.getKitchenOrderById(id);
     }
 
     @Patch('orders/:id/start')
-    @ApiOperation({ summary: 'Start preparing order' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager', 'chef')
+    @ApiOperation({ summary: 'Start preparing order (admin/manager/chef only)' })
     @ApiParam({ name: 'id', description: 'Kitchen order ID' })
     @ApiResponse({ status: 200, description: 'Order preparation started' })
     @ApiResponse({ status: 400, description: 'Bad request' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager/Chef only' })
     @ApiResponse({ status: 404, description: 'Kitchen order not found' })
     async startPreparing(
         @Param('id', ParseIntPipe) id: number,
@@ -79,20 +90,26 @@ export class KitchenController {
     }
 
     @Patch('orders/:id/complete')
-    @ApiOperation({ summary: 'Complete kitchen order (dish ready and served)' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager', 'chef')
+    @ApiOperation({ summary: 'Complete kitchen order (admin/manager/chef only)' })
     @ApiParam({ name: 'id', description: 'Kitchen order ID' })
     @ApiResponse({ status: 200, description: 'Order completed' })
     @ApiResponse({ status: 400, description: 'Bad request' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager/Chef only' })
     @ApiResponse({ status: 404, description: 'Kitchen order not found' })
     async completeOrder(@Param('id', ParseIntPipe) id: number) {
         return this.kitchenService.completeOrder(id);
     }
 
     @Patch('orders/:id/cancel')
-    @ApiOperation({ summary: 'Cancel kitchen order' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager', 'chef')
+    @ApiOperation({ summary: 'Cancel kitchen order (admin/manager/chef only)' })
     @ApiParam({ name: 'id', description: 'Kitchen order ID' })
     @ApiResponse({ status: 200, description: 'Order cancelled' })
     @ApiResponse({ status: 400, description: 'Bad request' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager/Chef only' })
     @ApiResponse({ status: 404, description: 'Kitchen order not found' })
     async cancelOrder(@Param('id', ParseIntPipe) id: number) {
         return this.kitchenService.cancelKitchenOrder(id);

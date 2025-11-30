@@ -20,11 +20,20 @@ import {
 import { Plus, ChevronLeft, ChevronRight, Calendar, TrendingUp, Keyboard, Maximize2, Minimize2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/hooks/useAuth';
+import { hasPermission } from '@/types/permissions';
 
 export function ReservationListView() {
     const { t } = useTranslation();
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { user } = useAuth();
+
+    // Permission checks
+    const canCreate = user ? hasPermission(user.role, 'reservations.create') : false;
+    const canUpdate = user ? hasPermission(user.role, 'reservations.update') : false;
+    const canCancel = user ? hasPermission(user.role, 'reservations.cancel') : false;
+
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [showHelpDialog, setShowHelpDialog] = useState(false);
 
@@ -236,14 +245,16 @@ export function ReservationListView() {
                             {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
                             <span className="hidden sm:inline">{isFullscreen ? t('common.exitFullscreen') : t('common.fullscreen')}</span>
                         </Button>
-                        <Button
-                            onClick={() => router.push('/admin/reservations/create')}
-                            size="lg"
-                            className="bg-linear-to-r shadow-xl shadow-blue-500/30 dark:shadow-blue-400/20 hover:shadow-2xl hover:shadow-blue-500/40 dark:hover:shadow-blue-400/30 transition-all duration-300 gap-2 text-base px-6 py-6"
-                        >
-                            <Plus className="w-5 h-5" />
-                            {t('common.newReservation')}
-                        </Button>
+                        {canCreate && (
+                            <Button
+                                onClick={() => router.push('/admin/reservations/create')}
+                                size="lg"
+                                className="bg-linear-to-r shadow-xl shadow-blue-500/30 dark:shadow-blue-400/20 hover:shadow-2xl hover:shadow-blue-500/40 dark:hover:shadow-blue-400/30 transition-all duration-300 gap-2 text-base px-6 py-6"
+                            >
+                                <Plus className="w-5 h-5" />
+                                {t('common.newReservation')}
+                            </Button>
+                        )}
                     </div>
                 </div>
             </div>
@@ -257,9 +268,9 @@ export function ReservationListView() {
                     reservations={reservations}
                     loading={loading}
                     onReservationClick={handleReservationClick}
-                    onConfirm={handleConfirm}
-                    onCancel={handleCancel}
-                    onCheckIn={handleCheckIn}
+                    onConfirm={canUpdate ? handleConfirm : undefined}
+                    onCancel={canCancel ? handleCancel : undefined}
+                    onCheckIn={canUpdate ? handleCheckIn : undefined}
                     showActions
                 />
             </div>

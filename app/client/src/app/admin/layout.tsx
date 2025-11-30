@@ -43,6 +43,7 @@ export default function DashboardLayout({
                     title: t('sidebar.dashboard'),
                     href: '/admin/dashboard',
                     icon: LayoutDashboard,
+                    permission: 'dashboard.read',
                 },
             ],
         },
@@ -106,14 +107,12 @@ export default function DashboardLayout({
                     href: '/admin/staff',
                     icon: Users,
                     permission: 'staff.read',
-                    roles: ['admin', 'manager'],
                 },
                 {
                     title: t('sidebar.reports'),
                     href: '/admin/reports',
                     icon: BarChart3,
                     permission: 'reports.read',
-                    roles: ['admin', 'manager'],
                 },
                 {
                     title: t('sidebar.settings'),

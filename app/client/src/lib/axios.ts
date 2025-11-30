@@ -136,7 +136,12 @@ axiosInstance.interceptors.response.use(
             
             // Don't show toast for auth errors (handled by redirect)
             if (error.response.status !== 401) {
-                toast.error(errorMessage);
+                // Special handling for 403 Forbidden (permission denied)
+                if (error.response.status === 403) {
+                    toast.error('Bạn không có quyền thực hiện thao tác này');
+                } else {
+                    toast.error(errorMessage);
+                }
             }
         } else if (error.request) {
             // Network error

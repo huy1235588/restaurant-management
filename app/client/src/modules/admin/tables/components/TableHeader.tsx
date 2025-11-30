@@ -7,7 +7,7 @@ import { exportTablesToCsv, exportTablesToJson } from '@/utils/table-export';
 
 interface TableHeaderProps {
     tables?: Table[];
-    onCreateTable: () => void;
+    onCreateTable?: () => void;
     onRefresh: () => void;
 }
 
@@ -56,13 +56,17 @@ export function TableHeader({ tables = [], onCreateTable, onRefresh }: TableHead
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-                <Button size="sm" onClick={onCreateTable} className="hidden sm:flex">
-                    <Plus className="w-4 h-4 mr-2" />
-                    {t('tables.createTable', 'New Table')}
-                </Button>
-                <Button size="sm" onClick={onCreateTable} className="sm:hidden">
-                    <Plus className="w-4 h-4" />
-                </Button>
+                {onCreateTable && (
+                    <Button size="sm" onClick={onCreateTable} className="hidden sm:flex">
+                        <Plus className="w-4 h-4 mr-2" />
+                        {t('tables.createTable', 'New Table')}
+                    </Button>
+                )}
+                {onCreateTable && (
+                    <Button size="sm" onClick={onCreateTable} className="sm:hidden">
+                        <Plus className="w-4 h-4" />
+                    </Button>
+                )}
             </div>
         </div>
     );

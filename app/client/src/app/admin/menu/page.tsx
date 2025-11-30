@@ -44,10 +44,18 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from '@/components/ui/pagination';
+import { useAuth } from '@/hooks/useAuth';
+import { hasPermission } from '@/types/permissions';
 
 export default function MenuPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { user } = useAuth();
+
+    // Permission checks - admin/manager only for write operations
+    const canCreate = user ? hasPermission(user.role, 'menu.create') : false;
+    const canUpdate = user ? hasPermission(user.role, 'menu.update') : false;
+    const canDelete = user ? hasPermission(user.role, 'menu.delete') : false;
 
     // View mode with localStorage persistence
     const [viewMode, setViewMode] = useState<ViewMode>(() => {
@@ -295,10 +303,12 @@ export default function MenuPage() {
                     <p className="text-muted-foreground mt-1">Manage your restaurant menu items</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button onClick={() => setCreateDialogOpen(true)}>
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Menu Item
-                    </Button>
+                    {canCreate && (
+                        <Button onClick={() => setCreateDialogOpen(true)}>
+                            <Plus className="w-4 h-4 mr-2" />
+                            Add Menu Item
+                        </Button>
+                    )}
                 </div>
             </div>
 
@@ -362,11 +372,11 @@ export default function MenuPage() {
                     }
                     setPage(1);
                 }}
-                onEdit={handleEdit}
-                onDelete={handleDeleteClick}
-                onDuplicate={handleDuplicate}
+                onEdit={canUpdate ? handleEdit : undefined}
+                onDelete={canDelete ? handleDeleteClick : undefined}
+                onDuplicate={canCreate ? handleDuplicate : undefined}
                 onViewDetails={handleViewDetails}
-                onToggleAvailability={handleToggleAvailability}
+                onToggleAvailability={canUpdate ? handleToggleAvailability : undefined}
             />
 
             {/* Pagination */}

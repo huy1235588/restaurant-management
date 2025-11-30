@@ -28,6 +28,8 @@ import {
     BulkUpdateStatusDto,
 } from '@/modules/table/dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
 import { TableStatus } from '@/lib/prisma';
 
 @ApiTags('table')
@@ -192,10 +194,13 @@ export class TableController {
     }
 
     @Post()
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager')
     @HttpCode(HttpStatus.CREATED)
-    @ApiOperation({ summary: 'Create a new table' })
+    @ApiOperation({ summary: 'Create a new table (admin/manager only)' })
     @ApiResponse({ status: 201, description: 'Table created successfully' })
     @ApiResponse({ status: 400, description: 'Bad request' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
     async create(@Body() createTableDto: CreateTableDto) {
         const table = await this.tableService.createTable(createTableDto);
         return {
@@ -205,8 +210,11 @@ export class TableController {
     }
 
     @Put(':id')
-    @ApiOperation({ summary: 'Update a table' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager')
+    @ApiOperation({ summary: 'Update a table (admin/manager only)' })
     @ApiResponse({ status: 200, description: 'Table updated successfully' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
     @ApiResponse({ status: 404, description: 'Table not found' })
     async update(
         @Param('id', ParseIntPipe) id: number,
@@ -220,12 +228,15 @@ export class TableController {
     }
 
     @Patch('bulk-status')
-    @ApiOperation({ summary: 'Bulk update table status' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager')
+    @ApiOperation({ summary: 'Bulk update table status (admin/manager only)' })
     @ApiResponse({
         status: 200,
         description: 'Tables status updated successfully',
     })
     @ApiResponse({ status: 400, description: 'Bad request' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
     async bulkUpdateStatus(@Body() bulkUpdateDto: BulkUpdateStatusDto) {
         const result = await this.tableService.bulkUpdateStatus(
             bulkUpdateDto.tableIds,
@@ -258,8 +269,11 @@ export class TableController {
     }
 
     @Delete(':id')
-    @ApiOperation({ summary: 'Delete a table' })
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager')
+    @ApiOperation({ summary: 'Delete a table (admin/manager only)' })
     @ApiResponse({ status: 200, description: 'Table deleted successfully' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
     @ApiResponse({ status: 404, description: 'Table not found' })
     async delete(@Param('id', ParseIntPipe) id: number) {
         await this.tableService.deleteTable(id);
