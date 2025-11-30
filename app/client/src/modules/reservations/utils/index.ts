@@ -11,6 +11,12 @@ import {
     TIME_SLOT_LABELS,
 } from '../constants';
 
+/**
+ * Application timezone - should match server timezone
+ * Vietnam timezone (UTC+7)
+ */
+const APP_TIMEZONE = 'Asia/Ho_Chi_Minh';
+
 // Format reservation code for display
 export function formatReservationCode(code: string): string {
     return code.toUpperCase();
@@ -41,26 +47,45 @@ export function canCancelReservation(status: ReservationStatus): boolean {
     return CANCELLABLE_RESERVATION_STATUSES.includes(status);
 }
 
-// Combine date and time strings from backend into a single Date object
+/**
+ * Combine date and time strings from backend into a single Date object
+ * Interprets both date and time in local timezone (APP_TIMEZONE)
+ * 
+ * @param dateStr - Date in "YYYY-MM-DD" or ISO format
+ * @param timeStr - Time in "HH:mm:ss" or ISO format
+ * @returns Date object in local timezone
+ */
 export function combineDateTime(dateStr: string, timeStr: string): Date {
-    // dateStr format: "2024-12-25" or "2024-12-25T00:00:00.000Z"
-    // timeStr format: "19:00:00" or "1970-01-01T19:00:00.000Z"
-    
     // Extract date part
-    const datePart = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+    let datePart = dateStr;
+    if (dateStr.includes('T')) {
+        datePart = dateStr.split('T')[0];
+    }
     
     // Extract time part
     let timePart: string;
     if (timeStr.includes('T')) {
         // If it's an ISO timestamp, extract HH:mm:ss
-        timePart = timeStr.split('T')[1].split('.')[0];
+        // Use local timezone extraction instead of UTC
+        const timeDate = new Date(timeStr);
+        const hours = timeDate.getHours().toString().padStart(2, '0');
+        const minutes = timeDate.getMinutes().toString().padStart(2, '0');
+        const seconds = timeDate.getSeconds().toString().padStart(2, '0');
+        timePart = `${hours}:${minutes}:${seconds}`;
     } else {
         timePart = timeStr;
     }
     
-    // Combine: "2024-12-25T19:00:00"
-    const combined = `${datePart}T${timePart}`;
-    return new Date(combined);
+    // Parse parts
+    const [year, month, day] = datePart.split('-').map(Number);
+    const timeParts = timePart.split(':').map(Number);
+    const hours = timeParts[0] || 0;
+    const minutes = timeParts[1] || 0;
+    const seconds = timeParts[2] || 0;
+    
+    // Create date in local timezone
+    // new Date(year, month-1, day, hours, minutes, seconds) creates in local timezone
+    return new Date(year, month - 1, day, hours, minutes, seconds);
 }
 
 // Format date and time for display

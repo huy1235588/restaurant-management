@@ -2,19 +2,80 @@ import { ReservationStatus } from '@/lib/prisma';
 import { RESERVATION_CONSTANTS } from '../constants/reservation.constants';
 
 /**
+ * Default timezone for the application
+ * This should match the TZ environment variable
+ */
+const DEFAULT_TIMEZONE = process.env['TZ'] || 'Asia/Ho_Chi_Minh';
+
+/**
  * Reservation Module Helper Functions
  * Contains reusable business logic and utility functions
+ * 
+ * IMPORTANT: All date/time operations use local timezone (Asia/Ho_Chi_Minh by default)
  */
 
 export class ReservationHelper {
     /**
      * Combine date and time strings into a Date object
+     * Both date and time are interpreted in local timezone
+     * 
+     * @param date - Date string in YYYY-MM-DD format
+     * @param time - Time string in HH:mm or HH:mm:ss format
+     * @returns Date object in local timezone
      */
     static combineDateTime(date: string, time: string): Date {
-        const dateObj = new Date(date);
-        const [hours, minutes] = time.split(':').map(Number);
-        dateObj.setHours(hours, minutes, 0, 0);
-        return dateObj;
+        // Handle ISO format date strings
+        let datePart = date;
+        if (date.includes('T')) {
+            datePart = date.split('T')[0];
+        }
+        
+        // Validate date format
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
+            throw new Error(`Invalid date format: ${date}. Expected YYYY-MM-DD`);
+        }
+        
+        // Validate and normalize time format
+        let timePart = time;
+        if (!/^\d{2}:\d{2}(:\d{2})?$/.test(time)) {
+            throw new Error(`Invalid time format: ${time}. Expected HH:mm or HH:mm:ss`);
+        }
+        
+        // Parse date and time parts
+        const [year, month, day] = datePart.split('-').map(Number);
+        const timeParts = timePart.split(':').map(Number);
+        const hours = timeParts[0];
+        const minutes = timeParts[1];
+        const seconds = timeParts[2] || 0;
+        
+        // Create date in local timezone
+        // Using new Date(year, month-1, day, hours, minutes, seconds) creates in local timezone
+        const result = new Date(year, month - 1, day, hours, minutes, seconds);
+        
+        return result;
+    }
+
+    /**
+     * Extract date string (YYYY-MM-DD) from a Date object
+     * Uses local timezone
+     */
+    static extractDateString(date: Date): string {
+        return date.toLocaleDateString('en-CA', { 
+            timeZone: DEFAULT_TIMEZONE 
+        }); // Format: YYYY-MM-DD
+    }
+
+    /**
+     * Extract time string (HH:mm) from a Date object
+     * Uses local timezone
+     */
+    static extractTimeString(date: Date): string {
+        return date.toLocaleTimeString('en-GB', {
+            timeZone: DEFAULT_TIMEZONE,
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+        });
     }
 
     /**

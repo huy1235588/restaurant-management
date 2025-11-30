@@ -3,6 +3,7 @@ import { ReservationRepository } from './reservation.repository';
 import { PrismaService } from '@/database/prisma.service';
 import { ReservationAuditService } from '../reservation-audit';
 import { OrderService } from '../order/order.service';
+import { DateTimeService } from '@/shared/utils/datetime.service';
 import {
     CreateReservationDto,
     UpdateReservationDto,
@@ -49,6 +50,7 @@ export class ReservationService {
         private readonly prisma: PrismaService,
         private readonly auditService: ReservationAuditService,
         private readonly orderService: OrderService,
+        private readonly dateTimeService: DateTimeService,
     ) {}
 
     async findAll(query: QueryReservationDto) {
@@ -229,9 +231,10 @@ export class ReservationService {
         }
 
         // Create reservation
-        const [hours, minutes] = dto.reservationTime.split(':');
-        const reservationTimeDate = new Date();
-        reservationTimeDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+        // Use DateTimeService to properly create time-only Date for reservationTime
+        const reservationTimeDate = this.dateTimeService.createTimeDate(
+            dto.reservationTime,
+        );
 
         const reservation = await this.reservationRepository.create({
             customerName: dto.customerName,
@@ -239,7 +242,7 @@ export class ReservationService {
             email: dto.email,
             customer: { connect: { customerId: customer.customerId } },
             table: { connect: { tableId } },
-            reservationDate: new Date(dto.reservationDate),
+            reservationDate: this.dateTimeService.parseLocalDate(dto.reservationDate),
             reservationTime: reservationTimeDate,
             duration:
                 dto.duration ||
@@ -282,12 +285,13 @@ export class ReservationService {
 
         // If date/time changed, re-check availability
         if (dto.reservationDate || dto.reservationTime) {
+            // Use DateTimeService to properly extract date and time in local timezone
             const newDate =
                 dto.reservationDate ||
-                existing.reservationDate.toISOString().split('T')[0];
+                this.dateTimeService.extractDateString(existing.reservationDate);
             const newTime =
                 dto.reservationTime ||
-                existing.reservationTime.toISOString().substring(11, 16);
+                this.dateTimeService.extractTimeString(existing.reservationTime);
 
             if (!ReservationHelper.isFutureDateTime(newDate, newTime)) {
                 throw new InvalidReservationDateException();
@@ -316,13 +320,14 @@ export class ReservationService {
             }
 
             if (dto.reservationDate) {
-                changes.reservationDate = new Date(dto.reservationDate);
+                changes.reservationDate = this.dateTimeService.parseLocalDate(
+                    dto.reservationDate,
+                );
             }
             if (dto.reservationTime) {
-                const [hours, minutes] = dto.reservationTime.split(':');
-                const timeDate = new Date();
-                timeDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-                changes.reservationTime = timeDate;
+                changes.reservationTime = this.dateTimeService.createTimeDate(
+                    dto.reservationTime,
+                );
             }
         }
 
@@ -416,12 +421,13 @@ export class ReservationService {
         }
 
         // Check if reservation time has passed grace period
-        const reservationDate = reservation.reservationDate
-            .toISOString()
-            .split('T')[0];
-        const reservationTime = reservation.reservationTime
-            .toISOString()
-            .substring(11, 16);
+        // Use DateTimeService to properly extract date and time in local timezone
+        const reservationDate = this.dateTimeService.extractDateString(
+            reservation.reservationDate,
+        );
+        const reservationTime = this.dateTimeService.extractTimeString(
+            reservation.reservationTime,
+        );
         if (ReservationHelper.isExpired(reservationDate, reservationTime)) {
             throw new ReservationExpiredException(reservation.reservationCode);
         }

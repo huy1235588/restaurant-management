@@ -1,8 +1,18 @@
 import { format, parse } from 'date-fns';
+import { toZonedTime, formatInTimeZone } from 'date-fns-tz';
+
+/**
+ * Application timezone - should match server timezone
+ * Vietnam timezone (UTC+7)
+ */
+export const APP_TIMEZONE = 'Asia/Ho_Chi_Minh';
 
 /**
  * Utility functions for handling date and time formatting
  * Handles both legacy ISO timestamp format and new separated date/time format
+ * 
+ * IMPORTANT: All operations use APP_TIMEZONE (Asia/Ho_Chi_Minh) for consistency
+ * with the backend server
  */
 
 /**
@@ -21,6 +31,7 @@ export function parseReservationDate(dateString: string | Date): Date {
     }
     
     // If it's date-only format (new: "2025-11-16")
+    // Parse as local date at midnight
     return parse(dateString, 'yyyy-MM-dd', new Date());
 }
 
@@ -79,19 +90,61 @@ export function formatReservationTime(timeString: string): string {
 
 /**
  * Convert date and time to full Date object
+ * Interprets both date and time in local timezone
  * @param dateString - Date in "YYYY-MM-DD" format
  * @param timeString - Time in "HH:mm:ss" or "HH:mm" format
  */
 export function combineDateAndTime(dateString: string, timeString: string): Date {
-    const date = parseReservationDate(dateString);
+    // Extract date part if ISO format
+    let datePart = dateString;
+    if (dateString.includes('T')) {
+        datePart = dateString.split('T')[0];
+    }
+    
+    // Parse time
     const time = parseReservationTime(timeString);
     const [hours, minutes, seconds = '0'] = time.split(':');
     
-    date.setHours(parseInt(hours, 10));
-    date.setMinutes(parseInt(minutes, 10));
-    date.setSeconds(parseInt(seconds, 10));
+    // Parse date parts
+    const [year, month, day] = datePart.split('-').map(Number);
     
-    return date;
+    // Create date in local timezone
+    // new Date(year, month-1, day, hours, minutes, seconds) creates in local timezone
+    return new Date(
+        year, 
+        month - 1, 
+        day, 
+        parseInt(hours, 10), 
+        parseInt(minutes, 10), 
+        parseInt(seconds, 10)
+    );
+}
+
+/**
+ * Format a Date to timezone-aware display string
+ * @param date - Date object
+ * @param formatStr - Format string (date-fns format)
+ */
+export function formatWithTimezone(date: Date, formatStr: string = 'yyyy-MM-dd HH:mm:ss'): string {
+    try {
+        return formatInTimeZone(date, APP_TIMEZONE, formatStr);
+    } catch {
+        return format(date, formatStr);
+    }
+}
+
+/**
+ * Get current date in app timezone formatted as YYYY-MM-DD
+ */
+export function getTodayDate(): string {
+    return formatInTimeZone(new Date(), APP_TIMEZONE, 'yyyy-MM-dd');
+}
+
+/**
+ * Get current time in app timezone formatted as HH:mm
+ */
+export function getCurrentTime(): string {
+    return formatInTimeZone(new Date(), APP_TIMEZONE, 'HH:mm');
 }
 
 /**
@@ -111,13 +164,15 @@ export function formatBirthday(birthdayString?: string | null, formatString: str
 
 /**
  * Format timestamp for display
+ * Uses app timezone for consistent display
  * @param timestamp - ISO timestamp string
+ * @param formatString - Format string (default: 'MMM dd, yyyy • hh:mm a')
  */
 export function formatTimestamp(timestamp?: string | null, formatString: string = 'MMM dd, yyyy • hh:mm a'): string {
     if (!timestamp) return 'N/A';
     
     try {
-        return format(new Date(timestamp), formatString);
+        return formatInTimeZone(new Date(timestamp), APP_TIMEZONE, formatString);
     } catch {
         return timestamp;
     }
@@ -135,4 +190,76 @@ export function isNewDateFormat(dateString: string): boolean {
  */
 export function isNewTimeFormat(timeString: string): boolean {
     return /^\d{2}:\d{2}(:\d{2})?$/.test(timeString);
+}
+
+/**
+ * Check if a date/time is in the future
+ * @param dateString - Date in YYYY-MM-DD format
+ * @param timeString - Optional time in HH:mm format
+ */
+export function isFutureDateTime(dateString: string, timeString?: string): boolean {
+    const now = new Date();
+    let targetDate: Date;
+    
+    if (timeString) {
+        targetDate = combineDateAndTime(dateString, timeString);
+    } else {
+        targetDate = parseReservationDate(dateString);
+    }
+    
+    return targetDate > now;
+}
+
+/**
+ * Check if a date is today
+ * @param dateString - Date string in any format
+ */
+export function isToday(dateString: string | Date): boolean {
+    const today = getTodayDate();
+    
+    if (dateString instanceof Date) {
+        return formatInTimeZone(dateString, APP_TIMEZONE, 'yyyy-MM-dd') === today;
+    }
+    
+    // Extract date part if it's ISO format
+    const datePart = dateString.includes('T') 
+        ? dateString.split('T')[0] 
+        : dateString;
+    
+    return datePart === today;
+}
+
+/**
+ * Calculate elapsed time in seconds from a timestamp
+ * @param timestamp - ISO timestamp string
+ */
+export function getElapsedSeconds(timestamp: string): number {
+    const created = new Date(timestamp);
+    const now = new Date();
+    return Math.floor((now.getTime() - created.getTime()) / 1000);
+}
+
+/**
+ * Calculate elapsed time in minutes from a timestamp
+ * @param timestamp - ISO timestamp string
+ */
+export function getElapsedMinutes(timestamp: string): number {
+    return Math.floor(getElapsedSeconds(timestamp) / 60);
+}
+
+/**
+ * Format duration in human readable format
+ * @param minutes - Duration in minutes
+ */
+export function formatDuration(minutes: number): string {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    
+    if (hours === 0) {
+        return `${mins} min`;
+    }
+    if (mins === 0) {
+        return `${hours} hr`;
+    }
+    return `${hours}h ${mins}m`;
 }

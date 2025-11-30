@@ -3,6 +3,10 @@ export default () => ({
     port: parseInt(process.env['PORT'] || '8000', 10),
     apiVersion: process.env['API_VERSION'] || 'v1',
 
+    // Timezone configuration
+    // Server should use this timezone for all date/time operations
+    timezone: process.env['TZ'] || 'Asia/Ho_Chi_Minh',
+
     // App
     app: {
         url: process.env['APP_URL'] || 'http://localhost:8000',

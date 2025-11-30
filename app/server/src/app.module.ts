@@ -6,6 +6,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AppController } from '@/app.controller';
 import { AppService } from '@/app.service';
 import { DatabaseModule } from '@/database/database.module';
+import { SharedModule } from '@/shared/shared.module';
 import { AuthModule } from '@/modules/auth/auth.module';
 import { StaffModule } from '@/modules/staff/staff.module';
 import { CategoryModule } from '@/modules/category/category.module';
@@ -38,6 +39,8 @@ import configuration from '@/config/configuration';
         ScheduleModule.forRoot(),
         // Database
         DatabaseModule,
+        // Shared utilities (DateTimeService, etc.)
+        SharedModule,
         // Auth
         AuthModule,
         // Staff
