@@ -3,7 +3,7 @@ import { Table } from '@/types';
 import { useTranslation } from 'react-i18next';
 import { Clock, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { tableApi } from '@/modules/tables/services/table.service';
+import { tableApi } from '@/modules/admin/tables/services/table.service';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface TableHistoryDialogProps {

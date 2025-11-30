@@ -5,12 +5,12 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { tableApi } from '@/modules/tables/services/table.service';
+import { tableApi } from '@/modules/admin/tables/services/table.service';
 import { Table, TableStatus } from '@/types';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { Loader2, AlertTriangle } from 'lucide-react';
-import { TableStatusBadge } from '@/modules/tables/components/TableStatusBadge';
+import { TableStatusBadge } from '@/modules/admin/tables/components/TableStatusBadge';
 
 interface StatusChangeDialogProps {
     open: boolean;

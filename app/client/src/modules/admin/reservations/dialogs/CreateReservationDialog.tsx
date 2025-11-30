@@ -21,8 +21,8 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useReservationActions } from '@/modules/reservations/hooks/useReservationActions';
-import { useTableAvailability } from '@/modules/reservations/hooks/useTableAvailability';
+import { useReservationActions } from '@/modules/admin/reservations/hooks/useReservationActions';
+import { useTableAvailability } from '@/modules/admin/reservations/hooks/useTableAvailability';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 

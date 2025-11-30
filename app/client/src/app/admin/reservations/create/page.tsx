@@ -1,6 +1,6 @@
 'use client';
 
-import { CreateReservationView } from '@/modules/reservations/views';
+import { CreateReservationView } from '@/modules/admin/reservations/views';
 
 export default function CreateReservationPage() {
     return <CreateReservationView />;

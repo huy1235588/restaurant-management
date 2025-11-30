@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { EditOrderView } from '@/modules/order';
+import { EditOrderView } from '@/modules/admin/order';
 
 export default function EditOrderPage() {
     const params = useParams();

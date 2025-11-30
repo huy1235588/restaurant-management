@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { categoryApi } from '@/modules/categories/services';
+import { categoryApi } from '@/modules/admin/categories/services';
 import { Category } from '@/types';
 
 // Hook to fetch all categories

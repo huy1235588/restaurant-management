@@ -9,7 +9,7 @@ import { OrderStatusBadge } from "./OrderStatusBadge";
 import { PrepTimeIndicator } from "./PrepTimeIndicator";
 import { OrderItemsList } from "./OrderItemsList";
 import { KitchenHelpers } from "../utils/kitchen-helpers";
-import { formatOrderNumber } from "@/modules/order";
+import { formatOrderNumber } from "@/modules/admin/order";
 import { useTranslation } from "react-i18next";
 
 interface KitchenOrderCardProps {

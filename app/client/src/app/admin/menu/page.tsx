@@ -34,8 +34,8 @@ import {
     useDeleteMenuItem,
     useUpdateAvailability,
     useMenuItemHandlers,
-} from '@/modules/menu';
-import { useCategories } from '@/modules/categories';
+} from '@/modules/admin/menu';
+import { useCategories } from '@/modules/admin/categories';
 import {
     Pagination,
     PaginationContent,

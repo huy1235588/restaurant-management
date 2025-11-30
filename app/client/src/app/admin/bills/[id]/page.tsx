@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { BillDetailView } from '@/modules/bills';
+import { BillDetailView } from '@/modules/admin/bills';
 
 export default function BillDetailPage() {
     const params = useParams();

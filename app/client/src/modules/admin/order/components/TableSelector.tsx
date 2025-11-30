@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useAvailableTables } from '@/modules/tables/hooks';
+import { useAvailableTables } from '@/modules/admin/tables/hooks';
 import { Table } from '@/types';
 import { Users, CheckCircle2, Loader2, MapPin, Building2, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';

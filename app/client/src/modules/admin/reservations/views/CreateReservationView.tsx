@@ -24,9 +24,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useReservationActions } from '@/modules/reservations/hooks/useReservationActions';
-import { useTableAvailability } from '@/modules/reservations/hooks/useTableAvailability';
-import { TableSelector } from '@/modules/reservations/components/TableSelector';
+import { useReservationActions } from '@/modules/admin/reservations/hooks/useReservationActions';
+import { useTableAvailability } from '@/modules/admin/reservations/hooks/useTableAvailability';
+import { TableSelector } from '@/modules/admin/reservations/components/TableSelector';
 import { ArrowLeft, Calendar, Users, Clock, Mail, Phone, User, FileText, Loader2, Keyboard, Maximize2, Minimize2 } from 'lucide-react';
 
 const reservationSchema = z.object({

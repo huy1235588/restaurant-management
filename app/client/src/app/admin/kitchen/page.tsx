@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { KitchenDisplayView } from "@/modules/kitchen/views/KitchenDisplayView";
+import { KitchenDisplayView } from "@/modules/admin/kitchen/views/KitchenDisplayView";
 
 export const metadata: Metadata = {
     title: "Kitchen Display | Restaurant Management",

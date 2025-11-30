@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { ReservationDetailView } from '@/modules/reservations/views';
+import { ReservationDetailView } from '@/modules/admin/reservations/views';
 
 export default function ReservationDetailPage() {
     const params = useParams();

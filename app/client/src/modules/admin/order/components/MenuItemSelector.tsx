@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useMenuItems, useCategories } from '@/modules/menu/hooks';
+import { useMenuItems, useCategories } from '@/modules/admin/menu/hooks';
 import { MenuItem as MenuItemType } from '@/types';
 import { ShoppingCartItem } from '../types';
 import { formatCurrency } from '../utils';

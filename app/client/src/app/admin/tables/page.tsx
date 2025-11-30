@@ -5,12 +5,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Table, TableStatus } from '@/types';
-import { useTableStore } from '@/modules/tables/stores';
-import { useTables, useTableStats, useTableMutations } from '@/modules/tables/hooks';
+import { useTableStore } from '@/modules/admin/tables/stores';
+import { useTables, useTableStats, useTableMutations } from '@/modules/admin/tables/hooks';
 import { Button } from '@/components/ui/button';
-import { TableHeader, TableStats, TableFilters, TablePagination, QuickViewPanel } from '@/modules/tables/components';
-import { TableListView } from '@/modules/tables/views';
-import { TableDialogs } from '@/modules/tables/dialogs/TableDialogs';
+import { TableHeader, TableStats, TableFilters, TablePagination, QuickViewPanel } from '@/modules/admin/tables/components';
+import { TableListView } from '@/modules/admin/tables/views';
+import { TableDialogs } from '@/modules/admin/tables/dialogs/TableDialogs';
 import {
     BulkStatusChangeDialog,
     BulkDeleteDialog,
@@ -18,7 +18,7 @@ import {
     BulkActivateDeactivateDialog,
     TableHistoryDialog,
     KeyboardShortcutsDialog,
-} from '@/modules/tables/dialogs';
+} from '@/modules/admin/tables/dialogs';
 
 type SortField = 'tableNumber' | 'capacity' | 'floor' | 'status';
 type SortOrder = 'asc' | 'desc';
