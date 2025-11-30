@@ -77,6 +77,20 @@ export class StaffController {
         };
     }
 
+    @Get('available-accounts')
+    @ApiOperation({ summary: 'Get accounts without staff profile' })
+    @ApiResponse({
+        status: 200,
+        description: 'Available accounts retrieved successfully',
+    })
+    async getAvailableAccounts() {
+        const accounts = await this.staffService.getAvailableAccounts();
+        return {
+            message: 'Available accounts retrieved successfully',
+            data: accounts,
+        };
+    }
+
     @Get('role/:role')
     @ApiOperation({ summary: 'Get staff by role' })
     @ApiResponse({ status: 200, description: 'Staff retrieved successfully' })

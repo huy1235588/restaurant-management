@@ -43,7 +43,7 @@ export class CreateStaffDto {
     @IsOptional()
     salary?: number;
 
-    @ApiProperty({ example: 'WAITER', enum: Role, description: 'Staff role' })
+    @ApiProperty({ example: 'waiter', enum: Role, description: 'Staff role' })
     @IsEnum(Role)
     @IsNotEmpty()
     role: Role;

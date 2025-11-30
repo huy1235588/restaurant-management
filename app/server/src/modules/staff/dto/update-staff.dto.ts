@@ -38,7 +38,7 @@ export class UpdateStaffDto {
     salary?: number;
 
     @ApiPropertyOptional({
-        example: 'WAITER',
+        example: 'waiter',
         enum: Role,
         description: 'Staff role',
     })

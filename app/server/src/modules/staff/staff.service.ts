@@ -209,4 +209,23 @@ export class StaffService {
             },
         };
     }
+
+    /**
+     * Get available accounts (accounts without staff profile)
+     */
+    async getAvailableAccounts() {
+        return this.prisma.account.findMany({
+            where: {
+                staff: {
+                    is: null,
+                },
+            },
+            select: {
+                accountId: true,
+                username: true,
+                email: true,
+                phoneNumber: true,
+            },
+        });
+    }
 }

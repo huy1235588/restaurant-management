@@ -4,7 +4,7 @@ import { Role } from '@/lib/prisma';
 
 export class UpdateStaffRoleDto {
     @ApiProperty({
-        example: 'MANAGER',
+        example: 'manager',
         enum: Role,
         description: 'New staff role',
     })

@@ -4,7 +4,6 @@ import {
     IsNotEmpty,
     MinLength,
     IsOptional,
-    IsDateString,
     IsNumber,
     IsEnum,
 } from 'class-validator';
@@ -45,23 +44,26 @@ export class CreateStaffWithAccountDto {
 
     @ApiPropertyOptional({
         example: '1990-01-01',
-        description: 'Date of birth',
+        description: 'Date of birth (YYYY-MM-DD)',
     })
-    @IsDateString()
+    @IsString()
     @IsOptional()
-    dateOfBirth?: Date;
+    dateOfBirth?: string;
 
-    @ApiPropertyOptional({ example: '2024-01-01', description: 'Hire date' })
-    @IsDateString()
+    @ApiPropertyOptional({
+        example: '2024-01-01',
+        description: 'Hire date (YYYY-MM-DD)',
+    })
+    @IsString()
     @IsOptional()
-    hireDate?: Date;
+    hireDate?: string;
 
     @ApiPropertyOptional({ example: 5000000, description: 'Salary' })
     @IsNumber()
     @IsOptional()
     salary?: number;
 
-    @ApiProperty({ example: 'WAITER', enum: Role, description: 'Staff role' })
+    @ApiProperty({ example: 'waiter', enum: Role, description: 'Staff role' })
     @IsEnum(Role)
     @IsNotEmpty()
     role: Role;
