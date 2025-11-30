@@ -21,6 +21,7 @@ import { RestaurantSettingsModule } from '@/modules/restaurant-settings/restaura
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import configuration from '@/config/configuration';
 import { ReportsModule } from './modules/reports';
+import { DashboardModule } from './modules/dashboard';
 
 @Module({
     imports: [
@@ -67,6 +68,8 @@ import { ReportsModule } from './modules/reports';
         RestaurantSettingsModule,
         // Reports
         ReportsModule,
+        // Dashboard
+        DashboardModule,
     ],
     controllers: [AppController],
     providers: [

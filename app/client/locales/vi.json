@@ -101,19 +101,52 @@
     "dashboard": {
         "title": "Bảng điều khiển",
         "subtitle": "Chào mừng bạn quay trở lại! Đây là những gì đang diễn ra hôm nay.",
+        "welcomeMessage": "Chào mừng {{name}} quay lại! Đây là tình hình hôm nay.",
         "todayRevenue": "Doanh thu hôm nay",
         "todayOrders": "Đơn hàng hôm nay",
         "activeOrders": "Đơn hàng đang xử lý",
         "availableTables": "Bàn trống",
-        "pendingReservations": "Đặt bàn chờ xác nhận",
+        "pendingReservations": "Đặt bàn hôm nay",
         "revenueChart": "Biểu đồ doanh thu",
         "categorySales": "Doanh số theo danh mục",
         "recentOrders": "Đơn hàng gần đây",
+        "vsYesterday": "so với hôm qua",
+        "totalTables": "Tổng số bàn",
+        "totalOrders": "Tổng đơn trong bếp",
+        "tableOverview": "Trạng thái bàn",
+        "kitchenQueue": "Hàng đợi bếp",
+        "tableStatus": {
+            "available": "Trống",
+            "occupied": "Có khách",
+            "reserved": "Đã đặt",
+            "maintenance": "Bảo trì"
+        },
+        "kitchenStatus": {
+            "pending": "Chờ xử lý",
+            "preparing": "Đang nấu",
+            "ready": "Sẵn sàng phục vụ"
+        },
+        "quickActions": {
+            "title": "Thao tác nhanh",
+            "newOrder": "Tạo đơn mới",
+            "newReservation": "Đặt bàn mới",
+            "viewKitchen": "Màn hình bếp",
+            "viewReports": "Xem báo cáo",
+            "viewOrders": "Xem đơn hàng"
+        },
+        "recentActivity": {
+            "title": "Hoạt động gần đây",
+            "empty": "Không có hoạt động gần đây",
+            "order": "Đơn hàng",
+            "reservation": "Đặt bàn",
+            "payment": "Thanh toán"
+        },
         "stats": {
             "revenue": "Doanh thu hôm nay",
             "orders": "Đơn hàng hôm nay",
             "activeOrders": "Đơn hàng đang xử lý",
-            "tables": "Trạng thái bàn"
+            "tables": "Trạng thái bàn",
+            "avgOrderValue": "Giá trị TB/đơn"
         }
     },
     "orders": {

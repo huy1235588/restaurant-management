@@ -101,19 +101,52 @@
     "dashboard": {
         "title": "Dashboard",
         "subtitle": "Welcome back! Here's what's happening today.",
+        "welcomeMessage": "Welcome back, {{name}}! Here's what's happening today.",
         "todayRevenue": "Today's Revenue",
         "todayOrders": "Today's Orders",
         "activeOrders": "Active Orders",
         "availableTables": "Available Tables",
-        "pendingReservations": "Pending Reservations",
+        "pendingReservations": "Today's Reservations",
         "revenueChart": "Revenue Chart",
         "categorySales": "Sales by Category",
         "recentOrders": "Recent Orders",
+        "vsYesterday": "vs yesterday",
+        "totalTables": "Total Tables",
+        "totalOrders": "Total Orders in Queue",
+        "tableOverview": "Table Status",
+        "kitchenQueue": "Kitchen Queue",
+        "tableStatus": {
+            "available": "Available",
+            "occupied": "Occupied",
+            "reserved": "Reserved",
+            "maintenance": "Maintenance"
+        },
+        "kitchenStatus": {
+            "pending": "Pending",
+            "preparing": "Preparing",
+            "ready": "Ready to Serve"
+        },
+        "quickActions": {
+            "title": "Quick Actions",
+            "newOrder": "New Order",
+            "newReservation": "New Reservation",
+            "viewKitchen": "Kitchen Display",
+            "viewReports": "View Reports",
+            "viewOrders": "View Orders"
+        },
+        "recentActivity": {
+            "title": "Recent Activity",
+            "empty": "No recent activity",
+            "order": "Order",
+            "reservation": "Reservation",
+            "payment": "Payment"
+        },
         "stats": {
             "revenue": "Today's Revenue",
             "orders": "Today's Orders",
             "activeOrders": "Active Orders",
-            "tables": "Tables Status"
+            "tables": "Tables Status",
+            "avgOrderValue": "Avg. Order Value"
         }
     },
     "orders": {
