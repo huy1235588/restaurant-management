@@ -139,7 +139,7 @@ export function ReservationListView() {
         }
 
         const queryString = params.toString();
-        const newUrl = queryString ? `/reservations?${queryString}` : '/reservations';
+        const newUrl = queryString ? `/admin/reservations?${queryString}` : '/admin/reservations';
 
         router.replace(newUrl, { scroll: false });
     }, [filters, router]);
@@ -149,7 +149,7 @@ export function ReservationListView() {
     };
 
     const handleReservationClick = (reservation: Reservation) => {
-        router.push(`/reservations/${reservation.reservationId}`);
+        router.push(`/admin/reservations/${reservation.reservationId}`);
     };
 
     const handleConfirm = (reservation: Reservation) => {
@@ -237,7 +237,7 @@ export function ReservationListView() {
                             <span className="hidden sm:inline">{isFullscreen ? t('common.exitFullscreen') : t('common.fullscreen')}</span>
                         </Button>
                         <Button
-                            onClick={() => router.push('/reservations/create')}
+                            onClick={() => router.push('/admin/reservations/create')}
                             size="lg"
                             className="bg-linear-to-r shadow-xl shadow-blue-500/30 dark:shadow-blue-400/20 hover:shadow-2xl hover:shadow-blue-500/40 dark:hover:shadow-blue-400/30 transition-all duration-300 gap-2 text-base px-6 py-6"
                         >

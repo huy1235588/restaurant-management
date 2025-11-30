@@ -201,7 +201,7 @@ export default function TablesPage() {
 
     const handleAssignOrder = useCallback((table: Table) => {
         // Navigate to orders page with table pre-selected
-        router.push(`/orders/create?tableId=${table.tableId}`);
+        router.push(`/admin/orders/create?tableId=${table.tableId}`);
     }, [router]);
 
     const handleSelectionChange = useCallback((ids: number[]) => {

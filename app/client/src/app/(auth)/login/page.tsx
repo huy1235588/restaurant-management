@@ -14,8 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuthStore } from '@/stores/authStore';
-import { authApi } from '@/services/auth.service';
+import { useAuth } from '@/hooks/useAuth';
 
 const loginSchema = z.object({
     username: z.string().min(3, 'Username must be at least 3 characters'),
@@ -27,7 +26,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export default function LoginPage() {
     const { t } = useTranslation();
     const router = useRouter();
-    const { setUser } = useAuthStore();
+    const { login, isLoading: authLoading } = useAuth();
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -46,25 +45,25 @@ export default function LoginPage() {
     const onSubmit = async (data: LoginFormData) => {
         setIsLoading(true);
         try {
-            const response = await authApi.login(data);
+            const result = await login(data);
 
-            // Save to store
-            setUser(response.user);
+            if (result.success && result.user) {
+                toast.success(t('auth.loginSuccess') || 'Login successful!');
 
-            toast.success(t('auth.loginSuccess') || 'Login successful!');
+                // Redirect based on role
+                const roleRedirects: Record<string, string> = {
+                    admin: '/admin/dashboard',
+                    manager: '/admin/dashboard',
+                    waiter: '/admin/orders',
+                    chef: '/admin/kitchen',
+                    cashier: '/admin/bills',
+                };
 
-            // Redirect based on role
-            const roleRedirects: Record<string, string> = {
-                admin: '/dashboard',
-                manager: '/dashboard',
-                waiter: '/orders',
-                chef: '/kitchen',
-                cashier: '/bills',
-            };
-
-            const redirectPath = roleRedirects[response.user.role] || '/dashboard';
-            router.push(redirectPath);
-
+                const redirectPath = roleRedirects[result.user.role] || '/admin/dashboard';
+                router.push(redirectPath);
+            } else {
+                toast.error(result.error || 'Login failed');
+            }
         } catch (error: unknown) {
             console.error('Login error:', error);
             let errorMessage = 'Login failed';

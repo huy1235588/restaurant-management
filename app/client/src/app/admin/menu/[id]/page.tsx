@@ -69,7 +69,7 @@ export default function MenuItemDetailPage({
             refetch();
         },
         onDeleteSuccess: () => {
-            router.push('/menu');
+            router.push('/admin/menu');
         },
     });
 
@@ -92,7 +92,7 @@ export default function MenuItemDetailPage({
     };
 
     const handleDuplicate = () => {
-        router.push(`/menu?duplicate=${itemId}`);
+        router.push(`/admin/menu?duplicate=${itemId}`);
     };
 
     if (loading) {
@@ -120,7 +120,7 @@ export default function MenuItemDetailPage({
                         <p className="text-muted-foreground mb-4">
                             {error || 'Menu item does not exist'}
                         </p>
-                        <Button onClick={() => router.push('/menu')}>
+                        <Button onClick={() => router.push('/admin/menu')}>
                             <ArrowLeft className="w-4 h-4 mr-2" />
                             Back to Menu
                         </Button>
@@ -135,7 +135,7 @@ export default function MenuItemDetailPage({
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                    <Button variant="outline" size="icon" onClick={() => router.push('/menu')}>
+                    <Button variant="outline" size="icon" onClick={() => router.push('/admin/menu')}>
                         <ArrowLeft className="w-4 h-4" />
                     </Button>
                     <div>

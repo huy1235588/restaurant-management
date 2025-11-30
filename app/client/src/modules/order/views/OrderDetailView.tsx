@@ -120,11 +120,11 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
     }, [order, toggleFullscreen]);
 
     const handleBack = () => {
-        router.push('/orders');
+        router.push('/admin/orders');
     };
 
     const handleAddItems = () => {
-        router.push(`/orders/${orderId}/edit`);
+        router.push(`/admin/orders/${orderId}/edit`);
     };
 
     const handleCancelOrder = () => {
@@ -144,7 +144,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
 
     const handleCreateBill = () => {
         // TODO: Integrate with billing module
-        router.push(`/bills/create?orderId=${orderId}`);
+        router.push(`/admin/bills/create?orderId=${orderId}`);
     };
 
     if (isLoading) {

@@ -16,8 +16,7 @@ import {
     Tag,
 } from 'lucide-react';
 
-import { useAuthStore } from '@/stores/authStore';
-import { authApi } from '@/services/auth.service';
+import { useAuth } from '@/hooks/useAuth';
 import { hasPermission } from '@/types/permissions';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
 import { DashboardSidebar, NavItem, NavGroup } from '@/components/layouts/DashboardSidebar';
@@ -42,7 +41,7 @@ export default function DashboardLayout({
             items: [
                 {
                     title: t('sidebar.dashboard'),
-                    href: '/dashboard',
+                    href: '/admin/dashboard',
                     icon: LayoutDashboard,
                 },
             ],
@@ -52,19 +51,19 @@ export default function DashboardLayout({
             items: [
                 {
                     title: t('sidebar.orders'),
-                    href: '/orders',
+                    href: '/admin/orders',
                     icon: ShoppingCart,
                     permission: 'orders.read',
                 },
                 {
                     title: t('sidebar.kitchen'),
-                    href: '/kitchen',
+                    href: '/admin/kitchen',
                     icon: ChefHat,
                     permission: 'kitchen.read',
                 },
                 {
                     title: t('sidebar.tables'),
-                    href: '/tables',
+                    href: '/admin/tables',
                     icon: Table,
                     permission: 'tables.read',
                 },
@@ -75,25 +74,25 @@ export default function DashboardLayout({
             items: [
                 {
                     title: t('sidebar.menu'),
-                    href: '/menu',
+                    href: '/admin/menu',
                     icon: UtensilsCrossed,
                     permission: 'menu.read',
                 },
                 {
                     title: t('sidebar.category'),
-                    href: '/categories',
+                    href: '/admin/categories',
                     icon: Tag,
                     permission: 'category.read',
                 },
                 {
                     title: t('sidebar.reservations'),
-                    href: '/reservations',
+                    href: '/admin/reservations',
                     icon: Calendar,
                     permission: 'reservations.read',
                 },
                 {
                     title: t('sidebar.bills'),
-                    href: '/bills',
+                    href: '/admin/bills',
                     icon: Receipt,
                     permission: 'bills.read',
                 },
@@ -104,21 +103,21 @@ export default function DashboardLayout({
             items: [
                 {
                     title: t('sidebar.staff'),
-                    href: '/staff',
+                    href: '/admin/staff',
                     icon: Users,
                     permission: 'staff.read',
                     roles: ['admin', 'manager'],
                 },
                 {
                     title: t('sidebar.reports'),
-                    href: '/reports',
+                    href: '/admin/reports',
                     icon: BarChart3,
                     permission: 'reports.read',
                     roles: ['admin', 'manager'],
                 },
                 {
                     title: t('sidebar.settings'),
-                    href: '/settings',
+                    href: '/admin/settings',
                     icon: Settings,
                 },
             ],
@@ -126,7 +125,7 @@ export default function DashboardLayout({
     ];
 
     const router = useRouter();
-    const { user, isAuthenticated, isLoading, logout } = useAuthStore();
+    const { user, isAuthenticated, isLoading, logout } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     useEffect(() => {
@@ -142,13 +141,7 @@ export default function DashboardLayout({
     }, [isAuthenticated, isLoading, router]);
 
     const handleLogout = async () => {
-        try {
-            await authApi.logout();
-        } catch (error) {
-            console.error('Logout failed:', error);
-        }
-        logout();
-        router.replace('/login');
+        await logout(); // useAuth handles everything
     };
 
     // Filter navigation groups based on user permissions and roles

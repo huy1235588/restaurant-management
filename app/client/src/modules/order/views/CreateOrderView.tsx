@@ -247,7 +247,7 @@ export function CreateOrderView() {
             if (!confirmed) return;
         }
         localStorage.removeItem(STORAGE_KEY);
-        router.push('/orders');
+        router.push('/admin/orders');
     };
 
     const handleStepClick = (step: number) => {

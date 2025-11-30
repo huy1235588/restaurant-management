@@ -28,7 +28,7 @@ export const BillCard = memo(
             if (onClick) {
                 onClick();
             } else {
-                router.push(`/bills/${bill.billId}`);
+                router.push(`/admin/bills/${bill.billId}`);
             }
         }, [router, bill.billId, onClick]);
 

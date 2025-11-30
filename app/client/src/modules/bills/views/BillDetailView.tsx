@@ -100,7 +100,7 @@ export function BillDetailView({ billId }: BillDetailViewProps) {
                 case 'o':
                     if (bill.orderId) {
                         e.preventDefault();
-                        router.push(`/orders/${bill.orderId}`);
+                        router.push(`/admin/orders/${bill.orderId}`);
                     }
                     break;
                 case '?':
@@ -115,7 +115,7 @@ export function BillDetailView({ billId }: BillDetailViewProps) {
     }, [bill, router]);
 
     const handleBack = () => {
-        router.push('/bills');
+        router.push('/admin/bills');
     };
 
     const handlePrint = () => {
@@ -263,7 +263,7 @@ export function BillDetailView({ billId }: BillDetailViewProps) {
                                     <Button
                                         variant="link"
                                         className="h-auto p-0 text-lg"
-                                        onClick={() => router.push(`/orders/${bill.orderId}`)}
+                                        onClick={() => router.push(`/admin/orders/${bill.orderId}`)}
                                     >
                                         #{bill.order?.orderNumber || bill.orderId}
                                     </Button>

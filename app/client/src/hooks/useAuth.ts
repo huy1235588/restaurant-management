@@ -37,8 +37,8 @@ export function useAuth(requiredRole?: UserRole | UserRole[]) {
             const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
 
             if (!roles.includes(user.role)) {
-                // User doesn't have required role, redirect to dashboard
-                router.push('/dashboard');
+                // User doesn't have required role, redirect to admin dashboard
+                router.push('/admin/dashboard');
             }
         }
     }, [requiredRole, user, isAuthenticated, isLoading, router]);
@@ -121,16 +121,17 @@ export function useAuth(requiredRole?: UserRole | UserRole[]) {
         return roles.includes(user.role);
     };
 
-    // Check if user has permission for route
+    // Check if user has permission for route (admin section only)
     const canAccessRoute = (route: string) => {
         if (!user) return false;
 
+        // Role-based access for admin routes
         const roleRoutes: Record<string, string[]> = {
             admin: ['*'],
-            manager: ['/dashboard', '/orders', '/menu', '/tables', '/reservations', '/bills', '/staff', '/reports', '/kitchen'],
-            waiter: ['/dashboard', '/orders', '/menu', '/tables', '/reservations'],
-            chef: ['/kitchen', '/orders', '/menu'],
-            cashier: ['/dashboard', '/orders', '/bills', '/payments'],
+            manager: ['/admin/dashboard', '/admin/orders', '/admin/menu', '/admin/tables', '/admin/reservations', '/admin/bills', '/admin/staff', '/admin/reports', '/admin/kitchen', '/admin/categories'],
+            waiter: ['/admin/dashboard', '/admin/orders', '/admin/menu', '/admin/tables', '/admin/reservations'],
+            chef: ['/admin/kitchen', '/admin/orders', '/admin/menu'],
+            cashier: ['/admin/dashboard', '/admin/orders', '/admin/bills'],
         };
 
         const allowedRoutes = roleRoutes[user.role] || [];

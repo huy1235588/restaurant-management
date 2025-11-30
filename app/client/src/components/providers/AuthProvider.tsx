@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { authApi } from '@/services/auth.service';
@@ -9,55 +9,83 @@ interface AuthProviderProps {
     children: React.ReactNode;
 }
 
-const publicPaths = ['/login', '/register', '/'];
+// Public paths that don't require authentication (customer-facing pages)
+const publicPaths = [
+    '/login',
+    '/register',
+    '/menu',
+    '/reservation',
+    '/about',
+    '/contact',
+    '/health',
+];
+
+// Check if pathname is a public route
+function isPublicRoute(pathname: string): boolean {
+    // Root path is always public
+    if (pathname === '/') return true;
+    
+    // Check if pathname matches any public path
+    return publicPaths.some(path => 
+        pathname === path || pathname.startsWith(path + '/')
+    );
+}
+
+// Check if pathname is an admin route (requires authentication)
+function isAdminRoute(pathname: string): boolean {
+    return pathname.startsWith('/admin');
+}
 
 export function AuthProvider({ children }: AuthProviderProps) {
     const pathname = usePathname();
     const router = useRouter();
-    const { isLoading, setAuth, clearAuth, setLoading } = useAuthStore();
-
-    const checkAuth = useCallback(async () => {
-        const isPublicPath = publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'));
-
-        try {
-            setLoading(true);
-
-            // Always verify session with server (using HttpOnly cookie)
-            const user = await authApi.me();
-
-            // User has valid session, update store
-            setAuth(user, ''); // Access token is in cookie
-            setLoading(false);
-        } catch {
-            // Session invalid or no session
-            clearAuth();
-            setLoading(false);
-
-            // Redirect to login if not on public path
-            if (!isPublicPath) {
-                router.push('/login');
-            }
-        }
-    }, [pathname, router, setAuth, clearAuth, setLoading]);
+    const { isAuthenticated, isLoading, setAuth, clearAuth, setLoading } = useAuthStore();
+    const hasCheckedAuth = useRef(false);
 
     useEffect(() => {
-        let mounted = true;
+        const isPublic = isPublicRoute(pathname);
+        const isAdmin = isAdminRoute(pathname);
 
-        const performAuthCheck = async () => {
-            await checkAuth();
-        };
-
-        if (mounted) {
-            performAuthCheck();
+        // For public routes, don't do anything - just render children
+        if (isPublic && !isAdmin) {
+            // Optionally check auth silently in background (only once)
+            if (!hasCheckedAuth.current) {
+                hasCheckedAuth.current = true;
+                authApi.me()
+                    .then(user => setAuth(user, ''))
+                    .catch(() => clearAuth());
+            }
+            return;
         }
 
-        return () => {
-            mounted = false;
-        };
-    }, [checkAuth]);
+        // For admin routes, check authentication
+        if (isAdmin) {
+            // If already checked and authenticated, skip
+            if (hasCheckedAuth.current && isAuthenticated) {
+                return;
+            }
 
-    // Show loading state
-    if (isLoading && !publicPaths.some(path => pathname === path)) {
+            const checkAuth = async () => {
+                try {
+                    setLoading(true);
+                    const user = await authApi.me();
+                    setAuth(user, '');
+                    hasCheckedAuth.current = true;
+                } catch {
+                    clearAuth();
+                    hasCheckedAuth.current = true;
+                    router.push('/login');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            checkAuth();
+        }
+    }, [pathname, isAuthenticated, router, setAuth, clearAuth, setLoading]);
+
+    // Only show loading state for admin routes
+    if (isLoading && isAdminRoute(pathname)) {
         return (
             <div className="flex h-screen items-center justify-center">
                 <div className="text-center">

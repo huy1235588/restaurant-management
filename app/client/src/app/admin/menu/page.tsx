@@ -255,7 +255,7 @@ export default function MenuPage() {
     };
 
     const handleViewDetails = (item: MenuItem) => {
-        router.push(`/menu/${item.itemId}`);
+        router.push(`/admin/menu/${item.itemId}`);
     };
 
     const handleToggleAvailability = async (item: MenuItem, isAvailable: boolean) => {

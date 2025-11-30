@@ -14,7 +14,7 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ 
     children, 
     allowedRoles, 
-    fallbackPath = '/dashboard' 
+    fallbackPath = '/admin/dashboard' 
 }: ProtectedRouteProps) {
     const router = useRouter();
     const { user, isAuthenticated, isLoading } = useAuthStore();

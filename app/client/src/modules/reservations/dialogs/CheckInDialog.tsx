@@ -45,7 +45,7 @@ export function CheckInDialog({
 
     const handleViewOrder = () => {
         if (result?.order) {
-            router.push(`/orders?orderId=${result.order.orderId}`);
+            router.push(`/admin/orders?orderId=${result.order.orderId}`);
             handleClose();
         }
     };

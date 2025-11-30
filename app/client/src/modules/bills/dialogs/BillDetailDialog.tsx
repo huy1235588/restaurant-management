@@ -40,7 +40,7 @@ export function BillDetailDialog({
 
     const handleViewFullDetail = () => {
         onOpenChange(false);
-        router.push(`/bills/${bill.billId}`);
+        router.push(`/admin/bills/${bill.billId}`);
     };
 
     const handlePrint = () => {

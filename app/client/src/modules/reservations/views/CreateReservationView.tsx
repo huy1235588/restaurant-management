@@ -154,7 +154,7 @@ export function CreateReservationView() {
                 tableId: data.tableId,
             });
 
-            router.push('/reservations');
+            router.push('/admin/reservations');
         } catch (error) {
             // Error already handled by hook
         }

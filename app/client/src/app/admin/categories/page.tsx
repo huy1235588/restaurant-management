@@ -131,7 +131,7 @@ export default function CategoriesPage() {
     };
 
     const handleViewDetails = (category: Category) => {
-        router.push(`/categories/${category.categoryId}`);
+        router.push(`/admin/categories/${category.categoryId}`);
     };
 
     return (

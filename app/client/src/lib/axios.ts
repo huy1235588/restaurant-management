@@ -113,9 +113,14 @@ axiosInstance.interceptors.response.use(
                 // Clear auth state
                 useAuthStore.getState().clearAuth();
 
-                // Redirect to login if not already there
-                if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
-                    window.location.href = '/login';
+                // Only redirect to login if on admin routes (protected routes)
+                if (typeof window !== 'undefined') {
+                    const pathname = window.location.pathname;
+                    const isAdminRoute = pathname.startsWith('/admin');
+                    
+                    if (isAdminRoute) {
+                        window.location.href = '/login';
+                    }
                 }
 
                 return Promise.reject(refreshError);

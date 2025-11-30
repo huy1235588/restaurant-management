@@ -28,9 +28,9 @@ export default function CreateBillPage() {
 
     const handleBack = () => {
         if (orderIdNum) {
-            router.push(`/orders/${orderIdNum}`);
+            router.push(`/admin/orders/${orderIdNum}`);
         } else {
-            router.push('/orders');
+            router.push('/admin/orders');
         }
     };
 
@@ -41,7 +41,7 @@ export default function CreateBillPage() {
             const result = await createBillMutation.mutateAsync({ orderId: orderIdNum });
             toast.success(t('billing.messages.billCreated', 'Hóa đơn đã được tạo thành công'));
             // Navigate to the new bill
-            router.push(`/bills/${result.billId}`);
+            router.push(`/admin/bills/${result.billId}`);
         } catch (error: any) {
             toast.error(error.message || t('billing.errors.createFailed', 'Không thể tạo hóa đơn'));
         }
@@ -51,7 +51,7 @@ export default function CreateBillPage() {
     if (!orderIdNum) {
         return (
             <div className="space-y-6">
-                <Button variant="ghost" onClick={() => router.push('/orders')}>
+                <Button variant="ghost" onClick={() => router.push('/admin/orders')}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     {t('common.back', 'Quay lại')}
                 </Button>
@@ -62,7 +62,7 @@ export default function CreateBillPage() {
                             <p className="text-destructive">
                                 {t('billing.errors.noOrderId', 'Không có mã đơn hàng. Vui lòng chọn đơn hàng để tạo hóa đơn.')}
                             </p>
-                            <Button onClick={() => router.push('/orders')}>
+                            <Button onClick={() => router.push('/admin/orders')}>
                                 {t('billing.goToOrders', 'Đi tới đơn hàng')}
                             </Button>
                         </div>

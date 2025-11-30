@@ -132,7 +132,7 @@ export function OrderListView() {
 
     // Memoize callbacks
     const handleCreateOrder = useCallback(() => {
-        router.push('/orders/new');
+        router.push('/admin/orders/new');
     }, [router]);
 
     const handleCancelOrder = useCallback((order: Order) => {

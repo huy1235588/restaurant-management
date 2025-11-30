@@ -83,7 +83,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
             // B - back
             if (e.key === 'b' || e.key === 'B') {
                 e.preventDefault();
-                router.push('/reservations');
+                router.push('/admin/reservations');
             }
             // Ctrl+P - print
             else if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
@@ -158,7 +158,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Reservation not found</h3>
                 <p className="text-gray-500 dark:text-gray-400 mb-6">The reservation you're looking for doesn't exist</p>
-                <Button onClick={() => router.push('/reservations')} className="gap-2">
+                <Button onClick={() => router.push('/admin/reservations')} className="gap-2">
                     <ArrowLeft className="w-4 h-4" />
                     Back to Reservations
                 </Button>
@@ -176,7 +176,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                     <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => router.push('/reservations')}
+                        onClick={() => router.push('/admin/reservations')}
                         className="gap-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                         <ArrowLeft className="w-4 h-4" />

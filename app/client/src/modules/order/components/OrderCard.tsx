@@ -27,11 +27,11 @@ export const OrderCard = memo(function OrderCard({ order, onCancelOrder }: Order
     const { t } = useTranslation();
 
     const handleViewDetails = useCallback(() => {
-        router.push(`/orders/${order.orderId}`);
+        router.push(`/admin/orders/${order.orderId}`);
     }, [router, order.orderId]);
 
     const handleAddItems = useCallback(() => {
-        router.push(`/orders/${order.orderId}/edit`);
+        router.push(`/admin/orders/${order.orderId}/edit`);
     }, [router, order.orderId]);
 
     const handleCancelOrder = useCallback(() => {
@@ -41,7 +41,7 @@ export const OrderCard = memo(function OrderCard({ order, onCancelOrder }: Order
     }, [onCancelOrder, order]);
 
     const handleCreateBill = useCallback(() => {
-        router.push(`/bills/create?orderId=${order.orderId}`);
+        router.push(`/admin/bills/create?orderId=${order.orderId}`);
     }, [router, order.orderId]);
 
     return (

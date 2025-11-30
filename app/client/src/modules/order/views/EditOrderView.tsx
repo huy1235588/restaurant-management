@@ -108,7 +108,7 @@ export function EditOrderView({ orderId }: EditOrderViewProps) {
             const confirmed = confirm(t('orders.unsavedChangesWarning'));
             if (!confirmed) return;
         }
-        router.push(`/orders/${orderId}`);
+        router.push(`/admin/orders/${orderId}`);
     };
 
     const handleSubmit = async () => {
