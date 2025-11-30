@@ -101,13 +101,13 @@ export function UserMenu({ user, onLogout }: UserMenuProps) {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild className="cursor-pointer py-2.5 transition-colors duration-200">
-                    <Link href="/profile" className="flex items-center">
+                    <Link href="/admin/profile" className="flex items-center">
                         <User2 className="mr-2 h-4 w-4" />
                         <span className="font-medium">{t('common.profile') || 'Profile'}</span>
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild className="cursor-pointer py-2.5 transition-colors duration-200">
-                    <Link href="/settings" className="flex items-center">
+                    <Link href="/admin/settings" className="flex items-center">
                         <Settings className="mr-2 h-4 w-4" />
                         <span className="font-medium">{t('common.settings') || 'Settings'}</span>
                     </Link>
