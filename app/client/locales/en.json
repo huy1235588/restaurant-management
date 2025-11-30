@@ -1099,5 +1099,26 @@
         "waiter": "Waiter",
         "chef": "Chef",
         "cashier": "Cashier"
+    },
+    "profile": {
+        "title": "My Profile",
+        "pageDescription": "View and manage your personal information",
+        "editProfile": "Edit Profile",
+        "editProfileDescription": "Update your personal information",
+        "changePassword": "Change Password",
+        "changePasswordDescription": "Enter your current password to confirm password change",
+        "accountInfo": "Account Information",
+        "personalInfo": "Personal Information",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm New Password",
+        "passwordHint": "Minimum 6 characters",
+        "passwordMismatch": "Passwords do not match",
+        "profileUpdated": "Profile updated successfully",
+        "passwordChanged": "Password changed successfully",
+        "passwordChangeFailed": "Failed to change password",
+        "loadError": "Failed to load profile",
+        "noChanges": "No changes made",
+        "lastLogin": "Last Login"
     }
 }

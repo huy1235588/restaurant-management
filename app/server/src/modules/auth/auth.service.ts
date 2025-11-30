@@ -14,6 +14,8 @@ import {
     LoginDto,
     RegisterDto,
     CreateStaffWithAccountDto,
+    UpdateProfileDto,
+    ChangePasswordDto,
 } from '@/modules/auth/dto';
 import { Prisma } from '@/lib/prisma';
 import { StaffRepository } from '@/modules/staff/staff.repository';
@@ -334,5 +336,94 @@ export class AuthService {
         const result = await this.refreshTokenRepository.deleteExpired();
         this.logger.log(`Cleaned up ${result.count} expired tokens`);
         return result;
+    }
+
+    /**
+     * Update user profile
+     */
+    async updateProfile(accountId: number, data: UpdateProfileDto) {
+        const account = await this.accountRepository.findById(accountId);
+        if (!account) {
+            throw new NotFoundException('Account not found');
+        }
+
+        const staff = await this.staffRepository.findByAccountId(accountId);
+        if (!staff) {
+            throw new NotFoundException('Staff profile not found');
+        }
+
+        // Check if email is being changed and already exists
+        if (data.email && data.email !== account.email) {
+            const existingEmail = await this.accountRepository.findByEmail(
+                data.email,
+            );
+            if (existingEmail) {
+                throw new ConflictException('Email already exists');
+            }
+        }
+
+        // Check if phone number is being changed and already exists
+        if (data.phoneNumber && data.phoneNumber !== account.phoneNumber) {
+            const existingPhone = await this.accountRepository.findByPhoneNumber(
+                data.phoneNumber,
+            );
+            if (existingPhone) {
+                throw new ConflictException('Phone number already exists');
+            }
+        }
+
+        // Update account fields
+        const accountUpdateData: Prisma.AccountUpdateInput = {};
+        if (data.email) accountUpdateData.email = data.email;
+        if (data.phoneNumber) accountUpdateData.phoneNumber = data.phoneNumber;
+
+        if (Object.keys(accountUpdateData).length > 0) {
+            await this.accountRepository.update(accountId, accountUpdateData);
+        }
+
+        // Update staff fields
+        const staffUpdateData: Prisma.StaffUpdateInput = {};
+        if (data.fullName) staffUpdateData.fullName = data.fullName;
+        if (data.address !== undefined) staffUpdateData.address = data.address;
+
+        if (Object.keys(staffUpdateData).length > 0) {
+            await this.staffRepository.update(staff.staffId, staffUpdateData);
+        }
+
+        this.logger.log(`Profile updated for account ${accountId}`);
+
+        // Return updated data
+        return this.getUserInfo(accountId);
+    }
+
+    /**
+     * Change user password
+     */
+    async changePassword(accountId: number, data: ChangePasswordDto) {
+        const account = await this.accountRepository.findById(accountId);
+        if (!account) {
+            throw new NotFoundException('Account not found');
+        }
+
+        // Verify current password
+        const isPasswordValid = await AuthUtils.comparePassword(
+            data.currentPassword,
+            account.password,
+        );
+        if (!isPasswordValid) {
+            throw new UnauthorizedException('Current password is incorrect');
+        }
+
+        // Hash new password
+        const hashedPassword = await AuthUtils.hashPassword(data.newPassword);
+
+        // Update password
+        await this.accountRepository.update(accountId, {
+            password: hashedPassword,
+        });
+
+        this.logger.log(`Password changed for account ${accountId}`);
+
+        return { message: 'Password changed successfully' };
     }
 }

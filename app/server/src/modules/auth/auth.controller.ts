@@ -2,6 +2,7 @@ import {
     Controller,
     Post,
     Get,
+    Put,
     Body,
     Req,
     Res,
@@ -22,6 +23,8 @@ import {
     LoginDto,
     RegisterDto,
     CreateStaffWithAccountDto,
+    UpdateProfileDto,
+    ChangePasswordDto,
 } from '@/modules/auth/dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { Public } from '@/common/decorators/public.decorator';
@@ -221,5 +224,48 @@ export class AuthController {
         return {
             message: 'Logged out from all devices',
         };
+    }
+
+    @Put('profile')
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Update user profile' })
+    @ApiResponse({ status: 200, description: 'Profile updated successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({
+        status: 409,
+        description: 'Email/Phone already exists',
+    })
+    async updateProfile(
+        @CurrentUser() user: JwtPayload,
+        @Body() updateProfileDto: UpdateProfileDto,
+    ) {
+        const result = await this.authService.updateProfile(
+            user.accountId,
+            updateProfileDto,
+        );
+        return {
+            message: 'Profile updated successfully',
+            data: result,
+        };
+    }
+
+    @Put('change-password')
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Change user password' })
+    @ApiResponse({ status: 200, description: 'Password changed successfully' })
+    @ApiResponse({ status: 401, description: 'Current password is incorrect' })
+    async changePassword(
+        @CurrentUser() user: JwtPayload,
+        @Body() changePasswordDto: ChangePasswordDto,
+    ) {
+        const result = await this.authService.changePassword(
+            user.accountId,
+            changePasswordDto,
+        );
+        return result;
     }
 }

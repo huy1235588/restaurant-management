@@ -1099,5 +1099,26 @@
         "waiter": "Phục vụ",
         "chef": "Đầu bếp",
         "cashier": "Thu ngân"
+    },
+    "profile": {
+        "title": "Hồ Sơ Cá Nhân",
+        "pageDescription": "Xem và quản lý thông tin cá nhân của bạn",
+        "editProfile": "Chỉnh Sửa Thông Tin",
+        "editProfileDescription": "Cập nhật thông tin cá nhân của bạn",
+        "changePassword": "Đổi Mật Khẩu",
+        "changePasswordDescription": "Nhập mật khẩu hiện tại để xác nhận đổi mật khẩu",
+        "accountInfo": "Thông Tin Tài Khoản",
+        "personalInfo": "Thông Tin Cá Nhân",
+        "currentPassword": "Mật khẩu hiện tại",
+        "newPassword": "Mật khẩu mới",
+        "confirmPassword": "Xác nhận mật khẩu mới",
+        "passwordHint": "Tối thiểu 6 ký tự",
+        "passwordMismatch": "Mật khẩu không khớp",
+        "profileUpdated": "Cập nhật thông tin thành công",
+        "passwordChanged": "Đổi mật khẩu thành công",
+        "passwordChangeFailed": "Đổi mật khẩu thất bại",
+        "loadError": "Không thể tải thông tin hồ sơ",
+        "noChanges": "Không có thay đổi nào",
+        "lastLogin": "Đăng nhập lần cuối"
     }
 }
