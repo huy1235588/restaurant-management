@@ -41,7 +41,7 @@ export function MenuItemCard({ item, index = 0 }: MenuItemCardProps) {
             className="group bg-background rounded-xl overflow-hidden shadow-sm border hover:shadow-lg transition-all duration-300"
         >
             {/* Image */}
-            <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+            <div className="relative aspect-4/3 overflow-hidden bg-muted">
                 {item.imagePath ? (
                     <Image
                         src={item.imagePath}
@@ -83,7 +83,7 @@ export function MenuItemCard({ item, index = 0 }: MenuItemCardProps) {
                     </h3>
                     {/* Spicy indicator */}
                     {item.spicyLevel && item.spicyLevel > 0 && (
-                        <div className="flex items-center gap-0.5 flex-shrink-0">
+                        <div className="flex items-center gap-0.5 shrink-0">
                             {getSpicyLevel(item.spicyLevel)}
                         </div>
                     )}

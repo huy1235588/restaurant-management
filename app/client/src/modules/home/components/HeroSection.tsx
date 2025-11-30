@@ -40,7 +40,7 @@ export function HeroSection() {
             ) : (
                 <>
                     {/* Fallback gradient background */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-background" />
+                    <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-background to-background" />
                     
                     {/* Decorative elements */}
                     <div className="absolute inset-0 overflow-hidden">
@@ -66,7 +66,7 @@ export function HeroSection() {
                         className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 ${
                             heroImageUrl 
                                 ? "text-white drop-shadow-lg" 
-                                : "bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent"
+                                : "bg-linear-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent"
                         }`}
                     >
                         {t("home.hero.title", { defaultValue: settings.name })}

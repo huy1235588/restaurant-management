@@ -73,7 +73,7 @@ export function ContactSection() {
                                 transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
                                 className="flex items-start gap-4 p-4 rounded-xl hover:bg-muted transition-colors group"
                             >
-                                <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                                <div className="shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                                     <item.icon className="h-6 w-6 text-primary" />
                                 </div>
                                 <div>

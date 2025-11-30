@@ -61,7 +61,7 @@ export function AboutSection() {
                         {/* Image */}
                         <motion.div
                             variants={itemVariants}
-                            className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-xl"
+                            className="relative aspect-4/3 rounded-2xl overflow-hidden shadow-xl"
                         >
                             {aboutImageUrl ? (
                                 <Image
@@ -73,7 +73,7 @@ export function AboutSection() {
                                 />
                             ) : (
                                 <>
-                                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5" />
+                                    <div className="absolute inset-0 bg-linear-to-br from-primary/20 to-primary/5" />
                                     {/* Placeholder for restaurant image */}
                                     <div className="absolute inset-0 flex items-center justify-center bg-muted">
                                         <span className="text-6xl">🍽️</span>
