@@ -57,7 +57,9 @@
         "or": "hoặc",
         "comingSoon": "Sắp ra mắt...",
         "createdAt": "Ngày tạo",
-        "updatedAt": "Ngày cập nhật"
+        "updatedAt": "Ngày cập nhật",
+        "date": "Ngày",
+        "minutes": "phút"
     },
     "sidebar": {
         "overview": "Tổng quan",
@@ -1099,6 +1101,38 @@
         "waiter": "Phục vụ",
         "chef": "Đầu bếp",
         "cashier": "Thu ngân"
+    },
+    "reports": {
+        "title": "Báo Cáo",
+        "subtitle": "Phân tích hiệu suất nhà hàng của bạn",
+        "totalRevenue": "Tổng Doanh Thu",
+        "totalOrders": "Tổng Đơn Hàng",
+        "totalReservations": "Tổng Đặt Bàn",
+        "avgOrderValue": "Giá Trị Đơn TB",
+        "revenueOverTime": "Doanh Thu Theo Thời Gian",
+        "topSellingItems": "Món Bán Chạy Nhất",
+        "paymentMethods": "Phương Thức Thanh Toán",
+        "ordersByHour": "Đơn Hàng Theo Giờ",
+        "ordersByStatus": "Đơn Hàng Theo Trạng Thái",
+        "today": "Hôm Nay",
+        "last7Days": "7 Ngày Qua",
+        "last30Days": "30 Ngày Qua",
+        "custom": "Tùy Chọn",
+        "revenue": "Doanh Thu",
+        "quantitySold": "Số Lượng Bán",
+        "amount": "Số Tiền",
+        "orderCount": "Số Đơn Hàng",
+        "totalOrdersInPeriod": "Tổng Đơn Trong Kỳ",
+        "totalAmountInPeriod": "Tổng Tiền Trong Kỳ",
+        "avgPrepTime": "Thời Gian Chế Biến TB",
+        "vsPrevious": "so với kỳ trước",
+        "date": "Ngày",
+        "paymentMethodLabels": {
+            "cash": "Tiền Mặt",
+            "card": "Thẻ",
+            "momo": "MoMo",
+            "bank_transfer": "Chuyển Khoản"
+        }
     },
     "profile": {
         "title": "Hồ Sơ Cá Nhân",

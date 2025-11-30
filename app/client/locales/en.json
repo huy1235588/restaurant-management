@@ -57,7 +57,9 @@
         "or": "or",
         "comingSoon": "Coming soon...",
         "createdAt": "Created At",
-        "updatedAt": "Updated At"
+        "updatedAt": "Updated At",
+        "date": "Date",
+        "minutes": "minutes"
     },
     "sidebar": {
         "overview": "Overview",
@@ -1099,6 +1101,38 @@
         "waiter": "Waiter",
         "chef": "Chef",
         "cashier": "Cashier"
+    },
+    "reports": {
+        "title": "Reports",
+        "subtitle": "Analyze your restaurant performance",
+        "totalRevenue": "Total Revenue",
+        "totalOrders": "Total Orders",
+        "totalReservations": "Total Reservations",
+        "avgOrderValue": "Avg Order Value",
+        "revenueOverTime": "Revenue Over Time",
+        "topSellingItems": "Top Selling Items",
+        "paymentMethods": "Payment Methods",
+        "ordersByHour": "Orders by Hour",
+        "ordersByStatus": "Orders by Status",
+        "today": "Today",
+        "last7Days": "Last 7 Days",
+        "last30Days": "Last 30 Days",
+        "custom": "Custom",
+        "revenue": "Revenue",
+        "quantitySold": "Quantity Sold",
+        "amount": "Amount",
+        "orderCount": "Order Count",
+        "totalOrdersInPeriod": "Total Orders in Period",
+        "totalAmountInPeriod": "Total Amount in Period",
+        "avgPrepTime": "Avg Prep Time",
+        "vsPrevious": "vs previous",
+        "date": "Date",
+        "paymentMethodLabels": {
+            "cash": "Cash",
+            "card": "Card",
+            "momo": "MoMo",
+            "bank_transfer": "Bank Transfer"
+        }
     },
     "profile": {
         "title": "My Profile",

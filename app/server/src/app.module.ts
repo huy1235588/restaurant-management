@@ -20,6 +20,7 @@ import { BillingModule } from '@/modules/billing/billing.module';
 import { RestaurantSettingsModule } from '@/modules/restaurant-settings/restaurant-settings.module';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import configuration from '@/config/configuration';
+import { ReportsModule } from './modules/reports';
 
 @Module({
     imports: [
@@ -64,6 +65,8 @@ import configuration from '@/config/configuration';
         BillingModule,
         // Restaurant Settings
         RestaurantSettingsModule,
+        // Reports
+        ReportsModule,
     ],
     controllers: [AppController],
     providers: [
