@@ -870,5 +870,81 @@
                 "step4": "Step 4 (Confirm)"
             }
         }
+    },
+    "home": {
+        "nav": {
+            "home": "Home",
+            "about": "About",
+            "menu": "Menu",
+            "reservation": "Reservation",
+            "contact": "Contact",
+            "bookTable": "Book Table"
+        },
+        "hero": {
+            "title": "Vietnam Restaurant",
+            "tagline": "Traditional flavors - Modern style",
+            "description": "Experience authentic Vietnamese cuisine with elegant atmosphere and dedicated service",
+            "bookTable": "Book a Table",
+            "viewMenu": "View Menu"
+        },
+        "about": {
+            "title": "Welcome to Vietnam Restaurant",
+            "paragraph1": "Established in 2010, Vietnam Restaurant is proud to be a leading culinary destination, bringing together the essence of traditional Vietnamese cuisine with modern service style.",
+            "paragraph2": "With a team of experienced chefs and fresh ingredients carefully selected every day, we are committed to bringing customers delicious, beautiful and flavorful dishes.",
+            "paragraph3": "The restaurant space is elegantly designed, combining traditional beauty and modern comfort, creating a cozy and luxurious atmosphere for all gatherings.",
+            "highlight1": "Years of experience",
+            "highlight2": "Professional chefs",
+            "highlight3": "Happy customers",
+            "highlight4": "Signature dishes"
+        },
+        "menu": {
+            "title": "Featured Menu",
+            "subtitle": "Discover our best dishes",
+            "loadError": "Failed to load menu",
+            "empty": "Menu is being updated...",
+            "bookNow": "Book Now"
+        },
+        "reservation": {
+            "title": "Book a Table",
+            "subtitle": "Reserve in advance for the best experience",
+            "nameLabel": "Full Name",
+            "namePlaceholder": "John Doe",
+            "phoneLabel": "Phone Number",
+            "emailLabel": "Email (optional)",
+            "dateLabel": "Date",
+            "selectDate": "Select date",
+            "timeLabel": "Time",
+            "selectTime": "Select time",
+            "partySizeLabel": "Party Size",
+            "selectPartySize": "Select party size",
+            "guests": "guests",
+            "specialRequestLabel": "Special Requests",
+            "specialRequestPlaceholder": "E.g.: Window seat, birthday, anniversary...",
+            "submit": "Book Table",
+            "submitting": "Processing...",
+            "successTitle": "Booking Successful!",
+            "successMessage": "Thank you for your reservation. We will contact you to confirm.",
+            "errorMessage": "Unable to book. Please try again later.",
+            "code": "Reservation Code:",
+            "name": "Name:",
+            "phone": "Phone:",
+            "date": "Date:",
+            "time": "Time:",
+            "newBooking": "Make Another Booking"
+        },
+        "contact": {
+            "title": "Contact Us",
+            "subtitle": "Come and experience great cuisine",
+            "address": "Address",
+            "phone": "Phone",
+            "email": "Email",
+            "hours": "Opening Hours"
+        },
+        "footer": {
+            "quickLinks": "Quick Links",
+            "contact": "Contact Information",
+            "copyright": "All rights reserved.",
+            "backToTop": "Back to Top"
+        }
     }
 }

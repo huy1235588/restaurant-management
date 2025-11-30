@@ -1,0 +1,9 @@
+// Home module components barrel export
+export { Header } from "./Header";
+export { HeroSection } from "./HeroSection";
+export { AboutSection } from "./AboutSection";
+export { MenuSection } from "./MenuSection";
+export { MenuItemCard } from "./MenuItemCard";
+export { ReservationSection } from "./ReservationSection";
+export { ContactSection } from "./ContactSection";
+export { Footer } from "./Footer";

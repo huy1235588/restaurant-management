@@ -870,5 +870,81 @@
                 "step4": "Bước 4 (Xác nhận)"
             }
         }
+    },
+    "home": {
+        "nav": {
+            "home": "Trang chủ",
+            "about": "Giới thiệu",
+            "menu": "Thực đơn",
+            "reservation": "Đặt bàn",
+            "contact": "Liên hệ",
+            "bookTable": "Đặt Bàn"
+        },
+        "hero": {
+            "title": "Nhà Hàng Việt Nam",
+            "tagline": "Hương vị truyền thống - Phong cách hiện đại",
+            "description": "Trải nghiệm ẩm thực Việt Nam đích thực với không gian sang trọng và dịch vụ tận tâm",
+            "bookTable": "Đặt Bàn Ngay",
+            "viewMenu": "Xem Thực Đơn"
+        },
+        "about": {
+            "title": "Chào mừng đến với Nhà Hàng Việt Nam",
+            "paragraph1": "Được thành lập từ năm 2010, Nhà Hàng Việt Nam tự hào là điểm đến ẩm thực hàng đầu, nơi hội tụ tinh hoa ẩm thực truyền thống Việt Nam với phong cách phục vụ hiện đại.",
+            "paragraph2": "Với đội ngũ đầu bếp giàu kinh nghiệm và nguyên liệu tươi ngon được chọn lọc kỹ càng mỗi ngày, chúng tôi cam kết mang đến cho quý khách những món ăn ngon miệng, đẹp mắt và đậm đà hương vị.",
+            "paragraph3": "Không gian nhà hàng được thiết kế tinh tế, kết hợp giữa nét đẹp truyền thống và sự tiện nghi hiện đại, tạo nên bầu không khí ấm cúng và sang trọng cho mọi dịp sum họp.",
+            "highlight1": "Năm kinh nghiệm",
+            "highlight2": "Đầu bếp chuyên nghiệp",
+            "highlight3": "Khách hàng hài lòng",
+            "highlight4": "Món ăn đặc sắc"
+        },
+        "menu": {
+            "title": "Thực Đơn Đặc Sắc",
+            "subtitle": "Khám phá những món ăn ngon nhất của chúng tôi",
+            "loadError": "Không thể tải thực đơn",
+            "empty": "Thực đơn đang được cập nhật...",
+            "bookNow": "Đặt Bàn Ngay"
+        },
+        "reservation": {
+            "title": "Đặt Bàn",
+            "subtitle": "Đặt bàn trước để có trải nghiệm tốt nhất",
+            "nameLabel": "Họ và tên",
+            "namePlaceholder": "Nguyễn Văn A",
+            "phoneLabel": "Số điện thoại",
+            "emailLabel": "Email (không bắt buộc)",
+            "dateLabel": "Ngày đặt",
+            "selectDate": "Chọn ngày",
+            "timeLabel": "Giờ đặt",
+            "selectTime": "Chọn giờ",
+            "partySizeLabel": "Số người",
+            "selectPartySize": "Chọn số người",
+            "guests": "khách",
+            "specialRequestLabel": "Yêu cầu đặc biệt",
+            "specialRequestPlaceholder": "Ví dụ: Bàn gần cửa sổ, sinh nhật, kỷ niệm...",
+            "submit": "Đặt Bàn",
+            "submitting": "Đang xử lý...",
+            "successTitle": "Đặt Bàn Thành Công!",
+            "successMessage": "Cảm ơn bạn đã đặt bàn. Chúng tôi sẽ liên hệ để xác nhận.",
+            "errorMessage": "Không thể đặt bàn. Vui lòng thử lại sau.",
+            "code": "Mã đặt bàn:",
+            "name": "Tên:",
+            "phone": "SĐT:",
+            "date": "Ngày:",
+            "time": "Giờ:",
+            "newBooking": "Đặt Bàn Khác"
+        },
+        "contact": {
+            "title": "Liên Hệ",
+            "subtitle": "Hãy đến và trải nghiệm ẩm thực tuyệt vời",
+            "address": "Địa chỉ",
+            "phone": "Điện thoại",
+            "email": "Email",
+            "hours": "Giờ mở cửa"
+        },
+        "footer": {
+            "quickLinks": "Liên kết nhanh",
+            "contact": "Thông tin liên hệ",
+            "copyright": "Đã đăng ký bản quyền.",
+            "backToTop": "Về đầu trang"
+        }
     }
 }
