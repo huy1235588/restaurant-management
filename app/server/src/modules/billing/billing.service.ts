@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, Inject, forwardRef } from '@nestjs/common';
 import { BillRepository, FindOptions } from './bill.repository';
 import { PaymentRepository } from './payment.repository';
 import { PrismaService } from '@/database/prisma.service';
@@ -25,6 +25,7 @@ import {
     InvalidPaymentMethodException,
 } from './exceptions/billing.exceptions';
 import { BillingHelper } from './helpers/billing.helper';
+import { ReportsCacheService } from '../reports/reports-cache.service';
 
 @Injectable()
 export class BillingService {
@@ -37,6 +38,8 @@ export class BillingService {
         private readonly paymentRepository: PaymentRepository,
         private readonly prisma: PrismaService,
         private readonly configService: ConfigService,
+        @Inject(forwardRef(() => ReportsCacheService))
+        private readonly reportsCacheService: ReportsCacheService,
     ) {
         this.TAX_RATE = this.configService.get<number>(
             'billing.taxRate',
@@ -369,6 +372,10 @@ export class BillingService {
         this.logger.log(
             `Payment processed for bill ${bill.billNumber}: ${paymentData.paymentMethod} ${paymentData.amount}`,
         );
+
+        // Invalidate reports cache after successful payment
+        this.reportsCacheService.invalidateAllReportCaches();
+        this.logger.debug('Reports cache invalidated after payment');
 
         return result;
     }

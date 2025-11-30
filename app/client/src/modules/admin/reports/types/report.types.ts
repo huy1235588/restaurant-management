@@ -4,10 +4,16 @@ export type GroupBy = 'day' | 'week' | 'month' | 'hour' | 'status';
 
 export type PaymentMethod = 'cash' | 'card' | 'momo' | 'bank_transfer';
 
+export type ExportType = 'revenue' | 'top-items' | 'orders';
+
 // Query params
 export interface ReportQueryParams {
     startDate?: string;
     endDate?: string;
+}
+
+export interface DashboardQueryParams extends ReportQueryParams {
+    refresh?: boolean;
 }
 
 export interface RevenueQueryParams extends ReportQueryParams {
@@ -92,10 +98,27 @@ export interface OrdersReport {
     };
 }
 
+// Dashboard (batch) report
+export interface DashboardReport {
+    overview: OverviewReport;
+    revenue: RevenueReport;
+    topItems: TopItemsReport;
+    paymentMethods: PaymentMethodsReport;
+    orders: OrdersReport;
+}
+
 // API Response wrapper
 export interface ApiResponse<T> {
     message: string;
     data: T;
+}
+
+// Dashboard API Response with cache info
+export interface DashboardApiResponse {
+    message: string;
+    data: DashboardReport;
+    cached: boolean;
+    cachedAt?: string;
 }
 
 // Date range presets
@@ -106,3 +129,4 @@ export interface DateRange {
     endDate: string;
     preset: DateRangePreset;
 }
+

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format, subDays } from 'date-fns';
 import {
@@ -9,8 +9,16 @@ import {
     Calendar,
     TrendingUp,
     RefreshCw,
+    Clock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import {
     ReportCard,
     RevenueChart,
@@ -18,14 +26,10 @@ import {
     PaymentMethodChart,
     OrdersChart,
     DateRangePicker,
+    DashboardSkeleton,
+    ExportButton,
 } from '../components';
-import {
-    useOverviewReport,
-    useRevenueReport,
-    useTopItemsReport,
-    usePaymentMethodsReport,
-    useOrdersReport,
-} from '../hooks';
+import { useDashboardReport, usePrefetchDashboard } from '../hooks';
 import { DateRange } from '../types';
 
 export function ReportsView() {
@@ -38,58 +42,51 @@ export function ReportsView() {
         preset: 'week',
     });
 
+    const [forceRefresh, setForceRefresh] = useState(false);
+
     const queryParams = useMemo(
         () => ({
             startDate: dateRange.startDate,
             endDate: dateRange.endDate,
+            refresh: forceRefresh,
         }),
-        [dateRange]
+        [dateRange, forceRefresh]
     );
 
-    // Fetch all reports
+    // Use batch dashboard hook instead of 5 separate hooks
     const {
-        data: overview,
-        isLoading: overviewLoading,
-        refetch: refetchOverview,
-    } = useOverviewReport(queryParams);
+        data: dashboard,
+        isLoading,
+        isFetching,
+        refetch,
+    } = useDashboardReport(queryParams);
 
-    const {
-        data: revenue,
-        isLoading: revenueLoading,
-        refetch: refetchRevenue,
-    } = useRevenueReport({ ...queryParams, groupBy: 'day' });
+    // Prefetch common date ranges
+    const prefetch = usePrefetchDashboard();
 
-    const {
-        data: topItems,
-        isLoading: topItemsLoading,
-        refetch: refetchTopItems,
-    } = useTopItemsReport({ ...queryParams, limit: 10 });
+    useEffect(() => {
+        // Prefetch today's data
+        prefetch({
+            startDate: format(today, 'yyyy-MM-dd'),
+            endDate: format(today, 'yyyy-MM-dd'),
+        });
+        // Prefetch last 30 days
+        prefetch({
+            startDate: format(subDays(today, 29), 'yyyy-MM-dd'),
+            endDate: format(today, 'yyyy-MM-dd'),
+        });
+    }, [prefetch, today]);
 
-    const {
-        data: paymentMethods,
-        isLoading: paymentMethodsLoading,
-        refetch: refetchPaymentMethods,
-    } = usePaymentMethodsReport(queryParams);
-
-    const {
-        data: orders,
-        isLoading: ordersLoading,
-        refetch: refetchOrders,
-    } = useOrdersReport({ ...queryParams, groupBy: 'hour' });
-
-    const isLoading =
-        overviewLoading ||
-        revenueLoading ||
-        topItemsLoading ||
-        paymentMethodsLoading ||
-        ordersLoading;
+    // Reset forceRefresh after fetch
+    useEffect(() => {
+        if (!isFetching && forceRefresh) {
+            setForceRefresh(false);
+        }
+    }, [isFetching, forceRefresh]);
 
     const handleRefresh = () => {
-        refetchOverview();
-        refetchRevenue();
-        refetchTopItems();
-        refetchPaymentMethods();
-        refetchOrders();
+        setForceRefresh(true);
+        refetch();
     };
 
     const formatCurrency = (value: number | string) => {
@@ -101,27 +98,68 @@ export function ReportsView() {
         }).format(num);
     };
 
+    // Show full skeleton on initial load
+    if (isLoading && !dashboard) {
+        return <DashboardSkeleton />;
+    }
+
+    const overview = dashboard?.overview;
+    const revenue = dashboard?.revenue;
+    const topItems = dashboard?.topItems;
+    const paymentMethods = dashboard?.paymentMethods;
+    const orders = dashboard?.orders;
+    const isCached = dashboard?.cached;
+    const cachedAt = dashboard?.cachedAt;
+
     return (
         <div className="space-y-6">
             {/* Header */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight">
-                        {t('reports.title')}
-                    </h1>
+                    <div className="flex items-center gap-2">
+                        <h1 className="text-2xl font-bold tracking-tight">
+                            {t('reports.title')}
+                        </h1>
+                        {isCached && cachedAt && (
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Badge variant="secondary" className="gap-1">
+                                            <Clock className="h-3 w-3" />
+                                            {t('reports.cached')}
+                                        </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>
+                                            {t('reports.cachedAt', {
+                                                time: format(new Date(cachedAt), 'HH:mm:ss'),
+                                            })}
+                                        </p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
+                    </div>
                     <p className="text-muted-foreground">
                         {t('reports.subtitle')}
                     </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                     <DateRangePicker value={dateRange} onChange={setDateRange} />
+                    <ExportButton
+                        params={{
+                            startDate: dateRange.startDate,
+                            endDate: dateRange.endDate,
+                        }}
+                        disabled={isLoading}
+                    />
                     <Button
                         variant="outline"
                         size="icon"
                         onClick={handleRefresh}
-                        disabled={isLoading}
+                        disabled={isFetching}
                     >
-                        <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                        <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
                     </Button>
                 </div>
             </div>
@@ -134,7 +172,7 @@ export function ReportsView() {
                     change={overview?.comparison.revenue}
                     icon={DollarSign}
                     iconColor="text-green-600"
-                    loading={overviewLoading}
+                    loading={isFetching && !dashboard}
                     formatValue={formatCurrency}
                 />
                 <ReportCard
@@ -143,7 +181,7 @@ export function ReportsView() {
                     change={overview?.comparison.orders}
                     icon={ShoppingCart}
                     iconColor="text-blue-600"
-                    loading={overviewLoading}
+                    loading={isFetching && !dashboard}
                 />
                 <ReportCard
                     title={t('reports.totalReservations')}
@@ -151,7 +189,7 @@ export function ReportsView() {
                     change={overview?.comparison.reservations}
                     icon={Calendar}
                     iconColor="text-purple-600"
-                    loading={overviewLoading}
+                    loading={isFetching && !dashboard}
                 />
                 <ReportCard
                     title={t('reports.avgOrderValue')}
@@ -159,7 +197,7 @@ export function ReportsView() {
                     change={overview?.comparison.avgOrderValue}
                     icon={TrendingUp}
                     iconColor="text-orange-600"
-                    loading={overviewLoading}
+                    loading={isFetching && !dashboard}
                     formatValue={formatCurrency}
                 />
             </div>
@@ -167,28 +205,28 @@ export function ReportsView() {
             {/* Revenue Chart */}
             <RevenueChart
                 data={revenue?.data ?? []}
-                loading={revenueLoading}
+                loading={isFetching && !dashboard}
             />
 
-            {/* Charts Grid */}
+            {/* Charts Grid - Stack on mobile */}
             <div className="grid gap-6 lg:grid-cols-2">
                 {/* Top Items */}
                 <TopItemsChart
                     data={topItems?.items ?? []}
-                    loading={topItemsLoading}
+                    loading={isFetching && !dashboard}
                 />
 
                 {/* Payment Methods */}
                 <PaymentMethodChart
                     data={paymentMethods?.methods ?? []}
-                    loading={paymentMethodsLoading}
+                    loading={isFetching && !dashboard}
                 />
             </div>
 
             {/* Orders by Hour */}
             <OrdersChart
                 data={orders?.data ?? []}
-                loading={ordersLoading}
+                loading={isFetching && !dashboard}
                 groupBy="hour"
             />
 

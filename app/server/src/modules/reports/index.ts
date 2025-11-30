@@ -1,5 +1,7 @@
 export * from './reports.module';
 export * from './reports.service';
+export * from './reports-cache.service';
+export * from './reports-export.service';
 export * from './reports.controller';
 export * from './dto';
 export * from './types';
