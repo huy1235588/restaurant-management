@@ -34,6 +34,7 @@ export interface RestaurantInfo {
     }[];
     heroImage: string;
     aboutImage: string;
+    logoUrl?: string;
 }
 
 export const restaurantConfig: RestaurantInfo = {

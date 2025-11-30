@@ -2,5 +2,6 @@
 export * from "./components";
 export * from "./hooks";
 export * from "./types";
+export * from "./context";
 export * from "./config/restaurant.config";
 export { homeApi } from "./services/home.service";

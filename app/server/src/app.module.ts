@@ -17,6 +17,7 @@ import { OrderModule } from '@/modules/order/order.module';
 import { ReservationModule } from '@/modules/reservation/reservation.module';
 import { KitchenModule } from '@/modules/kitchen/kitchen.module';
 import { BillingModule } from '@/modules/billing/billing.module';
+import { RestaurantSettingsModule } from '@/modules/restaurant-settings/restaurant-settings.module';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import configuration from '@/config/configuration';
 
@@ -61,6 +62,8 @@ import configuration from '@/config/configuration';
         KitchenModule,
         // Billing
         BillingModule,
+        // Restaurant Settings
+        RestaurantSettingsModule,
     ],
     controllers: [AppController],
     providers: [

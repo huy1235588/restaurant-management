@@ -4,8 +4,9 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { ArrowUp, Facebook, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { restaurantConfig, navSections } from "../config/restaurant.config";
+import { navSections } from "../config/restaurant.config";
 import { useScrollSpy } from "../hooks/useScrollSpy";
+import { useRestaurantSettingsContext } from "../context";
 
 // TikTok icon component (not available in lucide-react)
 function TikTokIcon({ className }: { className?: string }) {
@@ -37,6 +38,7 @@ function getSocialIcon(platform: string) {
 
 export function Footer() {
     const { t } = useTranslation();
+    const { settings } = useRestaurantSettingsContext();
     const { scrollToSection } = useScrollSpy({ sectionIds: navSections.map(s => s.id) });
 
     const scrollToTop = () => {
@@ -52,15 +54,15 @@ export function Footer() {
                     {/* Brand */}
                     <div className="space-y-4">
                         <h3 className="text-2xl font-bold text-primary">
-                            {restaurantConfig.name}
+                            {settings.name}
                         </h3>
                         <p className="text-muted-foreground">
-                            {restaurantConfig.description}
+                            {settings.description}
                         </p>
                         
                         {/* Social Links */}
                         <div className="flex gap-3 pt-2">
-                            {restaurantConfig.socialLinks.map((social) => (
+                            {settings.socialLinks.map((social) => (
                                 <motion.a
                                     key={social.platform}
                                     href={social.url}
@@ -101,21 +103,21 @@ export function Footer() {
                             {t("home.footer.contact", { defaultValue: "Thông tin liên hệ" })}
                         </h4>
                         <address className="not-italic space-y-2 text-muted-foreground">
-                            <p>{restaurantConfig.contact.address}</p>
+                            <p>{settings.contact.address}</p>
                             <p>
                                 <a
-                                    href={`tel:${restaurantConfig.contact.phone.replace(/-/g, "")}`}
+                                    href={`tel:${settings.contact.phone.replace(/-/g, "")}`}
                                     className="hover:text-primary transition-colors"
                                 >
-                                    {restaurantConfig.contact.phone}
+                                    {settings.contact.phone}
                                 </a>
                             </p>
                             <p>
                                 <a
-                                    href={`mailto:${restaurantConfig.contact.email}`}
+                                    href={`mailto:${settings.contact.email}`}
                                     className="hover:text-primary transition-colors"
                                 >
-                                    {restaurantConfig.contact.email}
+                                    {settings.contact.email}
                                 </a>
                             </p>
                         </address>
@@ -125,7 +127,7 @@ export function Footer() {
                 {/* Bottom Bar */}
                 <div className="border-t mt-10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p className="text-sm text-muted-foreground text-center sm:text-left">
-                        © {currentYear} {restaurantConfig.name}.{" "}
+                        © {currentYear} {settings.name}.{" "}
                         {t("home.footer.copyright", { defaultValue: "Đã đăng ký bản quyền." })}
                     </p>
 

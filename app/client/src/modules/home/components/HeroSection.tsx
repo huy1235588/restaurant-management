@@ -2,28 +2,53 @@
 
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { restaurantConfig } from "../config/restaurant.config";
 import { useScrollSpy } from "../hooks/useScrollSpy";
+import { useRestaurantSettingsContext } from "../context";
+import { getImageUrl } from "@/lib/utils/image";
 
 export function HeroSection() {
     const { t } = useTranslation();
+    const { settings } = useRestaurantSettingsContext();
     const { scrollToSection } = useScrollSpy({ sectionIds: ["menu", "reservation"] });
+
+    const heroImageUrl = settings.heroImage ? getImageUrl(settings.heroImage) : null;
 
     return (
         <section
             id="home"
             className="relative min-h-screen flex items-center justify-center overflow-hidden"
         >
-            {/* Background with gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-background" />
-            
-            {/* Decorative elements */}
-            <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-primary/5 rounded-full blur-3xl" />
-                <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-primary/5 rounded-full blur-3xl" />
-            </div>
+            {/* Background Image */}
+            {heroImageUrl ? (
+                <>
+                    <div className="absolute inset-0">
+                        <Image
+                            src={heroImageUrl}
+                            alt={settings.name}
+                            fill
+                            priority
+                            className="object-cover"
+                            sizes="100vw"
+                        />
+                    </div>
+                    {/* Dark overlay for better text readability */}
+                    <div className="absolute inset-0 bg-black/50" />
+                </>
+            ) : (
+                <>
+                    {/* Fallback gradient background */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-background" />
+                    
+                    {/* Decorative elements */}
+                    <div className="absolute inset-0 overflow-hidden">
+                        <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-primary/5 rounded-full blur-3xl" />
+                        <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-primary/5 rounded-full blur-3xl" />
+                    </div>
+                </>
+            )}
 
             {/* Content */}
             <div className="relative z-10 container mx-auto px-4 text-center">
@@ -38,9 +63,13 @@ export function HeroSection() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.2 }}
-                        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent"
+                        className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 ${
+                            heroImageUrl 
+                                ? "text-white drop-shadow-lg" 
+                                : "bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent"
+                        }`}
                     >
-                        {t("home.hero.title", { defaultValue: restaurantConfig.name })}
+                        {t("home.hero.title", { defaultValue: settings.name })}
                     </motion.h1>
 
                     {/* Tagline */}
@@ -48,9 +77,11 @@ export function HeroSection() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.4 }}
-                        className="text-xl sm:text-2xl md:text-3xl text-muted-foreground mb-4"
+                        className={`text-xl sm:text-2xl md:text-3xl mb-4 ${
+                            heroImageUrl ? "text-white/90" : "text-muted-foreground"
+                        }`}
                     >
-                        {t("home.hero.tagline", { defaultValue: restaurantConfig.tagline })}
+                        {t("home.hero.tagline", { defaultValue: settings.tagline })}
                     </motion.p>
 
                     {/* Description */}
@@ -58,9 +89,11 @@ export function HeroSection() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.6 }}
-                        className="text-base sm:text-lg text-muted-foreground/80 mb-10 max-w-2xl mx-auto"
+                        className={`text-base sm:text-lg mb-10 max-w-2xl mx-auto ${
+                            heroImageUrl ? "text-white/80" : "text-muted-foreground/80"
+                        }`}
                     >
-                        {t("home.hero.description", { defaultValue: restaurantConfig.description })}
+                        {t("home.hero.description", { defaultValue: settings.description })}
                     </motion.p>
 
                     {/* CTA Buttons */}

@@ -4,10 +4,11 @@ import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, useInView } from "framer-motion";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
-import { restaurantConfig } from "../config/restaurant.config";
+import { useRestaurantSettingsContext } from "../context";
 
 export function ContactSection() {
     const { t } = useTranslation();
+    const { settings } = useRestaurantSettingsContext();
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true, margin: "-100px" });
 
@@ -15,20 +16,20 @@ export function ContactSection() {
         {
             icon: MapPin,
             label: t("home.contact.address", { defaultValue: "Địa chỉ" }),
-            value: restaurantConfig.contact.address,
-            href: `https://maps.google.com/?q=${encodeURIComponent(restaurantConfig.contact.address)}`,
+            value: settings.contact.address,
+            href: `https://maps.google.com/?q=${encodeURIComponent(settings.contact.address)}`,
         },
         {
             icon: Phone,
             label: t("home.contact.phone", { defaultValue: "Điện thoại" }),
-            value: restaurantConfig.contact.phone,
-            href: `tel:${restaurantConfig.contact.phone.replace(/-/g, "")}`,
+            value: settings.contact.phone,
+            href: `tel:${settings.contact.phone.replace(/-/g, "")}`,
         },
         {
             icon: Mail,
             label: t("home.contact.email", { defaultValue: "Email" }),
-            value: restaurantConfig.contact.email,
-            href: `mailto:${restaurantConfig.contact.email}`,
+            value: settings.contact.email,
+            href: `mailto:${settings.contact.email}`,
         },
     ];
 
@@ -100,7 +101,7 @@ export function ContactSection() {
                                 </p>
                             </div>
                             <div className="space-y-2 pl-16">
-                                {restaurantConfig.operatingHours.map((schedule, index) => (
+                                {settings.operatingHours.map((schedule, index) => (
                                     <div key={index} className="flex justify-between text-sm">
                                         <span className="text-muted-foreground">{schedule.day}</span>
                                         <span className="font-medium">{schedule.hours}</span>
@@ -117,9 +118,9 @@ export function ContactSection() {
                         transition={{ duration: 0.6, delay: 0.3 }}
                         className="relative aspect-square md:aspect-auto md:h-full min-h-[300px] rounded-2xl overflow-hidden shadow-lg border"
                     >
-                        {restaurantConfig.contact.mapEmbedUrl ? (
+                        {settings.contact.mapEmbedUrl ? (
                             <iframe
-                                src={restaurantConfig.contact.mapEmbedUrl}
+                                src={settings.contact.mapEmbedUrl}
                                 width="100%"
                                 height="100%"
                                 style={{ border: 0 }}
@@ -133,7 +134,7 @@ export function ContactSection() {
                                 <div className="text-center">
                                     <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                                     <p className="text-muted-foreground">
-                                        {restaurantConfig.contact.address}
+                                        {settings.contact.address}
                                     </p>
                                 </div>
                             </div>

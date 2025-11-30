@@ -4,12 +4,17 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
-import { restaurantConfig } from "../config/restaurant.config";
+import Image from "next/image";
+import { useRestaurantSettingsContext } from "../context";
+import { getImageUrl } from "@/lib/utils/image";
 
 export function AboutSection() {
     const { t } = useTranslation();
+    const { settings } = useRestaurantSettingsContext();
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+    const aboutImageUrl = settings.aboutImage ? getImageUrl(settings.aboutImage) : null;
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -46,7 +51,7 @@ export function AboutSection() {
                     {/* Section Title */}
                     <motion.div variants={itemVariants} className="text-center mb-12 md:mb-16">
                         <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-                            {t("home.about.title", { defaultValue: restaurantConfig.about.title })}
+                            {t("home.about.title", { defaultValue: settings.about.title })}
                         </h2>
                         <div className="w-24 h-1 bg-primary mx-auto rounded-full" />
                     </motion.div>
@@ -58,16 +63,28 @@ export function AboutSection() {
                             variants={itemVariants}
                             className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-xl"
                         >
-                            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5" />
-                            {/* Placeholder for restaurant image */}
-                            <div className="absolute inset-0 flex items-center justify-center bg-muted">
-                                <span className="text-6xl">🍽️</span>
-                            </div>
+                            {aboutImageUrl ? (
+                                <Image
+                                    src={aboutImageUrl}
+                                    alt={settings.about.title}
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                />
+                            ) : (
+                                <>
+                                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5" />
+                                    {/* Placeholder for restaurant image */}
+                                    <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                                        <span className="text-6xl">🍽️</span>
+                                    </div>
+                                </>
+                            )}
                         </motion.div>
 
                         {/* Text Content */}
                         <motion.div variants={itemVariants} className="space-y-6">
-                            {restaurantConfig.about.paragraphs.map((paragraph, index) => (
+                            {settings.about.paragraphs.map((paragraph, index) => (
                                 <p
                                     key={index}
                                     className="text-muted-foreground leading-relaxed text-base md:text-lg"
@@ -83,7 +100,7 @@ export function AboutSection() {
                         variants={itemVariants}
                         className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16"
                     >
-                        {restaurantConfig.about.highlights.map((highlight, index) => (
+                        {settings.about.highlights.map((highlight, index) => (
                             <motion.div
                                 key={index}
                                 whileHover={{ scale: 1.05 }}

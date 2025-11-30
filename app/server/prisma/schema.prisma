@@ -462,3 +462,30 @@ model Payment {
     @@index([transactionId])
     @@map("payments")
 }
+
+// ============================================
+// RESTAURANT SETTINGS
+// ============================================
+
+model RestaurantSettings {
+    id             Int      @id @default(1)
+    name           String   @db.VarChar(200)
+    tagline        String?  @db.VarChar(500)
+    description    String?  @db.Text
+    aboutTitle     String?  @db.VarChar(200)
+    aboutContent   String?  @db.Text
+    address        String?  @db.VarChar(500)
+    phone          String?  @db.VarChar(20)
+    email          String?  @db.VarChar(255)
+    mapEmbedUrl    String?  @db.Text
+    heroImage      String?  @db.VarChar(500)
+    aboutImage     String?  @db.VarChar(500)
+    logoUrl        String?  @db.VarChar(500)
+    operatingHours Json?    // Array of { day: string, hours: string }
+    socialLinks    Json?    // Array of { platform: string, url: string, icon: string }
+    highlights     Json?    // Array of { icon: string, label: string, value: string }
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+
+    @@map("restaurant_settings")
+}

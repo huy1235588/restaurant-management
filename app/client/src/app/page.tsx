@@ -7,6 +7,7 @@ import {
     ReservationSection,
     ContactSection,
     Footer,
+    RestaurantSettingsProvider,
 } from "@/modules/home";
 import { restaurantConfig } from "@/modules/home/config/restaurant.config";
 
@@ -23,16 +24,18 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
     return (
-        <div className="min-h-screen">
-            <Header />
-            <main>
-                <HeroSection />
-                <AboutSection />
-                <MenuSection />
-                <ReservationSection />
-                <ContactSection />
-            </main>
-            <Footer />
-        </div>
+        <RestaurantSettingsProvider>
+            <div className="min-h-screen">
+                <Header />
+                <main>
+                    <HeroSection />
+                    <AboutSection />
+                    <MenuSection />
+                    <ReservationSection />
+                    <ContactSection />
+                </main>
+                <Footer />
+            </div>
+        </RestaurantSettingsProvider>
     );
 }

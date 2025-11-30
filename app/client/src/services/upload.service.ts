@@ -16,7 +16,7 @@ export interface UploadedFileInfo {
     publicId?: string;      // Cloud storage public ID (Cloudinary/R2)
 }
 
-export type UploadFolder = 'temp' | 'menu' | "categories" | 'staff' | 'documents' | 'images' | 'others';
+export type UploadFolder = 'temp' | 'menu' | "categories" | 'staff' | 'documents' | 'images' | 'settings' | 'others';
 
 /**
  * Upload service for handling file uploads to the server

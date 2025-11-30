@@ -7,11 +7,13 @@ import { Menu, X, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
-import { navSections, restaurantConfig } from "../config/restaurant.config";
+import { navSections } from "../config/restaurant.config";
 import { useScrollSpy } from "../hooks/useScrollSpy";
+import { useRestaurantSettingsContext } from "../context";
 
 export function Header() {
     const { t, i18n } = useTranslation();
+    const { settings } = useRestaurantSettingsContext();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     
@@ -65,7 +67,7 @@ export function Header() {
                             onClick={() => handleNavClick("home")}
                             className="font-bold text-xl md:text-2xl text-primary hover:opacity-80 transition-opacity"
                         >
-                            {restaurantConfig.name}
+                            {settings.name}
                         </button>
 
                         {/* Desktop Navigation */}

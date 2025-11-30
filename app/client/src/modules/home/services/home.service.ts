@@ -5,6 +5,7 @@ import type {
     ReservationResponse,
     ApiResponse,
     PaginatedMenuResponse,
+    RestaurantSettingsApiResponse,
 } from "../types";
 
 // Use relative API path - works with reverse proxy
@@ -20,6 +21,22 @@ const publicAxios = axios.create({
 });
 
 export const homeApi = {
+    /**
+     * Get restaurant settings for landing page
+     * Returns restaurant information from database
+     */
+    getRestaurantSettings: async (): Promise<RestaurantSettingsApiResponse | null> => {
+        try {
+            const response = await publicAxios.get<ApiResponse<RestaurantSettingsApiResponse>>(
+                "/restaurant-settings"
+            );
+            return response.data.data;
+        } catch {
+            // Return null if settings not found, will fallback to static config
+            return null;
+        }
+    },
+
     /**
      * Get featured menu items for landing page
      * Returns limited items that are available and active

@@ -18,6 +18,48 @@ export interface FeaturedMenuItem {
     };
 }
 
+// Operating hours
+export interface OperatingHoursData {
+    day: string;
+    hours: string;
+}
+
+// Social link
+export interface SocialLinkData {
+    platform: string;
+    url: string;
+    icon: string;
+}
+
+// Highlight data
+export interface HighlightData {
+    icon: string;
+    label: string;
+    value: string;
+}
+
+// Restaurant settings response from API
+export interface RestaurantSettingsApiResponse {
+    id: number;
+    name: string;
+    tagline: string | null;
+    description: string | null;
+    aboutTitle: string | null;
+    aboutContent: string | null;
+    address: string | null;
+    phone: string | null;
+    email: string | null;
+    mapEmbedUrl: string | null;
+    heroImage: string | null;
+    aboutImage: string | null;
+    logoUrl: string | null;
+    operatingHours: OperatingHoursData[];
+    socialLinks: SocialLinkData[];
+    highlights: HighlightData[];
+    createdAt: string;
+    updatedAt: string;
+}
+
 // Reservation form data
 export interface ReservationFormData {
     customerName: string;
