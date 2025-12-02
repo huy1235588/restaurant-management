@@ -222,6 +222,27 @@ export function useKitchenSocket() {
                 });
             });
 
+            // Listen to order paid event (bill processed)
+            socket.on("order:paid", (data: any) => {
+                console.log("[Kitchen Socket] Order paid:", data);
+
+                // Event data is wrapped: { event, data, timestamp }
+                const eventData = data.data || data;
+
+                // Invalidate kitchen orders to remove paid order from list
+                debouncedInvalidateQueries(
+                    queryClient,
+                    kitchenQueryKeys.list()
+                );
+
+                // Show notification
+                toast.success("Order Paid", {
+                    description: `Order #${
+                        eventData.orderNumber || ""
+                    } has been paid and removed`,
+                });
+            });
+
             // Store cleanup function for event handlers
             return () => {
                 socket.off(KitchenSocketEvents.NEW_ORDER);
@@ -229,6 +250,7 @@ export function useKitchenSocket() {
                 socket.off(KitchenSocketEvents.ORDER_COMPLETED);
                 socket.off("order:cancelled");
                 socket.off("kitchen:order-cancelled");
+                socket.off("order:paid");
             };
         }
 

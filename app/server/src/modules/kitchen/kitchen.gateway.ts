@@ -151,4 +151,21 @@ export class KitchenGateway
             `Emitted order cancelled to kitchen: Order #${data.orderNumber}`,
         );
     }
+
+    /**
+     * Emit event when order is paid (bill processed)
+     * Broadcast to kitchen room to remove the order from display
+     * @param data - Order payment data
+     */
+    emitOrderPaid(data: { orderId: number; orderNumber: string }) {
+        this.server.to('kitchen').emit('order:paid', {
+            event: 'order:paid',
+            data,
+            timestamp: new Date().toISOString(),
+            source: 'billing',
+        });
+        this.logger.log(
+            `Emitted order paid to kitchen: Order #${data.orderNumber}`,
+        );
+    }
 }

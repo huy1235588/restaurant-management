@@ -26,6 +26,9 @@ import {
 } from './exceptions/billing.exceptions';
 import { BillingHelper } from './helpers/billing.helper';
 import { ReportsCacheService } from '../reports/reports-cache.service';
+import { KitchenRepository } from '../kitchen/kitchen.repository';
+import { KitchenGateway } from '../kitchen/kitchen.gateway';
+import { SocketEmitterService } from '@/shared/websocket';
 
 @Injectable()
 export class BillingService {
@@ -40,6 +43,9 @@ export class BillingService {
         private readonly configService: ConfigService,
         @Inject(forwardRef(() => ReportsCacheService))
         private readonly reportsCacheService: ReportsCacheService,
+        private readonly kitchenRepository: KitchenRepository,
+        private readonly kitchenGateway: KitchenGateway,
+        private readonly socketEmitter: SocketEmitterService,
     ) {
         this.TAX_RATE = this.configService.get<number>(
             'billing.taxRate',
@@ -366,11 +372,35 @@ export class BillingService {
                 data: { status: TableStatus.available },
             });
 
+            // Delete kitchen order if exists (order is paid, no need to keep in kitchen display)
+            await tx.kitchenOrder.deleteMany({
+                where: { orderId: bill.orderId },
+            });
+
             return { payment, bill: updatedBill };
         });
 
         this.logger.log(
             `Payment processed for bill ${bill.billNumber}: ${paymentData.paymentMethod} ${paymentData.amount}`,
+        );
+
+        // Emit payment completed event to all clients (including kitchen display)
+        this.socketEmitter.emitPaymentCompleted({
+            billId: result.bill.billId,
+            orderId: bill.orderId,
+            orderNumber: result.bill.order.orderNumber,
+            totalAmount: Number(result.bill.totalAmount),
+            tableId: bill.tableId,
+        });
+
+        // Also emit to kitchen namespace specifically
+        this.kitchenGateway.emitOrderPaid({
+            orderId: bill.orderId,
+            orderNumber: result.bill.order.orderNumber,
+        });
+
+        this.logger.log(
+            `Kitchen notified: Order #${result.bill.order.orderNumber} has been paid`,
         );
 
         // Invalidate reports cache after successful payment
