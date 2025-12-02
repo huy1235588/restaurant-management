@@ -27,6 +27,17 @@ export const highlightSchema = z.object({
 });
 
 /**
+ * Bank Config validation schema
+ */
+export const bankConfigSchema = z.object({
+    bankId: z.string().max(20).optional().or(z.literal('')),
+    bankName: z.string().max(100).optional().or(z.literal('')),
+    accountNo: z.string().max(30).optional().or(z.literal('')),
+    accountName: z.string().max(100).optional().or(z.literal('')),
+    template: z.string().max(20).optional().or(z.literal('')),
+});
+
+/**
  * Main settings form validation schema
  */
 export const settingsFormSchema = z.object({
@@ -45,6 +56,7 @@ export const settingsFormSchema = z.object({
     operatingHours: z.array(operatingHoursSchema).optional(),
     socialLinks: z.array(socialLinkSchema).optional(),
     highlights: z.array(highlightSchema).optional(),
+    bankConfig: bankConfigSchema.optional(),
 });
 
 export type SettingsFormValues = z.infer<typeof settingsFormSchema>;

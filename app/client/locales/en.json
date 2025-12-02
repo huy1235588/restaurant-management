@@ -434,8 +434,6 @@
         "enterReceivedAmount": "Enter amount received from customer",
         "enterPaymentDetails": "Enter payment details",
         "receivedAmount": "Amount Received",
-        "cardNumber": "Card Number",
-        "cardHolderName": "Card Holder Name",
         "transactionId": "Transaction ID",
         "transactionIdPlaceholder": "Enter transaction ID...",
         "confirmPayment": "Confirm Payment",
@@ -443,6 +441,13 @@
         "paymentSuccessDescription": "The bill has been paid successfully",
         "changeToReturn": "Change to Return",
         "paymentMethod": "Payment Method",
+        "scanQrToPay": "Scan QR code to pay",
+        "bankAccount": "Account Number",
+        "bankName": "Bank",
+        "accountHolder": "Account Holder",
+        "transferAmount": "Amount",
+        "transferContent": "Transfer Note",
+        "bankNotConfigured": "Bank information not configured. Please update in Settings > Payment.",
         "discountType": "Discount Type",
         "percentage": "Percentage (%)",
         "fixedAmount": "Fixed Amount",
@@ -465,6 +470,7 @@
         "printPreview": "Print Preview",
         "printPreviewDescription": "Preview bill before printing",
         "invoiceCopy": "Invoice Copy",
+        "statusLabel": "Status",
         "status": {
             "all": "All",
             "pending": "Pending",
@@ -474,8 +480,6 @@
         },
         "paymentMethods": {
             "cash": "Cash",
-            "card": "Card",
-            "e-wallet": "E-Wallet",
             "transfer": "Bank Transfer"
         },
         "messages": {
@@ -1060,13 +1064,27 @@
             "contact": "Contact",
             "hours": "Hours",
             "social": "Social",
-            "images": "Images"
+            "images": "Images",
+            "payment": "Payment"
         },
         "generalDescription": "Basic information about your restaurant",
         "contactDescription": "Contact details and location",
         "hoursDescription": "Operating hours for customers",
         "socialDescription": "Social media links",
         "imagesDescription": "Images displayed on the homepage",
+        "paymentDescription": "Configure payment information and bank transfer QR code",
+        "bankConfig": {
+            "title": "QR Payment Configuration",
+            "description": "Configure bank information to generate QR payment codes for customers when they choose bank transfer.",
+            "bank": "Bank",
+            "selectBank": "Select bank",
+            "accountNo": "Account Number",
+            "accountName": "Account Holder Name",
+            "accountNameHint": "Enter name in uppercase without accents",
+            "template": "QR Template",
+            "preview": "QR Code Preview",
+            "previewNote": "* This is a sample QR with amount 100,000 VND"
+        },
         "form": {
             "name": "Restaurant Name",
             "namePlaceholder": "Enter restaurant name",

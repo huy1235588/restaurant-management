@@ -13,7 +13,7 @@ export class ProcessPaymentDto {
     @ApiProperty({
         enum: PaymentMethod,
         example: 'cash',
-        description: 'Payment method',
+        description: 'Payment method (cash or transfer)',
     })
     @IsEnum(PaymentMethod)
     @IsNotEmpty()
@@ -27,27 +27,11 @@ export class ProcessPaymentDto {
 
     @ApiPropertyOptional({
         example: 'TXN123456',
-        description: 'Transaction ID (for card/bank transfer)',
+        description: 'Transaction ID (for bank transfer)',
     })
     @IsString()
     @IsOptional()
     transactionId?: string;
-
-    @ApiPropertyOptional({
-        example: '1234',
-        description: 'Last 4 digits of card number',
-    })
-    @IsString()
-    @IsOptional()
-    cardNumber?: string;
-
-    @ApiPropertyOptional({
-        example: 'John Doe',
-        description: 'Card holder name',
-    })
-    @IsString()
-    @IsOptional()
-    cardHolderName?: string;
 
     @ApiPropertyOptional({
         example: 'Payment via bank transfer',

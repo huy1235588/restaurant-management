@@ -11,27 +11,17 @@ export const BILLING_CONSTANTS = {
     MAX_LIMIT: 100,
 } as const;
 
-// Payment methods configuration
+// Payment methods configuration - Chỉ hỗ trợ tiền mặt và chuyển khoản (có QR)
 export const PAYMENT_METHODS: {
     value: PaymentMethod;
     labelKey: string;
     icon: string;
 }[] = [
-    { value: "cash", labelKey: "billing.paymentMethod.cash", icon: "Banknote" },
-    {
-        value: "card",
-        labelKey: "billing.paymentMethod.card",
-        icon: "CreditCard",
-    },
-    {
-        value: "e-wallet",
-        labelKey: "billing.paymentMethod.eWallet",
-        icon: "Wallet",
-    },
+    { value: "cash", labelKey: "billing.paymentMethods.cash", icon: "Banknote" },
     {
         value: "transfer",
-        labelKey: "billing.paymentMethod.transfer",
-        icon: "ArrowLeftRight",
+        labelKey: "billing.paymentMethods.transfer",
+        icon: "QrCode",
     },
 ];
 

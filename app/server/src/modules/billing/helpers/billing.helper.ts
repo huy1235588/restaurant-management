@@ -212,8 +212,6 @@ export class BillingHelper {
     static getPaymentMethodDisplayName(method: PaymentMethod): string {
         const displayNames: Record<PaymentMethod, string> = {
             cash: 'Tiền mặt',
-            card: 'Thẻ tín dụng/ghi nợ',
-            'e-wallet': 'Ví điện tử',
             transfer: 'Chuyển khoản',
         };
         return displayNames[method] || method;

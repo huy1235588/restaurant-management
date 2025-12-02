@@ -1,13 +1,15 @@
-import { Injectable, Logger, NotFoundException, Inject, forwardRef } from '@nestjs/common';
+import {
+    Injectable,
+    Logger,
+    NotFoundException,
+    Inject,
+    forwardRef,
+} from '@nestjs/common';
 import { BillRepository, FindOptions } from './bill.repository';
 import { PaymentRepository } from './payment.repository';
 import { PrismaService } from '@/database/prisma.service';
 import { CreateBillDto, ApplyDiscountDto, ProcessPaymentDto } from './dto';
-import {
-    PaymentStatus,
-    OrderStatus,
-    TableStatus,
-} from '@/lib/prisma';
+import { PaymentStatus, OrderStatus, TableStatus } from '@/lib/prisma';
 import { ConfigService } from '@nestjs/config';
 import {
     BILLING_CONSTANTS,
@@ -328,8 +330,6 @@ export class BillingService {
                     paymentMethod: paymentData.paymentMethod,
                     amount: paymentData.amount,
                     transactionId: paymentData.transactionId,
-                    cardNumber: paymentData.cardNumber,
-                    cardHolderName: paymentData.cardHolderName,
                     notes: paymentData.notes,
                     status: PaymentStatus.paid,
                 },

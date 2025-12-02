@@ -82,7 +82,7 @@ export function VoidBillDialog({
                             </div>
                             <div>
                                 <span className="text-muted-foreground">
-                                    {t("billing.status")}:{" "}
+                                    {t("billing.statusLabel")}:{" "}
                                 </span>
                                 <span className="font-medium">
                                     {t(`billing.status.${bill.paymentStatus}`)}

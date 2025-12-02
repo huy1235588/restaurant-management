@@ -484,6 +484,7 @@ model RestaurantSettings {
     operatingHours Json?    // Array of { day: string, hours: string }
     socialLinks    Json?    // Array of { platform: string, url: string, icon: string }
     highlights     Json?    // Array of { icon: string, label: string, value: string }
+    bankConfig     Json?    // { bankId: string, bankName: string, accountNo: string, accountName: string, template: string }
     createdAt      DateTime @default(now())
     updatedAt      DateTime @updatedAt
 

@@ -274,7 +274,7 @@ export function BillDetailView({ billId }: BillDetailViewProps) {
                                     </p>
                                     <p className="text-lg">
                                         {bill.paymentMethod
-                                            ? t(`billing.paymentMethod.${bill.paymentMethod}`, bill.paymentMethod)
+                                            ? t(`billing.paymentMethods.${bill.paymentMethod}`, bill.paymentMethod)
                                             : t('billing.notPaid', 'Chưa thanh toán')}
                                     </p>
                                 </div>
@@ -331,7 +331,7 @@ export function BillDetailView({ billId }: BillDetailViewProps) {
                                         >
                                             <div>
                                                 <p className="font-medium">
-                                                    {t(`billing.paymentMethod.${payment.paymentMethod}`, payment.paymentMethod)}
+                                                    {t(`billing.paymentMethods.${payment.paymentMethod}`, payment.paymentMethod)}
                                                 </p>
                                                 <p className="text-sm text-muted-foreground">
                                                     {formatDateTime(payment.createdAt)}

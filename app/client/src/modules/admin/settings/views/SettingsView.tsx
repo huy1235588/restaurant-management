@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
-import { Save, Loader2, Settings, MapPin, Clock, Share2, Image } from 'lucide-react';
+import { Save, Loader2, Settings, MapPin, Clock, Share2, Image, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Form } from '@/components/ui/form';
@@ -22,6 +22,7 @@ import {
     SocialLinksForm,
     HighlightsForm,
     ImagesSettingsForm,
+    BankConfigForm,
 } from '../components';
 
 export function SettingsView() {
@@ -47,6 +48,13 @@ export function SettingsView() {
             operatingHours: [],
             socialLinks: [],
             highlights: [],
+            bankConfig: {
+                bankId: '',
+                bankName: '',
+                accountNo: '',
+                accountName: '',
+                template: 'compact2',
+            },
         },
     });
 
@@ -69,6 +77,13 @@ export function SettingsView() {
                 operatingHours: settings.operatingHours || [],
                 socialLinks: settings.socialLinks || [],
                 highlights: settings.highlights || [],
+                bankConfig: settings.bankConfig || {
+                    bankId: '',
+                    bankName: '',
+                    accountNo: '',
+                    accountName: '',
+                    template: 'compact2',
+                },
             });
         }
     }, [settings, form]);
@@ -91,6 +106,7 @@ export function SettingsView() {
                 operatingHours: data.operatingHours,
                 socialLinks: data.socialLinks,
                 highlights: data.highlights,
+                bankConfig: data.bankConfig?.bankId ? data.bankConfig : undefined,
             });
             toast.success(t('settings.saveSuccess'));
             refetch();
@@ -158,7 +174,7 @@ export function SettingsView() {
             <Form {...form}>
                 <form id="settings-form" onSubmit={form.handleSubmit(onSubmit)}>
                     <Tabs defaultValue="general" className="space-y-6">
-                        <TabsList className="grid w-full grid-cols-5">
+                        <TabsList className="grid w-full grid-cols-6">
                             <TabsTrigger value="general" className="gap-2">
                                 <Settings className="h-4 w-4" />
                                 <span className="hidden sm:inline">
@@ -187,6 +203,12 @@ export function SettingsView() {
                                 <Image className="h-4 w-4" />
                                 <span className="hidden sm:inline">
                                     {t('settings.tabs.images')}
+                                </span>
+                            </TabsTrigger>
+                            <TabsTrigger value="payment" className="gap-2">
+                                <CreditCard className="h-4 w-4" />
+                                <span className="hidden sm:inline">
+                                    {t('settings.tabs.payment', 'Thanh toán')}
                                 </span>
                             </TabsTrigger>
                         </TabsList>
@@ -260,6 +282,20 @@ export function SettingsView() {
                                 </CardHeader>
                                 <CardContent>
                                     <ImagesSettingsForm form={form} />
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+
+                        <TabsContent value="payment">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>{t('settings.tabs.payment', 'Thanh toán')}</CardTitle>
+                                    <CardDescription>
+                                        {t('settings.paymentDescription', 'Cấu hình thông tin thanh toán và mã QR chuyển khoản')}
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <BankConfigForm form={form} />
                                 </CardContent>
                             </Card>
                         </TabsContent>

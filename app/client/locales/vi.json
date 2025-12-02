@@ -434,8 +434,6 @@
         "enterReceivedAmount": "Nhập số tiền nhận từ khách",
         "enterPaymentDetails": "Nhập thông tin thanh toán",
         "receivedAmount": "Số tiền nhận",
-        "cardNumber": "Số thẻ",
-        "cardHolderName": "Tên chủ thẻ",
         "transactionId": "Mã giao dịch",
         "transactionIdPlaceholder": "Nhập mã giao dịch...",
         "confirmPayment": "Xác nhận thanh toán",
@@ -443,6 +441,13 @@
         "paymentSuccessDescription": "Hóa đơn đã được thanh toán thành công",
         "changeToReturn": "Tiền thối trả khách",
         "paymentMethod": "Phương thức thanh toán",
+        "scanQrToPay": "Quét mã QR để thanh toán",
+        "bankAccount": "Số tài khoản",
+        "bankName": "Ngân hàng",
+        "accountHolder": "Chủ tài khoản",
+        "transferAmount": "Số tiền",
+        "transferContent": "Nội dung CK",
+        "bankNotConfigured": "Chưa cấu hình thông tin ngân hàng. Vui lòng cập nhật trong Cài đặt > Thanh toán.",
         "discountType": "Loại giảm giá",
         "percentage": "Phần trăm (%)",
         "fixedAmount": "Số tiền cố định",
@@ -465,6 +470,7 @@
         "printPreview": "Xem trước hóa đơn",
         "printPreviewDescription": "Xem trước hóa đơn trước khi in",
         "invoiceCopy": "Bản in hóa đơn",
+        "statusLabel": "Trạng thái",
         "status": {
             "all": "Tất cả",
             "pending": "Chờ thanh toán",
@@ -474,8 +480,6 @@
         },
         "paymentMethods": {
             "cash": "Tiền mặt",
-            "card": "Thẻ",
-            "e-wallet": "Ví điện tử",
             "transfer": "Chuyển khoản"
         },
         "messages": {
@@ -1060,13 +1064,27 @@
             "contact": "Liên hệ",
             "hours": "Giờ hoạt động",
             "social": "Mạng xã hội",
-            "images": "Hình ảnh"
+            "images": "Hình ảnh",
+            "payment": "Thanh toán"
         },
         "generalDescription": "Thông tin cơ bản về nhà hàng",
         "contactDescription": "Thông tin liên hệ và địa chỉ",
         "hoursDescription": "Giờ hoạt động của nhà hàng",
         "socialDescription": "Liên kết mạng xã hội",
         "imagesDescription": "Hình ảnh hiển thị trên trang chủ",
+        "paymentDescription": "Cấu hình thông tin thanh toán và mã QR chuyển khoản",
+        "bankConfig": {
+            "title": "Cấu hình thanh toán QR",
+            "description": "Cấu hình thông tin ngân hàng để tạo mã QR thanh toán cho khách hàng khi chọn phương thức chuyển khoản.",
+            "bank": "Ngân hàng",
+            "selectBank": "Chọn ngân hàng",
+            "accountNo": "Số tài khoản",
+            "accountName": "Tên chủ tài khoản",
+            "accountNameHint": "Nhập tên không dấu, viết hoa",
+            "template": "Kiểu mã QR",
+            "preview": "Xem trước mã QR",
+            "previewNote": "* Đây là mã QR mẫu với số tiền 100.000đ"
+        },
         "form": {
             "name": "Tên Nhà Hàng",
             "namePlaceholder": "Nhập tên nhà hàng",

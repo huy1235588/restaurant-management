@@ -5,7 +5,7 @@ import { PAYMENT_METHODS } from "../constants";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
-import { Banknote, CreditCard, Wallet, ArrowLeftRight } from "lucide-react";
+import { Banknote, QrCode } from "lucide-react";
 
 interface PaymentMethodSelectorProps {
     selected: PaymentMethod | null;
@@ -15,9 +15,7 @@ interface PaymentMethodSelectorProps {
 
 const iconMap = {
     Banknote,
-    CreditCard,
-    Wallet,
-    ArrowLeftRight,
+    QrCode,
 };
 
 export function PaymentMethodSelector({

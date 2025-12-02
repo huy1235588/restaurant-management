@@ -56,6 +56,34 @@ export class HighlightDto {
     value: string;
 }
 
+export class BankConfigDto {
+    @ApiProperty({ example: '970422', description: 'VietQR Bank ID' })
+    @IsString()
+    @MaxLength(20)
+    bankId: string;
+
+    @ApiProperty({ example: 'MB Bank', description: 'Bank name' })
+    @IsString()
+    @MaxLength(100)
+    bankName: string;
+
+    @ApiProperty({ example: '0123456789', description: 'Bank account number' })
+    @IsString()
+    @MaxLength(30)
+    accountNo: string;
+
+    @ApiProperty({ example: 'NGUYEN VAN A', description: 'Account holder name' })
+    @IsString()
+    @MaxLength(100)
+    accountName: string;
+
+    @ApiPropertyOptional({ example: 'compact2', description: 'VietQR template' })
+    @IsOptional()
+    @IsString()
+    @MaxLength(20)
+    template?: string;
+}
+
 export class UpdateRestaurantSettingsDto {
     @ApiProperty({ example: 'Nhà Hàng Việt Nam', maxLength: 200 })
     @IsString()
@@ -151,4 +179,10 @@ export class UpdateRestaurantSettingsDto {
     @ValidateNested({ each: true })
     @Type(() => HighlightDto)
     highlights?: HighlightDto[];
+
+    @ApiPropertyOptional({ type: BankConfigDto, description: 'Bank configuration for QR payment' })
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => BankConfigDto)
+    bankConfig?: BankConfigDto;
 }

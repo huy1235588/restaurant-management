@@ -10,17 +10,29 @@ import {
     PaymentResult,
 } from "../types";
 
+// API response type
+interface BillsApiResponse {
+    message?: string;
+    items: Bill[];
+    pagination: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
+}
+
 export const billingApi = {
     /**
      * Get all bills with pagination and filters
      */
     getAll: async (params?: BillFilterOptions): Promise<PaginatedBills> => {
-        const response = await axiosInstance.get<
-            PaginatedBills & { message?: string }
-        >("/bills", { params });
+        const response = await axiosInstance.get<BillsApiResponse>("/bills", {
+            params,
+        });
         return {
-            data: response.data.data,
-            meta: response.data.meta,
+            data: response.data.items,
+            meta: response.data.pagination,
         };
     },
 

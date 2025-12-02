@@ -5,3 +5,4 @@ export { SocialLinksForm } from './SocialLinksForm';
 export { HighlightsForm } from './HighlightsForm';
 export { ImagesSettingsForm } from './ImagesSettingsForm';
 export { SettingsImageUpload } from './SettingsImageUpload';
+export { BankConfigForm } from './BankConfigForm';

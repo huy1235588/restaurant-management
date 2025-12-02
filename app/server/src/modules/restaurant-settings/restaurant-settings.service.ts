@@ -38,9 +38,11 @@ export class RestaurantSettingsService {
             heroImage: dto.heroImage,
             aboutImage: dto.aboutImage,
             logoUrl: dto.logoUrl,
-            operatingHours: dto.operatingHours as unknown as Prisma.InputJsonValue,
+            operatingHours:
+                dto.operatingHours as unknown as Prisma.InputJsonValue,
             socialLinks: dto.socialLinks as unknown as Prisma.InputJsonValue,
             highlights: dto.highlights as unknown as Prisma.InputJsonValue,
+            bankConfig: dto.bankConfig as unknown as Prisma.InputJsonValue,
         });
 
         this.logger.log('Restaurant settings updated successfully');

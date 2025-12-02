@@ -1,8 +1,8 @@
 // Payment status enum
 export type PaymentStatus = "pending" | "paid" | "refunded" | "cancelled";
 
-// Payment method enum
-export type PaymentMethod = "cash" | "card" | "e-wallet" | "transfer";
+// Payment method enum - Chỉ hỗ trợ tiền mặt và chuyển khoản (có QR)
+export type PaymentMethod = "cash" | "transfer";
 
 // Menu Item interface (minimal - full version in menu module)
 export interface MenuItem {
@@ -119,8 +119,6 @@ export interface ProcessPaymentDto {
     amount: number;
     paymentMethod: PaymentMethod;
     transactionId?: string;
-    cardNumber?: string;
-    cardHolderName?: string;
     notes?: string;
 }
 

@@ -19,6 +19,14 @@ export interface Highlight {
     value: string;
 }
 
+export interface BankConfig {
+    bankId?: string;
+    bankName?: string;
+    accountNo?: string;
+    accountName?: string;
+    template?: string;
+}
+
 export interface RestaurantSettings {
     id: number;
     name: string;
@@ -36,6 +44,7 @@ export interface RestaurantSettings {
     operatingHours?: OperatingHours[] | null;
     socialLinks?: SocialLink[] | null;
     highlights?: Highlight[] | null;
+    bankConfig?: BankConfig | null;
     createdAt?: string;
     updatedAt?: string;
 }
@@ -56,6 +65,7 @@ export interface UpdateRestaurantSettingsDto {
     operatingHours?: OperatingHours[];
     socialLinks?: SocialLink[];
     highlights?: Highlight[];
+    bankConfig?: BankConfig;
 }
 
 // Form data types matching the DTO
