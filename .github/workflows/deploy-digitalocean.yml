@@ -1,0 +1,214 @@
+name: Deploy to DigitalOcean VPS
+
+on:
+  # Tự động deploy khi push vào main
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'deploy/**'
+      - '.github/workflows/deploy-digitalocean.yml'
+  
+  # Cho phép chạy thủ công
+  workflow_dispatch:
+    inputs:
+      skip_backup:
+        description: 'Skip pre-deployment backup'
+        required: false
+        default: false
+        type: boolean
+      no_build:
+        description: 'Skip Docker image rebuild'
+        required: false
+        default: false
+        type: boolean
+      environment:
+        description: 'Deployment environment'
+        required: false
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+env:
+  APP_DIR: /opt/restaurant-management
+  DEPLOY_USER: root
+
+jobs:
+  # Job 1: Build và test trước khi deploy
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Client image (test)
+        uses: docker/build-push-action@v5
+        with:
+          context: ./app/client
+          file: ./app/client/Dockerfile
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build Server image (test)
+        uses: docker/build-push-action@v5
+        with:
+          context: ./app/server
+          file: ./app/server/Dockerfile
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # Job 2: Deploy lên DigitalOcean
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    environment: 
+      name: ${{ github.event.inputs.environment || 'production' }}
+      url: ${{ secrets.APP_URL }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH Key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DIGITALOCEAN_SSH_KEY }}
+
+      - name: Add VPS to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.DIGITALOCEAN_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Create deployment script
+        run: |
+          cat << 'EOF' > deploy-remote.sh
+          #!/bin/bash
+          set -e
+
+          echo "=== Starting Deployment ==="
+          echo "Time: $(date)"
+          echo "Branch: $GITHUB_REF_NAME"
+          echo "Commit: $GITHUB_SHA"
+
+          # Navigate to app directory
+          cd $APP_DIR
+
+          # Pull latest code
+          echo "=== Pulling latest code ==="
+          git fetch origin
+          git reset --hard origin/$GITHUB_REF_NAME
+
+          # Build deploy flags
+          DEPLOY_FLAGS=""
+          if [ "$SKIP_BACKUP" = "true" ]; then
+            DEPLOY_FLAGS="$DEPLOY_FLAGS --skip-backup"
+          fi
+          if [ "$NO_BUILD" = "true" ]; then
+            DEPLOY_FLAGS="$DEPLOY_FLAGS --no-build"
+          fi
+
+          # Run deploy script
+          echo "=== Running deploy script with flags: $DEPLOY_FLAGS ==="
+          bash deploy/digitalocean/scripts/deploy.sh $DEPLOY_FLAGS
+
+          echo "=== Deployment completed successfully ==="
+          EOF
+          chmod +x deploy-remote.sh
+
+      - name: Deploy to DigitalOcean VPS
+        env:
+          SKIP_BACKUP: ${{ github.event.inputs.skip_backup || 'false' }}
+          NO_BUILD: ${{ github.event.inputs.no_build || 'false' }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          ssh ${{ env.DEPLOY_USER }}@${{ secrets.DIGITALOCEAN_HOST }} \
+            "export APP_DIR='${{ env.APP_DIR }}' && \
+             export SKIP_BACKUP='$SKIP_BACKUP' && \
+             export NO_BUILD='$NO_BUILD' && \
+             export GITHUB_REF_NAME='$GITHUB_REF_NAME' && \
+             export GITHUB_SHA='$GITHUB_SHA' && \
+             bash -s" < deploy-remote.sh
+
+      - name: Health Check
+        run: |
+          echo "=== Running health check ==="
+          sleep 30
+          
+          # Check if health endpoint responds
+          HEALTH_URL="${{ secrets.APP_URL }}/api/v1/health"
+          
+          for i in 1 2 3 4 5; do
+            echo "Attempt $i: Checking $HEALTH_URL"
+            if curl -sf "$HEALTH_URL" > /dev/null 2>&1; then
+              echo "✅ Health check passed!"
+              exit 0
+            fi
+            echo "Waiting 10 seconds before retry..."
+            sleep 10
+          done
+          
+          echo "❌ Health check failed after 5 attempts"
+          exit 1
+
+      - name: Notify on Success
+        if: success()
+        run: |
+          echo "🚀 Deployment successful!"
+          echo "- Environment: ${{ github.event.inputs.environment || 'production' }}"
+          echo "- Branch: ${{ github.ref_name }}"
+          echo "- Commit: ${{ github.sha }}"
+          echo "- URL: ${{ secrets.APP_URL }}"
+
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          echo "❌ Deployment failed!"
+          echo "- Environment: ${{ github.event.inputs.environment || 'production' }}"
+          echo "- Branch: ${{ github.ref_name }}"
+          echo "- Commit: ${{ github.sha }}"
+
+  # Job 3: Rollback nếu cần (chỉ chạy khi deploy fail)
+  rollback:
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: failure()
+    
+    steps:
+      - name: Setup SSH Key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DIGITALOCEAN_SSH_KEY }}
+
+      - name: Add VPS to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.DIGITALOCEAN_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Attempt Rollback
+        run: |
+          echo "=== Attempting rollback ==="
+          ssh ${{ env.DEPLOY_USER }}@${{ secrets.DIGITALOCEAN_HOST }} << 'EOF'
+            cd ${{ env.APP_DIR }}
+            
+            # Get previous commit
+            PREVIOUS_COMMIT=$(git rev-parse HEAD~1)
+            echo "Rolling back to commit: $PREVIOUS_COMMIT"
+            
+            # Reset to previous commit
+            git reset --hard $PREVIOUS_COMMIT
+            
+            # Restart containers without rebuild
+            cd deploy
+            docker compose -f docker-compose.prod.yml restart
+            
+            echo "Rollback completed"
+          EOF
