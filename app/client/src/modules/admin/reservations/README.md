@@ -663,7 +663,7 @@ const handleSeat = async (id: number) => {
         toast.success(RESERVATION_MESSAGES.SUCCESS.ORDER_CREATED);
         
         // Navigate to order page or show order dialog
-        router.push(`/orders/${result.order.orderId}`);
+        router.push(`/admin/orders/${result.order.orderId}`);
     } catch (error) {
         toast.error(RESERVATION_MESSAGES.ERROR.SEAT_FAILED);
     }

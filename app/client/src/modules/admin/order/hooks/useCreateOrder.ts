@@ -26,7 +26,7 @@ export const useCreateOrder = () => {
             toast.success("Tạo đơn hàng thành công");
 
             // Navigate to order detail
-            router.push(`/orders/${order.orderId}`);
+            router.push(`/admin/orders/${order.orderId}`);
         },
         onError: (error: any) => {
             toast.error(

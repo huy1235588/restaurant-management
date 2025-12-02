@@ -168,7 +168,7 @@ export default function MenuPage() {
         if (sortBy) params.set('sortBy', sortBy);
         if (sortOrder) params.set('sortOrder', sortOrder);
 
-        const newUrl = `/menu?${params.toString()}`;
+        const newUrl = `/admin/menu?${params.toString()}`;
         const currentUrl = window.location.pathname + window.location.search;
         
         // Only push if URL actually changed

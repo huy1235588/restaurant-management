@@ -110,7 +110,7 @@ export default function TablesPage() {
             }
         });
 
-        router.push(`/tables?${newSearchParams.toString()}`, { scroll: false });
+        router.push(`/admin/tables?${newSearchParams.toString()}`, { scroll: false });
     }, [router, searchParams]);
 
     // Keyboard shortcuts

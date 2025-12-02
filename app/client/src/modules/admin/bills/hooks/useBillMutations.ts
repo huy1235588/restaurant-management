@@ -32,7 +32,7 @@ export const useCreateBill = () => {
             toast.success(t("billing.messages.billCreated"));
 
             // Navigate to bill detail
-            router.push(`/bills/${bill.billId}`);
+            router.push(`/admin/bills/${bill.billId}`);
         },
         onError: (error: any) => {
             toast.error(
@@ -123,7 +123,7 @@ export const useVoidBill = () => {
             toast.success(t("billing.messages.billVoided"));
 
             // Navigate back to bills list
-            router.push("/bills");
+            router.push("/admin/bills");
         },
         onError: (error: any) => {
             toast.error(

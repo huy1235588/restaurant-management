@@ -34,7 +34,7 @@ export const useCancelOrder = () => {
             toast.success("Hủy đơn hàng thành công");
 
             // Navigate to orders list
-            router.push("/orders");
+            router.push("/admin/orders");
         },
         onError: (error: any) => {
             toast.error(

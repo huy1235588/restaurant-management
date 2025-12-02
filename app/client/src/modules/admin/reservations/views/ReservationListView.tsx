@@ -17,7 +17,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Plus, ChevronLeft, ChevronRight, Calendar, TrendingUp, Keyboard, Maximize2, Minimize2 } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, Calendar, TrendingUp, Keyboard, Maximize2, Minimize2, RefreshCw } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
@@ -36,6 +36,7 @@ export function ReservationListView() {
 
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [showHelpDialog, setShowHelpDialog] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
     // Initialize filters from URL
     const [filters, setFilters] = useState<FilterType>(() => {
@@ -124,6 +125,15 @@ export function ReservationListView() {
             }
         } catch (error) {
             console.error('Fullscreen error:', error);
+        }
+    };
+
+    const handleRefresh = async () => {
+        setIsRefreshing(true);
+        try {
+            await refetch();
+        } finally {
+            setIsRefreshing(false);
         }
     };
 
@@ -225,6 +235,17 @@ export function ReservationListView() {
                     </div>
 
                     <div className="flex items-center gap-2">
+                        <Button
+                            onClick={handleRefresh}
+                            variant="outline"
+                            size="lg"
+                            title={t('common.refresh')}
+                            className="gap-2 text-base"
+                            disabled={isRefreshing}
+                        >
+                            <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                            <span className="hidden sm:inline">{t('common.refresh')}</span>
+                        </Button>
                         <Button
                             onClick={() => setShowHelpDialog(true)}
                             variant="outline"

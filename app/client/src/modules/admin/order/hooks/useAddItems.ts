@@ -33,7 +33,7 @@ export const useAddItems = () => {
             toast.success("Thêm món thành công");
 
             // Navigate back to order detail
-            router.push(`/orders/${order.orderId}`);
+            router.push(`/admin/orders/${order.orderId}`);
         },
         onError: (error: any) => {
             toast.error(error.response?.data?.message || "Thêm món thất bại");
