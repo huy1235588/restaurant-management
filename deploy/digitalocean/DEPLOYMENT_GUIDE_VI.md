@@ -620,7 +620,7 @@ docker logs restaurant_postgres_prod | tail -50
 Thêm dữ liệu mẫu (users, menu items, tables):
 
 ```bash
-docker exec -it restaurant_server_prod npm run seed
+docker exec -it restaurant_server_prod npm run seed:prod
 ```
 
 ---

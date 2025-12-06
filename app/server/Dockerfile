@@ -58,6 +58,7 @@ COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nestjs:nodejs /app/package.json ./package.json
 COPY --from=builder --chown=nestjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nestjs:nodejs /app/prisma.config.ts .
+# dist/prisma contains compiled seed.js for production seeding
 
 # Create uploads directory for file storage
 RUN mkdir -p ./uploads && \
