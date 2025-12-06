@@ -93,6 +93,10 @@ services:
         build:
             context: ../app/client
             dockerfile: Dockerfile
+            args:
+                NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+                NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL}
+                NEXT_PUBLIC_STORAGE_URL: ${NEXT_PUBLIC_STORAGE_URL}
         container_name: restaurant_client_prod
         restart: always
         ports:
@@ -101,6 +105,7 @@ services:
             NODE_ENV: production
             NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
             NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL}
+            NEXT_PUBLIC_STORAGE_URL: ${NEXT_PUBLIC_STORAGE_URL}
             NEXT_TELEMETRY_DISABLED: 1
         networks:
             - restaurant_network

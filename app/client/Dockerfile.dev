@@ -23,10 +23,12 @@ COPY . .
 # Accept build arguments for Next.js environment variables
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_SOCKET_URL
+ARG NEXT_PUBLIC_STORAGE_URL
 
 # Set as environment variables for build
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 ENV NEXT_PUBLIC_SOCKET_URL=${NEXT_PUBLIC_SOCKET_URL}
+ENV NEXT_PUBLIC_STORAGE_URL=${NEXT_PUBLIC_STORAGE_URL}
 
 # Build application (Next.js will embed NEXT_PUBLIC_* variables)
 RUN pnpm run build

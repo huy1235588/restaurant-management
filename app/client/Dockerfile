@@ -25,8 +25,17 @@ COPY --from=deps /app/package.json ./package.json
 # Copy source files
 COPY . .
 
-# Build with telemetry disabled
-ENV NEXT_TELEMETRY_DISABLED=1
+# Build arguments for Next.js public environment variables
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_SOCKET_URL
+ARG NEXT_PUBLIC_STORAGE_URL
+
+# Set environment variables for build
+ENV NEXT_TELEMETRY_DISABLED=1 \
+    NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL} \
+    NEXT_PUBLIC_SOCKET_URL=${NEXT_PUBLIC_SOCKET_URL} \
+    NEXT_PUBLIC_STORAGE_URL=${NEXT_PUBLIC_STORAGE_URL}
+
 RUN pnpm run build
 
 # Stage 3: Runner
