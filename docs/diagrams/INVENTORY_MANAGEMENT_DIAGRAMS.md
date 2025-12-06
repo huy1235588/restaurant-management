@@ -1,5 +1,13 @@
 # Sơ Đồ và Biểu Đồ Quản Lý Tồn Kho
 
+> ⚠️ **CHƯA TRIỂN KHAI**: Module Quản Lý Tồn Kho chưa được triển khai trong phiên bản hiện tại của hệ thống.
+> 
+> Tài liệu này mô tả thiết kế và kiến trúc dự kiến cho các bản phát triển tương lai.
+> 
+> **Trạng thái**: Thiết kế hoàn chỉnh, chờ triển khai
+
+---
+
 ## 1. Giới Thiệu
 
 Tài liệu này cung cấp các sơ đồ trực quan để hiểu rõ hơn về quy trình và nghiệp vụ quản lý tồn kho trong hệ thống nhà hàng.

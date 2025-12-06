@@ -1,5 +1,7 @@
 # Tài Liệu Chi Tiết Quản Lý Đơn Hàng
 
+> **Lưu ý**: Tài liệu này đã được cập nhật để phản ánh chính xác hệ thống đã triển khai thực tế (Tháng 6/2025).
+
 ## 1. Giới Thiệu
 
 Hệ thống quản lý đơn hàng là trung tâm của ứng dụng quản lý nhà hàng, kết nối giữa khách hàng, nhân viên phục vụ, bếp và thanh toán. Hệ thống cho phép tạo, theo dõi và quản lý toàn bộ vòng đời của đơn hàng từ khi khách gọi món cho đến khi hoàn tất thanh toán. Đây là module quan trọng nhất, đảm bảo quy trình phục vụ diễn ra mượt mà và chính xác.
@@ -13,42 +15,45 @@ Hệ thống quản lý đơn hàng là trung tâm của ứng dụng quản lý
 -   **Định nghĩa**: Yêu cầu đặt món ăn/đồ uống của khách hàng tại nhà hàng
 -   **Mục đích**: Quản lý và theo dõi các món khách gọi, truyền thông tin đến bếp
 -   **Thông tin chứa**:
-    -   Số đơn hàng (Order Number)
-    -   Bàn (Table)
-    -   Nhân viên phục vụ (Waiter/Staff)
-    -   Đặt bàn liên kết (Reservation - nếu có)
-    -   Tên khách hàng (Customer Name)
-    -   Số điện thoại khách (Customer Phone)
-    -   Số lượng khách (Head Count)
-    -   Trạng thái (Status)
-    -   Ghi chú (Notes)
-    -   Thời gian đặt (Order Time)
-    -   Thời gian xác nhận (Confirmed At)
-    -   Thời gian hoàn tất (Completed At)
+    -   Số đơn hàng (orderNumber) - Tự động sinh
+    -   Bàn (tableId)
+    -   Nhân viên phục vụ (staffId)
+    -   Đặt bàn liên kết (reservationId - nếu có)
+    -   Tên khách hàng (customerName)
+    -   Số điện thoại khách (customerPhone)
+    -   Số lượng khách (partySize)
+    -   Trạng thái (status): `pending`, `confirmed`, `completed`, `cancelled`
+    -   Ghi chú (notes)
+    -   Các giá trị tiền (totalAmount, discountAmount, taxAmount, finalAmount)
+    -   Thời gian đặt (orderTime)
+    -   Thời gian xác nhận (confirmedAt)
+    -   Thời gian hoàn tất (completedAt)
+    -   Thời gian hủy (cancelledAt)
+    -   Lý do hủy (cancellationReason)
 
 ### 2.2 Chi Tiết Đơn Hàng (Order Items)
 
 -   **Định nghĩa**: Danh sách các món ăn/đồ uống trong đơn hàng
 -   **Mục đích**: Ghi nhận chi tiết từng món khách gọi
 -   **Thông tin chứa**:
-    -   Món ăn (Menu Item)
-    -   Số lượng (Quantity)
-    -   Đơn giá (Unit Price)
-    -   Tổng tiền (Subtotal)
-    -   Yêu cầu đặc biệt (Special Request)
-    -   Trạng thái (Status)
+    -   Món ăn (itemId)
+    -   Số lượng (quantity)
+    -   Đơn giá (unitPrice)
+    -   Tổng tiền (totalPrice)
+    -   Yêu cầu đặc biệt (specialRequest)
+    -   Trạng thái (status): `pending`, `ready`, `cancelled`
 
 ### 2.3 Đơn Bếp (Kitchen Orders)
 
--   **Định nghĩa**: Đơn hàng được chuyển đến bếp để chuẩn bị
+-   **Định nghĩa**: Đơn hàng được chuyển đến bếp để chuẩn bị (quan hệ 1-1 với Order)
 -   **Mục đích**: Quản lý quy trình nấu nướng, theo dõi tiến độ
 -   **Thông tin chứa**:
-    -   Đơn hàng liên kết (Order)
-    -   Đầu bếp phụ trách (Chef/Staff)
-    -   Độ ưu tiên (Priority)
-    -   Trạng thái (Status)
-    -   Thời gian bắt đầu (Start Time)
-    -   Thời gian hoàn tất (Complete Time)
+    -   Đơn hàng liên kết (orderId) - Unique, 1-1 với Order
+    -   Đầu bếp phụ trách (staffId)
+    -   Trạng thái (status): `pending`, `preparing`, `ready`, `completed`
+    -   Thời gian chuẩn bị thực tế (prepTimeActual)
+    -   Thời gian bắt đầu (startedAt)
+    -   Thời gian hoàn tất (completedAt)
 
 ---
 
@@ -877,54 +882,82 @@ Hệ thống quản lý đơn hàng là trung tâm của ứng dụng quản lý
 
 ---
 
-## 6. Công Nghệ và Công Cụ
+## 6. Công Nghệ và Công Cụ (Đã triển khai)
 
 ### 6.1 Công Nghệ Sử Dụng
 
--   **Frontend**: Next.js, React, TypeScript, Tailwind CSS
--   **Backend**: Node.js, Express, TypeScript
--   **Database**: PostgreSQL, Prisma ORM
--   **Real-time**: Socket.io (cập nhật trạng thái real-time)
--   **Notification**: Web Push API (thông báo cho nhân viên/bếp)
--   **Printer**: Thermal Printer API (in phiếu order)
--   **QR Code**: QRCode.js (mã QR trên bàn để đặt món)
+-   **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
+-   **State Management**: Zustand
+-   **Backend**: NestJS, TypeScript
+-   **Database**: PostgreSQL với Prisma ORM
+-   **Real-time**: NestJS WebSocket Gateway (Socket.io adapter)
+-   **Authentication**: JWT (Access Token 15 phút, Refresh Token 7 ngày)
 
-### 6.2 Tích Hợp
+### 6.2 Các Module Liên Quan
 
--   **POS System**: Tích hợp với hệ thống thanh toán
--   **Kitchen Display System (KDS)**: Màn hình hiển thị đơn cho bếp
--   **Mobile App**: App cho nhân viên phục vụ
--   **Customer App**: App cho khách đặt món online
+-   **OrderController**: Quản lý CRUD đơn hàng (`/orders`)
+-   **KitchenController**: Quản lý đơn bếp (`/kitchen/orders`)
+-   **OrderGateway**: WebSocket cho cập nhật real-time
+-   **KitchenGateway**: WebSocket cho màn hình bếp
+-   **OrderService**: Business logic xử lý đơn
+-   **KitchenService**: Business logic xử lý bếp
+
+### 6.3 API Endpoints
+
+**Order Controller:**
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| GET | `/orders/count` | Đếm đơn theo filter |
+| GET | `/orders` | Danh sách đơn (pagination) |
+| GET | `/orders/:id` | Chi tiết đơn |
+| POST | `/orders` | Tạo đơn mới |
+| PATCH | `/orders/:id/items` | Thêm món |
+| DELETE | `/orders/:id/items/:itemId` | Hủy món |
+| DELETE | `/orders/:id` | Hủy đơn |
+| PATCH | `/orders/:id/status` | Cập nhật trạng thái |
+| PATCH | `/orders/:id/items/:itemId/serve` | Đánh dấu đã phục vụ |
+
+**Kitchen Controller:**
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| GET | `/kitchen/orders` | Danh sách đơn bếp |
+| GET | `/kitchen/orders/:id` | Chi tiết đơn bếp |
+| PATCH | `/kitchen/orders/:id/start` | Bắt đầu chuẩn bị |
+| PATCH | `/kitchen/orders/:id/complete` | Hoàn tất |
+| PATCH | `/kitchen/orders/:id/cancel` | Hủy đơn bếp |
 
 ---
 
 ## 7. Bảng Tóm Tắt Lỗi và Xử Lý
 
-| Lỗi                         | Nguyên Nhân                  | Cách Xử Lý                                  |
-| --------------------------- | ---------------------------- | ------------------------------------------- |
-| Món ăn hết hàng             | Nguyên liệu hết              | Cập nhật trạng thái món, đề xuất món khác   |
-| Không gửi được đơn đến bếp  | Lỗi kết nối                  | Gửi lại hoặc in phiếu order thủ công        |
-| Bàn không tồn tại           | Dữ liệu không chính xác      | Kiểm tra lại số bàn                         |
-| Không thể hủy món           | Món đã hoàn tất              | Chuyển sang quy trình hoàn món              |
-| Giỏ hàng trống              | Chưa chọn món                | Yêu cầu chọn ít nhất một món                |
-| Đơn hàng đã thanh toán      | Không thể sửa/hủy            | Thông báo đơn đã thanh toán                 |
-| Tính tổng tiền sai          | Lỗi tính toán                | Kiểm tra lại giá món và số lượng            |
-| Không in được phiếu         | Lỗi máy in                   | Kiểm tra kết nối máy in, gửi email dự phòng |
+| Lỗi | Nguyên Nhân | Xử Lý | Exception Class |
+|-----|-------------|-------|-----------------|
+| Order not found | ID không tồn tại | Trả về 404 | `OrderNotFoundException` |
+| Order item not found | Item ID không tồn tại | Trả về 404 | `OrderItemNotFoundException` |
+| Table not found | Table ID không tồn tại | Trả về 404 | `TableNotFoundException` |
+| Table occupied | Bàn đang có khách | Trả về 400 | `TableOccupiedException` |
+| Cannot modify completed | Đơn đã hoàn tất | Trả về 400 | `CannotModifyCompletedOrderException` |
+| Cannot modify cancelled | Đơn đã hủy | Trả về 400 | `CannotModifyCancelledOrderException` |
+| Already cancelled | Đơn đã bị hủy trước đó | Trả về 400 | `OrderAlreadyCancelledException` |
+| Bill already created | Đơn đã có hóa đơn | Trả về 400 | `BillAlreadyCreatedException` |
+| Invalid status | Trạng thái không hợp lệ | Trả về 400 | `InvalidOrderStatusException` |
 
 ---
 
-## 8. Tính Năng Nâng Cao (Trong Tương Lai)
+## 8. Tính Năng Chưa Triển Khai (Trong Tương Lai)
+
+> **Lưu ý**: Các tính năng dưới đây chưa được triển khai trong phiên bản hiện tại.
 
 -   **Self-ordering (Khách tự đặt)**: Khách scan QR trên bàn và tự đặt món
 -   **AI Menu Recommendation**: Gợi ý món dựa trên lịch sử và sở thích
 -   **Voice Order**: Nhân viên đặt món bằng giọng nói
 -   **Multi-language Menu**: Menu đa ngôn ngữ cho khách quốc tế
--   **Allergen Alert**: Cảnh báo món có thành phần gây dị ứng
+-   **Thermal Printer Integration**: In phiếu order tự động
 -   **Combo/Bundle Deal**: Tự động áp dụng combo khi đủ điều kiện
 -   **Split Bill by Item**: Chia hóa đơn theo từng món
--   **Kitchen Video**: Camera theo dõi tiến độ nấu
 -   **Predictive Ordering**: Dự đoán nhu cầu nguyên liệu dựa trên đơn hàng
 -   **Customer Feedback**: Khách đánh giá món ăn ngay sau khi ăn
+-   **Mobile App**: App riêng cho nhân viên phục vụ
 
 ---
 

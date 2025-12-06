@@ -1,5 +1,18 @@
 # Biểu Đồ Quản Lý Đơn Hàng
 
+> **Lưu ý**: Tài liệu này đã được cập nhật để phản ánh chính xác hệ thống đã triển khai thực tế (Tháng 6/2025).
+
+## Mục lục
+
+1. [Biểu Đồ Quy Trình Tổng Thể (Flowchart)](#1-biểu-đồ-quy-trình-tổng-thể-flowchart)
+2. [Biểu Đồ Use Case](#2-biểu-đồ-use-case)
+3. [Biểu Đồ Tuần Tự (Sequence Diagram)](#3-biểu-đồ-tuần-tự-sequence-diagram)
+4. [Biểu Đồ Trạng Thái (State Diagram)](#4-biểu-đồ-trạng-thái-state-diagram)
+5. [Biểu Đồ Hoạt Động (Activity Diagram)](#5-biểu-đồ-hoạt-động-activity-diagram)
+6. [Biểu Đồ Thành Phần (Component Diagram)](#6-biểu-đồ-thành-phần-component-diagram)
+
+---
+
 ## 1. Biểu Đồ Quy Trình Tổng Thể (Flowchart)
 
 ```mermaid
@@ -36,13 +49,15 @@ flowchart TD
 
 ## 2. Biểu Đồ Quản Lý Đơn Hàng (Sequence Diagram)
 
+### 2.1 Tạo Đơn Hàng và Xử Lý Bếp
+
 ```mermaid
 sequenceDiagram
     actor Waiter as Nhân Viên Phục Vụ
     actor Customer as Khách Hàng
     participant UI as Giao Diện
-    participant API as Backend API
-    participant DB as Database
+    participant API as NestJS API
+    participant DB as PostgreSQL
     participant Kitchen as Bếp (KDS)
     participant Socket as WebSocket
 
@@ -54,182 +69,141 @@ sequenceDiagram
     API -->> UI: Trạng thái bàn
     
     Waiter ->> UI: Chọn món từ menu
-    Waiter ->> UI: Nhập số lượng & yêu cầu
+    Waiter ->> UI: Nhập số lượng & yêu cầu đặc biệt
     Waiter ->> UI: Xác nhận đơn
     UI ->> API: POST /orders
+    Note right of API: {tableId, partySize, items[], notes}
     
-    API ->> DB: Tạo đơn hàng
-    DB -->> API: Order ID
+    API ->> DB: Tạo đơn hàng (status: pending)
+    DB -->> API: Order với orderNumber tự động
     API ->> DB: Tạo order items
-    API ->> DB: Cập nhật trạng thái bàn
+    API ->> DB: Cập nhật table status = occupied
+    API ->> DB: Tạo kitchen order (status: pending)
     
-    par Gửi đến Bếp
-        API ->> DB: Tạo kitchen order
-        API ->> Socket: Emit new order
-        Socket -->> Kitchen: Thông báo đơn mới
+    par Thông báo Real-time
+        API ->> Socket: Emit ORDER_CREATED
+        Socket -->> Kitchen: Hiển thị đơn mới
     end
     
     API -->> UI: Thành công
     UI -->> Waiter: Hiển thị đơn hàng
     
-    Note over Kitchen: Bếp xử lý đơn
-    Kitchen ->> API: PUT /kitchen-orders/:id/start
-    API ->> DB: Cập nhật trạng thái
-    API ->> Socket: Emit order preparing
+    Note over Kitchen: Đầu bếp nhận đơn
+    Kitchen ->> API: PATCH /kitchen/orders/:id/start
+    API ->> DB: status = preparing, startedAt = now
+    API ->> Socket: Emit KITCHEN_ORDER_UPDATED
     Socket -->> UI: Cập nhật trạng thái
     
-    Kitchen ->> API: PUT /kitchen-orders/:id/complete
-    API ->> DB: Cập nhật hoàn tất
-    API ->> Socket: Emit order ready
+    Kitchen ->> API: PATCH /kitchen/orders/:id/complete
+    API ->> DB: status = completed, prepTimeActual
+    API ->> Socket: Emit KITCHEN_ORDER_COMPLETED
     Socket -->> UI: Thông báo món xong
     
-    Waiter ->> UI: Xác nhận lấy món
-    UI ->> API: PUT /orders/:id/pickup
-    API ->> DB: Cập nhật trạng thái
-    
-    Waiter ->> Customer: Phục vụ món ăn
-    Waiter ->> UI: Xác nhận đã phục vụ
-    UI ->> API: PUT /orders/:id/served
-    API ->> DB: Cập nhật trạng thái
+    Waiter ->> UI: Xác nhận đã phục vụ món
+    UI ->> API: PATCH /orders/:id/items/:itemId/serve
+    API ->> DB: Cập nhật trạng thái item = ready
     API -->> UI: Hoàn tất
 ```
 
 ---
 
-## 3. Biểu Đồ Trạng Thái Đơn Hàng (State Diagram)
+## 3. Biểu Đồ Trạng Thái (State Diagram)
+
+### 3.1 Trạng Thái Đơn Hàng (OrderStatus)
+
+> **Lưu ý**: Hệ thống sử dụng 4 trạng thái đơn hàng chính. Trạng thái "Preparing" và "Ready" được quản lý riêng trong KitchenOrder.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Pending: Tạo đơn mới
+    [*] --> pending: Tạo đơn mới
     
-    Pending --> Confirmed: Xác nhận đơn
-    Pending --> Cancelled: Hủy đơn
+    pending --> confirmed: Xác nhận đơn
+    pending --> cancelled: Hủy đơn
     
-    Confirmed --> Preparing: Bếp bắt đầu nấu
-    Confirmed --> Cancelled: Hủy đơn
+    confirmed --> completed: Hoàn tất thanh toán
+    confirmed --> cancelled: Hủy đơn
     
-    Preparing --> Ready: Nấu xong
-    Preparing --> Cancelled: Hủy đơn (phí phát sinh)
+    completed --> [*]
+    cancelled --> [*]
     
-    Ready --> Served: Đã phục vụ khách
-    
-    Served --> Completed: Hoàn tất & thanh toán
-    
-    Completed --> [*]
-    Cancelled --> [*]
-    
-    note right of Pending
+    note right of pending
         Đơn vừa tạo
-        Chờ xác nhận
+        Đã gửi đến bếp
     end note
     
-    note right of Confirmed
+    note right of confirmed
         Đã xác nhận
-        Chờ gửi bếp
+        Bếp đang xử lý
     end note
     
-    note right of Preparing
-        Bếp đang nấu
-        Cập nhật tiến độ
+    note right of completed
+        Đã thanh toán
+        Hoàn tất
     end note
     
-    note right of Ready
-        Món đã xong
-        Chờ nhân viên lấy
-    end note
-    
-    note right of Served
-        Đã phục vụ khách
-        Chờ thanh toán
+    note right of cancelled
+        Đã hủy
+        Lưu lý do hủy
     end note
 ```
 
----
-
-## 4. Biểu Đồ Cấu Trúc Dữ Liệu (Entity Relationship)
+### 3.2 Trạng Thái Đơn Bếp (KitchenOrderStatus)
 
 ```mermaid
-erDiagram
-    ORDER ||--o{ ORDER_ITEM : contains
-    ORDER ||--|| KITCHEN_ORDER : "sent to"
-    ORDER }o--|| RESTAURANT_TABLE : "placed at"
-    ORDER }o--o| STAFF : "served by"
-    ORDER }o--o| RESERVATION : "linked to"
-    ORDER ||--o| BILL : "generates"
+stateDiagram-v2
+    [*] --> pending: Nhận từ Order
     
-    ORDER_ITEM }o--|| MENU_ITEM : references
-    KITCHEN_ORDER }o--o| STAFF : "assigned to"
+    pending --> preparing: Đầu bếp bắt đầu
+    preparing --> ready: Nấu xong
+    ready --> completed: Đã giao
+    
+    pending --> [*]: Đơn bị hủy
+    preparing --> [*]: Đơn bị hủy
+    
+    note right of pending
+        Chờ đầu bếp nhận
+    end note
+    
+    note right of preparing
+        Đang nấu
+        Ghi nhận thời gian bắt đầu
+    end note
+    
+    note right of ready
+        Sẵn sàng phục vụ
+        Thông báo nhân viên
+    end note
+    
+    note right of completed
+        Đã phục vụ xong
+        Tính thời gian thực tế
+    end note
+```
 
-    ORDER {
-        int orderId PK
-        string orderNumber UK
-        int tableId FK
-        int staffId FK
-        int reservationId FK
-        string customerName
-        string customerPhone
-        int headCount
-        string status
-        string notes
-        timestamp orderTime
-        timestamp confirmedAt
-        timestamp completedAt
-        timestamp createdAt
-        timestamp updatedAt
-    }
+### 3.3 Trạng Thái Món (OrderItemStatus)
 
-    ORDER_ITEM {
-        int orderItemId PK
-        int orderId FK
-        int itemId FK
-        int quantity
-        decimal unitPrice
-        decimal subtotal
-        string specialRequest
-        string status
-        timestamp createdAt
-        timestamp updatedAt
-    }
-
-    KITCHEN_ORDER {
-        int kitchenOrderId PK
-        int orderId FK
-        int staffId FK
-        int priority
-        string status
-        timestamp startTime
-        timestamp completedTime
-        timestamp createdAt
-    }
-
-    RESTAURANT_TABLE {
-        int tableId PK
-        string tableNumber UK
-        string status
-    }
-
-    MENU_ITEM {
-        int itemId PK
-        string name
-        decimal price
-    }
-
-    STAFF {
-        int staffId PK
-        string name
-        string role
-    }
-
-    RESERVATION {
-        int reservationId PK
-        string reservationCode UK
-    }
-
-    BILL {
-        int billId PK
-        int orderId FK
-        decimal totalAmount
-    }
+```mermaid
+stateDiagram-v2
+    [*] --> pending: Thêm món vào đơn
+    
+    pending --> ready: Bếp báo sẵn sàng
+    pending --> cancelled: Hủy món
+    
+    ready --> [*]
+    cancelled --> [*]
+    
+    note right of pending
+        Chờ chế biến
+    end note
+    
+    note right of ready
+        Đã sẵn sàng
+        Chờ phục vụ
+    end note
+    
+    note right of cancelled
+        Đã hủy
+    end note
 ```
 
 ---
@@ -268,7 +242,7 @@ graph LR
 
 ---
 
-## 6. Biểu Đồ Quy Trình Bếp (Kitchen Flow)
+## 5. Biểu Đồ Quy Trình Bếp (Kitchen Flow)
 
 ```mermaid
 flowchart TD
@@ -447,58 +421,58 @@ timeline
 
 ## 11. Biểu Đồ Kiến Trúc Hệ Thống (Component Diagram)
 
+> **Lưu ý**: Kiến trúc thực tế sử dụng NestJS (Backend) và Next.js (Frontend)
+
 ```mermaid
 graph TB
-    subgraph Client["📱 Frontend Apps"]
-        WaiterApp["👨‍💼 Waiter App"]
-        KitchenApp["👨‍🍳 Kitchen Display"]
-        CustomerApp["👤 Customer App"]
-        ManagerApp["💼 Manager Dashboard"]
+    subgraph Client["📱 Frontend (Next.js 15)"]
+        WaiterUI["👨‍💼 Order Management UI"]
+        KitchenUI["👨‍🍳 Kitchen Display (KDS)"]
+        ManagerUI["💼 Manager Dashboard"]
     end
 
-    subgraph API["🔌 Backend Services"]
-        OrderAPI["📋 Order Service"]
-        KitchenAPI["🍳 Kitchen Service"]
-        MenuAPI["🍽️ Menu Service"]
-        NotificationAPI["🔔 Notification Service"]
+    subgraph Gateway["🔌 NestJS WebSocket"]
+        OrderGateway["📋 OrderGateway"]
+        KitchenGateway["🍳 KitchenGateway"]
+    end
+
+    subgraph API["🔌 NestJS Controllers"]
+        OrderController["📋 OrderController"]
+        KitchenController["🍳 KitchenController"]
+        TableController["🪑 TableController"]
+    end
+
+    subgraph Services["💼 NestJS Services"]
+        OrderService["📋 OrderService"]
+        KitchenService["🍳 KitchenService"]
     end
 
     subgraph Data["💾 Data Layer"]
-        OrderDB["📊 Order Database"]
-        Cache["⚡ Redis Cache"]
-        Queue["📬 Message Queue"]
+        Prisma["📊 Prisma ORM"]
+        PostgreSQL["🐘 PostgreSQL"]
     end
 
-    subgraph External["🌐 External"]
-        Printer["🖨️ Thermal Printer"]
-        Socket["📡 WebSocket Server"]
-        Push["📱 Push Notification"]
-    end
-
-    WaiterApp --> OrderAPI
-    KitchenApp --> KitchenAPI
-    CustomerApp --> OrderAPI
-    ManagerApp --> OrderAPI
+    WaiterUI --> OrderController
+    WaiterUI <--> OrderGateway
+    KitchenUI --> KitchenController
+    KitchenUI <--> KitchenGateway
+    ManagerUI --> OrderController
     
-    OrderAPI --> OrderDB
-    OrderAPI --> Cache
-    OrderAPI --> Queue
-    OrderAPI --> Socket
+    OrderController --> OrderService
+    KitchenController --> KitchenService
     
-    KitchenAPI --> OrderDB
-    KitchenAPI --> Socket
-    KitchenAPI --> Queue
+    OrderService --> Prisma
+    KitchenService --> Prisma
+    OrderService --> OrderGateway
+    KitchenService --> KitchenGateway
     
-    NotificationAPI --> Push
-    NotificationAPI --> Socket
-    
-    OrderAPI --> Printer
-    OrderAPI --> MenuAPI
+    Prisma --> PostgreSQL
     
     style Client fill:#e3f2fd
+    style Gateway fill:#fff3e0
     style API fill:#f3e5f5
-    style Data fill:#e8f5e9
-    style External fill:#fff3e0
+    style Services fill:#e8f5e9
+    style Data fill:#fce4ec
 ```
 
 ---
@@ -683,6 +657,78 @@ flowchart TD
     
     style A fill:#e3f2fd
     style H fill:#f3e5f5
+```
+
+---
+
+## 17. API Reference (Đã triển khai thực tế)
+
+### 17.1 Order Controller (`/orders`)
+
+| Method | Endpoint | Mô tả | Roles |
+|--------|----------|-------|-------|
+| GET | `/orders/count` | Đếm số đơn theo filter | admin, manager, waiter |
+| GET | `/orders` | Lấy danh sách đơn (pagination) | admin, manager, waiter |
+| GET | `/orders/:id` | Lấy chi tiết đơn | admin, manager, waiter |
+| POST | `/orders` | Tạo đơn hàng mới | admin, manager, waiter |
+| PATCH | `/orders/:id/items` | Thêm món vào đơn | admin, manager, waiter |
+| DELETE | `/orders/:id/items/:itemId` | Hủy món trong đơn | admin, manager, waiter |
+| DELETE | `/orders/:id` | Hủy toàn bộ đơn | admin, manager |
+| PATCH | `/orders/:id/status` | Cập nhật trạng thái đơn | admin, manager |
+| PATCH | `/orders/:id/items/:itemId/serve` | Đánh dấu món đã phục vụ | admin, manager, waiter |
+
+### 17.2 Kitchen Controller (`/kitchen`)
+
+| Method | Endpoint | Mô tả | Roles |
+|--------|----------|-------|-------|
+| GET | `/kitchen/orders` | Lấy danh sách đơn bếp | admin, manager, chef, waiter |
+| GET | `/kitchen/orders/:id` | Lấy chi tiết đơn bếp | admin, manager, chef, waiter |
+| PATCH | `/kitchen/orders/:id/start` | Bắt đầu chuẩn bị | admin, manager, chef |
+| PATCH | `/kitchen/orders/:id/complete` | Hoàn tất đơn bếp | admin, manager, chef |
+| PATCH | `/kitchen/orders/:id/cancel` | Hủy đơn bếp | admin, manager, chef |
+
+### 17.3 WebSocket Events
+
+| Namespace | Event | Mô tả |
+|-----------|-------|-------|
+| `/orders` | `ORDER_CREATED` | Đơn mới được tạo |
+| `/orders` | `ORDER_UPDATED` | Đơn được cập nhật |
+| `/orders` | `ORDER_CANCELLED` | Đơn bị hủy |
+| `/orders` | `ITEM_ADDED` | Món mới được thêm |
+| `/orders` | `ITEM_CANCELLED` | Món bị hủy |
+| `/orders` | `KITCHEN_ORDER_UPDATED` | Trạng thái bếp thay đổi |
+| `/orders` | `KITCHEN_ORDER_COMPLETED` | Bếp hoàn tất |
+
+### 17.4 Request/Response Examples
+
+**Tạo đơn hàng mới:**
+```json
+POST /orders
+{
+  "tableId": 5,
+  "partySize": 4,
+  "customerName": "Nguyễn Văn A",
+  "customerPhone": "0901234567",
+  "notes": "Bàn cửa sổ",
+  "items": [
+    { "itemId": 1, "quantity": 2, "specialRequest": "Ít cay" },
+    { "itemId": 3, "quantity": 1 }
+  ]
+}
+```
+
+**Response thành công:**
+```json
+{
+  "orderId": 123,
+  "orderNumber": "ORD-20250610-001",
+  "status": "pending",
+  "table": { "tableId": 5, "tableNumber": "A5" },
+  "partySize": 4,
+  "items": [...],
+  "totalAmount": 350000,
+  "createdAt": "2025-06-10T10:30:00Z"
+}
 ```
 
 ---

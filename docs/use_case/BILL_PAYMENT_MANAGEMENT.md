@@ -1,5 +1,7 @@
 # Tài Liệu Chi Tiết Quản Lý Hóa Đơn và Thanh Toán
 
+> **Lưu ý**: Tài liệu này đã được cập nhật để phản ánh chính xác hệ thống đã triển khai thực tế (Tháng 6/2025).
+
 ## 1. Giới Thiệu
 
 Hệ thống quản lý hóa đơn và thanh toán là bộ phận quan trọng cuối cùng trong quy trình phục vụ khách hàng tại nhà hàng. Hệ thống cho phép tạo hóa đơn từ đơn hàng, xử lý nhiều phương thức thanh toán, áp dụng giảm giá, phí dịch vụ, thuế, và quản lý các tình huống đặc biệt như thanh toán một phần, chia hóa đơn, hoàn tiền. Đây là điểm cuối trong chuỗi dịch vụ, đảm bảo doanh thu được ghi nhận chính xác và khách hàng có trải nghiệm thanh toán thuận tiện.
@@ -13,22 +15,22 @@ Hệ thống quản lý hóa đơn và thanh toán là bộ phận quan trọng 
 -   **Định nghĩa**: Chứng từ tài chính ghi nhận chi tiết các món ăn/dịch vụ khách đã sử dụng và số tiền phải thanh toán
 -   **Mục đích**: Ghi nhận doanh thu, cung cấp chứng từ cho khách và kế toán
 -   **Thông tin chứa**:
-    -   Số hóa đơn (Bill Number)
-    -   Đơn hàng liên kết (Order)
-    -   Bàn (Table)
-    -   Thu ngân (Cashier/Staff)
-    -   Tổng tiền món ăn (Subtotal)
-    -   Thuế (Tax Amount & Tax Rate)
-    -   Giảm giá (Discount Amount)
-    -   Phí dịch vụ (Service Charge)
-    -   Tổng tiền (Total Amount)
-    -   Tiền đã thanh toán (Paid Amount)
-    -   Tiền thối (Change Amount)
-    -   Trạng thái thanh toán (Payment Status)
-    -   Phương thức thanh toán (Payment Method)
-    -   Ghi chú (Notes)
-    -   Thời gian tạo (Created At)
-    -   Thời gian thanh toán (Paid At)
+    -   Số hóa đơn (billNumber) - Tự động sinh UUID
+    -   Đơn hàng liên kết (orderId) - Quan hệ 1-1 với Order
+    -   Bàn (tableId)
+    -   Thu ngân (staffId)
+    -   Tổng tiền món ăn (subtotal)
+    -   Thuế (taxAmount & taxRate)
+    -   Giảm giá (discountAmount)
+    -   Phí dịch vụ (serviceCharge)
+    -   Tổng tiền (totalAmount)
+    -   Tiền đã thanh toán (paidAmount)
+    -   Tiền thối (changeAmount)
+    -   Trạng thái thanh toán (paymentStatus): `pending`, `paid`, `refunded`, `cancelled`
+    -   Phương thức thanh toán (paymentMethod): `cash`, `card`, `momo`, `bank_transfer`
+    -   Ghi chú (notes)
+    -   Thời gian tạo (createdAt)
+    -   Thời gian thanh toán (paidAt)
 
 ### 2.2 Chi Tiết Hóa Đơn (Bill Items)
 
@@ -764,24 +766,32 @@ Hẹn gặp lại!
 
 ---
 
-## 6. Công Nghệ và Công Cụ
+## 6. Công Nghệ và Công Cụ (Đã triển khai)
 
 ### 6.1 Công Nghệ Sử Dụng
 
--   **Frontend**: Next.js, React, TypeScript, Tailwind CSS
--   **Backend**: Node.js, Express, TypeScript
--   **Database**: PostgreSQL, Prisma ORM
--   **Payment Gateway**: VNPay, MoMo, ZaloPay API
--   **Printer**: Thermal Printer API (ESC/POS)
--   **PDF Generation**: PDFKit, Puppeteer
--   **Reporting**: Chart.js, Recharts
+-   **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
+-   **State Management**: Zustand
+-   **Backend**: NestJS, TypeScript
+-   **Database**: PostgreSQL với Prisma ORM
+-   **Authentication**: JWT (Access Token 15 phút, Refresh Token 7 ngày)
 
-### 6.2 Tích Hợp
+### 6.2 Các Module Liên Quan
 
--   **POS Terminal**: Tích hợp máy POS cho thanh toán thẻ
--   **E-wallet Gateway**: API các ví điện tử
--   **Accounting Software**: Tích hợp phần mềm kế toán
--   **Email Service**: Gửi hóa đơn qua email
+-   **BillingController**: Quản lý CRUD hóa đơn (`/bills`)
+-   **BillingService**: Business logic xử lý hóa đơn và thanh toán
+-   **Payment model**: Lưu trữ giao dịch thanh toán
+
+### 6.3 API Endpoints
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| GET | `/bills` | Danh sách hóa đơn (pagination) |
+| GET | `/bills/:id` | Chi tiết hóa đơn |
+| POST | `/bills` | Tạo hóa đơn từ Order |
+| PATCH | `/bills/:id/discount` | Áp dụng giảm giá |
+| POST | `/bills/:id/payment` | Xử lý thanh toán |
+| DELETE | `/bills/:id` | Hủy hóa đơn (admin only) |
 
 ---
 
@@ -800,18 +810,20 @@ Hẹn gặp lại!
 
 ---
 
-## 8. Tính Năng Nâng Cao (Trong Tương Lai)
+## 8. Tính Năng Chưa Triển Khai (Trong Tương Lai)
 
+> **Lưu ý**: Các tính năng dưới đây chưa được triển khai trong phiên bản hiện tại.
+
+-   **Payment Gateway Integration**: Tích hợp VNPay, MoMo, ZaloPay API
+-   **Partial Payment**: Thanh toán một phần
+-   **Split Bill**: Chia hóa đơn theo món hoặc theo người
+-   **Thermal Printer**: In hóa đơn nhiệt ESC/POS
 -   **Thanh toán online trước**: Khách thanh toán online trước khi đến
 -   **Loyalty Points**: Tích điểm, đổi quà, giảm giá
 -   **Digital Receipt**: Hóa đơn điện tử, không cần in giấy
--   **Split by Percentage**: Chia hóa đơn theo % (60%-40%)
 -   **Tip Management**: Quản lý tiền tip cho nhân viên
 -   **Auto-discount**: Tự động áp giảm giá theo điều kiện
--   **Invoice Template**: Nhiều mẫu hóa đơn khác nhau
 -   **Multi-currency**: Hỗ trợ nhiều loại tiền tệ
--   **Installment Payment**: Thanh toán trả góp qua thẻ
--   **Crypto Payment**: Thanh toán bằng tiền điện tử
 
 ---
 

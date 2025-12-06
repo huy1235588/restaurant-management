@@ -1,5 +1,12 @@
 # Kitchen API Documentation
 
+> **Lưu ý**: Tài liệu này đã được cập nhật để phản ánh triển khai thực tế của hệ thống (06/2025).
+> 
+> **Thay đổi so với thiết kế ban đầu:**
+> - Flow đơn giản hóa: `pending → preparing → completed` (không có trạng thái `ready` riêng trong API)
+> - Endpoint `/ready` đã được gộp vào flow - Chef start → Complete trực tiếp
+> - Cancel xóa KitchenOrder thay vì đặt trạng thái cancelled
+
 ## Overview
 
 API để quản lý hoạt động bếp, xử lý đơn hàng từ khi nhận đến khi hoàn thành.
@@ -14,7 +21,6 @@ API để quản lý hoạt động bếp, xử lý đơn hàng từ khi nhận 
 | GET /kitchen/orders | admin, manager, chef, waiter |
 | GET /kitchen/orders/:id | admin, manager, chef, waiter |
 | PATCH /kitchen/orders/:id/start | admin, manager, chef |
-| PATCH /kitchen/orders/:id/ready | admin, manager, chef |
 | PATCH /kitchen/orders/:id/complete | admin, manager, chef |
 | PATCH /kitchen/orders/:id/cancel | admin, manager, chef |
 
@@ -33,11 +39,9 @@ Lấy danh sách tất cả kitchen orders với filters.
 **Query Parameters**:
 ```typescript
 {
-  status?: 'pending' | 'ready' | 'completed' | 'cancelled';
-  priority?: 'low' | 'normal' | 'high' | 'urgent';
-  chefId?: number;
-  startDate?: string;     // ISO 8601
-  endDate?: string;       // ISO 8601
+  status?: 'pending' | 'preparing' | 'completed';  // Actual statuses
+  page?: number;       // Pagination
+  limit?: number;      // Default: 20
 }
 ```
 
@@ -50,11 +54,9 @@ Lấy danh sách tất cả kitchen orders với filters.
 interface KitchenOrder {
   kitchenOrderId: number;
   orderId: number;
-  chefId: number | null;
-  status: 'pending' | 'ready' | 'completed' | 'cancelled';
-  priority: 'low' | 'normal' | 'high' | 'urgent';
-  prepTimeEstimate: number | null;    // Minutes
-  prepTimeActual: number | null;      // Minutes
+  staffId: number | null;              // Chef who claimed the order
+  status: 'pending' | 'preparing' | 'completed';  // Actual statuses
+  prepTimeActual: number | null;      // Minutes (calculated when completed)
   startedAt: string | null;           // ISO 8601
   completedAt: string | null;         // ISO 8601
   createdAt: string;                  // ISO 8601
@@ -66,7 +68,6 @@ interface KitchenOrder {
     orderNumber: string;
     tableId: number;
     status: string;
-    partySize: number;
     specialRequest: string | null;
     orderItems: OrderItem[];
     table: {
@@ -90,14 +91,13 @@ interface OrderItem {
     itemId: number;
     itemName: string;
     category: string;
-    prepTimeEstimate: number;
   };
 }
 ```
 
 **Example**:
 ```bash
-GET /kitchen/orders?status=pending&priority=high
+GET /kitchen/orders?status=pending&page=1&limit=20
 ```
 
 ---
@@ -146,27 +146,28 @@ Chef nhận và bắt đầu chuẩn bị order.
 {
   kitchenOrderId: number;
   orderId: number;
-  chefId: number;              // Assigned chef
-  status: 'ready';             // Updated status
-  startedAt: string;           // Start timestamp
+  staffId: number;              // Assigned chef
+  status: 'preparing';          // Updated status
+  startedAt: string;            // Start timestamp
   // ... full kitchen order
 }
 ```
 
 **Side Effects**:
-- Kitchen order status → `ready`
-- Chef assigned to order
+- Kitchen order status → `preparing`
+- Chef (staffId) assigned to order
 - Start time recorded
 - WebSocket event: `kitchen:order_update`
 
 **Errors**:
 - `400 Bad Request`: 
   - Order not in pending status
-  - Cannot modify completed/cancelled order
+  - Order already claimed by another chef
 - `404 Not Found`: Kitchen order not found
 
 **Business Rules**:
 - Can only start orders with `status: 'pending'`
+- Uses optimistic locking to prevent concurrent chef claims
 - Chef ID is automatically set from authenticated user
 
 **Example**:
@@ -177,9 +178,8 @@ PATCH /kitchen/orders/123/start
 {
   "kitchenOrderId": 123,
   "orderId": 456,
-  "chefId": 789,
-  "status": "ready",
-  "priority": "normal",
+  "staffId": 789,
+  "status": "preparing",
   "startedAt": "2024-11-23T10:30:00Z",
   "order": {
     "orderNumber": "ORD-00000456",
@@ -197,70 +197,9 @@ PATCH /kitchen/orders/123/start
 
 ---
 
-### 4. Mark Order as Ready
+### 4. Complete Kitchen Order
 
-Đánh dấu order đã chuẩn bị xong, sẵn sàng để phục vụ.
-
-**Endpoint**: `PATCH /kitchen/orders/:id/ready`
-
-**Parameters**:
-- `id` (number, required): Kitchen Order ID
-
-**Request Body**: None
-
-**Response**: `200 OK`
-```typescript
-{
-  kitchenOrderId: number;
-  orderId: number;
-  status: 'ready';
-  completedAt: string;         // Completion timestamp
-  prepTimeActual: number;      // Calculated prep time in minutes
-  // ... full kitchen order
-}
-```
-
-**Side Effects**:
-- Kitchen order status → `ready`
-- Main order status → `ready`
-- Completion time recorded
-- Prep time calculated (completedAt - startedAt)
-- WebSocket event: `kitchen:order_ready`
-
-**Errors**:
-- `400 Bad Request`:
-  - Order already completed
-  - Order cancelled
-- `404 Not Found`: Kitchen order not found
-
-**Business Rules**:
-- Cannot mark cancelled or completed orders as ready
-- Prep time is auto-calculated based on startedAt and completedAt
-
-**Example**:
-```typescript
-PATCH /kitchen/orders/123/ready
-
-// Response
-{
-  "kitchenOrderId": 123,
-  "orderId": 456,
-  "status": "ready",
-  "startedAt": "2024-11-23T10:30:00Z",
-  "completedAt": "2024-11-23T10:50:00Z",
-  "prepTimeActual": 20,        // 20 minutes
-  "order": {
-    "orderNumber": "ORD-00000456",
-    "status": "ready"           // Updated to ready
-  }
-}
-```
-
----
-
-### 5. Mark Order as Completed
-
-Đánh dấu order đã được nhân viên phục vụ lấy đi (picked up).
+Đánh dấu order đã chuẩn bị xong. Kết hợp các bước "ready" và "complete" thành một flow đơn giản.
 
 **Endpoint**: `PATCH /kitchen/orders/:id/complete`
 
@@ -275,22 +214,26 @@ PATCH /kitchen/orders/123/ready
   kitchenOrderId: number;
   orderId: number;
   status: 'completed';
+  completedAt: string;         // Completion timestamp
+  prepTimeActual: number;      // Calculated prep time in minutes
   // ... full kitchen order
 }
 ```
 
 **Side Effects**:
 - Kitchen order status → `completed`
-- Main order status → `serving`
-- WebSocket event: `kitchen:order_completed`
+- All order items status → `ready`
+- Completion time recorded
+- Prep time calculated (completedAt - startedAt)
+- WebSocket events: `kitchen:order_completed`, `kitchenOrderReady` (global)
 
 **Errors**:
-- `400 Bad Request`: Can only complete ready orders
+- `400 Bad Request`: Order already completed
 - `404 Not Found`: Kitchen order not found
 
 **Business Rules**:
-- Can ONLY complete orders with `status: 'ready'`
-- This represents waiter picking up the food
+- Cannot complete already completed orders
+- Prep time is auto-calculated based on startedAt and completedAt
 
 **Example**:
 ```typescript
@@ -301,18 +244,20 @@ PATCH /kitchen/orders/123/complete
   "kitchenOrderId": 123,
   "orderId": 456,
   "status": "completed",
+  "startedAt": "2024-11-23T10:30:00Z",
+  "completedAt": "2024-11-23T10:50:00Z",
+  "prepTimeActual": 20,        // 20 minutes
   "order": {
-    "orderNumber": "ORD-00000456",
-    "status": "serving"         // Updated to serving
+    "orderNumber": "ORD-00000456"
   }
 }
 ```
 
 ---
 
-### 6. Cancel Kitchen Order
+### 5. Cancel Kitchen Order
 
-Hủy kitchen order.
+Hủy kitchen order (xóa kitchen order và cập nhật main order status).
 
 **Endpoint**: `PATCH /kitchen/orders/:id/cancel`
 
@@ -324,37 +269,31 @@ Hủy kitchen order.
 **Response**: `200 OK`
 ```typescript
 {
-  kitchenOrderId: number;
-  orderId: number;
-  status: 'cancelled';
-  // ... full kitchen order
+  message: "Kitchen order cancelled and deleted";
 }
 ```
 
 **Side Effects**:
-- Kitchen order status → `cancelled`
-- WebSocket event: `kitchen:order_update`
+- Kitchen order DELETED (not status change)
+- Main order status → `cancelled`
+- Main order cancellationReason → "Cancelled by kitchen"
+- WebSocket event: `orderCancelled` (global)
 
 **Errors**:
-- `400 Bad Request`:
-  - Cannot cancel completed order
-  - Order already cancelled
+- `400 Bad Request`: Cannot cancel completed order
 - `404 Not Found`: Kitchen order not found
 
 **Business Rules**:
 - Cannot cancel completed orders
-- Can cancel pending or ready orders
+- Kitchen order is deleted, not marked as cancelled
+- Main order is also cancelled with reason
 
 **Example**:
 ```typescript
 PATCH /kitchen/orders/123/cancel
 
-// Response
-{
-  "kitchenOrderId": 123,
-  "orderId": 456,
-  "status": "cancelled"
-}
+// Side effect: Kitchen order deleted, main order cancelled
+```
 ```
 
 ---
@@ -393,12 +332,10 @@ const socket = io('/kitchen', {
   kitchenOrderId: number;
   orderId: number;
   status: 'pending';
-  priority: 'low' | 'normal' | 'high' | 'urgent';
   createdAt: string;
   order: {
     orderNumber: string;
     tableId: number;
-    partySize: number;
     specialRequest: string | null;
     orderItems: OrderItem[];
     table: {
@@ -429,15 +366,15 @@ socket.on('kitchen:new_order', (data) => {
 
 #### 2. `kitchen:order_update`
 
-Được emit khi kitchen order được cập nhật (started, cancelled).
+Được emit khi kitchen order được cập nhật (started preparing).
 
 **Event Data**:
 ```typescript
 {
   kitchenOrderId: number;
   orderId: number;
-  status: 'pending' | 'ready' | 'completed' | 'cancelled';
-  chefId: number | null;
+  status: 'pending' | 'preparing' | 'completed';
+  staffId: number | null;
   startedAt: string | null;
   updatedAt: string;
   // ... full kitchen order
@@ -453,7 +390,7 @@ socket.on('kitchen:order_update', (data) => {
   updateOrderInList(data.kitchenOrderId, data);
   
   // If chef assigned, show notification
-  if (data.chefId) {
+  if (data.staffId) {
     showToast(`Order #${data.orderId} claimed by chef`);
   }
 });
@@ -461,7 +398,7 @@ socket.on('kitchen:order_update', (data) => {
 
 ---
 
-#### 3. `kitchen:order_ready`
+#### 3. `kitchen:order_completed`
 
 Được emit khi order đã chuẩn bị xong.
 
@@ -470,7 +407,7 @@ socket.on('kitchen:order_update', (data) => {
 {
   kitchenOrderId: number;
   orderId: number;
-  status: 'ready';
+  status: 'completed';
   completedAt: string;
   prepTimeActual: number;      // Minutes
   order: {
@@ -485,11 +422,11 @@ socket.on('kitchen:order_update', (data) => {
 
 **Client Handling**:
 ```typescript
-socket.on('kitchen:order_ready', (data) => {
-  console.log('Order ready for pickup:', data);
+socket.on('kitchen:order_completed', (data) => {
+  console.log('Order completed:', data);
   
-  // Move to ready area
-  moveToReadyArea(data);
+  // Move to completed area
+  moveToCompletedArea(data);
   
   // Notify waiters
   notifyWaiters(`Order for Table ${data.order.table.tableNumber} is ready!`);
@@ -506,34 +443,29 @@ socket.on('kitchen:order_ready', (data) => {
 
 ---
 
-#### 4. `kitchen:order_completed`
+#### 4. `kitchenOrderReady` (Global Event)
 
-Được emit khi order đã được waiter lấy đi.
+Được emit qua SocketEmitterService để thông báo cho tất cả clients (đặc biệt là Order Module).
 
 **Event Data**:
 ```typescript
 {
   kitchenOrderId: number;
   orderId: number;
+  orderNumber: string;
   status: 'completed';
-  order: {
-    orderNumber: string;
-    status: 'serving';
-  };
 }
 ```
 
 **Client Handling**:
 ```typescript
-socket.on('kitchen:order_completed', (data) => {
-  console.log('Order picked up:', data);
+socket.on('kitchenOrderReady', (data) => {
+  console.log('Kitchen completed order:', data);
   
-  // Remove from display
-  removeFromDisplay(data.kitchenOrderId);
-  
-  // Update stats
-  updateCompletionStats();
+  // Notify order module that food is ready
+  updateOrderReadyStatus(data.orderId);
 });
+```
 ```
 
 ---
@@ -577,28 +509,15 @@ socket.on('error', (error) => {
 ### Kitchen Order Status Flow
 
 ```
-pending → ready → completed
-   ↓
-cancelled
+pending → preparing → completed
 ```
+
+> **Note**: Trong triển khai thực tế, khi cancel thì KitchenOrder được xóa thay vì đặt trạng thái.
 
 **Status Descriptions**:
 - `pending`: Chờ chef nhận
-- `ready`: Đã chuẩn bị xong, sẵn sàng lấy
-- `completed`: Đã được waiter lấy đi
-- `cancelled`: Đã hủy
-
-### Priority Levels
-
-```typescript
-type Priority = 'low' | 'normal' | 'high' | 'urgent';
-
-// Priority weights (for sorting)
-urgent: 4   // VIP orders, complaints
-high: 3     // Large parties, time-sensitive
-normal: 2   // Standard orders (default)
-low: 1      // Pre-orders, non-urgent
-```
+- `preparing`: Chef đang chuẩn bị
+- `completed`: Đã chuẩn bị xong
 
 ### Prep Time Calculation
 
@@ -624,8 +543,8 @@ import { io, Socket } from 'socket.io-client';
 interface KitchenOrder {
   kitchenOrderId: number;
   orderId: number;
-  status: 'pending' | 'ready' | 'completed' | 'cancelled';
-  priority: 'low' | 'normal' | 'high' | 'urgent';
+  status: 'pending' | 'preparing' | 'completed';
+  staffId: number | null;
   order: {
     orderNumber: string;
     table: { tableNumber: string; };
@@ -645,6 +564,7 @@ export function KitchenDisplay() {
     const newSocket = io('/kitchen', {
       auth: { token }
     });
+
 
     newSocket.on('connect', () => {
       console.log('Kitchen connected');
@@ -730,22 +650,7 @@ export function KitchenDisplay() {
     }
   }
 
-  // 4. Mark as ready
-  async function handleReady(kitchenOrderId: number) {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`/api/kitchen/orders/${kitchenOrderId}/ready`, {
-      method: 'PATCH',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    
-    if (response.ok) {
-      // Update will come via WebSocket
-    }
-  }
-
-  // 5. Mark as completed
+  // 4. Mark as completed (combines ready + complete flow)
   async function handleComplete(kitchenOrderId: number) {
     const token = localStorage.getItem('token');
     await fetch(`/api/kitchen/orders/${kitchenOrderId}/complete`, {
@@ -754,6 +659,7 @@ export function KitchenDisplay() {
         'Authorization': `Bearer ${token}`
       }
     });
+    // Update will come via WebSocket
   }
 
   // Render
@@ -769,16 +675,14 @@ export function KitchenDisplay() {
       <div className="orders-grid">
         {orders
           .sort((a, b) => {
-            // Sort by priority then creation time
-            const priorityWeight = { urgent: 4, high: 3, normal: 2, low: 1 };
-            return priorityWeight[b.priority] - priorityWeight[a.priority];
+            // Sort by creation time (oldest first)
+            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
           })
           .map(order => (
             <OrderCard
               key={order.kitchenOrderId}
               order={order}
               onStart={() => handleStart(order.kitchenOrderId)}
-              onReady={() => handleReady(order.kitchenOrderId)}
               onComplete={() => handleComplete(order.kitchenOrderId)}
             />
           ))}
@@ -787,13 +691,13 @@ export function KitchenDisplay() {
   );
 }
 
-function OrderCard({ order, onStart, onReady, onComplete }) {
+function OrderCard({ order, onStart, onComplete }) {
   return (
-    <div className={`order-card priority-${order.priority}`}>
+    <div className={`order-card status-${order.status}`}>
       <div className="order-header">
         <h3>{order.order.orderNumber}</h3>
         <span className="table">Table {order.order.table.tableNumber}</span>
-        <span className={`priority ${order.priority}`}>{order.priority}</span>
+        <span className={`status ${order.status}`}>{order.status}</span>
       </div>
 
       <div className="order-items">
@@ -808,11 +712,8 @@ function OrderCard({ order, onStart, onReady, onComplete }) {
         {order.status === 'pending' && (
           <button onClick={onStart}>Start Preparing</button>
         )}
-        {order.status === 'ready' && (
-          <>
-            <button onClick={onReady}>Mark Ready</button>
-            <button onClick={onComplete}>Complete</button>
-          </>
+        {order.status === 'preparing' && (
+          <button onClick={onComplete}>Complete</button>
         )}
       </div>
     </div>
@@ -833,8 +734,8 @@ export function WaiterNotifications() {
       auth: { token }
     });
 
-    // Listen for ready orders
-    newSocket.on('kitchen:order_ready', (data) => {
+    // Listen for completed orders (food ready for pickup)
+    newSocket.on('kitchen:order_completed', (data) => {
       setReadyOrders(prev => [...prev, data]);
       
       // Show notification
@@ -849,15 +750,10 @@ export function WaiterNotifications() {
     return () => newSocket.close();
   }, []);
 
-  async function handlePickup(kitchenOrderId: number) {
-    const token = localStorage.getItem('token');
-    await fetch(`/api/kitchen/orders/${kitchenOrderId}/complete`, {
-      method: 'PATCH',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    
+  async function handlePickup(orderId: number) {
+    // Remove from ready list after waiter acknowledges
     setReadyOrders(prev => 
-      prev.filter(order => order.kitchenOrderId !== kitchenOrderId)
+      prev.filter(order => order.orderId !== orderId)
     );
   }
 
@@ -866,8 +762,8 @@ export function WaiterNotifications() {
       {readyOrders.map(order => (
         <div key={order.kitchenOrderId} className="notification">
           <span>Table {order.order.table.tableNumber} ready!</span>
-          <button onClick={() => handlePickup(order.kitchenOrderId)}>
-            Picked Up
+          <button onClick={() => handlePickup(order.orderId)}>
+            Acknowledged
           </button>
         </div>
       ))}
@@ -903,14 +799,13 @@ export function WaiterNotifications() {
 }
 ```
 
-**400 Bad Request** (Cannot complete):
+**400 Bad Request** (Already completed):
 ```json
 {
-  "message": "Can only complete ready orders",
-  "error": "Can Only Complete Ready Orders",
+  "message": "Kitchen order already completed",
+  "error": "Kitchen Order Already Completed",
   "statusCode": 400,
-  "kitchenOrderId": 123,
-  "currentStatus": "pending"
+  "kitchenOrderId": 123
 }
 ```
 
@@ -943,16 +838,11 @@ socket.on('connect', () => {
 });
 ```
 
-### 3. Sort Orders by Priority
+### 3. Sort Orders by Creation Time
 
 ```typescript
+// Sort by creation time (oldest first - FIFO)
 const sortedOrders = orders.sort((a, b) => {
-  const weights = { urgent: 4, high: 3, normal: 2, low: 1 };
-  const priorityDiff = weights[b.priority] - weights[a.priority];
-  
-  if (priorityDiff !== 0) return priorityDiff;
-  
-  // Same priority, sort by creation time (older first)
   return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
 });
 ```
@@ -960,11 +850,10 @@ const sortedOrders = orders.sort((a, b) => {
 ### 4. Visual Indicators for Prep Time
 
 ```typescript
-function getPrepTimeColor(actualTime: number, estimatedTime: number) {
-  const ratio = actualTime / estimatedTime;
-  if (ratio < 0.8) return 'green';   // Fast
-  if (ratio < 1.2) return 'yellow';  // On time
-  return 'red';                       // Slow
+function getPrepTimeColor(prepTimeActual: number) {
+  if (prepTimeActual < 10) return 'green';   // Fast
+  if (prepTimeActual < 30) return 'yellow';  // On time
+  return 'red';                               // Slow
 }
 ```
 
@@ -1000,10 +889,10 @@ curl -X PATCH http://localhost:3000/api/kitchen/orders/123/start \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
-### Test Mark Ready
+### Test Complete Order
 
 ```bash
-curl -X PATCH http://localhost:3000/api/kitchen/orders/123/ready \
+curl -X PATCH http://localhost:3000/api/kitchen/orders/123/complete \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 

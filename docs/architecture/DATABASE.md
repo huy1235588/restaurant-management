@@ -47,7 +47,7 @@
 
 ### 1.3. Cấu trúc tổng thể
 
-Cơ sở dữ liệu được chia thành 8 module chính với **18 bảng**:
+Cơ sở dữ liệu được chia thành 9 module chính với **18 bảng**:
 
 | STT | Module                     | Bảng chính                                  | Mô tả                   |
 | --- | -------------------------- | ------------------------------------------- | ----------------------- |
@@ -59,6 +59,7 @@ Cơ sở dữ liệu được chia thành 8 module chính với **18 bảng**:
 | 6   | **Order Management**       | orders, order_items                         | Quản lý đơn hàng        |
 | 7   | **Kitchen Management**     | kitchen_orders                              | Quản lý bếp             |
 | 8   | **Billing & Payment**      | bills, bill_items, payments                 | Thanh toán và hóa đơn   |
+| 9   | **Settings**               | restaurant_settings                         | Cấu hình nhà hàng       |
 
 ---
 
@@ -206,8 +207,7 @@ Danh mục món ăn.
 | description  | VARCHAR(500) | NULL             | Mô tả           |
 | displayOrder | INT          | DEFAULT 0        | Thứ tự hiển thị |
 | isActive     | BOOLEAN      | DEFAULT true     | Đang hoạt động  |
-| imageUrl     | VARCHAR(500) | NULL             | URL hình ảnh    |
-| imagePath    | VARCHAR(500) | NULL             | Đường dẫn file  |
+| imagePath    | VARCHAR(500) | NULL             | Đường dẫn file hình ảnh |
 | createdAt    | TIMESTAMP    | DEFAULT now()    | Ngày tạo        |
 | updatedAt    | TIMESTAMP    | AUTO UPDATE      | Ngày cập nhật   |
 
@@ -229,8 +229,7 @@ Thông tin chi tiết các món ăn.
 | price           | DECIMAL(10,2) | NOT NULL         | Giá bán                   |
 | cost            | DECIMAL(10,2) | NULL             | Giá vốn                   |
 | description     | VARCHAR(1000) | NULL             | Mô tả                     |
-| imageUrl        | VARCHAR(500)  | NULL             | URL hình ảnh              |
-| imagePath       | VARCHAR(500)  | NULL             | Đường dẫn file            |
+| imagePath       | VARCHAR(500)  | NULL             | Đường dẫn file hình ảnh   |
 | isAvailable     | BOOLEAN       | DEFAULT true     | Còn hàng                  |
 | isActive        | BOOLEAN       | DEFAULT true     | Đang bán                  |
 | preparationTime | INT           | NULL             | Thời gian chế biến (phút) |
@@ -511,6 +510,38 @@ Thanh toán.
 
 ---
 
+### 3.8. Restaurant Settings
+
+#### RestaurantSettings (restaurant_settings)
+
+Cấu hình thông tin nhà hàng.
+
+| Trường         | Kiểu         | Ràng buộc     | Mô tả                           |
+| -------------- | ------------ | ------------- | ------------------------------- |
+| id             | INT          | PK, DEFAULT 1 | ID (singleton)                  |
+| name           | VARCHAR(200) | NOT NULL      | Tên nhà hàng                    |
+| tagline        | VARCHAR(500) | NULL          | Slogan                          |
+| description    | TEXT         | NULL          | Mô tả                           |
+| aboutTitle     | VARCHAR(200) | NULL          | Tiêu đề phần giới thiệu         |
+| aboutContent   | TEXT         | NULL          | Nội dung giới thiệu             |
+| address        | VARCHAR(500) | NULL          | Địa chỉ                         |
+| phone          | VARCHAR(20)  | NULL          | Số điện thoại                   |
+| email          | VARCHAR(255) | NULL          | Email liên hệ                   |
+| mapEmbedUrl    | TEXT         | NULL          | URL nhúng bản đồ                |
+| heroImage      | VARCHAR(500) | NULL          | Ảnh banner chính                |
+| aboutImage     | VARCHAR(500) | NULL          | Ảnh phần giới thiệu             |
+| logoUrl        | VARCHAR(500) | NULL          | URL logo                        |
+| operatingHours | JSON         | NULL          | Giờ hoạt động [{day, hours}]    |
+| socialLinks    | JSON         | NULL          | Mạng xã hội [{platform, url}]   |
+| highlights     | JSON         | NULL          | Điểm nổi bật [{icon, label}]    |
+| bankConfig     | JSON         | NULL          | Cấu hình ngân hàng              |
+| createdAt      | TIMESTAMP    | DEFAULT now() | Ngày tạo                        |
+| updatedAt      | TIMESTAMP    | AUTO UPDATE   | Ngày cập nhật                   |
+
+**Lưu ý**: Đây là bảng singleton (chỉ có 1 record với id=1)
+
+---
+
 ## 4. Mối quan hệ giữa các bảng
 
 ### 4.1. Sơ đồ quan hệ
@@ -693,5 +724,5 @@ ORDER BY totalQuantity DESC;
 
 ---
 
-**Tài liệu được cập nhật lần cuối: 25/11/2025**  
+**Tài liệu được cập nhật lần cuối: 06/12/2025**  
 **Dựa trên schema.prisma từ dự án**

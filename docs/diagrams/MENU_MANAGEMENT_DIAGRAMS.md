@@ -1,5 +1,9 @@
 # Biểu Đồ Quản Lý Menu và Danh Mục
 
+> **Cập nhật**: Tài liệu này đã được cập nhật để phản ánh chính xác hệ thống đã triển khai.
+
+---
+
 ## 1. Biểu Đồ Quy Trình Tổng Thể (Flowchart)
 
 ```mermaid
@@ -12,31 +16,23 @@ flowchart TD
     F -->|Không| G[Hiển Thị Lỗi]
     G --> E
     F -->|Có| H[Tải Lên Ảnh]
-    H --> I[Chọn Allergens]
-    I --> J[Lưu Sản Phẩm]
+    H --> J[Lưu Sản Phẩm]
     J --> K[Quản Lý Hàng Ngày]
     K --> L{Cập Nhật<br/>Trạng Thái?}
-    L -->|Có Sẵn| M[Cập Nhật Trạng Thái]
-    L -->|Hết Hàng| M
-    M --> N[Ghi Log Thay Đổi]
+    L -->|Có Sẵn| M[Toggle isAvailable]
+    L -->|Không Sẵn| M
+    M --> N[Cập Nhật Database]
     N --> O[Hiển Thị Cho Khách]
     O --> P[Khách Xem & Đặt Hàng]
-    P --> Q[Phân Tích & Báo Cáo]
-    Q --> R[Xem Sản Phẩm Bán Chạy]
-    Q --> S[Xem Sản Phẩm Bán Chậm]
-    Q --> T[Phân Tích Doanh Thu]
-    R --> U[Điều Chỉnh Chiến Lược Menu]
-    S --> U
-    T --> U
+    P --> U[Điều Chỉnh Menu]
     U --> V[Bảo Trì]
     V --> W{Thao Tác<br/>Cần Thiết?}
-    W -->|Ẩn| X[Ẩn Sản Phẩm]
+    W -->|Ẩn| X[Toggle isActive]
     W -->|Sửa| Y[Cập Nhật Thông Tin]
     W -->|Xóa| Z[Xóa Sản Phẩm]
-    X --> AA[Sao Lưu Dữ Liệu]
-    Y --> AA
-    Z --> AA
-    AA --> K
+    X --> K
+    Y --> K
+    Z --> K
 ```
 
 ---
@@ -45,48 +41,53 @@ flowchart TD
 
 ```mermaid
 sequenceDiagram
-    actor User as Quản Lý
+    actor User as Quản Lý/Admin
     participant UI as Giao Diện
     participant API as Backend API
     participant DB as Database
     participant Storage as File Storage
 
+    Note over User,Storage: Tạo Danh Mục Mới
     User ->> UI: Nhấn "Tạo Danh Mục"
     UI ->> API: POST /categories
-    API ->> API: Kiểm tra tên duy nhất
+    API ->> API: Validate DTO (categoryName, description, displayOrder, imagePath, isActive)
+    API ->> API: Kiểm tra categoryName duy nhất
 
     alt Tên Trùng
-        API -->> UI: Lỗi - Tên đã tồn tại
-        UI -->> User: Hiển thị cảnh báo
+        API -->> UI: 409 Conflict - Danh mục đã tồn tại
+        UI -->> User: Hiển thị lỗi
     else Tên Mới
-        API ->> Storage: Lưu ảnh
-        API ->> DB: Lưu danh mục
-        DB -->> API: Thành công
-        API ->> DB: Ghi log
-        API -->> UI: Thành công
+        API ->> DB: Prisma create Category
+        DB -->> API: Trả về category mới
+        API -->> UI: 201 Created + category data
         UI -->> User: Hiển thị thành công
     end
 
+    Note over User,Storage: Cập Nhật Danh Mục
     User ->> UI: Nhấn "Sửa Danh Mục"
     UI ->> API: PUT /categories/:id
-    API ->> DB: Cập nhật thông tin
-    DB -->> API: Thành công
-    API ->> DB: Ghi log thay đổi
-    API -->> UI: Thành công
+    API ->> DB: Prisma findUnique(categoryId)
+    alt Không Tìm Thấy
+        API -->> UI: 404 Not Found
+    else Tìm Thấy
+        API ->> DB: Prisma update Category
+        DB -->> API: Trả về category đã cập nhật
+        API -->> UI: 200 OK + category data
+    end
 
+    Note over User,Storage: Xóa Danh Mục
     User ->> UI: Nhấn "Xóa Danh Mục"
     UI ->> API: DELETE /categories/:id
-    API ->> API: Kiểm tra sản phẩm
+    API ->> DB: Kiểm tra MenuItem liên quan
 
     alt Có Sản Phẩm
-        API -->> UI: Lỗi - Còn sản phẩm
+        API -->> UI: 400 Bad Request - Còn sản phẩm trong danh mục
         UI -->> User: Hiển thị thông báo
     else Không Có Sản Phẩm
-        API ->> Storage: Xóa ảnh
-        API ->> DB: Xóa danh mục
+        API ->> Storage: Xóa ảnh (nếu có)
+        API ->> DB: Prisma delete Category
         DB -->> API: Thành công
-        API ->> DB: Ghi log xóa
-        API -->> UI: Thành công
+        API -->> UI: 200 OK
     end
 ```
 
@@ -94,194 +95,132 @@ sequenceDiagram
 
 ## 3. Biểu Đồ Quản Lý Sản Phẩm (State Diagram)
 
+> **Lưu ý**: Hệ thống sử dụng 2 boolean flags đơn giản thay vì state machine phức tạp.
+
 ```mermaid
 stateDiagram-v2
-    [*] --> Draft
+    [*] --> Created
 
-    Draft --> Active: Lưu & Xuất Bản
-    Draft --> [*]: Hủy
+    Created --> Active_Available: isActive=true, isAvailable=true
+    
+    state "Trạng Thái Hoạt Động" as ActiveState {
+        Active_Available: Hiển thị & Có thể đặt
+        Active_Unavailable: Hiển thị nhưng Không thể đặt
+        
+        Active_Available --> Active_Unavailable: PATCH /menu/:id/availability (isAvailable=false)
+        Active_Unavailable --> Active_Available: PATCH /menu/:id/availability (isAvailable=true)
+    }
 
-    Active --> Available: Có Sẵn
-    Active --> OutOfStock: Hết Hàng
-    Active --> Hidden: Ẩn
-    Active --> Deleted: Xóa
-
-    Available --> OutOfStock: Báo Hết Hàng
-    Available --> Hidden: Ẩn
-    Available --> Editing: Chỉnh Sửa
-
-    OutOfStock --> Available: Có Hàng Lại
-    OutOfStock --> Hidden: Ẩn
-    OutOfStock --> Editing: Chỉnh Sửa
-
-    Hidden --> Available: Hiển Thị Lại
-    Hidden --> OutOfStock: Hiển Thị Lại
-    Hidden --> Deleted: Xóa
-
-    Editing --> Available: Lưu Thay Đổi
-    Editing --> OutOfStock: Lưu Thay Đổi
-    Editing --> Hidden: Lưu Thay Đổi
-
+    Active_Available --> Inactive: PUT /menu/:id (isActive=false)
+    Active_Unavailable --> Inactive: PUT /menu/:id (isActive=false)
+    
+    Inactive: Ẩn khỏi menu
+    Inactive --> Active_Available: PUT /menu/:id (isActive=true, isAvailable=true)
+    
+    Active_Available --> Deleted: DELETE /menu/:id
+    Active_Unavailable --> Deleted: DELETE /menu/:id
+    Inactive --> Deleted: DELETE /menu/:id
+    
     Deleted --> [*]
 ```
 
----
-
-## 4. Biểu Đồ Cấu Trúc Dữ Liệu (Entity Relationship)
-
-```mermaid
-erDiagram
-    CATEGORIES ||--o{ MENU_ITEMS : contains
-    MENU_ITEMS ||--o{ PRICE_HISTORY : has
-    MENU_ITEMS ||--o{ ALLERGENS : contains
-    MENU_ITEMS ||--o{ ORDER_ITEMS : "ordered in"
-
-    CATEGORIES {
-        int id PK
-        string name UK
-        string description
-        string image_url
-        int display_order
-        string status
-        timestamp created_at
-        timestamp updated_at
-    }
-
-    MENU_ITEMS {
-        int id PK
-        int category_id FK
-        string name
-        string short_description
-        string detailed_description
-        decimal price
-        string image_url
-        int prep_time_minutes
-        string availability_status
-        string notes
-        timestamp created_at
-        timestamp updated_at
-    }
-
-    PRICE_HISTORY {
-        int id PK
-        int menu_item_id FK
-        decimal old_price
-        decimal new_price
-        string reason
-        timestamp changed_at
-        int changed_by_user_id FK
-    }
-
-    ALLERGENS {
-        int id PK
-        int menu_item_id FK
-        string allergen_name
-        string notes
-    }
-
-    ORDER_ITEMS {
-        int id PK
-        int menu_item_id FK
-        int order_id FK
-        int quantity
-        decimal price_at_order
-        timestamp ordered_at
-    }
-```
+### Giải thích trạng thái:
+| isActive | isAvailable | Trạng thái | Mô tả |
+|----------|-------------|------------|-------|
+| true | true | Có sẵn | Hiển thị trên menu, khách có thể đặt |
+| true | false | Hết hàng | Hiển thị trên menu nhưng không thể đặt |
+| false | * | Ẩn | Không hiển thị trên menu khách hàng |
 
 ---
 
-## 5. Biểu Đồ Quy Trình Tạo Sản Phẩm Chi Tiết (Activity Diagram)
+## 4. Biểu Đồ Quy Trình Tạo Sản Phẩm Chi Tiết (Activity Diagram)
 
 ```mermaid
 graph LR
-    A["🔵 Người Dùng: Nhấn 'Thêm Sản Phẩm'"] --> B["📋 Mở Form Nhập Thông Tin"]
-    B --> C["✏️ Nhập Tên Sản Phẩm"]
-    C --> D["✏️ Nhập Mô Tả Ngắn & Chi Tiết"]
-    D --> E["💰 Nhập Giá Tiền"]
-    E --> F["🏷️ Chọn Danh Mục"]
-    F --> G{"Có Tải<br/>Ảnh?"}
-    G -->|Có| H["🖼️ Tải Lên Ảnh"]
-    G -->|Không| I["🔖 Chọn Allergens"]
-    H --> J["⏱️ Nhập Thời Gian Chuẩn Bị"]
-    I --> J
-    J --> K["📝 Nhập Ghi Chú"]
-    K --> L["⚙️ Kiểm Tra Dữ Liệu"]
-    L --> M{"Dữ Liệu<br/>Hợp Lệ?"}
-    M -->|Không| N["❌ Hiển Thị Lỗi"]
-    N --> O["🔄 Quay Lại Bước Sửa"]
-    O --> L
-    M -->|Có| P["💾 Lưu Sản Phẩm Vào Database"]
-    P --> Q["📸 Xử Lý & Lưu Ảnh"]
-    Q --> R["📋 Cập Nhật Danh Mục"]
-    R --> S["📝 Ghi Log Hành Động"]
-    S --> T["✅ Thông Báo Thành Công"]
-    T --> U["🔵 Kết Thúc"]
+    A["🔵 Manager/Admin:<br/>Nhấn 'Thêm Sản Phẩm'"] --> B["📋 Mở Form Nhập"]
+    B --> C["✏️ Nhập itemCode (bắt buộc, unique)"]
+    C --> D["✏️ Nhập itemName (bắt buộc)"]
+    D --> E["🏷️ Chọn categoryId (bắt buộc)"]
+    E --> F["💰 Nhập price (bắt buộc, > 0)"]
+    F --> G{"Có thêm<br/>thông tin?"}
+    G -->|Có| H["📝 Nhập các trường tùy chọn:<br/>cost, description, preparationTime,<br/>spicyLevel, isVegetarian, calories"]
+    G -->|Không| I["🖼️ Upload ảnh (tùy chọn)"]
+    H --> I
+    I --> J["⚙️ Validate DTO"]
+    J --> K{"Dữ Liệu<br/>Hợp Lệ?"}
+    K -->|Không| L["❌ Hiển Thị Lỗi"]
+    L --> M["🔄 Quay Lại Sửa"]
+    M --> J
+    K -->|Có| N["🔍 Kiểm tra itemCode unique"]
+    N --> O{"itemCode<br/>trùng?"}
+    O -->|Có| P["❌ Lỗi: Mã sản phẩm đã tồn tại"]
+    P --> C
+    O -->|Không| Q["🔍 Kiểm tra categoryId tồn tại"]
+    Q --> R{"Category<br/>tồn tại?"}
+    R -->|Không| S["❌ Lỗi: Danh mục không tồn tại"]
+    S --> E
+    R -->|Có| T["💾 Prisma create MenuItem"]
+    T --> U["✅ Trả về 201 Created"]
+    U --> V["🔵 Kết Thúc"]
 ```
 
 ---
 
-## 6. Biểu Đồ Phân Quyền (Permission Matrix)
+## 5. Biểu Đồ Phân Quyền (Permission Matrix)
 
 ```mermaid
 graph TB
     A["Phân Quyền Hệ Thống Menu"] --> B["👥 Vai Trò"]
-    B --> C["👤 Khách Hàng"]
-    B --> D["👨‍💼 Nhân Viên Phục Vụ"]
-    B --> E["👨‍🍳 Đầu Bếp"]
-    B --> F["💼 Quản Lý"]
-    B --> G["🔐 Admin"]
+    B --> C["👤 staff"]
+    B --> D["👨‍🍳 chef"]
+    B --> E["💼 manager"]
+    B --> F["🔐 admin"]
 
-    C --> C1["✓ Xem Menu"]
-    C --> C2["✗ Tạo"]
-    C --> C3["✗ Sửa"]
+    C --> C1["✓ GET /categories"]
+    C --> C2["✓ GET /menu"]
+    C --> C3["✗ POST/PUT/DELETE"]
 
-    D --> D1["✓ Xem Menu"]
-    D --> D2["✗ Tạo"]
-    D --> D3["✗ Sửa"]
+    D --> D1["✓ GET /categories"]
+    D --> D2["✓ GET /menu"]
+    D --> D3["✗ POST/PUT/DELETE"]
 
-    E --> E1["✓ Xem Menu"]
-    E --> E2["✗ Tạo"]
-    E --> E3["✗ Sửa"]
-    E --> E4["✓ Cập Nhật Trạng Thái"]
+    E --> E1["✓ GET /categories"]
+    E --> E2["✓ POST /categories"]
+    E --> E3["✓ PUT /categories/:id"]
+    E --> E4["✓ DELETE /categories/:id"]
+    E --> E5["✓ CRUD /menu"]
+    E --> E6["✓ PATCH /menu/:id/availability"]
 
-    F --> F1["✓ Xem Menu"]
-    F --> F2["✓ Tạo"]
-    F --> F3["✓ Sửa"]
-    F --> F4["✓ Xóa"]
-    F --> F5["✓ Ẩn/Hiển Thị"]
-
-    G --> G1["✓ Xem Menu"]
-    G --> G2["✓ Tạo"]
-    G --> G3["✓ Sửa"]
-    G --> G4["✓ Xóa"]
-    G --> G5["✓ Ẩn/Hiển Thị"]
+    F --> F1["✓ Full Access"]
+    F --> F2["✓ GET /categories"]
+    F --> F3["✓ POST /categories"]
+    F --> F4["✓ PUT /categories/:id"]
+    F --> F5["✓ DELETE /categories/:id"]
+    F --> F6["✓ CRUD /menu"]
+    F --> F7["✓ PATCH /menu/:id/availability"]
 ```
 
 ---
 
 ## 7. Biểu Đồ Cập Nhật Giá Sản Phẩm (Flow)
 
+> **Lưu ý**: Hệ thống hiện tại **không lưu lịch sử giá**. Giá được cập nhật trực tiếp.
+
 ```mermaid
 flowchart TD
-    A["👤 Quản Lý Nhấn<br/>'Cập Nhật Giá'"] --> B["📊 Hiển Thị Form"]
-    B --> C["📌 Giá Cũ: 50,000 VND<br/>Read-only"]
-    C --> D["✏️ Nhập Giá Mới"]
-    D --> E["📝 Nhập Lý Do Thay Đổi<br/>Tùy Chọn"]
-    E --> F["📅 Chọn Ngày Có Hiệu Lực<br/>Default: Hôm Nay"]
-    F --> G["🆗 Xác Nhận Cập Nhật"]
-    G --> H{"Giá Mới<br/>Hợp Lệ?"}
-    H -->|Không| I["❌ Hiển Thị Lỗi<br/>Giá phải > 0"]
-    I --> D
-    H -->|Có| J["💾 Lưu Giá Mới"]
-    J --> K["📖 Lưu Lịch Sử Giá"]
-    K --> L["🔄 Cập Nhật Menu"]
-    L --> M["📝 Ghi Log Thay Đổi"]
-    M --> N["✅ Thông Báo Thành Công"]
-    N --> O["🎯 Kết Thúc"]
+    A["👤 Manager/Admin<br/>Mở form sửa sản phẩm"] --> B["📊 Hiển Thị Form với giá hiện tại"]
+    B --> C["✏️ Nhập Giá Mới"]
+    C --> D["🆗 Submit PUT /menu/:id"]
+    D --> E{"price > 0?"}
+    E -->|Không| F["❌ Validation Error<br/>price must be positive"]
+    F --> C
+    E -->|Có| G["💾 Prisma update MenuItem"]
+    G --> H["🔄 Cập nhật updatedAt"]
+    H --> I["✅ Trả về 200 OK"]
+    I --> J["🎯 Kết Thúc"]
 
-    style K fill:#e1f5ff
-    style M fill:#f3e5f5
+    style F fill:#ffcdd2
+    style I fill:#c8e6c9
 ```
 
 ---
@@ -289,36 +228,32 @@ flowchart TD
 ## 8. Biểu Đồ Quản Lý Trạng Thái Sẵn Có (Swimlanes)
 
 ```mermaid
-graph LR
-    subgraph Khách["👥 Khách Hàng"]
-        K1["Xem Menu"]
-        K2["Đặt Hàng"]
+graph TB
+    subgraph Kitchen["👨‍🍳 Bếp/Staff"]
+        K1["Báo hết nguyên liệu"]
     end
 
-    subgraph Bếp["👨‍🍳 Đầu Bếp"]
-        B1["Báo Hết Hàng"]
-        B2["Cập Nhật Trạng Thái"]
+    subgraph Manager["💼 Manager/Admin"]
+        M1["PATCH /menu/:id/availability"]
+        M2["Toggle isAvailable"]
     end
 
-    subgraph Nhân["👨‍💼 Nhân Viên"]
-        N1["Xem Trạng Thái"]
-        N2["Thông Báo Khách"]
+    subgraph System["⚙️ Hệ Thống"]
+        S1["Cập nhật Database"]
+        S2["Trả về MenuItem mới"]
     end
 
-    subgraph Hệ["⚙️ Hệ Thống"]
-        H1["Có Sẵn"]
-        H2["Hết Hàng"]
-        H3["Ẩn"]
+    subgraph Customer["👥 Khách Hàng"]
+        C1["GET /menu"]
+        C2["Xem menu có filter isAvailable"]
     end
 
-    K1 --> H1
-    K2 --> N2
-    B1 --> B2
-    B2 --> H2
-    H1 --> N1
-    H2 --> N1
-    N1 --> N2
-    N2 --> K2
+    K1 --> M1
+    M1 --> M2
+    M2 --> S1
+    S1 --> S2
+    S2 --> C1
+    C1 --> C2
 ```
 
 ---
@@ -327,282 +262,225 @@ graph LR
 
 ```mermaid
 graph TD
-    A["❌ Lỗi Hệ Thống"] --> B{Loại Lỗi}
+    A["❌ Lỗi API"] --> B{Loại Lỗi}
 
-    B -->|Tên Trùng| C["Lỗi: Danh Mục/Sản Phẩm<br/>Đã Tồn Tại"]
-    C --> C1["Cách Xử Lý: Thay Đổi Tên"]
+    B -->|400| C["Bad Request"]
+    C --> C1["- itemCode/categoryName required"]
+    C --> C2["- price must be positive"]
+    C --> C3["- Danh mục còn sản phẩm"]
 
-    B -->|Ảnh Quá Lớn| D["Lỗi: File > 5MB"]
-    D --> D1["Cách Xử Lý: Nén Ảnh"]
+    B -->|404| D["Not Found"]
+    D --> D1["- Category not found"]
+    D --> D2["- MenuItem not found"]
 
-    B -->|Ảnh Không Hợp Lệ| E["Lỗi: Định Dạng Không<br/>Được Phép"]
-    E --> E1["Cách Xử Lý: Dùng JPG/PNG/WebP"]
+    B -->|409| E["Conflict"]
+    E --> E1["- itemCode đã tồn tại"]
+    E --> E2["- categoryName đã tồn tại"]
 
-    B -->|Không Xóa Được| F["Lỗi: Còn Dữ Liệu<br/>Liên Quan"]
-    F --> F1["Cách Xử Lý: Xóa/Chuyển Trước"]
+    B -->|401| F["Unauthorized"]
+    F --> F1["- Token không hợp lệ"]
+    F --> F2["- Token hết hạn"]
 
-    B -->|Giá Không Hợp Lệ| G["Lỗi: Giá ≤ 0"]
-    G --> G1["Cách Xử Lý: Nhập Giá > 0"]
-
-    B -->|Lỗi Kết Nối| H["Lỗi: Không Thể Kết Nối"]
-    H --> H1["Cách Xử Lý: Refresh/Thử Lại"]
+    B -->|403| G["Forbidden"]
+    G --> G1["- Không đủ quyền (role)"]
 
     style C fill:#ffcdd2
     style D fill:#ffcdd2
     style E fill:#ffcdd2
     style F fill:#ffcdd2
     style G fill:#ffcdd2
-    style H fill:#ffcdd2
 ```
 
 ---
 
-## 10. Biểu Đồ Báo Cáo & Phân Tích (Pie Chart Concept)
-
-```mermaid
-pie title Phân Tích Sản Phẩm Bán Chạy Nhất Tháng 10
-    "Phở Bò" : 350
-    "Cơm Tấm" : 280
-    "Bánh Mì" : 210
-    "Cà Phê" : 190
-    "Trà Đá" : 160
-    "Khác" : 220
-```
-
----
-
-## 11. Biểu Đồ Dòng Thời Gian (Timeline)
-
-```mermaid
-timeline
-    title Hành Trình Sản Phẩm Từ Tạo Đến Xóa
-
-    section Tạo
-        Nhân viên nhấn 'Thêm' : crit, 2h
-        Nhập thông tin : crit, 3h
-        Chọn ảnh : crit, 1h
-        Xác nhận : crit, 0.5h
-
-    section Hoạt Động
-        Sản phẩm có sẵn : active, 7d
-        Cập nhật giá : 1d
-        Thay đổi mô tả : 1d
-
-    section Không Hoạt Động
-        Sản phẩm hết hàng : crit, 2d
-        Báo hết hàng : crit, 1d
-        Có sẵn lại : 1d
-
-    section Xóa
-        Ẩn sản phẩm : crit, 1d
-        Xóa vĩnh viễn : crit, 0.5h
-```
-
----
-
-## 12. Biểu Đồ Kiến Trúc Thành Phần (Component Diagram)
+## 10. Biểu Đồ Kiến Trúc Thành Phần (Component Diagram)
 
 ```mermaid
 graph TB
-    subgraph Client["📱 Frontend - Next.js/React"]
+    subgraph Client["📱 Frontend - Next.js"]
         UI["🎨 UI Components"]
-        Forms["📋 Forms & Validation"]
-        State["🔄 State Management"]
+        Forms["📋 React Hook Form + Zod"]
+        State["🔄 Zustand Store"]
+        API_Client["🔌 API Client (axios/fetch)"]
     end
 
-    subgraph API["🔌 Backend API - Node.js/Express"]
-        Controllers["⚙️ Controllers"]
-        Services["🛠️ Services"]
-        Middlewares["🚪 Middlewares"]
+    subgraph Server["🔌 Backend - NestJS"]
+        Controllers["⚙️ CategoryController<br/>MenuController"]
+        Services["🛠️ CategoryService<br/>MenuService"]
+        Guards["🚪 JwtAuthGuard<br/>RolesGuard"]
+        DTOs["📋 CreateCategoryDto<br/>CreateMenuItemDto"]
     end
 
     subgraph Data["💾 Data Layer"]
-        ORM["📊 Prisma ORM"]
+        Prisma["📊 Prisma Client"]
         DB["🗄️ PostgreSQL"]
     end
 
     subgraph Storage["💿 File Storage"]
-        LocalStorage["📁 Local Storage"]
-        CloudStorage["☁️ Cloud S3"]
+        StorageService["📁 StorageService"]
+        Uploads["📂 /uploads folder"]
     end
 
     UI --> Forms
     Forms --> State
-    State --> Controllers
-    Controllers --> Services
-    Services --> Middlewares
-    Middlewares --> ORM
-    ORM --> DB
-    Services --> LocalStorage
-    Services --> CloudStorage
+    State --> API_Client
+    API_Client --> Guards
+    Guards --> Controllers
+    Controllers --> DTOs
+    DTOs --> Services
+    Services --> Prisma
+    Prisma --> DB
+    Services --> StorageService
+    StorageService --> Uploads
 
     style Client fill:#e3f2fd
-    style API fill:#f3e5f5
+    style Server fill:#f3e5f5
     style Data fill:#e8f5e9
     style Storage fill:#fff3e0
 ```
 
 ---
 
-## 13. Biểu Đồ Dòng Dữ Liệu (Data Flow)
+## 11. Biểu Đồ Dòng Dữ Liệu (Data Flow)
 
 ```mermaid
 graph LR
-    A["👤 Người Dùng"] -->|Nhập Dữ Liệu| B["📱 UI Form"]
-    B -->|Gửi Request| C["🔌 API Endpoint"]
-    C -->|Xác Thực| D["🚪 Middleware"]
-    D -->|Kiểm Tra| E["⚙️ Business Logic"]
-    E -->|Lưu Dữ Liệu| F["🗄️ Database"]
-    E -->|Lưu File| G["💿 Storage"]
-    F -->|Trả Về Data| H["📊 Response"]
-    G -->|Trả Về URL| H
-    H -->|Cập Nhật UI| B
-    B -->|Hiển Thị Kết Quả| A
+    A["👤 Manager/Admin"] -->|Request| B["📱 Frontend Form"]
+    B -->|POST/PUT/DELETE| C["🔌 API Endpoint"]
+    C -->|Validate| D["🚪 JwtAuthGuard + RolesGuard"]
+    D -->|Check Role| E{"admin/manager?"}
+    E -->|No| F["403 Forbidden"]
+    E -->|Yes| G["⚙️ Controller"]
+    G -->|Call| H["🛠️ Service"]
+    H -->|Prisma Query| I["🗄️ PostgreSQL"]
+    I -->|Return Data| J["📊 Response DTO"]
+    J -->|JSON| B
+    B -->|Display| A
 ```
 
 ---
 
-## 14. Biểu Đồ Vòng Đời Sản Phẩm (Lifecycle)
+## 12. Biểu Đồ Vòng Đời Sản Phẩm (Lifecycle)
 
 ```mermaid
 graph TD
-    A["🆕 Sản Phẩm Mới<br/>Trạng Thái: Draft"] --> B["📝 Nhập Thông Tin"]
-    B --> C["✅ Kiểm Tra & Xác Nhận"]
-    C --> D["🎯 Xuất Bản<br/>Trạng Thái: Active"]
-    D --> E{Điều Hành}
+    A["🆕 POST /menu<br/>Tạo MenuItem mới"] --> B["✅ isActive=true<br/>isAvailable=true"]
+    B --> C{Điều Hành Hàng Ngày}
 
-    E -->|Hàng Ngày| F["📊 Cập Nhật Trạng Thái"]
-    E -->|Cần Sửa| G["🔧 Chỉnh Sửa Thông Tin"]
-    E -->|Cần Ẩn| H["👁️ Ẩn Tạm Thời"]
+    C -->|Hết hàng| D["PATCH /menu/:id/availability<br/>isAvailable=false"]
+    C -->|Cập nhật| E["PUT /menu/:id<br/>Sửa thông tin"]
+    C -->|Tạm ẩn| F["PUT /menu/:id<br/>isActive=false"]
 
-    F --> I{Trạng Thái Nào?}
-    I -->|Có Sẵn| J["✓ Có Sẵn"]
-    I -->|Hết Hàng| K["✗ Hết Hàng"]
+    D --> G["Trạng thái: Hết hàng<br/>Hiển thị nhưng không đặt được"]
+    E --> C
+    F --> H["Trạng thái: Ẩn<br/>Không hiển thị trên menu"]
 
-    J --> L{Cập Nhật Giá?}
-    L -->|Có| M["💰 Cập Nhật Giá"]
-    L -->|Không| N["📈 Tiếp Tục Bán"]
+    G -->|Có hàng lại| I["PATCH /menu/:id/availability<br/>isAvailable=true"]
+    I --> C
 
-    K --> O["⏱️ Chờ Hàng Về"]
-    O --> J
+    H -->|Hiển thị lại| J["PUT /menu/:id<br/>isActive=true"]
+    J --> C
 
-    G --> F
-    H --> P{Quyết Định}
-    P -->|Hiển Thị Lại| J
-    P -->|Xóa Vĩnh Viễn| Q["🗑️ Xóa Sản Phẩm"]
-
-    M --> F
-    N --> F
-    Q --> R["❌ Kết Thúc"]
+    H -->|Xóa| K["DELETE /menu/:id"]
+    K --> L["🗑️ MenuItem bị xóa"]
+    L --> M["❌ Kết Thúc"]
 
     style A fill:#c8e6c9
-    style D fill:#ffccbc
-    style R fill:#ffcdd2
+    style L fill:#ffcdd2
 ```
 
 ---
 
-## 15. Biểu Đồ Tương Tác Người Dùng (Use Case Diagram)
+## 13. Biểu Đồ API Endpoints
 
 ```mermaid
 graph TB
-    subgraph System["🏪 Hệ Thống Quản Lý Menu"]
-        UC1["Tạo Danh Mục"]
-        UC2["Xem Danh Mục"]
-        UC3["Chỉnh Sửa Danh Mục"]
-        UC4["Xóa Danh Mục"]
-        UC5["Tạo Sản Phẩm"]
-        UC6["Xem Sản Phẩm"]
-        UC7["Chỉnh Sửa Sản Phẩm"]
-        UC8["Xóa Sản Phẩm"]
-        UC9["Cập Nhật Giá"]
-        UC10["Cập Nhật Trạng Thái"]
-        UC11["Báo Cáo & Phân Tích"]
+    subgraph Categories["📁 /categories"]
+        C1["GET /categories<br/>Lấy tất cả danh mục"]
+        C2["GET /categories/:id<br/>Lấy chi tiết danh mục"]
+        C3["GET /categories/:id/items<br/>Lấy sản phẩm trong danh mục"]
+        C4["GET /categories/count<br/>Đếm số danh mục"]
+        C5["POST /categories<br/>Tạo danh mục mới"]
+        C6["PUT /categories/:id<br/>Cập nhật danh mục"]
+        C7["DELETE /categories/:id<br/>Xóa danh mục"]
     end
 
-    A["👤 Khách Hàng"] -->|Sử Dụng| UC2
-    A -->|Sử Dụng| UC6
-    A -->|Sử Dụng| UC11
+    subgraph Menu["🍽️ /menu"]
+        M1["GET /menu<br/>Lấy tất cả món ăn"]
+        M2["GET /menu/:id<br/>Lấy chi tiết món"]
+        M3["GET /menu/code/:code<br/>Lấy món theo mã"]
+        M4["GET /menu/category/:categoryId<br/>Lấy món theo danh mục"]
+        M5["GET /menu/count<br/>Đếm số món"]
+        M6["POST /menu<br/>Tạo món mới"]
+        M7["PUT /menu/:id<br/>Cập nhật món"]
+        M8["PATCH /menu/:id/availability<br/>Toggle trạng thái sẵn có"]
+        M9["DELETE /menu/:id<br/>Xóa món"]
+    end
 
-    B["👨‍💼 Nhân Viên Phục Vụ"] -->|Sử Dụng| UC2
-    B -->|Sử Dụng| UC6
+    subgraph Auth["🔐 Authorization"]
+        A1["Public: GET endpoints"]
+        A2["Protected: POST/PUT/PATCH/DELETE"]
+        A3["Roles: admin, manager"]
+    end
 
-    C["👨‍🍳 Đầu Bếp"] -->|Sử Dụng| UC2
-    C -->|Sử Dụng| UC6
-    C -->|Sử Dụng| UC10
+    C1 --> A1
+    C2 --> A1
+    C3 --> A1
+    C4 --> A1
+    C5 --> A2
+    C6 --> A2
+    C7 --> A2
 
-    D["💼 Quản Lý"] -->|Sử Dụng| UC1
-    D -->|Sử Dụng| UC2
-    D -->|Sử Dụng| UC3
-    D -->|Sử Dụng| UC4
-    D -->|Sử Dụng| UC5
-    D -->|Sử Dụng| UC6
-    D -->|Sử Dụng| UC7
-    D -->|Sử Dụng| UC8
-    D -->|Sử Dụng| UC9
-    D -->|Sử Dụng| UC10
-    D -->|Sử Dụng| UC11
+    M1 --> A1
+    M2 --> A1
+    M3 --> A1
+    M4 --> A1
+    M5 --> A1
+    M6 --> A2
+    M7 --> A2
+    M8 --> A2
+    M9 --> A2
 
-    E["🔐 Admin"] -->|Sử Dụng| UC1
-    E -->|Sử Dụng| UC3
-    E -->|Sử Dụng| UC4
-    E -->|Sử Dụng| UC5
-    E -->|Sử Dụng| UC7
-    E -->|Sử Dụng| UC8
-    E -->|Sử Dụng| UC9
-    E -->|Sử Dụng| UC10
-    E -->|Sử Dụng| UC11
+    A2 --> A3
 
-    style System fill:#e3f2fd
-```
-
----
-
-## 16. Biểu Đồ Quy Trình Xóa Sản Phẩm (Decision Tree)
-
-```mermaid
-graph TD
-    A["🗑️ Bắt Đầu: Xóa Sản Phẩm"] --> B{"Sản phẩm có<br/>trong đơn<br/>chưa thanh toán?"}
-
-    B -->|Có| C["⚠️ Cảnh Báo:<br/>Còn đơn liên quan"]
-    C --> D["❓ Yêu Cầu:<br/>Xóa/Chuyển đơn?"]
-    D -->|Xóa| E["🔄 Quay Lại"]
-    D -->|Chuyển| F["🔄 Quay Lại"]
-    E --> A
-    F --> A
-
-    B -->|Không| G["📋 Hiển Thị<br/>Hộp Thoại Xác Nhận"]
-    G --> H["❓ Người Dùng<br/>Xác Nhận Xóa?"]
-
-    H -->|Không| I["🚫 Hủy"]
-    H -->|Có| J["🗑️ Xóa Sản Phẩm"]
-
-    J --> K["🖼️ Xóa Ảnh"]
-    K --> L["📊 Xóa Lịch Sử Giá"]
-    L --> M["📝 Ghi Log Xóa"]
-    M --> N["✅ Thông Báo Thành Công"]
-    N --> O["✔️ Kết Thúc"]
-
-    I --> P["🔴 Kết Thúc: Hủy"]
-
-    style G fill:#fff3e0
-    style N fill:#c8e6c9
-    style P fill:#ffcdd2
+    style Categories fill:#e3f2fd
+    style Menu fill:#fff3e0
+    style Auth fill:#f3e5f5
 ```
 
 ---
 
 ## Ghi Chú
 
-Các biểu đồ này được tạo bằng **Mermaid** và có thể được:
+### Các tính năng đã triển khai:
+- ✅ CRUD Category với validation unique categoryName
+- ✅ CRUD MenuItem với validation unique itemCode
+- ✅ Upload/Delete ảnh qua StorageService
+- ✅ Toggle availability (isAvailable)
+- ✅ Toggle active status (isActive)
+- ✅ Role-based access control (admin, manager)
+- ✅ Pagination và filtering
 
--   Chỉnh sửa trực tiếp trong markdown
--   Xuất thành hình ảnh PNG/SVG
--   Nhúng vào tài liệu web hoặc wiki
--   Tích hợp vào các công cụ quản lý dự án
+### Các tính năng chưa triển khai:
+- ❌ Allergens management (thành phần gây dị ứng)
+- ❌ Price history tracking (lịch sử giá)
+- ❌ Bulk import/export từ Excel/CSV
+- ❌ Scheduled menu updates (menu theo giờ)
+- ❌ Reports & Analytics (báo cáo phân tích)
+- ❌ Activity logging (ghi log hành động)
+
+### Công nghệ sử dụng:
+- **Frontend**: Next.js 15, React, TypeScript, Tailwind CSS, Zustand
+- **Backend**: NestJS, TypeScript, Prisma ORM
+- **Database**: PostgreSQL
+- **Authentication**: JWT (Access Token 15 phút, Refresh Token 7 ngày)
+- **Storage**: Local filesystem (/uploads)
+
+Các biểu đồ này được tạo bằng **Mermaid** và có thể được:
+- Chỉnh sửa trực tiếp trong markdown
+- Xuất thành hình ảnh PNG/SVG
+- Nhúng vào tài liệu web hoặc wiki
 
 **Để sử dụng Mermaid:**
-
 1. GitHub hỗ trợ mermaid trực tiếp trong markdown
-2. Các công cụ khác có thể cần plugin (Notion, Confluence, v.v.)
-3. Online editor: https://mermaid.live
+2. Online editor: https://mermaid.live

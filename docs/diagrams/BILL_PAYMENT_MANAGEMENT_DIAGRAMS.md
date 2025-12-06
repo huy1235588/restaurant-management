@@ -1,5 +1,16 @@
 # Biểu Đồ Quản Lý Hóa Đơn và Thanh Toán
 
+> **Lưu ý**: Tài liệu này đã được cập nhật để phản ánh chính xác hệ thống đã triển khai thực tế (Tháng 6/2025).
+
+## Mục lục
+
+1. [Biểu Đồ Quy Trình Tổng Thể](#1-biểu-đồ-quy-trình-tổng-thể-flowchart)
+2. [Biểu Đồ Sequence](#2-biểu-đồ-quản-lý-thanh-toán-sequence-diagram)
+3. [Biểu Đồ Trạng Thái](#3-biểu-đồ-trạng-thái-hóa-đơn-state-diagram)
+4. [API Reference](#api-reference)
+
+---
+
 ## 1. Biểu Đồ Quy Trình Tổng Thể (Flowchart)
 
 ```mermaid
@@ -108,132 +119,43 @@ sequenceDiagram
 
 ## 3. Biểu Đồ Trạng Thái Hóa Đơn (State Diagram)
 
+> **Lưu ý**: Hệ thống hiện tại sử dụng 4 trạng thái thanh toán. Các tính năng chia hóa đơn, thanh toán một phần sẽ được bổ sung trong tương lai.
+
 ```mermaid
 stateDiagram-v2
-    [*] --> Pending: Tạo hóa đơn
+    [*] --> pending: Tạo hóa đơn
     
-    Pending --> Paid: Thanh toán đầy đủ
-    Pending --> PartiallyPaid: Thanh toán một phần
-    Pending --> Cancelled: Hủy hóa đơn
+    pending --> paid: Thanh toán thành công
+    pending --> cancelled: Hủy hóa đơn
     
-    PartiallyPaid --> Paid: Thanh toán phần còn lại
-    PartiallyPaid --> Cancelled: Hủy
+    paid --> refunded: Hoàn tiền
     
-    Paid --> Refunded: Hoàn tiền toàn bộ
-    Paid --> PartiallyRefunded: Hoàn tiền một phần
+    refunded --> [*]
+    cancelled --> [*]
+    paid --> [*]
     
-    PartiallyRefunded --> Refunded: Hoàn phần còn lại
-    
-    Paid --> Split: Chia hóa đơn
-    Split --> [*]
-    
-    Refunded --> [*]
-    Cancelled --> [*]
-    
-    note right of Pending
+    note right of pending
         Chờ thanh toán
         Tổng tiền đã xác định
     end note
     
-    note right of Paid
+    note right of paid
         Đã thanh toán đầy đủ
         Có thể hoàn tiền
     end note
     
-    note right of PartiallyPaid
-        Đã thanh toán một phần
-        Còn nợ
+    note right of refunded
+        Đã hoàn tiền
+    end note
+    
+    note right of cancelled
+        Đã hủy
     end note
 ```
 
 ---
 
-## 4. Biểu Đồ Cấu Trúc Dữ Liệu (Entity Relationship)
-
-```mermaid
-erDiagram
-    BILL ||--|| ORDER : "generated from"
-    BILL ||--o{ BILL_ITEM : contains
-    BILL ||--o{ PAYMENT : "has"
-    BILL }o--|| RESTAURANT_TABLE : "for"
-    BILL }o--o| STAFF : "handled by"
-    
-    BILL_ITEM }o--|| MENU_ITEM : references
-    
-    BILL {
-        int billId PK
-        string billNumber UK
-        int orderId FK UK
-        int tableId FK
-        int staffId FK
-        decimal subtotal
-        decimal taxAmount
-        decimal taxRate
-        decimal discountAmount
-        decimal serviceCharge
-        decimal totalAmount
-        decimal paidAmount
-        decimal changeAmount
-        string paymentStatus
-        string paymentMethod
-        string notes
-        timestamp createdAt
-        timestamp paidAt
-        timestamp updatedAt
-    }
-    
-    BILL_ITEM {
-        int billItemId PK
-        int billId FK
-        int itemId FK
-        string itemName
-        int quantity
-        decimal unitPrice
-        decimal subtotal
-        decimal discount
-        decimal total
-        timestamp createdAt
-    }
-    
-    PAYMENT {
-        int paymentId PK
-        int billId FK
-        string paymentMethod
-        decimal amount
-        string transactionId
-        string cardNumber
-        string cardHolderName
-        string status
-        string notes
-        timestamp paymentDate
-        timestamp createdAt
-    }
-    
-    ORDER {
-        int orderId PK
-        string orderNumber UK
-    }
-    
-    RESTAURANT_TABLE {
-        int tableId PK
-        string tableNumber UK
-    }
-    
-    STAFF {
-        int staffId PK
-        string fullName
-    }
-    
-    MENU_ITEM {
-        int itemId PK
-        string name
-        decimal price
-    }
-```
-
----
-
-## 5. Biểu Đồ Tính Toán Hóa Đơn (Activity Diagram)
+## 4. Biểu Đồ Tính Toán Hóa Đơn (Activity Diagram)
 
 ```mermaid
 graph LR
@@ -261,7 +183,7 @@ graph LR
 
 ---
 
-## 6. Biểu Đồ Xử Lý Thanh Toán Tiền Mặt (Flow)
+## 5. Biểu Đồ Xử Lý Thanh Toán Tiền Mặt (Flow)
 
 ```mermaid
 flowchart TD
@@ -690,6 +612,73 @@ graph LR
     style A fill:#e3f2fd
     style I fill:#f3e5f5
     style E fill:#e8f5e9
+```
+
+---
+
+## 17. API Reference (Đã triển khai thực tế)
+
+### 17.1 Billing Controller (`/bills`)
+
+| Method | Endpoint | Mô tả | Roles |
+|--------|----------|-------|-------|
+| GET | `/bills` | Danh sách hóa đơn (pagination, filters) | all authenticated |
+| GET | `/bills/:id` | Chi tiết hóa đơn | all authenticated |
+| POST | `/bills` | Tạo hóa đơn từ Order | all authenticated |
+| PATCH | `/bills/:id/discount` | Áp dụng giảm giá | all authenticated |
+| POST | `/bills/:id/payment` | Xử lý thanh toán | all authenticated |
+| DELETE | `/bills/:id` | Hủy hóa đơn (void) | admin only |
+
+### 17.2 Enums
+
+**PaymentStatus:**
+- `pending` - Chờ thanh toán
+- `paid` - Đã thanh toán
+- `refunded` - Đã hoàn tiền
+- `cancelled` - Đã hủy
+
+**PaymentMethod:**
+- `cash` - Tiền mặt
+- `card` - Thẻ tín dụng/ghi nợ
+- `momo` - Ví MoMo
+- `bank_transfer` - Chuyển khoản ngân hàng
+
+### 17.3 Request/Response Examples
+
+**Tạo hóa đơn:**
+```json
+POST /bills
+{
+  "orderId": 123,
+  "taxRate": 10,
+  "serviceChargeRate": 5
+}
+```
+
+**Xử lý thanh toán:**
+```json
+POST /bills/123/payment
+{
+  "paymentMethod": "cash",
+  "amount": 200000,
+  "notes": "Khách trả tiền mặt"
+}
+```
+
+**Response thành công:**
+```json
+{
+  "message": "Payment processed successfully",
+  "data": {
+    "billId": 123,
+    "billNumber": "BILL-ABC123",
+    "paymentStatus": "paid",
+    "totalAmount": 162475,
+    "paidAmount": 200000,
+    "changeAmount": 37525,
+    "paidAt": "2025-06-10T14:30:00Z"
+  }
+}
 ```
 
 ---

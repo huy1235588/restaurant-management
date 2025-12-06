@@ -117,7 +117,7 @@ confirmed ──→ no_show (nếu khách không đến)
 | reservationDate | DATE         | Ngày đặt (YYYY-MM-DD)         |
 | reservationTime | TIME         | Giờ đặt (HH:MM:SS)            |
 | duration        | INTEGER      | Thời lượng dự kiến (phút)     |
-| headCount       | INTEGER      | Số người                      |
+| partySize       | INTEGER      | Số người                      |
 | specialRequest  | TEXT         | Yêu cầu đặc biệt (sinh nhật, etc.) |
 | depositAmount   | DECIMAL      | Tiền cọc                      |
 | status          | ENUM         | Trạng thái (pending, confirmed, etc.) |
@@ -193,7 +193,7 @@ AND t.isActive = true;
 ### 5.3. Quy tắc sức chứa
 
 ```
-minCapacity ≤ headCount ≤ capacity
+minCapacity ≤ partySize ≤ capacity
 
 Ví dụ: Bàn 6 người (minCapacity=2, capacity=6)
 - Có thể đặt cho 2, 3, 4, 5, hoặc 6 người
@@ -315,7 +315,7 @@ INSERT INTO orders (
     reservationId,
     customerName,
     customerPhone,
-    headCount,
+    partySize,
     staffId,
     status,
     orderTime
@@ -325,7 +325,7 @@ SELECT
     reservationId,
     customerName,
     phoneNumber as customerPhone,
-    headCount,
+    partySize,
     $2 as staffId,
     'pending' as status,
     NOW()
@@ -493,7 +493,7 @@ FROM reservations
 WHERE reservationDate >= DATE_SUB(CURDATE(), INTERVAL 30 DAY);
 
 -- Average party size
-SELECT AVG(headCount) as avg_party_size
+SELECT AVG(partySize) as avg_party_size
 FROM reservations
 WHERE status = 'completed'
 AND createdAt >= DATE_SUB(CURDATE(), INTERVAL 30 DAY);

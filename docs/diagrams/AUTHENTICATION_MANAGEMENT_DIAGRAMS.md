@@ -4,31 +4,32 @@
 
 ```mermaid
 flowchart TB
-    Start([Người dùng]) --> Login{Đăng nhập}
-    Login -->|Username/Password| Auth[Xác thực]
-    Login -->|QR Code| QRAuth[Xác thực QR]
-    Login -->|OAuth| OAuth[Xác thực OAuth]
+    Start([Người dùng]) --> Login[Trang đăng nhập]
+    Login --> Input[Nhập Username/Password]
     
+    Input --> Auth[Xác thực]
     Auth --> Validate{Valid?}
+    
     Validate -->|No| Error[Lỗi đăng nhập]
-    Validate -->|Yes| Check2FA{2FA enabled?}
+    Validate -->|Yes| CheckStatus{Account<br/>Active?}
     
-    Check2FA -->|No| CreateTokens[Tạo Tokens]
-    Check2FA -->|Yes| Verify2FA[Nhập mã 2FA]
-    Verify2FA --> Valid2FA{Valid?}
-    Valid2FA -->|No| Error
-    Valid2FA -->|Yes| CreateTokens
+    CheckStatus -->|No| ErrorInactive[Tài khoản<br/>không hoạt động]
+    CheckStatus -->|Yes| CreateTokens[Tạo Tokens]
     
-    CreateTokens --> AccessToken[Access Token<br/>expires: 30min]
+    CreateTokens --> AccessToken[Access Token<br/>expires: 15min]
     CreateTokens --> RefreshToken[Refresh Token<br/>expires: 7 days]
     
-    AccessToken --> Success[Đăng nhập<br/>thành công]
-    RefreshToken --> Success
+    AccessToken --> SetCookie[Lưu vào Cookie]
+    RefreshToken --> SetCookie
     
-    Success --> App[Truy cập ứng dụng]
+    SetCookie --> Success[Đăng nhập<br/>thành công]
+    Success --> Redirect[Chuyển hướng<br/>theo Role]
     
-    Error --> Retry{Retry?}
-    Retry -->|Yes| Login
+    Redirect --> App[Truy cập ứng dụng]
+    
+    Error --> Retry{Thử lại?}
+    ErrorInactive --> Retry
+    Retry -->|Yes| Input
     Retry -->|No| End([Kết thúc])
     
     App --> End
@@ -39,81 +40,60 @@ flowchart TB
 ```mermaid
 sequenceDiagram
     participant A as Admin/Manager
-    participant S as System
-    participant DB as Database
-    participant E as Email Service
-    participant L as Logger
+    participant S as Server (NestJS)
+    participant DB as Database (PostgreSQL)
     
-    A->>S: POST /api/accounts/create
-    Note over A,S: {username, email, phone, password}
+    A->>S: POST /auth/staff
+    Note over A,S: {username, email, phoneNumber,<br/>password, fullName, role, ...}
     
-    S->>S: Validate input
+    S->>S: Validate input (class-validator)
+    
     S->>DB: Check username exists
     DB-->>S: Not exists
     
     S->>DB: Check email exists
     DB-->>S: Not exists
     
-    S->>DB: Check phone exists
+    S->>DB: Check phoneNumber exists
     DB-->>S: Not exists
     
     S->>S: Hash password (bcrypt)
-    Note over S: saltRounds: 10
+    Note over S: saltRounds: 12
     
-    S->>DB: INSERT Account
-    DB-->>S: Account created
+    S->>DB: CREATE Staff with Account
+    Note over S,DB: Prisma nested create
+    DB-->>S: Staff + Account created
     
-    S->>DB: INSERT Staff (link to Account)
-    DB-->>S: Staff created
-    
-    S->>DB: Assign default role
-    DB-->>S: Role assigned
-    
-    S->>E: Send welcome email
-    Note over E: Username + temp password<br/>+ login link
-    E-->>S: Email sent
-    
-    S->>L: Log account creation
-    L-->>S: Logged
+    S->>S: Log account creation
     
     S-->>A: 201 Created
-    Note over S,A: {id, username, email, role}
+    Note over S,A: {staffId, accountId, fullName, role}
 ```
 
 ## 3. Biểu Đồ Trạng Thái Tài Khoản
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Pending: Tạo tài khoản
-    Pending --> Active: Kích hoạt
-    Pending --> Expired: Quá hạn kích hoạt
+    [*] --> Active: Tạo tài khoản
     
-    Active --> Locked: Khóa tài khoản
-    Active --> Suspended: Tạm ngưng
-    Active --> Inactive: Vô hiệu hóa
+    Active --> Inactive: Vô hiệu hóa (isActive = false)
+    Inactive --> Active: Kích hoạt lại (isActive = true)
     
-    Locked --> Active: Mở khóa
-    Suspended --> Active: Kích hoạt lại
-    Inactive --> Active: Kích hoạt lại
-    
-    Expired --> [*]: Xóa
-    Locked --> Deleted: Admin xóa
-    Suspended --> Deleted: Admin xóa
+    Active --> Deleted: Admin xóa
     Inactive --> Deleted: Admin xóa
     
     Deleted --> [*]
     
     note right of Active
-        Trạng thái hoạt động
+        Trạng thái hoạt động (isActive = true)
         - Đăng nhập được
-        - Có quyền truy cập
+        - Có quyền truy cập theo Role
     end note
     
-    note right of Locked
-        Bị khóa do:
-        - Vi phạm chính sách
-        - Đăng nhập sai nhiều lần
-        - Admin khóa
+    note right of Inactive
+        Bị vô hiệu hóa (isActive = false)
+        - Không thể đăng nhập
+        - Trả về "Account is inactive"
     end note
 ```
 
@@ -122,47 +102,54 @@ stateDiagram-v2
 ```mermaid
 sequenceDiagram
     participant U as User
-    participant C as Client
-    participant S as Server
-    participant DB as Database
-    participant L as Logger
+    participant C as Client (Next.js)
+    participant S as Server (NestJS)
+    participant DB as Database (PostgreSQL)
     
     U->>C: Nhập username + password
-    C->>S: POST /api/auth/login
+    C->>S: POST /auth/login
+    Note over C,S: {username, password}
     
-    S->>DB: Find user by username
-    DB-->>S: User data
+    S->>DB: Find account by username
+    DB-->>S: Account data
     
-    S->>S: Check account status
-    alt Account inactive or locked
-        S-->>C: 403 Forbidden
-        C-->>U: Tài khoản bị khóa
+    alt Account not found
+        S-->>C: 401 Unauthorized
+        C-->>U: Sai tên đăng nhập hoặc mật khẩu
     end
     
-    S->>S: Compare password
-    Note over S: bcrypt.compare(input, hash)
-    
-    alt Password incorrect
-        S->>L: Log failed attempt
+    S->>S: Check account.isActive
+    alt Account inactive
         S-->>C: 401 Unauthorized
-        C-->>U: Sai mật khẩu
+        C-->>U: Tài khoản không hoạt động
+    end
+    
+    S->>S: bcrypt.compare(password, hash)
+    alt Password incorrect
+        S-->>C: 401 Unauthorized
+        C-->>U: Sai tên đăng nhập hoặc mật khẩu
     else Password correct
+        S->>DB: Get Staff by accountId
+        DB-->>S: Staff data (fullName, role)
+        
         S->>S: Generate Access Token
-        Note over S: JWT expires: 30min
+        Note over S: JWT expires: 15min
         S->>S: Generate Refresh Token
         Note over S: JWT expires: 7 days
         
-        S->>DB: Save refresh token
-        S->>DB: Update lastLogin
-        S->>L: Log successful login
+        S->>DB: Save RefreshToken
+        Note over S,DB: {token, accountId, deviceInfo, ipAddress, expiresAt}
+        S->>DB: Update account.lastLogin
         
-        S-->>C: 200 OK
-        Note over C,S: {accessToken, refreshToken, user}
+        S-->>C: 200 OK + Set-Cookie
+        Note over C,S: Cookie: accessToken (15min)<br/>Cookie: refreshToken (7 days, httpOnly)
+        Note over C,S: Body: {user, accessToken}
         
-        C->>C: Store tokens
-        Note over C: Access: memory<br/>Refresh: httpOnly cookie
+        C->>C: Store accessToken in memory
+        C->>C: Store user in Zustand
         
-        C-->>U: Chuyển đến trang chủ
+        C-->>U: Redirect theo role
+        Note over U,C: admin/manager → /admin/dashboard<br/>waiter → /admin/orders<br/>chef → /admin/kitchen<br/>cashier → /admin/bills
     end
 ```
 
@@ -171,7 +158,7 @@ sequenceDiagram
 ```mermaid
 flowchart TB
     Start([Đăng nhập]) --> Create[Tạo Access Token]
-    Create --> Store[Lưu token<br/>expires: 30 phút]
+    Create --> Store[Lưu token trong memory<br/>expires: 15 phút]
     
     Store --> Use[Sử dụng token<br/>cho API requests]
     
@@ -179,7 +166,7 @@ flowchart TB
     Check -->|Yes| Valid[Request thành công]
     Check -->|No| Expired[Token hết hạn]
     
-    Expired --> Refresh[Gọi /refresh]
+    Expired --> Refresh[Gọi POST /auth/refresh<br/>với cookie refreshToken]
     Refresh --> CheckRefresh{Refresh token<br/>hợp lệ?}
     
     CheckRefresh -->|Yes| NewAccess[Tạo Access token mới]
@@ -191,8 +178,9 @@ flowchart TB
     Continue -->|Yes| Use
     Continue -->|No| Logout[Đăng xuất]
     
-    Logout --> Blacklist[Thêm vào blacklist]
-    Blacklist --> End([Kết thúc])
+    Logout --> RevokeToken[Revoke RefreshToken trong DB]
+    RevokeToken --> ClearCookie[Xóa Cookie]
+    ClearCookie --> End([Kết thúc])
     ReLogin --> End
 ```
 
@@ -200,43 +188,43 @@ flowchart TB
 
 ```mermaid
 sequenceDiagram
-    participant C as Client
-    participant S as Server
+    participant C as Client (Next.js)
+    participant S as Server (NestJS)
     participant DB as Database
-    participant BL as Blacklist
     
     C->>S: API Request with Access Token
-    S->>S: Verify token
+    S->>S: Verify token (JwtAuthGuard)
     S-->>C: 401 Token expired
     
-    C->>S: POST /api/auth/refresh
-    Note over C,S: {refreshToken}
+    C->>S: POST /auth/refresh
+    Note over C,S: Cookie: refreshToken (httpOnly)
     
-    S->>S: Verify refresh token
+    S->>S: Extract refreshToken from cookie
+    S->>S: Verify JWT signature
     
-    alt Invalid refresh token
+    alt Invalid JWT
         S-->>C: 401 Unauthorized
-        C->>C: Clear all tokens
-        C-->>C: Redirect to login
-    else Valid refresh token
-        S->>DB: Check token exists
-        DB-->>S: Token found
+        C->>C: Clear auth state
+        C-->>C: Redirect to /login
+    else Valid JWT
+        S->>DB: Find RefreshToken by token
+        Note over S,DB: Check: exists, not revoked, not expired
         
-        S->>S: Generate new Access Token
-        Note over S: expires: 30 min
-        
-        opt Generate new Refresh Token
-            S->>S: Generate new Refresh Token
-            S->>DB: Save new refresh token
-            S->>DB: Delete old refresh token
+        alt Token not found or revoked
+            S-->>C: 401 Invalid refresh token
+            C-->>C: Redirect to /login
+        else Token valid
+            S->>S: Generate new Access Token
+            Note over S: expires: 15 min
+            
+            S-->>C: 200 OK + Set-Cookie
+            Note over C,S: Cookie: accessToken (15min)
+            Note over C,S: Body: {accessToken}
+            
+            C->>C: Update accessToken in memory
+            C->>S: Retry original request
+            S-->>C: 200 OK
         end
-        
-        S-->>C: 200 OK
-        Note over C,S: {accessToken, refreshToken?}
-        
-        C->>C: Update tokens
-        C->>S: Retry original request
-        S-->>C: 200 OK
     end
 ```
 
@@ -246,281 +234,158 @@ sequenceDiagram
 flowchart TB
     Start([User nhấn Đăng xuất]) --> Choice{Đăng xuất<br/>khỏi?}
     
-    Choice -->|Thiết bị này| SingleLogout[Đăng xuất đơn]
-    Choice -->|Tất cả thiết bị| AllLogout[Đăng xuất tất cả]
+    Choice -->|Thiết bị này| SingleLogout[POST /auth/logout]
+    Choice -->|Tất cả thiết bị| AllLogout[POST /auth/logout-all]
     
-    SingleLogout --> DeleteRT[Xóa Refresh Token hiện tại]
-    SingleLogout --> AddBL[Thêm Access Token<br/>vào Blacklist]
+    SingleLogout --> DeleteRT[Xóa RefreshToken hiện tại<br/>khỏi Database]
     
-    AllLogout --> Confirm{Xác nhận<br/>mật khẩu?}
-    Confirm -->|No| End([Hủy])
-    Confirm -->|Yes| DeleteAllRT[Xóa tất cả<br/>Refresh Tokens]
-    DeleteAllRT --> AddAllBL[Thêm tất cả<br/>Access Tokens vào Blacklist]
+    AllLogout --> RevokeAllRT[Revoke tất cả RefreshTokens<br/>của Account]
     
-    AddBL --> ClearClient[Xóa tokens<br/>trên Client]
-    AddAllBL --> ClearClient
+    DeleteRT --> ClearCookie[Server xóa Cookie<br/>accessToken, refreshToken]
+    RevokeAllRT --> ClearCookie
     
-    ClearClient --> Log[Ghi log]
-    Log --> Redirect[Chuyển về<br/>trang đăng nhập]
+    ClearCookie --> ClearClient[Client xóa auth state<br/>Zustand store]
     
-    Redirect --> End
+    ClearClient --> Redirect[Chuyển về<br/>trang đăng nhập]
+    
+    Redirect --> End([Kết thúc])
 ```
 
-## 8. Biểu Đồ Quên Mật Khẩu
+## 8. Biểu Đồ Đổi Mật Khẩu
 
 ```mermaid
 sequenceDiagram
     participant U as User
-    participant S as System
+    participant C as Client (Next.js)
+    participant S as Server (NestJS)
     participant DB as Database
-    participant E as Email Service
     
-    U->>S: POST /api/auth/forgot-password
-    Note over U,S: {email}
+    U->>C: Vào Settings > Đổi mật khẩu
+    C->>C: Hiển thị form
+    U->>C: Nhập currentPassword + newPassword
     
-    S->>DB: Find user by email
+    C->>S: PUT /auth/change-password
+    Note over C,S: {currentPassword, newPassword}
+    Note over C,S: Header: Authorization Bearer token
     
-    alt Email not found
-        S-->>U: 200 OK (không tiết lộ)
-        Note over S,U: "Nếu email tồn tại,<br/>bạn sẽ nhận được link"
-    else Email found
-        S->>S: Generate reset token (UUID)
-        Note over S: expires: 1 hour
-        
-        S->>DB: Save reset token
-        DB-->>S: Saved
-        
-        S->>S: Create reset link
-        Note over S: https://app.com/reset?token=xxx
-        
-        S->>E: Send email with link
-        E-->>S: Sent
-        
-        S-->>U: 200 OK
-        Note over S,U: "Nếu email tồn tại,<br/>bạn sẽ nhận được link"
-    end
+    S->>S: JwtAuthGuard verify token
+    S->>S: Extract accountId from token
     
-    U->>U: Click link in email
-    U->>S: GET /reset-password?token=xxx
+    S->>DB: Find Account by accountId
+    DB-->>S: Account data
     
-    S->>DB: Verify token
+    S->>S: bcrypt.compare(currentPassword, hash)
     
-    alt Token invalid or expired
-        S-->>U: 400 Bad Request
-    else Token valid
-        S-->>U: Show reset form
+    alt Current password incorrect
+        S-->>C: 401 Current password is incorrect
+        C-->>U: Hiển thị lỗi
+    else Password correct
+        S->>S: bcrypt.hash(newPassword, 12)
+        S->>DB: Update account.password
+        DB-->>S: Updated
         
-        U->>S: POST /api/auth/reset-password
-        Note over U,S: {token, newPassword}
-        
-        S->>S: Validate password strength
-        S->>S: Hash new password
-        S->>DB: Update password
-        S->>DB: Mark token as used
-        S->>DB: Delete all refresh tokens
-        
-        S->>E: Send confirmation email
-        
-        S-->>U: 200 OK
-        U->>U: Redirect to login
+        S-->>C: 200 Password changed successfully
+        C-->>U: Thông báo thành công
     end
 ```
 
-## 9. Biểu Đồ Đổi Mật Khẩu
-
-```mermaid
-flowchart TB
-    Start([User vào Settings]) --> Form[Form đổi mật khẩu]
-    
-    Form --> Input[Nhập:<br/>- Old password<br/>- New password<br/>- Confirm password]
-    
-    Input --> Submit[Submit]
-    
-    Submit --> VerifyOld{Old password<br/>đúng?}
-    VerifyOld -->|No| ErrorOld[Lỗi: Mật khẩu cũ sai]
-    VerifyOld -->|Yes| CheckStrength{New password<br/>đủ mạnh?}
-    
-    CheckStrength -->|No| ErrorWeak[Lỗi: Mật khẩu yếu]
-    CheckStrength -->|Yes| CheckSame{New khác Old?}
-    
-    CheckSame -->|No| ErrorSame[Lỗi: Phải khác mật khẩu cũ]
-    CheckSame -->|Yes| CheckConfirm{Confirm khớp?}
-    
-    CheckConfirm -->|No| ErrorConfirm[Lỗi: Xác nhận không khớp]
-    CheckConfirm -->|Yes| CheckHistory{Trong lịch sử<br/>5 mật khẩu?}
-    
-    CheckHistory -->|Yes| ErrorHistory[Lỗi: Đã dùng gần đây]
-    CheckHistory -->|No| Hash[Hash mật khẩu mới]
-    
-    Hash --> Update[Cập nhật DB]
-    Update --> SaveHistory[Lưu vào lịch sử]
-    SaveHistory --> LogoutOthers[Đăng xuất<br/>các thiết bị khác]
-    
-    LogoutOthers --> SendEmail[Gửi email thông báo]
-    SendEmail --> Success[Thành công]
-    
-    Success --> End([Kết thúc])
-    ErrorOld --> End
-    ErrorWeak --> End
-    ErrorSame --> End
-    ErrorConfirm --> End
-    ErrorHistory --> End
-```
-
-## 10. Biểu Đồ Bật 2FA
+## 9. Biểu Đồ Cập Nhật Profile
 
 ```mermaid
 sequenceDiagram
     participant U as User
-    participant S as Server
+    participant C as Client (Next.js)
+    participant S as Server (NestJS)
     participant DB as Database
-    participant A as Authenticator App
     
-    U->>S: POST /api/auth/2fa/enable
+    U->>C: Vào Profile Settings
+    C->>S: GET /auth/me
+    S-->>C: User info
+    C->>C: Hiển thị form với dữ liệu hiện tại
     
-    S->>S: Generate secret key
-    Note over S: Base32 encoded
+    U->>C: Sửa thông tin (email, phone, fullName, address)
+    C->>S: PUT /auth/profile
+    Note over C,S: {email?, phoneNumber?, fullName?, address?}
     
-    S->>S: Generate QR code
-    Note over S: otpauth://totp/App:user@email?secret=xxx
+    S->>S: JwtAuthGuard verify token
     
-    S->>DB: Save secret (temporary)
-    
-    S-->>U: 200 OK
-    Note over S,U: {qrCode, secret, backupCodes}
-    
-    U->>A: Scan QR code
-    A->>A: Add account
-    A-->>U: Display 6-digit code
-    
-    U->>S: POST /api/auth/2fa/verify
-    Note over U,S: {code}
-    
-    S->>S: Verify code with secret
-    Note over S: TOTP algorithm
-    
-    alt Code invalid
-        S-->>U: 400 Invalid code
-    else Code valid
-        S->>DB: Enable 2FA for user
-        S->>DB: Save secret (permanent)
-        S->>DB: Generate 10 backup codes
-        
-        S-->>U: 200 OK
-        Note over S,U: {success, backupCodes}
-        
-        U->>U: Save backup codes
+    alt Email bị thay đổi
+        S->>DB: Check email exists
+        alt Email đã tồn tại
+            S-->>C: 409 Email already exists
+        end
     end
+    
+    alt Phone bị thay đổi
+        S->>DB: Check phoneNumber exists
+        alt Phone đã tồn tại
+            S-->>C: 409 Phone number already exists
+        end
+    end
+    
+    S->>DB: Update Account (email, phoneNumber)
+    S->>DB: Update Staff (fullName, address)
+    
+    S-->>C: 200 Profile updated successfully
+    C-->>U: Thông báo thành công
 ```
 
-## 11. Biểu Đồ Đăng Nhập Với 2FA
-
-```mermaid
-flowchart TB
-    Start([Đăng nhập]) --> Creds[Nhập username/password]
-    
-    Creds --> Auth{Xác thực}
-    Auth -->|Sai| Error[Lỗi đăng nhập]
-    Auth -->|Đúng| Check2FA{2FA enabled?}
-    
-    Check2FA -->|No| CreateTokens[Tạo tokens]
-    Check2FA -->|Yes| Show2FA[Hiển thị form 2FA]
-    
-    Show2FA --> Input2FA[Nhập mã 6 số]
-    Input2FA --> Verify{Verify code}
-    
-    Verify -->|Invalid| Retry{Thử lại?}
-    Retry -->|Yes| Input2FA
-    Retry -->|No| UseBackup{Dùng backup code?}
-    
-    UseBackup -->|Yes| InputBackup[Nhập backup code]
-    InputBackup --> VerifyBackup{Valid?}
-    VerifyBackup -->|No| Error
-    VerifyBackup -->|Yes| MarkUsed[Đánh dấu code đã dùng]
-    MarkUsed --> CreateTokens
-    
-    UseBackup -->|No| Error
-    Verify -->|Valid| CreateTokens
-    
-    CreateTokens --> Success[Đăng nhập thành công]
-    Success --> End([Kết thúc])
-    Error --> End
-```
-
-## 12. Biểu Đồ ERD Xác Thực
+## 10. Biểu Đồ ERD Xác Thực (Thực tế Triển Khai)
 
 ```mermaid
 erDiagram
+    ACCOUNTS ||--|| STAFF : has
     ACCOUNTS ||--o{ REFRESH_TOKENS : has
-    ACCOUNTS ||--o{ PASSWORD_HISTORY : has
-    ACCOUNTS ||--|| TWO_FACTOR_AUTH : has
-    ACCOUNTS ||--o{ LOGIN_HISTORY : has
-    ACCOUNTS }o--|| ROLES : has
-    ROLES ||--o{ PERMISSIONS : has
+    STAFF }o--|| ROLE : has
     
     ACCOUNTS {
-        int id PK
-        string username UK
-        string email UK
-        string phone UK
-        string password_hash
-        int role_id FK
-        enum status
-        datetime last_login
-        datetime created_at
-        datetime updated_at
+        int accountId PK
+        string username UK "VarChar(50)"
+        string email UK "VarChar(255)"
+        string phoneNumber UK "VarChar(20)"
+        string password "VarChar(255) bcrypt hash"
+        boolean isActive "default true"
+        datetime lastLogin "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    
+    STAFF {
+        int staffId PK
+        int accountId FK UK
+        string fullName "VarChar(255)"
+        string address "VarChar(500) nullable"
+        date dateOfBirth "nullable"
+        date hireDate "default now()"
+        decimal salary "Decimal(12,2) nullable"
+        enum role "admin|manager|waiter|chef|cashier"
+        boolean isActive "default true"
+        datetime createdAt
+        datetime updatedAt
     }
     
     REFRESH_TOKENS {
-        int id PK
-        int account_id FK
-        string token UK
-        string device_info
-        string ip_address
-        datetime expires_at
-        datetime created_at
+        int tokenId PK
+        int accountId FK
+        string token UK "Text"
+        datetime expiresAt
+        string deviceInfo "VarChar(500) nullable"
+        string ipAddress "VarChar(45) nullable"
+        boolean isRevoked "default false"
+        datetime createdAt
+        datetime revokedAt "nullable"
     }
     
-    PASSWORD_HISTORY {
-        int id PK
-        int account_id FK
-        string password_hash
-        datetime changed_at
-    }
-    
-    TWO_FACTOR_AUTH {
-        int id PK
-        int account_id FK
-        string secret
-        boolean enabled
-        json backup_codes
-        datetime created_at
-    }
-    
-    LOGIN_HISTORY {
-        int id PK
-        int account_id FK
-        string ip_address
-        string user_agent
-        boolean success
-        datetime timestamp
-    }
-    
-    ROLES {
-        int id PK
-        string name UK
-        string description
-    }
-    
-    PERMISSIONS {
-        int id PK
-        int role_id FK
-        string resource
-        string action
+    ROLE {
+        enum_value admin
+        enum_value manager
+        enum_value waiter
+        enum_value chef
+        enum_value cashier
     }
 ```
 
-## 13. Biểu Đồ Ma Trận Phân Quyền
+## 11. Biểu Đồ Ma Trận Phân Quyền
 
 ```mermaid
 graph TB
@@ -567,31 +432,36 @@ graph TB
     Cashier -.->|Full Access| Bills
 ```
 
-## 14. Biểu Đồ Kiểm Tra Quyền (Authorization)
+## 12. Biểu Đồ Kiểm Tra Quyền (Authorization)
 
 ```mermaid
 flowchart TB
-    Start([API Request]) --> HasToken{Has<br/>Token?}
+    Start([API Request]) --> HasToken{Có Cookie<br/>accessToken?}
     
     HasToken -->|No| Return401[401 Unauthorized]
-    HasToken -->|Yes| ValidToken{Token<br/>Valid?}
+    HasToken -->|Yes| JwtGuard[JwtAuthGuard]
     
-    ValidToken -->|No| Return401
-    ValidToken -->|Yes| Decode[Decode JWT]
+    JwtGuard --> ValidToken{Token<br/>hợp lệ?}
     
-    Decode --> ExtractUser[Extract user info<br/>userId, role]
-    ExtractUser --> CheckPermission{Has<br/>Permission?}
+    ValidToken -->|No| TryRefresh{Có refreshToken<br/>cookie?}
+    TryRefresh -->|No| Return401
+    TryRefresh -->|Yes| RefreshFlow[Gọi /auth/refresh]
+    RefreshFlow --> ValidToken
     
-    CheckPermission -->|No| Return403[403 Forbidden]
-    CheckPermission -->|Yes| CheckOwnership{Ownership<br/>Required?}
+    ValidToken -->|Yes| Decode[Decode JWT<br/>JwtStrategy]
     
-    CheckOwnership -->|No| AllowAccess[Allow Access]
-    CheckOwnership -->|Yes| IsOwner{Is Owner?}
+    Decode --> ExtractUser[Extract: accountId,<br/>staffId, username, role]
+    ExtractUser --> AttachUser[Attach to request.user]
     
-    IsOwner -->|No| Return403
-    IsOwner -->|Yes| AllowAccess
+    AttachUser --> RolesGuard{RolesGuard<br/>kiểm tra role?}
     
-    AllowAccess --> Execute[Execute Business Logic]
+    RolesGuard -->|Không yêu cầu| AllowAccess[Allow Access]
+    RolesGuard -->|Yêu cầu role| CheckRole{User.role<br/>trong allowedRoles?}
+    
+    CheckRole -->|No| Return403[403 Forbidden]
+    CheckRole -->|Yes| AllowAccess
+    
+    AllowAccess --> Execute[Execute Controller Method]
     Execute --> Return200[200 OK]
     
     Return401 --> End([End])
@@ -599,84 +469,25 @@ flowchart TB
     Return200 --> End
 ```
 
-## 15. Biểu Đồ Session Management
-
-```mermaid
-flowchart TB
-    Start([User Settings]) --> ViewSessions[Xem Phiên Đăng Nhập]
-    
-    ViewSessions --> Display[Hiển thị danh sách:<br/>- Device<br/>- Browser<br/>- IP<br/>- Location<br/>- Last activity]
-    
-    Display --> Choice{Chọn<br/>hành động}
-    
-    Choice -->|View Details| Details[Chi tiết phiên]
-    Details --> Display
-    
-    Choice -->|Logout One| Confirm1{Xác nhận?}
-    Confirm1 -->|No| Display
-    Confirm1 -->|Yes| DeleteOne[Xóa 1 refresh token]
-    DeleteOne --> BlacklistOne[Thêm access token<br/>vào blacklist]
-    BlacklistOne --> Success1[Thông báo thành công]
-    Success1 --> Display
-    
-    Choice -->|Logout All Others| Confirm2{Xác nhận<br/>mật khẩu?}
-    Confirm2 -->|No| Display
-    Confirm2 -->|Yes| DeleteOthers[Xóa tất cả tokens khác]
-    DeleteOthers --> BlacklistOthers[Blacklist tất cả<br/>access tokens khác]
-    BlacklistOthers --> Success2[Thông báo thành công]
-    Success2 --> Display
-    
-    Choice -->|Close| End([Kết thúc])
-```
-
-## 16. Biểu Đồ Audit Logging
-
-```mermaid
-sequenceDiagram
-    participant U as User Action
-    participant S as System
-    participant L as Logger
-    participant DB as Log Database
-    participant A as Alert System
-    
-    U->>S: Perform action
-    Note over U,S: Login, Logout, Change password,<br/>Access sensitive data, etc.
-    
-    S->>S: Execute action
-    
-    par Log to Database
-        S->>L: Create log entry
-        Note over L: {<br/>  userId, username,<br/>  action, resource,<br/>  ip, userAgent,<br/>  timestamp, result<br/>}
-        
-        L->>DB: INSERT log
-        DB-->>L: Logged
-    and Check Security Rules
-        S->>S: Evaluate security rules
-        
-        alt Suspicious Activity
-            S->>A: Trigger alert
-            Note over A: Multiple failed logins<br/>Access from new location<br/>Unusual activity pattern
-            
-            A->>A: Notify admins
-            A->>A: Lock account (if needed)
-        end
-    end
-    
-    S-->>U: Action response
-    
-    Note over DB: Logs retained for:<br/>- Security: 1 year<br/>- Audit: 7 years<br/>- Compliance: As required
-```
-
 ---
 
 ## Kết Luận
 
-Các biểu đồ trên mô tả chi tiết:
-- Quy trình xác thực và ủy quyền
-- Vòng đời JWT tokens
-- Quản lý phiên đăng nhập
-- Bảo mật 2FA
-- Phân quyền và kiểm soát truy cập
-- Audit logging và monitoring
+Các biểu đồ trên mô tả chi tiết hệ thống xác thực **đã được triển khai**:
 
-Tất cả sử dụng cú pháp Mermaid để dễ dàng hiển thị trên GitHub/GitLab.
+### Tính năng đã triển khai:
+- ✅ Quy trình đăng nhập với JWT (Access Token 15 phút, Refresh Token 7 ngày)
+- ✅ Đăng ký tài khoản nhân viên (Account + Staff)
+- ✅ Làm mới token tự động qua httpOnly cookie
+- ✅ Đăng xuất (thiết bị đơn và tất cả thiết bị)
+- ✅ Đổi mật khẩu
+- ✅ Cập nhật thông tin cá nhân
+- ✅ Phân quyền theo Role (admin, manager, waiter, chef, cashier)
+- ✅ Bảo mật token với httpOnly cookie
+
+### Công nghệ sử dụng:
+- **Backend**: NestJS, Passport JWT, bcrypt (salt rounds: 12)
+- **Frontend**: Next.js, Zustand, httpOnly cookies
+- **Database**: PostgreSQL với Prisma ORM
+
+Tất cả biểu đồ sử dụng cú pháp Mermaid để dễ dàng hiển thị trên GitHub/GitLab.

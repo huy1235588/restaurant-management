@@ -1,5 +1,13 @@
 # Tài Liệu Chi Tiết Quản Lý Tồn Kho
 
+> ⚠️ **CHƯA TRIỂN KHAI**: Module Quản Lý Tồn Kho chưa được triển khai trong phiên bản hiện tại của hệ thống.
+> 
+> Tài liệu này mô tả thiết kế và kiến trúc dự kiến cho các bản phát triển tương lai.
+> 
+> **Trạng thái**: Thiết kế hoàn chỉnh, chờ triển khai
+
+---
+
 ## 1. Giới Thiệu
 
 Hệ thống quản lý tồn kho là một phần quan trọng của ứng dụng quản lý nhà hàng, giúp theo dõi và quản lý nguyên liệu, vật tư, đảm bảo nguồn cung ứng ổn định cho hoạt động kinh doanh. Hệ thống hỗ trợ quản lý nguyên liệu, nhà cung cấp, đơn đặt hàng, giao dịch kho, theo dõi lô hàng, cảnh báo tồn kho và báo cáo phân tích.

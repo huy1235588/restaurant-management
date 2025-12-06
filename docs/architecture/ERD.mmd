@@ -204,7 +204,7 @@ erDiagram
         int itemId FK
         int quantity
         decimal unitPrice
-        decimal subtotal
+        decimal totalPrice
         string specialRequest
         enum status
         datetime createdAt
@@ -271,4 +271,26 @@ erDiagram
         string notes
         datetime paymentDate
         datetime createdAt
+    }
+
+    RestaurantSettings {
+        int id PK
+        string name
+        string tagline
+        string description
+        string aboutTitle
+        string aboutContent
+        string address
+        string phone
+        string email
+        string mapEmbedUrl
+        string heroImage
+        string aboutImage
+        string logoUrl
+        json operatingHours
+        json socialLinks
+        json highlights
+        json bankConfig
+        datetime createdAt
+        datetime updatedAt
     }

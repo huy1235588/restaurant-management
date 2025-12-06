@@ -166,7 +166,7 @@ INSERT INTO reservations (
     reservationDate,
     reservationTime,
     duration,
-    headCount,
+    partySize,
     specialRequest,
     status
 ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending')
@@ -242,7 +242,7 @@ INSERT INTO orders (
     reservationId,
     customerName,
     customerPhone,
-    headCount,
+    partySize,
     status,
     notes
 ) VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7)
@@ -254,7 +254,7 @@ INSERT INTO order_items (
     itemId,
     quantity,
     unitPrice,
-    subtotal,
+    totalPrice,
     specialRequest
 ) VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING *;
@@ -274,7 +274,7 @@ SELECT
             'itemName', m.itemName,
             'quantity', oi.quantity,
             'unitPrice', oi.unitPrice,
-            'subtotal', oi.subtotal,
+            'totalPrice', oi.totalPrice,
             'specialRequest', oi.specialRequest,
             'status', oi.status
         )
@@ -297,7 +297,7 @@ SELECT
     o.orderNumber,
     o.orderTime,
     o.status,
-    o.headCount,
+    o.partySize,
     t.tableNumber,
     t.section,
     s.fullName as waiterName,
@@ -569,7 +569,7 @@ SELECT
     t.section,
     COUNT(o.orderId) as totalOrders,
     SUM(EXTRACT(EPOCH FROM (o.completedAt - o.orderTime))/3600) as totalHours,
-    AVG(o.headCount) as avgHeadCount
+    AVG(o.partySize) as avgPartySize
 FROM restaurant_tables t
 LEFT JOIN orders o ON t.tableId = o.tableId
     AND o.orderTime >= $1

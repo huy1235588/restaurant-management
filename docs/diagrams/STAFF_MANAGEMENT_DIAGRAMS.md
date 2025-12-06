@@ -1,6 +1,30 @@
 # Biểu Đồ Quản Lý Nhân Sự
 
+> **Lưu ý**: Tài liệu này đã được cập nhật để phản ánh triển khai thực tế của hệ thống (06/2025).
+> 
+> **Thay đổi so với thiết kế ban đầu:**
+> - Trạng thái nhân viên đơn giản: chỉ có `isActive` (true/false)
+> - Chưa triển khai: Chấm công, Xếp ca làm, Đánh giá hiệu suất phức tạp, Gửi email thông báo
+> - Performance API hiện tại tính từ Orders (số đơn, doanh thu phục vụ)
+
 ## 1. Biểu Đồ Quy Trình Tổng Thể (Flowchart)
+
+**Triển khai thực tế (đơn giản hóa):**
+
+```mermaid
+flowchart TD
+    A[Tuyển Dụng Nhân Viên Mới] --> B[Admin Tạo Account]
+    B --> C[Admin Tạo Staff Profile]
+    C --> D[Gán Vai Trò]
+    D --> E[Nhân Viên Đăng Nhập]
+    E --> F[Làm Việc Hàng Ngày]
+    F --> G{Còn Làm Việc?}
+    G -->|Có| F
+    G -->|Không| H[Admin Deactivate]
+    H --> I[Lưu Trữ Hồ Sơ]
+```
+
+**Thiết kế mở rộng (tương lai):**
 
 ```mermaid
 flowchart TD
@@ -83,6 +107,30 @@ sequenceDiagram
 
 ## 3. Biểu Đồ Trạng Thái Nhân Viên (State Diagram)
 
+**Triển khai thực tế (đơn giản):**
+
+```mermaid
+stateDiagram-v2
+    [*] --> Active: Tạo Staff Profile
+    
+    Active --> Inactive: Admin deactivate
+    Inactive --> Active: Admin activate
+    
+    Inactive --> [*]: Delete staff
+    
+    note right of Active
+        isActive = true
+        Có thể đăng nhập và làm việc
+    end note
+    
+    note right of Inactive
+        isActive = false
+        Account vẫn tồn tại nhưng không hoạt động
+    end note
+```
+
+**Thiết kế mở rộng (tương lai):**
+
 ```mermaid
 stateDiagram-v2
     [*] --> Pending: Tạo tài khoản
@@ -118,68 +166,7 @@ stateDiagram-v2
 
 ---
 
-## 4. Biểu Đồ Cấu Trúc Dữ Liệu (Entity Relationship)
-
-```mermaid
-erDiagram
-    ACCOUNT ||--|| STAFF : has
-    STAFF ||--o{ ORDER : creates
-    STAFF ||--o{ BILL : processes
-    STAFF ||--o{ KITCHEN_ORDER : handles
-    STAFF ||--o{ PURCHASE_ORDER : manages
-    STAFF ||--o{ STOCK_TRANSACTION : performs
-    STAFF ||--o{ TIMESHEET : has
-    STAFF ||--o{ PERFORMANCE_REVIEW : receives
-
-    ACCOUNT {
-        int accountId PK
-        string username UK
-        string email UK
-        string phoneNumber UK
-        string password
-        boolean isActive
-        timestamp lastLogin
-        timestamp createdAt
-    }
-
-    STAFF {
-        int staffId PK
-        int accountId FK UK
-        string fullName
-        string address
-        date dateOfBirth
-        date hireDate
-        decimal salary
-        string role
-        boolean isActive
-        timestamp createdAt
-    }
-
-    TIMESHEET {
-        int timesheetId PK
-        int staffId FK
-        date workDate
-        time checkIn
-        time checkOut
-        decimal totalHours
-        string shift
-        string status
-    }
-
-    PERFORMANCE_REVIEW {
-        int reviewId PK
-        int staffId FK
-        int reviewerId FK
-        string period
-        int rating
-        string comments
-        timestamp reviewDate
-    }
-```
-
----
-
-## 5. Biểu Đồ Xếp Ca Làm Việc (Activity Diagram)
+## 4. Biểu Đồ Xếp Ca Làm Việc (Activity Diagram)
 
 ```mermaid
 graph LR
@@ -203,7 +190,7 @@ graph LR
 
 ---
 
-## 6. Biểu Đồ Chấm Công (Flow)
+## 5. Biểu Đồ Chấm Công (Flow)
 
 ```mermaid
 flowchart TD
@@ -625,6 +612,50 @@ flowchart TD
     style A fill:#fff3cd
     style I fill:#ffcdd2
     style L fill:#c8e6c9
+```
+
+---
+
+## 17. API Reference (Triển khai thực tế)
+
+### Endpoints
+
+| Method | Endpoint | Description | Roles |
+|--------|----------|-------------|-------|
+| GET | `/staff` | Lấy danh sách nhân viên (pagination, filter) | admin, manager |
+| GET | `/staff/available-accounts` | Lấy accounts chưa có staff profile | admin, manager |
+| GET | `/staff/role/:role` | Lấy nhân viên theo vai trò | admin, manager |
+| GET | `/staff/:id` | Lấy chi tiết nhân viên | all authenticated |
+| GET | `/staff/:id/performance` | Lấy hiệu suất nhân viên | admin, manager |
+| POST | `/staff` | Tạo nhân viên mới | admin |
+| PUT | `/staff/:id` | Cập nhật thông tin nhân viên | admin |
+| PATCH | `/staff/:id/deactivate` | Vô hiệu hóa nhân viên | admin, manager |
+| PATCH | `/staff/:id/activate` | Kích hoạt lại nhân viên | admin, manager |
+| PATCH | `/staff/:id/role` | Cập nhật vai trò | admin |
+| DELETE | `/staff/:id` | Xóa nhân viên | admin |
+
+### Query Parameters (GET /staff)
+
+| Param | Type | Description |
+|-------|------|-------------|
+| page | number | Trang hiện tại (default: 1) |
+| limit | number | Số lượng mỗi trang (default: 10) |
+| role | string | Filter theo role (admin/manager/waiter/chef/cashier) |
+| isActive | boolean | Filter theo trạng thái |
+| search | string | Tìm kiếm theo tên |
+| sortBy | string | Sắp xếp theo field (default: fullName) |
+| sortOrder | string | asc hoặc desc |
+
+### Role Enum
+
+```typescript
+enum Role {
+  admin     // Toàn quyền quản lý hệ thống
+  manager   // Quản lý nhà hàng, xem báo cáo
+  waiter    // Nhân viên phục vụ
+  chef      // Đầu bếp
+  cashier   // Thu ngân
+}
 ```
 
 ---

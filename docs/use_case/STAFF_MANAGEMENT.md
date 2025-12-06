@@ -1,8 +1,15 @@
 # Tài Liệu Chi Tiết Quản Lý Nhân Sự
 
+> **Lưu ý**: Tài liệu này đã được cập nhật để phản ánh triển khai thực tế của hệ thống (06/2025).
+> 
+> **Thay đổi so với thiết kế ban đầu:**
+> - Trạng thái nhân viên đơn giản: chỉ có `isActive` (true/false)
+> - Chưa triển khai: Chấm công (Timesheet), Xếp ca làm việc (Shift scheduling), Đánh giá hiệu suất phức tạp (Performance review), Gửi email thông báo
+> - Performance API hiện tại tính dựa trên số Orders và doanh thu phục vụ
+
 ## 1. Giới Thiệu
 
-Hệ thống quản lý nhân sự là module quan trọng giúp quản lý toàn bộ nguồn nhân lực của nhà hàng, từ tuyển dụng, quản lý thông tin, phân công công việc, chấm công, đánh giá hiệu suất đến quản lý lương thưởng. Một hệ thống nhân sự hiệu quả giúp tối ưu hóa việc sử dụng nhân lực, tăng năng suất làm việc và cải thiện chất lượng dịch vụ.
+Hệ thống quản lý nhân sự là module quan trọng giúp quản lý nguồn nhân lực của nhà hàng. Trong phiên bản hiện tại, hệ thống tập trung vào việc quản lý thông tin cơ bản và phân quyền truy cập.
 
 ---
 
@@ -16,7 +23,7 @@ Hệ thống quản lý nhân sự là module quan trọng giúp quản lý toà
     -   Tên đăng nhập (Username)
     -   Email
     -   Số điện thoại (Phone Number)
-    -   Mật khẩu (Password - mã hóa)
+    -   Mật khẩu (Password - bcrypt hash)
     -   Trạng thái hoạt động (Active/Inactive)
     -   Lần đăng nhập cuối (Last Login)
 
@@ -25,22 +32,22 @@ Hệ thống quản lý nhân sự là module quan trọng giúp quản lý toà
 -   **Định nghĩa**: Thông tin chi tiết về nhân viên
 -   **Mục đích**: Quản lý hồ sơ nhân viên
 -   **Thông tin chứa**:
-    -   Tài khoản liên kết (Account)
+    -   Tài khoản liên kết (Account) - quan hệ 1-1
     -   Họ tên đầy đủ (Full Name)
-    -   Địa chỉ (Address)
-    -   Ngày sinh (Date of Birth)
+    -   Địa chỉ (Address) - tùy chọn
+    -   Ngày sinh (Date of Birth) - tùy chọn
     -   Ngày vào làm (Hire Date)
-    -   Lương (Salary)
-    -   Vai trò (Role): Admin, Manager, Waiter, Chef, Cashier
-    -   Trạng thái (Active/Inactive)
+    -   Lương (Salary) - tùy chọn
+    -   Vai trò (Role): admin, manager, waiter, chef, cashier
+    -   Trạng thái (isActive: true/false)
 
 ### 2.3 Vai Trò và Quyền Hạn (Roles & Permissions)
 
--   **Admin**: Toàn quyền quản lý hệ thống
--   **Manager**: Quản lý nhà hàng, xem báo cáo, phê duyệt
--   **Waiter**: Nhân viên phục vụ, tạo đơn hàng
--   **Chef**: Đầu bếp, xem đơn bếp, cập nhật tiến độ
--   **Cashier**: Thu ngân, xử lý thanh toán
+-   **admin**: Toàn quyền quản lý hệ thống
+-   **manager**: Quản lý nhà hàng, xem báo cáo, quản lý nhân viên (trừ tạo/xóa)
+-   **waiter**: Nhân viên phục vụ, tạo đơn hàng, quản lý reservation
+-   **chef**: Đầu bếp, xem/xử lý đơn bếp
+-   **cashier**: Thu ngân, xử lý thanh toán, xem bills
 
 ---
 
@@ -584,20 +591,29 @@ Hệ thống quản lý nhân sự là module quan trọng giúp quản lý toà
 
 ## 6. Công Nghệ và Công Cụ
 
-### 6.1 Công Nghệ Sử Dụng
+### 6.1 Công Nghệ Sử Dụng (Triển khai thực tế)
 
--   **Frontend**: Next.js, React, TypeScript
--   **Backend**: Node.js, Express, TypeScript
+-   **Frontend**: Next.js 15, React, TypeScript, Zustand
+-   **Backend**: NestJS (Node.js), TypeScript
 -   **Database**: PostgreSQL, Prisma ORM
--   **Authentication**: JWT, bcrypt
--   **Time Tracking**: Custom module
--   **Notification**: Email (SendGrid), SMS, Push
+-   **Authentication**: JWT (Access Token 15 phút, Refresh Token 7 ngày), bcrypt
+-   **API Documentation**: Swagger/OpenAPI
 
-### 6.2 Tích Hợp
+### 6.2 API Endpoints
 
--   **Biometric Devices**: Máy chấm công vân tay
--   **HR Software**: Tích hợp phần mềm nhân sự bên ngoài
--   **Payroll System**: Hệ thống tính lương
+| Method | Endpoint | Description | Roles |
+|--------|----------|-------------|-------|
+| GET | `/staff` | Danh sách nhân viên (phân trang) | admin, manager |
+| GET | `/staff/available-accounts` | Accounts chưa có staff | admin, manager |
+| GET | `/staff/role/:role` | Nhân viên theo vai trò | admin, manager |
+| GET | `/staff/:id` | Chi tiết nhân viên | all |
+| GET | `/staff/:id/performance` | Hiệu suất nhân viên | admin, manager |
+| POST | `/staff` | Tạo nhân viên mới | admin |
+| PUT | `/staff/:id` | Cập nhật nhân viên | admin |
+| PATCH | `/staff/:id/deactivate` | Vô hiệu hóa | admin, manager |
+| PATCH | `/staff/:id/activate` | Kích hoạt lại | admin, manager |
+| PATCH | `/staff/:id/role` | Đổi vai trò | admin |
+| DELETE | `/staff/:id` | Xóa nhân viên | admin |
 
 ---
 
@@ -608,24 +624,25 @@ Hệ thống quản lý nhân sự là module quan trọng giúp quản lý toà
 | Username đã tồn tại       | Username trùng        | Chọn username khác                   |
 | Email đã tồn tại          | Email đã đăng ký      | Sử dụng email khác                   |
 | Không thể đổi vai trò     | Không có quyền        | Chỉ Admin mới đổi được               |
-| Quên chấm công            | Nhân viên quên        | Manager sửa thủ công                 |
-| Trùng ca làm việc         | Xếp ca trùng          | Kiểm tra lịch trước khi xếp          |
-| Mật khẩu không đủ mạnh    | Mật khẩu yếu          | Yêu cầu mật khẩu mạnh hơn (>8 ký tự) |
+| Staff not found           | ID không tồn tại      | Kiểm tra lại ID                      |
+| Account already has staff | Account đã có profile | Dùng account khác hoặc xóa staff cũ  |
 
 ---
 
-## 8. Tính Năng Nâng Cao (Trong Tương Lai)
+## 8. Tính Năng Phát Triển Tương Lai
 
+> Các tính năng sau đây được thiết kế nhưng chưa triển khai trong phiên bản hiện tại:
+
+-   **Attendance/Timesheet**: Chấm công vào/ra, tính giờ làm
+-   **Shift Scheduling**: Xếp ca làm việc, thông báo ca
+-   **Performance Review**: Đánh giá hiệu suất định kỳ
+-   **Email Notifications**: Gửi email thông báo (welcome, shift changes)
 -   **AI Scheduling**: Tự động xếp ca tối ưu
--   **Performance Prediction**: Dự đoán hiệu suất
 -   **Training Management**: Quản lý đào tạo
--   **Career Development**: Lộ trình thăng tiến
--   **360 Feedback**: Đánh giá đa chiều
--   **Mobile App**: App chấm công và xem lịch
--   **Face Recognition**: Chấm công bằng khuôn mặt
--   **Payroll Integration**: Tính lương tự động
 -   **Leave Management**: Quản lý nghỉ phép
--   **Benefits Management**: Quản lý phúc lợi
+-   **Payroll Integration**: Tính lương tự động
+-   **Biometric Integration**: Chấm công vân tay/khuôn mặt
+-   **Mobile App**: App chấm công và xem lịch
 
 ---
 

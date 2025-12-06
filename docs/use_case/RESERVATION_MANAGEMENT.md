@@ -1,5 +1,7 @@
 # Tài Liệu Chi Tiết Quản Lý Đặt Bàn
 
+> **Lưu ý**: Tài liệu này đã được cập nhật để phản ánh chính xác hệ thống đã triển khai thực tế (Tháng 6/2025).
+
 ## 1. Giới Thiệu
 
 Hệ thống quản lý đặt bàn là một phần quan trọng của ứng dụng quản lý nhà hàng, cho phép khách hàng đặt trước bàn ăn và giúp nhà hàng tối ưu hóa việc sắp xếp chỗ ngồi. Hệ thống hỗ trợ quản lý lịch đặt bàn, xác nhận đặt chỗ, theo dõi trạng thái, và xử lý các tình huống đặc biệt như khách không đến hoặc thay đổi lịch hẹn.
@@ -27,19 +29,24 @@ Hệ thống quản lý đặt bàn là một phần quan trọng của ứng d�
 -   **Định nghĩa**: Yêu cầu đặt trước bàn ăn của khách hàng
 -   **Mục đích**: Đảm bảo chỗ ngồi cho khách, tối ưu hóa lịch phục vụ
 -   **Thông tin chứa**:
-    -   Mã đặt bàn (Reservation Code)
-    -   Tên khách hàng (Customer Name)
-    -   Số điện thoại (Phone Number)
-    -   Email
-    -   Bàn đặt (Table)
-    -   Ngày đặt (Reservation Date)
-    -   Giờ đặt (Reservation Time)
-    -   Thời gian dự kiến (Duration)
-    -   Số lượng khách (Head Count)
-    -   Yêu cầu đặc biệt (Special Request)
-    -   Tiền đặt cọc (Deposit Amount)
-    -   Trạng thái (Status)
-    -   Ghi chú (Notes)
+    -   Mã đặt bàn (reservationCode) - Tự động sinh UUID
+    -   Tên khách hàng (customerName)
+    -   Số điện thoại (phoneNumber)
+    -   Email (tùy chọn)
+    -   Khách hàng liên kết (customerId - tùy chọn)
+    -   Bàn đặt (tableId)
+    -   Ngày đặt (reservationDate)
+    -   Giờ đặt (reservationTime)
+    -   Thời gian dự kiến (duration - mặc định 120 phút)
+    -   Số lượng khách (partySize)
+    -   Yêu cầu đặc biệt (specialRequest)
+    -   Tiền đặt cọc (depositAmount)
+    -   Trạng thái (status): `pending`, `confirmed`, `seated`, `completed`, `cancelled`, `no_show`
+    -   Ghi chú (notes)
+    -   Tags (mảng tag)
+    -   Người tạo (createdBy)
+    -   Các timestamp: confirmedAt, seatedAt, completedAt, cancelledAt
+    -   Lý do hủy (cancellationReason)
 
 ---
 
@@ -922,24 +929,50 @@ Hotline: [Phone]
 
 ---
 
-## 6. Công Nghệ và Công Cụ
+## 6. Công Nghệ và Công Cụ (Đã triển khai)
 
 ### 6.1 Công Nghệ Sử Dụng
 
--   **Frontend**: Next.js, React, TypeScript, Tailwind CSS
--   **Backend**: Node.js, Express, TypeScript
--   **Database**: PostgreSQL, Prisma ORM
--   **Real-time**: Socket.io (cập nhật trạng thái real-time)
--   **Notification**: Twilio (SMS), SendGrid (Email)
--   **QR Code**: QRCode.js (tạo mã QR cho bàn)
--   **Calendar**: FullCalendar (hiển thị lịch đặt bàn)
+-   **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
+-   **State Management**: Zustand
+-   **Backend**: NestJS, TypeScript
+-   **Database**: PostgreSQL với Prisma ORM
+-   **Authentication**: JWT (Access Token 15 phút, Refresh Token 7 ngày)
 
-### 6.2 Tích Hợp Bên Ngoài
+### 6.2 Các Module Liên Quan
 
--   **SMS Gateway**: Gửi xác nhận và nhắc lịch qua SMS
--   **Email Service**: Gửi email xác nhận và thông báo
--   **Payment Gateway**: Xử lý đặt cọc trực tuyến
--   **Google Calendar**: Đồng bộ lịch đặt bàn
+-   **TableController**: Quản lý CRUD bàn (`/table`)
+-   **ReservationController**: Quản lý đặt bàn (`/reservations`)
+-   **ReservationService**: Business logic xử lý đặt bàn
+-   **ReservationAudit**: Ghi log lịch sử thay đổi
+
+### 6.3 API Endpoints
+
+**Table Controller:**
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| GET | `/table/stats` | Thống kê bàn |
+| GET | `/table` | Danh sách bàn |
+| GET | `/table/available` | Bàn trống |
+| GET | `/table/:id` | Chi tiết bàn |
+| POST | `/table` | Tạo bàn mới |
+| PUT | `/table/:id` | Cập nhật bàn |
+| PATCH | `/table/:id/status` | Cập nhật trạng thái |
+| DELETE | `/table/:id` | Xóa bàn |
+
+**Reservation Controller:**
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| GET | `/reservations` | Danh sách đặt bàn |
+| GET | `/reservations/check-availability` | Kiểm tra bàn trống |
+| GET | `/reservations/:id` | Chi tiết đặt bàn |
+| POST | `/reservations` | Tạo đặt bàn |
+| PUT | `/reservations/:id` | Cập nhật đặt bàn |
+| PATCH | `/reservations/:id/confirm` | Xác nhận |
+| PATCH | `/reservations/:id/seated` | Check-in (auto tạo Order) |
+| PATCH | `/reservations/:id/complete` | Hoàn tất |
+| PATCH | `/reservations/:id/cancel` | Hủy |
+| PATCH | `/reservations/:id/no-show` | Đánh dấu không đến |
 
 ---
 
@@ -958,8 +991,12 @@ Hotline: [Phone]
 
 ---
 
-## 8. Tính Năng Nâng Cao (Trong Tương Lai)
+## 8. Tính Năng Chưa Triển Khai (Trong Tương Lai)
 
+> **Lưu ý**: Các tính năng dưới đây chưa được triển khai trong phiên bản hiện tại.
+
+-   **SMS/Email Notifications**: Gửi xác nhận và nhắc lịch tự động (Twilio, SendGrid)
+-   **QR Code cho bàn**: Tạo mã QR để khách tự đặt món
 -   **Đặt bàn qua Chatbot**: Tích hợp Facebook Messenger, Zalo
 -   **Thanh toán trước online**: Đặt cọc hoặc thanh toán toàn bộ trước
 -   **Loyalty Program**: Tích điểm cho khách đặt bàn thường xuyên
@@ -967,7 +1004,7 @@ Hotline: [Phone]
 -   **VIP Table Management**: Quản lý bàn VIP với ưu đãi đặc biệt
 -   **AI Prediction**: Dự đoán nhu cầu đặt bàn, tối ưu hóa sắp xếp
 -   **Multi-language**: Hỗ trợ đa ngôn ngữ cho khách quốc tế
--   **Integration với Google Maps**: Hiển thị vị trí, chỉ đường
+-   **Google Calendar Integration**: Đồng bộ lịch đặt bàn
 -   **Review System**: Khách đánh giá sau khi sử dụng dịch vụ
 -   **Dynamic Pricing**: Giá đặt bàn linh hoạt theo giờ cao/thấp điểm
 

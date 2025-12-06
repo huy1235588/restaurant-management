@@ -1,5 +1,17 @@
 # Biểu Đồ Quản Lý Đặt Bàn
 
+> **Lưu ý**: Tài liệu này đã được cập nhật để phản ánh chính xác hệ thống đã triển khai thực tế (Tháng 6/2025).
+
+## Mục lục
+
+1. [Biểu Đồ Quy Trình Tổng Thể](#1-biểu-đồ-quy-trình-tổng-thể-flowchart)
+2. [Biểu Đồ Sequence](#2-biểu-đồ-quản-lý-đặt-bàn-sequence-diagram)
+3. [Biểu Đồ Trạng Thái Đặt Bàn](#3-biểu-đồ-trạng-thái-đặt-bàn-state-diagram)
+4. [Biểu Đồ Trạng Thái Bàn](#4-biểu-đồ-trạng-thái-bàn-state-diagram)
+5. [API Reference](#api-reference)
+
+---
+
 ## 1. Biểu Đồ Quy Trình Tổng Thể (Flowchart)
 
 ```mermaid
@@ -162,76 +174,7 @@ stateDiagram-v2
 
 ---
 
-## 5. Biểu Đồ Cấu Trúc Dữ Liệu (Entity Relationship)
-
-```mermaid
-erDiagram
-    RESTAURANT_TABLE ||--o{ RESERVATION : has
-    RESERVATION ||--o{ ORDER : "generates"
-    RESERVATION ||--o| BILL : "results in"
-    STAFF ||--o{ RESERVATION : manages
-
-    RESTAURANT_TABLE {
-        int tableId PK
-        string tableNumber UK
-        string tableName
-        int capacity
-        int minCapacity
-        int floor
-        string section
-        string status
-        string qrCode UK
-        boolean isActive
-        timestamp createdAt
-        timestamp updatedAt
-    }
-
-    RESERVATION {
-        int reservationId PK
-        string reservationCode UK
-        string customerName
-        string phoneNumber
-        string email
-        int tableId FK
-        date reservationDate
-        time reservationTime
-        int duration
-        int headCount
-        string specialRequest
-        decimal depositAmount
-        string status
-        string notes
-        timestamp createdAt
-        timestamp updatedAt
-    }
-
-    ORDER {
-        int orderId PK
-        int reservationId FK
-        int tableId FK
-        string status
-        decimal totalAmount
-        timestamp createdAt
-    }
-
-    BILL {
-        int billId PK
-        int reservationId FK
-        decimal totalAmount
-        string paymentStatus
-        timestamp createdAt
-    }
-
-    STAFF {
-        int staffId PK
-        string name
-        string role
-    }
-```
-
----
-
-## 6. Biểu Đồ Quy Trình Tạo Đặt Bàn Chi Tiết (Activity Diagram)
+## 5. Biểu Đồ Quy Trình Tạo Đặt Bàn Chi Tiết (Activity Diagram)
 
 ```mermaid
 graph LR
@@ -413,52 +356,43 @@ pie title Phân Bổ Trạng Thái Đặt Bàn Tháng 10
 
 ## 12. Biểu Đồ Kiến Trúc Hệ Thống (Component Diagram)
 
+> **Lưu ý**: Kiến trúc thực tế sử dụng NestJS (Backend) và Next.js 15 (Frontend)
+
 ```mermaid
 graph TB
-    subgraph Client["📱 Frontend - Next.js/React"]
+    subgraph Client["📱 Frontend - Next.js 15"]
         UI["🎨 UI Components"]
         Calendar["📅 Calendar View"]
         Forms["📋 Booking Forms"]
-        State["🔄 State Management"]
+        State["🔄 Zustand State"]
     end
 
-    subgraph API["🔌 Backend API"]
-        Controllers["⚙️ Reservation Controllers"]
-        Services["🛠️ Reservation Services"]
-        Validators["✅ Validators"]
-        Schedulers["⏰ Job Schedulers"]
+    subgraph API["🔌 NestJS Backend"]
+        TableController["🪑 TableController"]
+        ReservationController["📋 ReservationController"]
+        ReservationService["🛠️ ReservationService"]
+        TableService["🛠️ TableService"]
     end
 
     subgraph Data["💾 Data Layer"]
         ORM["📊 Prisma ORM"]
-        DB["🗄️ PostgreSQL"]
-        Cache["⚡ Redis Cache"]
-    end
-
-    subgraph External["🌐 External Services"]
-        SMS["📱 SMS Gateway"]
-        Email["📧 Email Service"]
-        QR["📷 QR Generator"]
+        DB["🐘 PostgreSQL"]
     end
 
     UI --> Forms
     Calendar --> State
     Forms --> State
-    State --> Controllers
-    Controllers --> Services
-    Services --> Validators
-    Services --> Schedulers
-    Services --> ORM
+    State --> TableController
+    State --> ReservationController
+    ReservationController --> ReservationService
+    TableController --> TableService
+    ReservationService --> ORM
+    TableService --> ORM
     ORM --> DB
-    ORM --> Cache
-    Schedulers --> SMS
-    Schedulers --> Email
-    Services --> QR
 
     style Client fill:#e3f2fd
     style API fill:#f3e5f5
     style Data fill:#e8f5e9
-    style External fill:#fff3e0
 ```
 
 ---
@@ -609,6 +543,80 @@ graph LR
     G -->|Response Data| L["📊 Response"]
     L -->|Update UI| B
     B -->|Display| A
+```
+
+---
+
+## 17. API Reference (Đã triển khai thực tế)
+
+### 17.1 Table Controller (`/table`)
+
+| Method | Endpoint | Mô tả | Roles |
+|--------|----------|-------|-------|
+| GET | `/table/stats` | Thống kê bàn | all authenticated |
+| GET | `/table/count` | Đếm bàn theo filter | all authenticated |
+| GET | `/table` | Danh sách bàn (pagination) | all authenticated |
+| GET | `/table/available` | Bàn trống | all authenticated |
+| GET | `/table/floor/:floor` | Bàn theo tầng | all authenticated |
+| GET | `/table/section/:section` | Bàn theo khu vực | all authenticated |
+| GET | `/table/number/:tableNumber` | Tìm theo số bàn | all authenticated |
+| GET | `/table/:id` | Chi tiết bàn | all authenticated |
+| POST | `/table` | Tạo bàn mới | admin, manager |
+| PUT | `/table/:id` | Cập nhật bàn | admin, manager |
+| PATCH | `/table/bulk-status` | Cập nhật nhiều bàn | admin, manager |
+| PATCH | `/table/:id/status` | Cập nhật trạng thái | all authenticated |
+| DELETE | `/table/:id` | Xóa bàn | admin, manager |
+
+### 17.2 Reservation Controller (`/reservations`)
+
+| Method | Endpoint | Mô tả | Roles |
+|--------|----------|-------|-------|
+| GET | `/reservations` | Danh sách đặt bàn | admin, manager, waiter |
+| GET | `/reservations/check-availability` | Kiểm tra bàn trống | admin, manager, waiter |
+| GET | `/reservations/phone/:phone` | Tìm theo SĐT | admin, manager, waiter |
+| GET | `/reservations/code/:code` | Tìm theo mã đặt | admin, manager, waiter |
+| GET | `/reservations/:id` | Chi tiết đặt bàn | admin, manager, waiter |
+| POST | `/reservations` | Tạo đặt bàn | admin, manager, waiter |
+| PUT | `/reservations/:id` | Cập nhật đặt bàn | admin, manager, waiter |
+| PATCH | `/reservations/:id/confirm` | Xác nhận | admin, manager, waiter |
+| PATCH | `/reservations/:id/seated` | Check-in + Tạo Order | admin, manager, waiter |
+| PATCH | `/reservations/:id/complete` | Hoàn tất | admin, manager, waiter |
+| PATCH | `/reservations/:id/cancel` | Hủy đặt bàn | admin, manager |
+| PATCH | `/reservations/:id/no-show` | Đánh dấu không đến | admin, manager |
+
+### 17.3 Request/Response Examples
+
+**Tạo đặt bàn mới:**
+```json
+POST /reservations
+{
+  "customerName": "Nguyễn Văn A",
+  "phoneNumber": "0901234567",
+  "email": "nguyenvana@email.com",
+  "tableId": 5,
+  "reservationDate": "2025-06-15",
+  "reservationTime": "19:00",
+  "partySize": 4,
+  "duration": 120,
+  "specialRequest": "Bàn gần cửa sổ",
+  "depositAmount": 200000,
+  "notes": "Sinh nhật"
+}
+```
+
+**Response thành công:**
+```json
+{
+  "success": true,
+  "message": "Reservation created successfully",
+  "data": {
+    "reservationId": 123,
+    "reservationCode": "RES-ABC123",
+    "status": "pending",
+    "table": { "tableId": 5, "tableNumber": "A5" },
+    "createdAt": "2025-06-10T10:30:00Z"
+  }
+}
 ```
 
 ---
