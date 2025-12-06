@@ -34,12 +34,10 @@ const nextConfig: NextConfig = {
         "qrcode",
         "canvas",
         "konva",
-        "i18next",
-        "i18next-browser-languagedetector",
     ],
 
     // Transpile specific packages if needed
-    transpilePackages: ["i18next", "react-i18next"],
+    transpilePackages: ["i18next", "react-i18next", "i18next-browser-languagedetector"],
 
     // Turbopack configuration (Next.js 16 uses Turbopack by default)
     // Empty config to suppress webpack warning
