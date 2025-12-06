@@ -32,13 +32,11 @@ import { Roles } from '@/common/decorators/roles.decorator';
 
 @ApiTags('menu')
 @Controller('menu')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
 export class MenuController {
     constructor(private readonly menuService: MenuService) {}
 
     @Get('count')
-    @ApiOperation({ summary: 'Count menu items' })
+    @ApiOperation({ summary: 'Count menu items (public)' })
     @ApiQuery({ name: 'categoryId', required: false, type: Number })
     @ApiQuery({ name: 'isAvailable', required: false, type: Boolean })
     @ApiQuery({ name: 'isActive', required: false, type: Boolean })
@@ -70,7 +68,7 @@ export class MenuController {
     }
 
     @Get()
-    @ApiOperation({ summary: 'Get all menu items with pagination' })
+    @ApiOperation({ summary: 'Get all menu items with pagination (public)' })
     @ApiQuery({ name: 'page', required: false, type: Number })
     @ApiQuery({ name: 'limit', required: false, type: Number })
     @ApiQuery({ name: 'categoryId', required: false, type: Number })
@@ -126,7 +124,7 @@ export class MenuController {
     }
 
     @Get('category/:categoryId')
-    @ApiOperation({ summary: 'Get menu items by category' })
+    @ApiOperation({ summary: 'Get menu items by category (public)' })
     @ApiResponse({
         status: 200,
         description: 'Menu items retrieved successfully',
@@ -140,7 +138,7 @@ export class MenuController {
     }
 
     @Get('code/:code')
-    @ApiOperation({ summary: 'Get menu item by code' })
+    @ApiOperation({ summary: 'Get menu item by code (public)' })
     @ApiResponse({
         status: 200,
         description: 'Menu item retrieved successfully',
@@ -155,7 +153,7 @@ export class MenuController {
     }
 
     @Get(':id')
-    @ApiOperation({ summary: 'Get menu item by ID' })
+    @ApiOperation({ summary: 'Get menu item by ID (public)' })
     @ApiResponse({
         status: 200,
         description: 'Menu item retrieved successfully',
@@ -170,8 +168,9 @@ export class MenuController {
     }
 
     @Post()
-    @UseGuards(RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager')
+    @ApiBearerAuth()
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({ summary: 'Create a new menu item (admin/manager only)' })
     @ApiResponse({ status: 201, description: 'Menu item created successfully' })
@@ -187,8 +186,9 @@ export class MenuController {
     }
 
     @Put(':id')
-    @UseGuards(RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager')
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Update a menu item (admin/manager only)' })
     @ApiResponse({ status: 200, description: 'Menu item updated successfully' })
     @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
@@ -208,9 +208,12 @@ export class MenuController {
     }
 
     @Patch(':id/availability')
-    @UseGuards(RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager')
-    @ApiOperation({ summary: 'Update menu item availability (admin/manager only)' })
+    @ApiBearerAuth()
+    @ApiOperation({
+        summary: 'Update menu item availability (admin/manager only)',
+    })
     @ApiResponse({
         status: 200,
         description: 'Menu item availability updated successfully',
@@ -231,8 +234,9 @@ export class MenuController {
     }
 
     @Delete(':id')
-    @UseGuards(RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager')
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Delete a menu item (admin/manager only)' })
     @ApiResponse({ status: 200, description: 'Menu item deleted successfully' })
     @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
