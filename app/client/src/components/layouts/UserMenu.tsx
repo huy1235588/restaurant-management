@@ -12,6 +12,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
+import { getImageUrl } from '@/lib/utils';
 
 interface User {
     username: string;
@@ -57,7 +58,7 @@ export function UserMenu({ user, onLogout }: UserMenuProps) {
                 >
                     <div className="flex items-center gap-2">
                         <Avatar className="h-8 w-8 ring-2 ring-background transition-all duration-200 group-hover:ring-primary/20">
-                            <AvatarImage src={user.avatar || ''} alt={user.fullName || user.username} />
+                            <AvatarImage src={getImageUrl(user.avatar) || ''} alt={user.fullName || user.username} />
                             <AvatarFallback className="bg-linear-to-br from-primary to-primary/80 text-primary-foreground text-xs font-semibold">
                                 {getInitials(user.fullName || user.username)}
                             </AvatarFallback>

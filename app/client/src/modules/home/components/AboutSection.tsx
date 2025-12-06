@@ -6,7 +6,6 @@ import { useInView } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
 import { useRestaurantSettingsContext } from "../context";
-import { getImageUrl } from "@/lib/utils/image";
 
 export function AboutSection() {
     const { t } = useTranslation();
@@ -14,7 +13,7 @@ export function AboutSection() {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true, margin: "-100px" });
 
-    const aboutImageUrl = settings.aboutImage ? getImageUrl(settings.aboutImage) : null;
+    const aboutImageUrl = settings.aboutImage;
 
     const containerVariants = {
         hidden: { opacity: 0 },

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Flame, Leaf } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getImageUrl } from "@/lib/utils";
 import type { FeaturedMenuItem } from "../types";
 
 interface MenuItemCardProps {
@@ -42,9 +42,9 @@ export function MenuItemCard({ item, index = 0 }: MenuItemCardProps) {
         >
             {/* Image */}
             <div className="relative aspect-4/3 overflow-hidden bg-muted">
-                {item.imagePath ? (
+                {getImageUrl(item.imagePath) ? (
                     <Image
-                        src={item.imagePath}
+                        src={getImageUrl(item.imagePath)!}
                         alt={item.itemName}
                         fill
                         className="object-cover transition-transform duration-300 group-hover:scale-105"

@@ -7,14 +7,13 @@ import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useScrollSpy } from "../hooks/useScrollSpy";
 import { useRestaurantSettingsContext } from "../context";
-import { getImageUrl } from "@/lib/utils/image";
 
 export function HeroSection() {
     const { t } = useTranslation();
     const { settings } = useRestaurantSettingsContext();
     const { scrollToSection } = useScrollSpy({ sectionIds: ["menu", "reservation"] });
 
-    const heroImageUrl = settings.heroImage ? getImageUrl(settings.heroImage) : null;
+    const heroImageUrl = settings.heroImage;
 
     return (
         <section
