@@ -29,44 +29,21 @@ const nextConfig: NextConfig = {
             : [],
     },
 
-    // Webpack configuration to handle Node.js modules
-    webpack: (config, { isServer }) => {
-        if (!isServer) {
-            // Don't resolve these modules on client-side
-            config.resolve.fallback = {
-                ...config.resolve.fallback,
-                fs: false,
-                net: false,
-                tls: false,
-                crypto: false,
-                stream: false,
-                url: false,
-                zlib: false,
-                http: false,
-                https: false,
-                assert: false,
-                os: false,
-                path: false,
-                child_process: false,
-                vm: false,
-            };
-        }
-        return config;
-    },
-
-    // Mark packages that use Node.js APIs as external for client
-    experimental: {
-        serverComponentsExternalPackages: [
-            "qrcode",
-            "canvas",
-            "konva",
-            "i18next",
-            "i18next-browser-languagedetector",
-        ],
-    },
+    // Mark packages that use Node.js APIs as external (moved from experimental in Next.js 16)
+    serverExternalPackages: [
+        "qrcode",
+        "canvas",
+        "konva",
+        "i18next",
+        "i18next-browser-languagedetector",
+    ],
 
     // Transpile specific packages if needed
     transpilePackages: ["i18next", "react-i18next"],
+
+    // Turbopack configuration (Next.js 16 uses Turbopack by default)
+    // Empty config to suppress webpack warning
+    turbopack: {},
 };
 
 export default nextConfig;
