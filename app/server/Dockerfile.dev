@@ -18,11 +18,16 @@ COPY prisma.config.ts .
 # Install dependencies
 RUN pnpm install
 
-# Generate Prisma Client
+# Generate Prisma Client (use dummy URL for build time)
+ARG DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy?schema=public"
+ENV DATABASE_URL=${DATABASE_URL}
 RUN pnpm exec prisma generate
 
 # Copy source code
 COPY . .
+
+# Build application
+RUN pnpm run build
 
 # Create uploads directory
 RUN mkdir -p ./uploads
@@ -30,11 +35,11 @@ RUN mkdir -p ./uploads
 EXPOSE 5000
 
 ENV PORT=5000
-ENV NODE_ENV=development
+ENV NODE_ENV=production
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:5000/api/v1/health || exit 1
 
-# Start in development mode with hot reload
-CMD ["sh", "-c", "pnpm exec prisma migrate deploy && pnpm run start:dev"]
+# Start in production mode with auto-seed
+CMD ["sh", "-c", "pnpm exec prisma migrate deploy && pnpm exec tsx prisma/seed.ts && pnpm run start:prod"]
