@@ -61,7 +61,8 @@
         "createdAt": "Ngày tạo",
         "updatedAt": "Ngày cập nhật",
         "date": "Ngày",
-        "minutes": "phút"
+        "minutes": "phút",
+        "today": "Hôm nay"
     },
     "sidebar": {
         "overview": "Tổng quan",
@@ -658,6 +659,18 @@
         "empty": {
             "title": "Không tìm thấy đặt bàn",
             "description": "Thử điều chỉnh bộ lọc hoặc tạo đặt bàn mới"
+        },
+        "timeline": {
+            "listView": "Danh sách",
+            "timelineView": "Timeline",
+            "floor": "Tầng",
+            "allFloors": "Tất cả tầng",
+            "floorN": "Tầng {{n}}",
+            "noTables": "Không có bàn nào",
+            "noTablesDescription": "Vui lòng thêm bàn trong phần quản lý bàn",
+            "noReservations": "Không có đặt bàn nào cho ngày này",
+            "clickToCreate": "Nhấp vào ô trống để tạo đặt bàn",
+            "currentTime": "Giờ hiện tại"
         },
         "upcoming": "Sắp tới",
         "today": "Hôm nay",

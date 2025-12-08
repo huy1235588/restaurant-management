@@ -61,7 +61,8 @@
         "createdAt": "Created At",
         "updatedAt": "Updated At",
         "date": "Date",
-        "minutes": "minutes"
+        "minutes": "minutes",
+        "today": "Today"
     },
     "sidebar": {
         "overview": "Overview",
@@ -658,6 +659,18 @@
         "empty": {
             "title": "No reservations found",
             "description": "Try adjusting your filters or create a new reservation"
+        },
+        "timeline": {
+            "listView": "List",
+            "timelineView": "Timeline",
+            "floor": "Floor",
+            "allFloors": "All Floors",
+            "floorN": "Floor {{n}}",
+            "noTables": "No tables available",
+            "noTablesDescription": "Please add tables in the table management section",
+            "noReservations": "No reservations for this date",
+            "clickToCreate": "Click on an empty cell to create a reservation",
+            "currentTime": "Current Time"
         },
         "upcoming": "Upcoming",
         "today": "Today",

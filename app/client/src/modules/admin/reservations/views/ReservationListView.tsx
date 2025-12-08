@@ -1,12 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useReservations } from '../hooks/useReservations';
-import { ReservationList, ReservationFilters } from '../components';
+import { 
+    ReservationList, 
+    ReservationFilters, 
+    GanttTimeline,
+    ViewMode,
+    DEFAULT_VIEW_MODE,
+    VIEW_PREFERENCE_KEY,
+} from '../components';
+import { toDateString } from '../components/timeline/timeline.utils';
 import {
     ConfirmReservationDialog,
     CancelReservationDialog,
     CheckInDialog,
     CompleteReservationDialog,
     NoShowDialog,
+    CreateReservationDialog,
 } from '../dialogs';
 import { Reservation, ReservationFilterOptions as FilterType } from '../types';
 import { Button } from '@/components/ui/button';
@@ -17,7 +26,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Plus, ChevronLeft, ChevronRight, Calendar, TrendingUp, Keyboard, Maximize2, Minimize2, RefreshCw } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, Calendar, TrendingUp, Keyboard, Maximize2, Minimize2, RefreshCw, List, GanttChart } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
@@ -38,6 +47,42 @@ export function ReservationListView() {
     const [showHelpDialog, setShowHelpDialog] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
+    // View mode state (list or timeline)
+    const [viewMode, setViewMode] = useState<ViewMode>(() => {
+        // Initialize from URL or localStorage
+        const urlView = searchParams.get('view') as ViewMode;
+        if (urlView === 'list' || urlView === 'timeline') {
+            return urlView;
+        }
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem(VIEW_PREFERENCE_KEY) as ViewMode;
+            if (saved === 'list' || saved === 'timeline') {
+                return saved;
+            }
+        }
+        return DEFAULT_VIEW_MODE;
+    });
+
+    // Timeline date state
+    const [timelineDate, setTimelineDate] = useState<Date>(() => {
+        const urlDate = searchParams.get('date');
+        if (urlDate) {
+            const parsed = new Date(urlDate);
+            if (!isNaN(parsed.getTime())) {
+                return parsed;
+            }
+        }
+        return new Date();
+    });
+
+    // Create dialog state for timeline
+    const [showCreateDialog, setShowCreateDialog] = useState(false);
+    const [createDialogDefaults, setCreateDialogDefaults] = useState<{
+        tableId?: number;
+        time?: string;
+        date?: string;
+    }>({});
+
     // Initialize filters from URL
     const [filters, setFilters] = useState<FilterType>(() => {
         const params: FilterType = {
@@ -57,7 +102,47 @@ export function ReservationListView() {
         return params;
     });
 
-    const { reservations, pagination, loading, refetch } = useReservations(filters);
+    // Timeline-specific filters
+    const timelineFilters: FilterType = {
+        date: toDateString(timelineDate),
+        limit: 100, // Get all reservations for the day
+    };
+
+    // Use different filters based on view mode
+    const { reservations, pagination, loading, refetch } = useReservations(
+        viewMode === 'timeline' ? timelineFilters : filters
+    );
+
+    // Save view preference to localStorage
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem(VIEW_PREFERENCE_KEY, viewMode);
+        }
+    }, [viewMode]);
+
+    // Handle view mode change
+    const handleViewModeChange = (mode: ViewMode) => {
+        setViewMode(mode);
+        // Sync date between views
+        if (mode === 'timeline' && filters.date) {
+            setTimelineDate(new Date(filters.date));
+        }
+    };
+
+    // Handle timeline date change
+    const handleTimelineDateChange = (date: Date) => {
+        setTimelineDate(date);
+    };
+
+    // Handle empty cell click on timeline (create reservation)
+    const handleEmptyCellClick = (tableId: number, time: string, date: string) => {
+        setCreateDialogDefaults({
+            tableId,
+            time,
+            date,
+        });
+        setShowCreateDialog(true);
+    };
 
     // Dialog states
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -137,31 +222,37 @@ export function ReservationListView() {
         }
     };
 
-    // Update URL when filters change
+    // Update URL when filters or view mode change
     useEffect(() => {
         const params = new URLSearchParams();
 
-        if (filters.page && filters.page !== 1) {
-            params.set('page', filters.page.toString());
-        }
+        // Add view mode to URL
+        if (viewMode === 'timeline') {
+            params.set('view', 'timeline');
+            params.set('date', toDateString(timelineDate));
+        } else {
+            if (filters.page && filters.page !== 1) {
+                params.set('page', filters.page.toString());
+            }
 
-        if (filters.status) {
-            params.set('status', filters.status);
-        }
+            if (filters.status) {
+                params.set('status', filters.status);
+            }
 
-        if (filters.date) {
-            params.set('date', filters.date);
-        }
+            if (filters.date) {
+                params.set('date', filters.date);
+            }
 
-        if (filters.search) {
-            params.set('search', filters.search);
+            if (filters.search) {
+                params.set('search', filters.search);
+            }
         }
 
         const queryString = params.toString();
         const newUrl = queryString ? `/admin/reservations?${queryString}` : '/admin/reservations';
 
         router.replace(newUrl, { scroll: false });
-    }, [filters, router]);
+    }, [filters, viewMode, timelineDate, router]);
 
     const handleFilterChange = (newFilters: Partial<FilterType>) => {
         setFilters((prev) => ({ ...prev, ...newFilters, page: 1 }));
@@ -198,18 +289,18 @@ export function ReservationListView() {
     return (
         <div className="space-y-6 pb-8">
             {/* Header Section */}
-            <div className="bg-linear-to-br from-white via-blue-50 to-purple-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg p-8">
-                <div className="flex items-center justify-between">
-                    <div className="flex-1">
+            <div className="bg-linear-to-br from-white via-blue-50 to-purple-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg p-4 sm:p-6 lg:p-8">
+                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                    <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="w-12 h-12 bg-linear-to-br from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
-                                <Calendar className="w-6 h-6 text-white" />
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-linear-to-br from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 rounded-xl flex items-center justify-center shadow-lg shrink-0">
+                                <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                             </div>
-                            <div>
-                                <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
+                            <div className="min-w-0">
+                                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 tracking-tight truncate">
                                     {t('reservations.title')}
                                 </h1>
-                                <p className="text-gray-600 dark:text-gray-400 font-medium mt-1">
+                                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 font-medium mt-1 truncate">
                                     {t('reservations.pageDescription')}
                                 </p>
                             </div>
@@ -217,16 +308,16 @@ export function ReservationListView() {
 
                         {/* Quick Stats */}
                         {pagination.total > 0 && (
-                            <div className="flex items-center gap-4 mt-4">
-                                <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-900 rounded-lg border border-blue-200 dark:border-blue-800 shadow-sm">
+                            <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-4">
+                                <div className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-white dark:bg-gray-900 rounded-lg border border-blue-200 dark:border-blue-800 shadow-sm">
                                     <TrendingUp className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                    <span className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">
                                         {t('common.total')}: <span className="text-blue-600 dark:text-blue-400">{pagination.total}</span>
                                     </span>
                                 </div>
-                                <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-900 rounded-lg border border-purple-200 dark:border-purple-800 shadow-sm">
+                                <div className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-white dark:bg-gray-900 rounded-lg border border-purple-200 dark:border-purple-800 shadow-sm">
                                     <Calendar className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                    <span className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">
                                         {t('common.page')}: <span className="text-purple-600 dark:text-purple-400">{pagination.page} {t('common.of')} {pagination.totalPages}</span>
                                     </span>
                                 </div>
@@ -234,70 +325,111 @@ export function ReservationListView() {
                         )}
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2 shrink-0">
                         <Button
                             onClick={handleRefresh}
                             variant="outline"
-                            size="lg"
+                            size="default"
                             title={t('common.refresh')}
-                            className="gap-2 text-base"
+                            className="gap-2"
                             disabled={isRefreshing}
                         >
-                            <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
-                            <span className="hidden sm:inline">{t('common.refresh')}</span>
+                            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                            <span className="hidden md:inline">{t('common.refresh')}</span>
                         </Button>
                         <Button
                             onClick={() => setShowHelpDialog(true)}
                             variant="outline"
-                            size="lg"
+                            size="default"
                             title={t('common.keyboardShortcuts')}
-                            className="gap-2 text-base"
+                            className="gap-2"
                         >
-                            <Keyboard className="w-5 h-5" />
-                            <span className="hidden sm:inline">{t('common.help')}</span>
+                            <Keyboard className="w-4 h-4" />
+                            <span className="hidden xl:inline">{t('common.help')}</span>
                         </Button>
                         <Button
                             onClick={toggleFullscreen}
                             variant="outline"
-                            size="lg"
+                            size="default"
                             title={isFullscreen ? t('common.exitFullscreen') : t('common.fullscreen')}
-                            className="gap-2 text-base"
+                            className="gap-2"
                         >
-                            {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
-                            <span className="hidden sm:inline">{isFullscreen ? t('common.exitFullscreen') : t('common.fullscreen')}</span>
+                            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                            <span className="hidden xl:inline">{isFullscreen ? t('common.exitFullscreen') : t('common.fullscreen')}</span>
                         </Button>
+                        
+                        {/* View Toggle Buttons */}
+                        <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                            <Button
+                                onClick={() => handleViewModeChange('list')}
+                                variant={viewMode === 'list' ? 'default' : 'ghost'}
+                                size="default"
+                                className={`rounded-none gap-2 ${viewMode === 'list' ? '' : 'text-gray-600 dark:text-gray-400'}`}
+                                title={t('reservations.timeline.listView')}
+                            >
+                                <List className="w-4 h-4" />
+                                <span className="hidden xl:inline">{t('reservations.timeline.listView')}</span>
+                            </Button>
+                            <Button
+                                onClick={() => handleViewModeChange('timeline')}
+                                variant={viewMode === 'timeline' ? 'default' : 'ghost'}
+                                size="default"
+                                className={`rounded-none gap-2 ${viewMode === 'timeline' ? '' : 'text-gray-600 dark:text-gray-400'}`}
+                                title={t('reservations.timeline.timelineView')}
+                            >
+                                <GanttChart className="w-4 h-4" />
+                                <span className="hidden xl:inline">{t('reservations.timeline.timelineView')}</span>
+                            </Button>
+                        </div>
+
                         {canCreate && (
                             <Button
                                 onClick={() => router.push('/admin/reservations/create')}
-                                size="lg"
-                                className="bg-linear-to-r shadow-xl shadow-blue-500/30 dark:shadow-blue-400/20 hover:shadow-2xl hover:shadow-blue-500/40 dark:hover:shadow-blue-400/30 transition-all duration-300 gap-2 text-base px-6 py-6"
+                                size="default"
+                                className="bg-linear-to-r shadow-xl shadow-blue-500/30 dark:shadow-blue-400/20 hover:shadow-2xl hover:shadow-blue-500/40 dark:hover:shadow-blue-400/30 transition-all duration-300 gap-2"
                             >
-                                <Plus className="w-5 h-5" />
-                                {t('common.newReservation')}
+                                <Plus className="w-4 h-4" />
+                                <span className="hidden sm:inline">{t('common.newReservation')}</span>
+                                <span className="sm:hidden">{t('common.new')}</span>
                             </Button>
                         )}
                     </div>
                 </div>
             </div>
 
-            {/* Filters */}
-            <ReservationFilters onFilterChange={handleFilterChange} />
+            {/* Content based on view mode */}
+            {viewMode === 'list' ? (
+                <>
+                    {/* Filters */}
+                    <ReservationFilters onFilterChange={handleFilterChange} />
 
-            {/* List */}
-            <div className="min-h-[400px]">
-                <ReservationList
+                    {/* List */}
+                    <div className="min-h-[400px]">
+                        <ReservationList
+                            reservations={reservations}
+                            loading={loading}
+                            onReservationClick={handleReservationClick}
+                            onConfirm={canUpdate ? handleConfirm : undefined}
+                            onCancel={canCancel ? handleCancel : undefined}
+                            onCheckIn={canUpdate ? handleCheckIn : undefined}
+                            showActions
+                        />
+                    </div>
+                </>
+            ) : (
+                /* Gantt Timeline View */
+                <GanttTimeline
                     reservations={reservations}
-                    loading={loading}
+                    selectedDate={timelineDate}
+                    onDateChange={handleTimelineDateChange}
                     onReservationClick={handleReservationClick}
-                    onConfirm={canUpdate ? handleConfirm : undefined}
-                    onCancel={canCancel ? handleCancel : undefined}
-                    onCheckIn={canUpdate ? handleCheckIn : undefined}
-                    showActions
+                    onEmptyCellClick={handleEmptyCellClick}
+                    loading={loading}
                 />
-            </div>
+            )}
 
-            {/* Enhanced Pagination */}
-            {pagination.totalPages > 1 && (
+            {/* Enhanced Pagination - only show in list view */}
+            {viewMode === 'list' && pagination.totalPages > 1 && (
                 <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4">
                     <div className="flex items-center justify-between">
                         {/* Page Info */}
@@ -417,6 +549,23 @@ export function ReservationListView() {
                 reservation={selectedReservation}
                 onClose={() => setShowNoShowDialog(false)}
                 onSuccess={handleSuccess}
+            />
+
+            {/* Create Reservation Dialog for Timeline */}
+            <CreateReservationDialog
+                open={showCreateDialog}
+                onClose={() => {
+                    setShowCreateDialog(false);
+                    setCreateDialogDefaults({});
+                }}
+                onSuccess={() => {
+                    refetch();
+                    setShowCreateDialog(false);
+                    setCreateDialogDefaults({});
+                }}
+                defaultTableId={createDialogDefaults.tableId}
+                defaultDate={createDialogDefaults.date}
+                defaultTime={createDialogDefaults.time}
             />
 
             {/* Keyboard Help Dialog */}

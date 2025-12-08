@@ -43,12 +43,21 @@ interface CreateReservationDialogProps {
     open: boolean;
     onClose: () => void;
     onSuccess: () => void;
+    /** Pre-select a table (from timeline click) */
+    defaultTableId?: number;
+    /** Pre-fill date in YYYY-MM-DD format (from timeline) */
+    defaultDate?: string;
+    /** Pre-fill time in HH:mm format (from timeline) */
+    defaultTime?: string;
 }
 
 export function CreateReservationDialog({
     open,
     onClose,
     onSuccess,
+    defaultTableId,
+    defaultDate,
+    defaultTime,
 }: CreateReservationDialogProps) {
     const { createReservation, loading } = useReservationActions();
     const [availabilityParams, setAvailabilityParams] = useState<any>(null);
@@ -67,6 +76,21 @@ export function CreateReservationDialog({
             tableId: undefined,
         },
     });
+
+    // Apply default values from timeline click
+    useEffect(() => {
+        if (open) {
+            if (defaultDate && defaultTime) {
+                // Combine date and time for datetime-local input
+                form.setValue('reservationDate', `${defaultDate}T${defaultTime}`);
+            } else if (defaultDate) {
+                form.setValue('reservationDate', `${defaultDate}T12:00`);
+            }
+            if (defaultTableId) {
+                form.setValue('tableId', defaultTableId);
+            }
+        }
+    }, [open, defaultDate, defaultTime, defaultTableId, form]);
 
     // Watch date and party size to check availability
     const watchDate = form.watch('reservationDate');
