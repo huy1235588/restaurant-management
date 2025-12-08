@@ -64,8 +64,20 @@ export function useAuth(requiredRole?: UserRole | UserRole[]) {
                 errorMessage = error.message;
             }
             if (error && typeof error === 'object' && 'response' in error) {
-                const axiosError = error as AxiosError<{ message?: string }>;
-                errorMessage = axiosError.response?.data?.message || errorMessage;
+                const axiosError = error as AxiosError<{ message?: string | string[] }>;
+
+                // Normalize error message: prefer string, fallback to first entry if array
+                const responseMessage = axiosError.response?.data?.message;
+                if (Array.isArray(responseMessage)) {
+                    errorMessage = responseMessage[0] || errorMessage;
+                } else if (typeof responseMessage === 'string') {
+                    errorMessage = responseMessage;
+                }
+
+                // Explicitly map 401 invalid credentials to a consistent message key
+                if (axiosError.response?.status === 401 && errorMessage === 'Invalid username or password') {
+                    errorMessage = 'Invalid username or password';
+                }
             }
             return {
                 success: false,

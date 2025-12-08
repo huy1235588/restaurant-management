@@ -62,7 +62,11 @@ export default function LoginPage() {
                 const redirectPath = roleRedirects[result.user.role] || '/admin/dashboard';
                 router.push(redirectPath);
             } else {
-                toast.error(result.error || 'Login failed');
+                const errorMessage = result.error;
+                const normalizedError = errorMessage === 'Invalid username or password'
+                    ? t('auth.invalidUsernamePassword') || errorMessage
+                    : errorMessage;
+                toast.error(normalizedError || 'Login failed');
             }
         } catch (error: unknown) {
             console.error('Login error:', error);

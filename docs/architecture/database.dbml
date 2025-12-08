@@ -1,0 +1,442 @@
+// Restaurant Management System - Database Schema
+// Generated for dbdiagram.io
+// Last updated: December 7, 2025
+
+Project restaurant_management {
+  database_type: 'PostgreSQL'
+  Note: 'Restaurant Management System Database Schema'
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+Enum Role {
+  admin
+  manager
+  waiter
+  chef
+  cashier
+}
+
+Enum TableStatus {
+  available
+  occupied
+  reserved
+  maintenance
+}
+
+Enum OrderStatus {
+  pending
+  confirmed
+  completed
+  cancelled
+}
+
+Enum OrderItemStatus {
+  pending
+  ready
+  cancelled
+}
+
+Enum KitchenOrderStatus {
+  pending
+  preparing
+  ready
+  completed
+}
+
+Enum PaymentStatus {
+  pending
+  paid
+  refunded
+  cancelled
+}
+
+Enum PaymentMethod {
+  cash
+  card
+  momo
+  bank_transfer
+}
+
+Enum ReservationStatus {
+  pending
+  confirmed
+  seated
+  completed
+  cancelled
+  no_show
+}
+
+// ============================================
+// AUTHENTICATION & USER MANAGEMENT
+// ============================================
+
+Table accounts {
+  accountId int [pk, increment]
+  username varchar(50) [unique, not null]
+  email varchar(255) [unique, not null]
+  phoneNumber varchar(20) [unique, not null]
+  password varchar(255) [not null]
+  isActive boolean [default: true]
+  lastLogin timestamp
+  createdAt timestamp [default: `now()`]
+  updatedAt timestamp [default: `now()`]
+
+  indexes {
+    email
+    username
+  }
+}
+
+Table refresh_tokens {
+  tokenId int [pk, increment]
+  accountId int [not null, ref: > accounts.accountId]
+  token text [unique, not null]
+  expiresAt timestamp [not null]
+  deviceInfo varchar(500)
+  ipAddress varchar(45)
+  isRevoked boolean [default: false]
+  createdAt timestamp [default: `now()`]
+  revokedAt timestamp
+
+  indexes {
+    accountId
+    token
+    expiresAt
+  }
+}
+
+Table staff {
+  staffId int [pk, increment]
+  accountId int [unique, not null, ref: - accounts.accountId]
+  fullName varchar(255) [not null]
+  address varchar(500)
+  dateOfBirth date
+  hireDate date [default: `now()`]
+  salary decimal(12,2)
+  role Role [not null]
+  isActive boolean [default: true]
+  createdAt timestamp [default: `now()`]
+  updatedAt timestamp [default: `now()`]
+
+  indexes {
+    role
+    isActive
+  }
+}
+
+// ============================================
+// MENU & CATEGORY MANAGEMENT
+// ============================================
+
+Table categories {
+  categoryId int [pk, increment]
+  categoryName varchar(100) [unique, not null]
+  description varchar(500)
+  displayOrder int [default: 0]
+  isActive boolean [default: true]
+  imagePath varchar(500)
+  createdAt timestamp [default: `now()`]
+  updatedAt timestamp [default: `now()`]
+
+  indexes {
+    isActive
+  }
+}
+
+Table menu_items {
+  itemId int [pk, increment]
+  itemCode varchar(20) [unique, not null]
+  itemName varchar(100) [not null]
+  categoryId int [not null, ref: > categories.categoryId]
+  price decimal(10,2) [not null]
+  cost decimal(10,2)
+  description varchar(1000)
+  imagePath varchar(500)
+  isAvailable boolean [default: true]
+  isActive boolean [default: true]
+  preparationTime int [note: 'in minutes']
+  spicyLevel int [default: 0, note: '0-5']
+  isVegetarian boolean [default: false]
+  calories int
+  displayOrder int [default: 0]
+  createdAt timestamp [default: `now()`]
+  updatedAt timestamp [default: `now()`]
+
+  indexes {
+    categoryId
+    isAvailable
+    isActive
+  }
+}
+
+// ============================================
+// TABLE MANAGEMENT
+// ============================================
+
+Table restaurant_tables {
+  tableId int [pk, increment]
+  tableNumber varchar(20) [unique, not null]
+  tableName varchar(50)
+  capacity int [not null]
+  minCapacity int [default: 1]
+  floor int [default: 1]
+  section varchar(50) [note: 'VIP, Garden, Indoor, Outdoor']
+  status TableStatus [default: 'available']
+  isActive boolean [default: true]
+  createdAt timestamp [default: `now()`]
+  updatedAt timestamp [default: `now()`]
+
+  indexes {
+    status
+    floor
+    isActive
+  }
+}
+
+// ============================================
+// RESERVATION MANAGEMENT
+// ============================================
+
+Table customers {
+  customerId int [pk, increment]
+  name varchar(255) [not null]
+  phoneNumber varchar(20) [unique, not null]
+  email varchar(255) [unique]
+  birthday date
+  preferences jsonb
+  notes text
+  isVip boolean [default: false]
+  createdAt timestamp [default: `now()`]
+  updatedAt timestamp [default: `now()`]
+
+  indexes {
+    name
+  }
+}
+
+Table reservations {
+  reservationId int [pk, increment]
+  reservationCode varchar(50) [unique, not null, default: `uuid()`]
+  customerName varchar(255) [not null]
+  phoneNumber varchar(20) [not null]
+  email varchar(255)
+  customerId int [ref: > customers.customerId]
+  tableId int [not null, ref: > restaurant_tables.tableId]
+  reservationDate date [not null]
+  reservationTime time [not null]
+  duration int [default: 120, note: 'minutes']
+  partySize int [not null]
+  specialRequest text
+  depositAmount decimal(10,2)
+  status ReservationStatus [default: 'pending']
+  notes text
+  tags varchar[] [default: '{}']
+  createdBy int [ref: > staff.staffId]
+  confirmedAt timestamp
+  seatedAt timestamp
+  completedAt timestamp
+  cancelledAt timestamp
+  cancellationReason text
+  createdAt timestamp [default: `now()`]
+  updatedAt timestamp [default: `now()`]
+
+  indexes {
+    reservationDate
+    reservationTime
+    status
+    phoneNumber
+    tableId
+    customerId
+  }
+}
+
+Table reservation_audits {
+  auditId int [pk, increment]
+  reservationId int [not null, ref: > reservations.reservationId]
+  action varchar(100) [not null]
+  userId int [ref: > staff.staffId]
+  changes jsonb
+  createdAt timestamp [default: `now()`]
+
+  indexes {
+    reservationId
+    createdAt
+  }
+}
+
+// ============================================
+// ORDER MANAGEMENT
+// ============================================
+
+Table orders {
+  orderId int [pk, increment]
+  orderNumber varchar(50) [unique, not null, default: `uuid()`]
+  tableId int [not null, ref: > restaurant_tables.tableId]
+  staffId int [ref: > staff.staffId, note: 'waiter who took the order']
+  reservationId int [ref: > reservations.reservationId]
+  customerName varchar(255)
+  customerPhone varchar(20)
+  partySize int [default: 1]
+  status OrderStatus [default: 'pending']
+  notes text
+  totalAmount decimal(12,2) [default: 0]
+  discountAmount decimal(12,2) [default: 0]
+  taxAmount decimal(12,2) [default: 0]
+  finalAmount decimal(12,2) [default: 0]
+  orderTime timestamp [default: `now()`]
+  confirmedAt timestamp
+  completedAt timestamp
+  cancelledAt timestamp
+  cancellationReason text
+  createdAt timestamp [default: `now()`]
+  updatedAt timestamp [default: `now()`]
+
+  indexes {
+    orderNumber
+    tableId
+    staffId
+    status
+    orderTime
+    createdAt
+  }
+}
+
+Table order_items {
+  orderItemId int [pk, increment]
+  orderId int [not null, ref: > orders.orderId]
+  itemId int [not null, ref: > menu_items.itemId]
+  quantity int [not null]
+  unitPrice decimal(10,2) [not null]
+  totalPrice decimal(10,2) [not null]
+  specialRequest varchar(500)
+  status OrderItemStatus [default: 'pending']
+  createdAt timestamp [default: `now()`]
+  updatedAt timestamp [default: `now()`]
+
+  indexes {
+    orderId
+    itemId
+    status
+  }
+}
+
+// ============================================
+// KITCHEN MANAGEMENT
+// ============================================
+
+Table kitchen_orders {
+  kitchenOrderId int [pk, increment]
+  orderId int [unique, not null, ref: - orders.orderId, note: 'One-to-one with Order']
+  staffId int [ref: > staff.staffId, note: 'chef assigned']
+  status KitchenOrderStatus [default: 'pending']
+  prepTimeActual int [note: 'actual prep time in minutes']
+  startedAt timestamp
+  completedAt timestamp
+  createdAt timestamp [default: `now()`]
+  updatedAt timestamp [default: `now()`]
+
+  indexes {
+    orderId
+    staffId
+    status
+    createdAt
+  }
+}
+
+// ============================================
+// BILLING & PAYMENT
+// ============================================
+
+Table bills {
+  billId int [pk, increment]
+  billNumber varchar(50) [unique, not null, default: `uuid()`]
+  orderId int [unique, not null, ref: - orders.orderId]
+  tableId int [not null, ref: > restaurant_tables.tableId]
+  staffId int [ref: > staff.staffId, note: 'cashier']
+  subtotal decimal(12,2) [not null]
+  taxAmount decimal(12,2) [default: 0]
+  taxRate decimal(5,2) [default: 0, note: 'percentage']
+  discountAmount decimal(12,2) [default: 0]
+  serviceCharge decimal(12,2) [default: 0]
+  totalAmount decimal(12,2) [not null]
+  paidAmount decimal(12,2) [default: 0]
+  changeAmount decimal(12,2) [default: 0]
+  paymentStatus PaymentStatus [default: 'pending']
+  paymentMethod PaymentMethod
+  notes text
+  createdAt timestamp [default: `now()`]
+  paidAt timestamp
+  updatedAt timestamp [default: `now()`]
+
+  indexes {
+    billNumber
+    orderId
+    paymentStatus
+    createdAt
+  }
+}
+
+Table bill_items {
+  billItemId int [pk, increment]
+  billId int [not null, ref: > bills.billId]
+  itemId int [not null, ref: > menu_items.itemId]
+  itemName varchar(100) [not null]
+  quantity int [not null]
+  unitPrice decimal(10,2) [not null]
+  subtotal decimal(10,2) [not null]
+  discount decimal(10,2) [default: 0]
+  total decimal(10,2) [not null]
+  createdAt timestamp [default: `now()`]
+
+  indexes {
+    billId
+  }
+}
+
+Table payments {
+  paymentId int [pk, increment]
+  billId int [not null, ref: > bills.billId]
+  paymentMethod PaymentMethod [not null]
+  amount decimal(12,2) [not null]
+  transactionId varchar(100)
+  cardNumber varchar(20) [note: 'last 4 digits only']
+  cardHolderName varchar(255)
+  status PaymentStatus [default: 'pending']
+  notes text
+  paymentDate timestamp [default: `now()`]
+  createdAt timestamp [default: `now()`]
+
+  indexes {
+    billId
+    transactionId
+  }
+}
+
+// ============================================
+// RESTAURANT SETTINGS
+// ============================================
+
+Table restaurant_settings {
+  id int [pk, default: 1]
+  name varchar(200) [not null]
+  tagline varchar(500)
+  description text
+  aboutTitle varchar(200)
+  aboutContent text
+  address varchar(500)
+  phone varchar(20)
+  email varchar(255)
+  mapEmbedUrl text
+  heroImage varchar(500)
+  aboutImage varchar(500)
+  logoUrl varchar(500)
+  operatingHours jsonb [note: 'Array of { day: string, hours: string }']
+  socialLinks jsonb [note: 'Array of { platform: string, url: string, icon: string }']
+  highlights jsonb [note: 'Array of { icon: string, label: string, value: string }']
+  bankConfig jsonb [note: '{ bankId, bankName, accountNo, accountName, template }']
+  createdAt timestamp [default: `now()`]
+  updatedAt timestamp [default: `now()`]
+}

@@ -60,8 +60,14 @@ axiosInstance.interceptors.response.use(
     async (error: AxiosError) => {
         const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
+        // Skip refresh logic for auth endpoints like login/register/refresh to avoid infinite retries
+        const skipRefreshEndpoints = ['/auth/login', '/auth/register', '/auth/refresh'];
+        const shouldSkipRefresh = skipRefreshEndpoints.some((endpoint) =>
+            (originalRequest?.url || '').includes(endpoint)
+        );
+
         // If error is 401 and we haven't retried yet
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (error.response?.status === 401 && !originalRequest._retry && !shouldSkipRefresh) {
             if (isRefreshing) {
                 // If already refreshing, queue this request
                 return new Promise((resolve, reject) => {

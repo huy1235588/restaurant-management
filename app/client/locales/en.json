@@ -97,6 +97,7 @@
         "loginSuccess": "Login successful",
         "loginFailed": "Login failed",
         "logoutSuccess": "Logout successful",
+        "invalidUsernamePassword": "Invalid username or password",
         "invalidCredentials": "Invalid credentials",
         "verifyingSession": "Verifying session..."
     },
