@@ -104,7 +104,7 @@ export function MenuItemCard({
                 <p className="text-lg font-bold text-primary">{formatPrice(item.price)}</p>
                 {item.preparationTime && (
                     <p className="text-xs text-muted-foreground mt-1">
-                        ⏱️ {item.preparationTime} min
+                        ⏱️ {item.preparationTime} {t('menu.minutes')}
                     </p>
                 )}
             </CardContent>

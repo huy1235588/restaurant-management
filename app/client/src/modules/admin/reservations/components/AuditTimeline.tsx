@@ -1,12 +1,16 @@
 import { ReservationAudit } from '../types';
 import { formatReservationDateTime } from '../utils';
 import { Check, X, UserCheck, Clock, CheckCircle, XCircle, Edit, User } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface AuditTimelineProps {
     audits: ReservationAudit[];
 }
 
 export function AuditTimeline({ audits }: AuditTimelineProps) {
+    const { i18n } = useTranslation();
+    const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
+    
     const getIconConfig = (action: string) => {
         switch (action) {
             case 'CONFIRMED':
@@ -130,7 +134,7 @@ export function AuditTimeline({ audits }: AuditTimelineProps) {
                                         )}
                                     </div>
                                     <span className="text-xs text-gray-500 dark:text-gray-400 font-medium bg-gray-50 dark:bg-gray-900 px-2.5 py-1 rounded-full whitespace-nowrap">
-                                        {formatReservationDateTime(audit.createdAt)}
+                                        {formatReservationDateTime(audit.createdAt, undefined, locale)}
                                     </span>
                                 </div>
 

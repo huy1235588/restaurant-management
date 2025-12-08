@@ -46,11 +46,13 @@ import {
 } from '@/components/ui/pagination';
 import { useAuth } from '@/hooks/useAuth';
 import { hasPermission } from '@/types/permissions';
+import { useTranslation } from 'react-i18next';
 
 export default function MenuPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { user } = useAuth();
+    const { t } = useTranslation();
 
     // Permission checks - admin/manager only for write operations
     const canCreate = user ? hasPermission(user.role, 'menu.create') : false;
@@ -270,11 +272,11 @@ export default function MenuPage() {
         try {
             await updateAvailability(item.itemId, isAvailable);
             toast.success(
-                `Menu item ${isAvailable ? 'marked as available' : 'marked as out of stock'}`
+                isAvailable ? t('menu.markedAsAvailable') : t('menu.markedAsOutOfStock')
             );
             refetch();
         } catch (error: any) {
-            toast.error(error.message || 'Failed to update availability');
+            toast.error(error.message || t('menu.failedToUpdateAvailability'));
         }
     };
 
@@ -299,14 +301,14 @@ export default function MenuPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold">Menu Management</h1>
-                    <p className="text-muted-foreground mt-1">Manage your restaurant menu items</p>
+                    <h1 className="text-3xl font-bold">{t('menu.title')}</h1>
+                    <p className="text-muted-foreground mt-1">{t('menu.pageDescription')}</p>
                 </div>
                 <div className="flex gap-2">
                     {canCreate && (
                         <Button onClick={() => setCreateDialogOpen(true)}>
                             <Plus className="w-4 h-4 mr-2" />
-                            Add Menu Item
+                            {t('menu.addMenuItem')}
                         </Button>
                     )}
                 </div>
@@ -321,27 +323,27 @@ export default function MenuPage() {
                     <MenuSearch
                         value={searchQuery}
                         onChange={setSearchQuery}
-                        placeholder="Search menu items..."
+                        placeholder={t('menu.searchPlaceholder')}
                     />
                     <Select value={`${sortBy}-${sortOrder}`} onValueChange={handleSortChange}>
                         <SelectTrigger className="w-[200px]">
                             <ArrowUpDown className="w-4 h-4 mr-2" />
-                            <SelectValue placeholder="Sort by" />
+                            <SelectValue placeholder={t('menu.sortBy')} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="itemCode-asc">Code (A-Z)</SelectItem>
-                            <SelectItem value="itemCode-desc">Code (Z-A)</SelectItem>
-                            <SelectItem value="itemName-asc">Name (A-Z)</SelectItem>
-                            <SelectItem value="itemName-desc">Name (Z-A)</SelectItem>
-                            <SelectItem value="categoryId-asc">Category (A-Z)</SelectItem>
-                            <SelectItem value="categoryId-desc">Category (Z-A)</SelectItem>
-                            <SelectItem value="price-asc">Price (Low-High)</SelectItem>
-                            <SelectItem value="price-desc">Price (High-Low)</SelectItem>
-                            <SelectItem value="isActive-asc">Status (Inactive First)</SelectItem>
-                            <SelectItem value="isActive-desc">Status (Active First)</SelectItem>
-                            <SelectItem value="createdAt-desc">Newest First</SelectItem>
-                            <SelectItem value="createdAt-asc">Oldest First</SelectItem>
-                            <SelectItem value="displayOrder-asc">Display Order</SelectItem>
+                            <SelectItem value="itemCode-asc">{t('menu.codeAZ')}</SelectItem>
+                            <SelectItem value="itemCode-desc">{t('menu.codeZA')}</SelectItem>
+                            <SelectItem value="itemName-asc">{t('menu.nameAZ')}</SelectItem>
+                            <SelectItem value="itemName-desc">{t('menu.nameZA')}</SelectItem>
+                            <SelectItem value="categoryId-asc">{t('menu.categoryAZ')}</SelectItem>
+                            <SelectItem value="categoryId-desc">{t('menu.categoryZA')}</SelectItem>
+                            <SelectItem value="price-asc">{t('menu.priceLowHigh')}</SelectItem>
+                            <SelectItem value="price-desc">{t('menu.priceHighLow')}</SelectItem>
+                            <SelectItem value="isActive-asc">{t('menu.statusInactiveFirst')}</SelectItem>
+                            <SelectItem value="isActive-desc">{t('menu.statusActiveFirst')}</SelectItem>
+                            <SelectItem value="createdAt-desc">{t('menu.newestFirst')}</SelectItem>
+                            <SelectItem value="createdAt-asc">{t('menu.oldestFirst')}</SelectItem>
+                            <SelectItem value="displayOrder-asc">{t('menu.displayOrderSort')}</SelectItem>
                         </SelectContent>
                     </Select>
                     <ViewModeSwitcher value={viewMode} onChange={setViewMode} />
@@ -383,8 +385,8 @@ export default function MenuPage() {
             {pagination.totalPages > 1 && (
                 <div className="flex items-center justify-between">
                     <div className="text-sm text-muted-foreground">
-                        Showing {(page - 1) * limit + 1} to{' '}
-                        {Math.min(page * limit, pagination.total)} of {pagination.total} items
+                        {t('menu.showing')} {(page - 1) * limit + 1} {t('menu.to')}{' '}
+                        {Math.min(page * limit, pagination.total)} {t('menu.of')} {pagination.total} {t('menu.items')}
                     </div>
                     <Pagination>
                         <PaginationContent>
@@ -450,7 +452,7 @@ export default function MenuPage() {
                 <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>
-                            {duplicateMode ? 'Duplicate Menu Item' : 'Create New Menu Item'}
+                            {duplicateMode ? t('menu.duplicateMenuItem') : t('menu.createNewMenuItem')}
                         </DialogTitle>
                     </DialogHeader>
                     <MenuItemForm
@@ -477,7 +479,7 @@ export default function MenuPage() {
             >
                 <DialogContent className="sm:max-w-6xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>Edit Menu Item</DialogTitle>
+                        <DialogTitle>{t('menu.editMenuItem')}</DialogTitle>
                     </DialogHeader>
                     <MenuItemForm
                         menuItem={selectedMenuItem}
@@ -502,20 +504,19 @@ export default function MenuPage() {
             >
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Menu Item</AlertDialogTitle>
+                        <AlertDialogTitle>{t('menu.deleteMenuItem')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete "{selectedMenuItem?.itemName}"? This
-                            action cannot be undone.
+                            {t('menu.deleteMenuItemConfirm', { itemName: selectedMenuItem?.itemName })}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleDeleteConfirm}
                             disabled={deleting}
                             className="bg-destructive hover:bg-destructive/90"
                         >
-                            {deleting ? 'Deleting...' : 'Delete'}
+                            {deleting ? t('menu.deleting') : t('menu.delete')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

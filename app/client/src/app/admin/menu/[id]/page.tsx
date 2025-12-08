@@ -38,6 +38,7 @@ import {
     getSpicyLevelEmoji,
 } from '@/modules/admin/menu/utils';
 import { getImageUrl } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 export default function MenuItemDetailPage({
     params,
@@ -46,6 +47,7 @@ export default function MenuItemDetailPage({
 }) {
     const { id } = use(params);
     const router = useRouter();
+    const { t } = useTranslation();
     const itemId = parseInt(id);
 
     const { menuItem, loading, error, refetch } = useMenuItem(itemId);
@@ -116,13 +118,13 @@ export default function MenuItemDetailPage({
             <div className="container mx-auto p-6">
                 <Card className="p-12">
                     <div className="text-center">
-                        <h2 className="text-2xl font-bold mb-2">Menu Item Not Found</h2>
+                        <h2 className="text-2xl font-bold mb-2">{t('menu.menuItemNotFound')}</h2>
                         <p className="text-muted-foreground mb-4">
-                            {error || 'Menu item does not exist'}
+                            {error || t('menu.menuItemDoesNotExist')}
                         </p>
                         <Button onClick={() => router.push('/admin/menu')}>
                             <ArrowLeft className="w-4 h-4 mr-2" />
-                            Back to Menu
+                            {t('menu.backToMenu')}
                         </Button>
                     </div>
                 </Card>
@@ -155,15 +157,15 @@ export default function MenuItemDetailPage({
                 <div className="flex gap-2">
                     <Button variant="outline" onClick={() => setEditDialogOpen(true)}>
                         <Edit className="w-4 h-4 mr-2" />
-                        Edit
+                        {t('menu.edit')}
                     </Button>
                     <Button variant="outline" onClick={handleDuplicate}>
                         <Copy className="w-4 h-4 mr-2" />
-                        Duplicate
+                        {t('menu.duplicate')}
                     </Button>
                     <Button variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
                         <Trash2 className="w-4 h-4 mr-2" />
-                        Delete
+                        {t('menu.delete')}
                     </Button>
                 </div>
             </div>
@@ -191,7 +193,7 @@ export default function MenuItemDetailPage({
 
                             {menuItem.description && (
                                 <div>
-                                    <h3 className="font-semibold text-lg mb-2">Description</h3>
+                                    <h3 className="font-semibold text-lg mb-2">{t('menu.description')}</h3>
                                     <p className="text-muted-foreground leading-relaxed">
                                         {menuItem.description}
                                     </p>
@@ -203,12 +205,12 @@ export default function MenuItemDetailPage({
                     {/* Details */}
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-lg">Details</CardTitle>
+                            <CardTitle className="text-lg">{t('menu.details')}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3 text-sm">
                             {menuItem.preparationTime && (
                                 <div className="flex items-center justify-between">
-                                    <span className="text-muted-foreground">Preparation Time</span>
+                                    <span className="text-muted-foreground">{t('menu.preparationTimeLabel')}</span>
                                     <span className="font-medium">
                                         {formatPreparationTime(menuItem.preparationTime)}
                                     </span>
@@ -216,7 +218,7 @@ export default function MenuItemDetailPage({
                             )}
                             {menuItem.spicyLevel !== undefined && menuItem.spicyLevel !== null && (
                                 <div className="flex items-center justify-between">
-                                    <span className="text-muted-foreground">Spicy Level</span>
+                                    <span className="text-muted-foreground">{t('menu.spicyLevelLabel')}</span>
                                     <span className="font-medium">
                                         {getSpicyLevelLabel(menuItem.spicyLevel)}
                                     </span>
@@ -224,21 +226,21 @@ export default function MenuItemDetailPage({
                             )}
                             {menuItem.calories && (
                                 <div className="flex items-center justify-between">
-                                    <span className="text-muted-foreground">Calories</span>
+                                    <span className="text-muted-foreground">{t('menu.caloriesLabel')}</span>
                                     <span className="font-medium">{menuItem.calories} kcal</span>
                                 </div>
                             )}
                             <div className="flex items-center justify-between">
-                                <span className="text-muted-foreground">Display Order</span>
+                                <span className="text-muted-foreground">{t('menu.displayOrder')}</span>
                                 <span className="font-medium">{menuItem.displayOrder || 0}</span>
                             </div>
                             <Separator />
                             <div className="flex items-center justify-between">
-                                <span className="text-muted-foreground">Created</span>
+                                <span className="text-muted-foreground">{t('menu.created')}</span>
                                 <span className="font-medium">{formatDate(menuItem.createdAt)}</span>
                             </div>
                             <div className="flex items-center justify-between">
-                                <span className="text-muted-foreground">Last Updated</span>
+                                <span className="text-muted-foreground">{t('menu.lastUpdated')}</span>
                                 <span className="font-medium">{formatDate(menuItem.updatedAt)}</span>
                             </div>
                         </CardContent>
@@ -250,24 +252,24 @@ export default function MenuItemDetailPage({
                     {/* Status */}
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-lg">Status</CardTitle>
+                            <CardTitle className="text-lg">{t('menu.statusTitle')}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3">
                             <div className="flex items-center justify-between">
-                                <span className="text-sm text-muted-foreground">Availability</span>
+                                <span className="text-sm text-muted-foreground">{t('menu.availabilityLabel')}</span>
                                 <Badge variant={menuItem.isAvailable ? 'default' : 'destructive'}>
-                                    {menuItem.isAvailable ? 'Available' : 'Out of Stock'}
+                                    {menuItem.isAvailable ? t('menu.available') : t('menu.outOfStock')}
                                 </Badge>
                             </div>
                             <div className="flex items-center justify-between">
-                                <span className="text-sm text-muted-foreground">Active</span>
+                                <span className="text-sm text-muted-foreground">{t('menu.activeLabel')}</span>
                                 <Badge variant={menuItem.isActive ? 'default' : 'secondary'}>
-                                    {menuItem.isActive ? 'Yes' : 'No'}
+                                    {menuItem.isActive ? t('menu.yes') : t('menu.no')}
                                 </Badge>
                             </div>
                             {menuItem.category && (
                                 <div className="flex items-center justify-between">
-                                    <span className="text-sm text-muted-foreground">Category</span>
+                                    <span className="text-sm text-muted-foreground">{t('menu.categoryLabel')}</span>
                                     <Badge variant="outline">{menuItem.category.categoryName}</Badge>
                                 </div>
                             )}
@@ -277,11 +279,11 @@ export default function MenuItemDetailPage({
                     {/* Pricing */}
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-lg">Pricing</CardTitle>
+                            <CardTitle className="text-lg">{t('menu.pricingTitle')}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3">
                             <div className="flex items-center justify-between">
-                                <span className="text-sm text-muted-foreground">Selling Price</span>
+                                <span className="text-sm text-muted-foreground">{t('menu.sellingPrice')}</span>
                                 <span className="text-lg font-bold text-primary">
                                     {formatPrice(menuItem.price)}
                                 </span>
@@ -289,12 +291,12 @@ export default function MenuItemDetailPage({
                             {menuItem.cost && (
                                 <>
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm text-muted-foreground">Cost</span>
+                                        <span className="text-sm text-muted-foreground">{t('menu.costLabel')}</span>
                                         <span className="font-medium">{formatPrice(menuItem.cost)}</span>
                                     </div>
                                     <Separator />
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm text-muted-foreground">Profit Margin</span>
+                                        <span className="text-sm text-muted-foreground">{t('menu.profitMarginLabel')}</span>
                                         <span className="font-bold text-green-600 dark:text-green-400">
                                             {formatMargin(menuItem.price, menuItem.cost)}
                                         </span>
@@ -310,7 +312,7 @@ export default function MenuItemDetailPage({
             <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
                 <DialogContent className="sm:max-w-6xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>Edit Menu Item</DialogTitle>
+                        <DialogTitle>{t('menu.editMenuItem')}</DialogTitle>
                     </DialogHeader>
                     <MenuItemForm
                         menuItem={menuItem}
@@ -326,20 +328,19 @@ export default function MenuItemDetailPage({
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Menu Item</AlertDialogTitle>
+                        <AlertDialogTitle>{t('menu.deleteMenuItem')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete "{menuItem.itemName}"? This action
-                            cannot be undone.
+                            {t('menu.deleteMenuItemConfirm', { itemName: menuItem.itemName })}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleDeleteConfirm}
                             disabled={deleting}
                             className="bg-destructive hover:bg-destructive/90"
                         >
-                            {deleting ? 'Deleting...' : 'Delete'}
+                            {deleting ? t('menu.deleting') : t('menu.delete')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

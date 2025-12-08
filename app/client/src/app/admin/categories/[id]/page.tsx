@@ -31,6 +31,7 @@ import {
 import { MenuItem } from '@/types';
 import { MenuItemCard } from '@/modules/admin/menu/components/MenuItemCard';
 import { getImageUrl } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 export default function CategoryDetailPage({
     params,
@@ -39,6 +40,7 @@ export default function CategoryDetailPage({
 }) {
     const { id } = use(params);
     const router = useRouter();
+    const { t } = useTranslation();
     const categoryId = parseInt(id);
 
     const { category, loading, error, refetch } = useCategoryWithItems(categoryId);
@@ -78,7 +80,7 @@ export default function CategoryDetailPage({
 
         if (category.menuItems && category.menuItems.length > 0) {
             toast.error(
-                `Cannot delete category with ${category.menuItems.length} menu items. Please move or delete the items first.`
+                t('categories.cannotDeleteWithItems')
             );
             return;
         }
@@ -100,7 +102,7 @@ export default function CategoryDetailPage({
 
     const handleDeleteMenuItem = (item: MenuItem) => {
         // This would open a delete dialog in the parent
-        toast.info('Please manage items from the main menu page');
+        toast.info(t('categories.manageFromMenuPage'));
     };
 
     const handleDuplicateMenuItem = (item: MenuItem) => {
@@ -109,7 +111,7 @@ export default function CategoryDetailPage({
 
     const handleToggleAvailability = async (item: MenuItem, isAvailable: boolean) => {
         // This would call the availability API
-        toast.info('Please manage availability from the main menu page');
+        toast.info(t('categories.manageFromMenuPage'));
     };
 
     if (loading) {
@@ -133,11 +135,11 @@ export default function CategoryDetailPage({
             <div className="container mx-auto p-6">
                 <Card className="p-12">
                     <div className="text-center">
-                        <h2 className="text-2xl font-bold mb-2">Category Not Found</h2>
-                        <p className="text-muted-foreground mb-4">{error || 'Category does not exist'}</p>
+                        <h2 className="text-2xl font-bold mb-2">{t('categories.categoryNotFound')}</h2>
+                        <p className="text-muted-foreground mb-4">{error || t('categories.categoryDoesNotExist')}</p>
                         <Button onClick={() => router.push('/admin/categories')}>
                             <ArrowLeft className="w-4 h-4 mr-2" />
-                            Back to Categories
+                            {t('categories.backToCategories')}
                         </Button>
                     </div>
                 </Card>
@@ -159,18 +161,18 @@ export default function CategoryDetailPage({
                         <div className="flex items-center gap-2">
                             <h1 className="text-3xl font-bold">{category.categoryName}</h1>
                             <Badge variant={category.isActive ? 'default' : 'secondary'}>
-                                {category.isActive ? 'Active' : 'Inactive'}
+                                {category.isActive ? t('categories.active') : t('categories.inactive')}
                             </Badge>
                         </div>
                         <p className="text-muted-foreground mt-1">
-                            {menuItems.length} {menuItems.length === 1 ? 'item' : 'items'}
+                            {menuItems.length} {menuItems.length === 1 ? t('common.item') : t('common.items')}
                         </p>
                     </div>
                 </div>
                 <div className="flex gap-2">
                     <Button variant="outline" onClick={() => setEditDialogOpen(true)}>
                         <Edit className="w-4 h-4 mr-2" />
-                        Edit
+                        {t('common.edit')}
                     </Button>
                     <Button
                         variant="destructive"
@@ -178,7 +180,7 @@ export default function CategoryDetailPage({
                         disabled={menuItems.length > 0}
                     >
                         <Trash2 className="w-4 h-4 mr-2" />
-                        Delete
+                        {t('common.delete')}
                     </Button>
                 </div>
             </div>
@@ -207,25 +209,25 @@ export default function CategoryDetailPage({
                         <div className="space-y-4">
                             {category.description && (
                                 <div>
-                                    <h3 className="font-semibold mb-1">Description</h3>
+                                    <h3 className="font-semibold mb-1">{t('categories.description')}</h3>
                                     <p className="text-muted-foreground">{category.description}</p>
                                 </div>
                             )}
                             <div>
-                                <h3 className="font-semibold mb-1">Details</h3>
+                                <h3 className="font-semibold mb-1">{t('common.details')}</h3>
                                 <div className="space-y-2 text-sm">
                                     <div className="flex justify-between">
-                                        <span className="text-muted-foreground">Display Order:</span>
+                                        <span className="text-muted-foreground">{t('categories.displayOrder')}:</span>
                                         <span className="font-medium">{category.displayOrder || 0}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-muted-foreground">Created:</span>
+                                        <span className="text-muted-foreground">{t('categories.createdAt')}:</span>
                                         <span className="font-medium">
                                             {formatDate(category.createdAt)}
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-muted-foreground">Last Updated:</span>
+                                        <span className="text-muted-foreground">{t('categories.updatedAt')}:</span>
                                         <span className="font-medium">
                                             {formatDate(category.updatedAt)}
                                         </span>
@@ -241,9 +243,9 @@ export default function CategoryDetailPage({
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center justify-between">
-                        <span>Menu Items</span>
+                        <span>{t('categories.menuItems')}</span>
                         <Button onClick={() => router.push('/admin/menu')} size="sm">
-                            View All
+                            {t('common.viewAll')}
                         </Button>
                     </CardTitle>
                 </CardHeader>
@@ -265,7 +267,7 @@ export default function CategoryDetailPage({
                     ) : (
                         <div className="text-center py-12 text-muted-foreground">
                             <Package className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                            <p>No menu items in this category yet</p>
+                            <p>{t('categories.noItemsInCategory')}</p>
                         </div>
                     )}
                 </CardContent>
@@ -275,7 +277,7 @@ export default function CategoryDetailPage({
             <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>Edit Category</DialogTitle>
+                        <DialogTitle>{t('categories.editCategory')}</DialogTitle>
                     </DialogHeader>
                     <CategoryForm
                         category={category}
@@ -290,27 +292,27 @@ export default function CategoryDetailPage({
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Category</AlertDialogTitle>
+                        <AlertDialogTitle>{t('categories.deleteCategory')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete "{category.categoryName}"?
+                            {t('categories.deleteConfirmDescription')}
+                            <span className="block mt-2 font-medium">"{category.categoryName}"</span>
                             {menuItems.length > 0 ? (
                                 <span className="block mt-2 text-destructive font-medium">
-                                    This category has {menuItems.length} menu items. You cannot
-                                    delete a category with items.
+                                    {t('categories.cannotDeleteWithItems')}
                                 </span>
                             ) : (
-                                <span className="block mt-2">This action cannot be undone.</span>
+                                <span className="block mt-2">{t('common.actionCannotBeUndone')}</span>
                             )}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleDeleteConfirm}
                             disabled={deleting || menuItems.length > 0}
                             className="bg-destructive hover:bg-destructive/90"
                         >
-                            {deleting ? 'Deleting...' : 'Delete'}
+                            {deleting ? t('common.deleting') : t('common.delete')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

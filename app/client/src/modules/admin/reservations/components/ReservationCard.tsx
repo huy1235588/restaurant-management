@@ -26,7 +26,8 @@ export function ReservationCard({
     onCancel,
     onCheckIn,
 }: ReservationCardProps) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
     const upcoming = isUpcoming(reservation.reservationDate);
 
     return (
@@ -70,7 +71,7 @@ export function ReservationCard({
                             <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                         </div>
                         <span className="font-medium">
-                            {formatReservationDateTime(reservation.reservationDate, reservation.reservationTime)}
+                            {formatReservationDateTime(reservation.reservationDate, reservation.reservationTime, locale)}
                         </span>
                     </div>
 
@@ -80,7 +81,7 @@ export function ReservationCard({
                             <div className="flex items-center justify-center w-8 h-8 bg-purple-50 dark:bg-purple-950 rounded-lg">
                                 <Clock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                             </div>
-                            <span className="font-medium">{formatDuration(reservation.duration)}</span>
+                            <span className="font-medium">{formatDuration(reservation.duration, locale)}</span>
                         </div>
 
                         <div className="flex items-center gap-2.5 text-sm text-gray-700 dark:text-gray-300">

@@ -175,14 +175,14 @@ export function EditTableDialog({ open, table, onClose, onSuccess }: EditTableDi
                                         >
                                             <FormControl>
                                                 <SelectTrigger>
-                                                    <SelectValue placeholder="Select floor" />
+                                                    <SelectValue placeholder={t('tables.selectFloor', 'Select floor')} />
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                <SelectItem value="1">Floor 1</SelectItem>
-                                                <SelectItem value="2">Floor 2</SelectItem>
-                                                <SelectItem value="3">Floor 3</SelectItem>
-                                                <SelectItem value="4">Floor 4</SelectItem>
+                                                <SelectItem value="1">{t('tables.floor', 'Floor')} 1</SelectItem>
+                                                <SelectItem value="2">{t('tables.floor', 'Floor')} 2</SelectItem>
+                                                <SelectItem value="3">{t('tables.floor', 'Floor')} 3</SelectItem>
+                                                <SelectItem value="4">{t('tables.floor', 'Floor')} 4</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
@@ -199,14 +199,14 @@ export function EditTableDialog({ open, table, onClose, onSuccess }: EditTableDi
                                         <Select onValueChange={field.onChange} value={field.value}>
                                             <FormControl>
                                                 <SelectTrigger>
-                                                    <SelectValue placeholder="Select section" />
+                                                    <SelectValue placeholder={t('tables.selectSection', 'Select section')} />
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                <SelectItem value="main">Main</SelectItem>
-                                                <SelectItem value="patio">Patio</SelectItem>
-                                                <SelectItem value="vip">VIP</SelectItem>
-                                                <SelectItem value="bar">Bar</SelectItem>
+                                                <SelectItem value="main">{t('tables.sections.main', 'Main')}</SelectItem>
+                                                <SelectItem value="patio">{t('tables.sections.patio', 'Patio')}</SelectItem>
+                                                <SelectItem value="vip">{t('tables.sections.vip', 'VIP')}</SelectItem>
+                                                <SelectItem value="bar">{t('tables.sections.bar', 'Bar')}</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />

@@ -55,7 +55,8 @@ interface ReservationDetailViewProps {
 }
 
 export function ReservationDetailView({ reservationId }: ReservationDetailViewProps) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
     const router = useRouter();
     const { reservation, loading, refetch } = useReservation(reservationId);
     const [isFullscreen, setIsFullscreen] = useState(false);
@@ -145,7 +146,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                         <Loader2 className="w-16 h-16" />
                     </div>
                 </div>
-                <p className="mt-6 text-base font-semibold text-gray-700 dark:text-gray-300">Loading reservation details...</p>
+                <p className="mt-6 text-base font-semibold text-gray-700 dark:text-gray-300">{t('reservations.timeline.loadingReservationDetails')}</p>
             </div>
         );
     }
@@ -156,11 +157,11 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                 <div className="w-20 h-20 bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-full flex items-center justify-center mb-6">
                     <AlertCircle className="w-10 h-10 text-gray-400 dark:text-gray-500" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Reservation not found</h3>
-                <p className="text-gray-500 dark:text-gray-400 mb-6">The reservation you're looking for doesn't exist</p>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">{t('reservations.timeline.reservationNotFound')}</h3>
+                <p className="text-gray-500 dark:text-gray-400 mb-6">{t('reservations.timeline.reservationNotFoundDesc')}</p>
                 <Button onClick={() => router.push('/admin/reservations')} className="gap-2">
                     <ArrowLeft className="w-4 h-4" />
-                    Back to Reservations
+                    {t('reservations.backToReservations')}
                 </Button>
             </div>
         );
@@ -180,7 +181,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                         className="gap-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back
+                        {t('common.back')}
                     </Button>
 
                     <div className="flex items-center gap-2">
@@ -192,22 +193,22 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                             className="gap-2"
                         >
                             <Keyboard className="w-4 h-4" />
-                            <span className="hidden sm:inline">Help</span>
+                            <span className="hidden sm:inline">{t('common.help')}</span>
                         </Button>
                         <Button
                             onClick={toggleFullscreen}
                             variant="outline"
                             size="sm"
-                            title={isFullscreen ? 'Exit fullscreen (F)' : 'Enter fullscreen (F)'}
+                            title={isFullscreen ? t('common.exitFullscreen') + ' (F)' : t('common.fullscreen') + ' (F)'}
                             className="gap-2"
                         >
                             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-                            <span className="hidden sm:inline">{isFullscreen ? 'Exit' : 'Fullscreen'}</span>
+                            <span className="hidden sm:inline">{isFullscreen ? t('common.exitFullscreen') : t('common.fullscreen')}</span>
                         </Button>
                         {canEditReservation(reservation.status) && (
                             <Button variant="outline" size="sm" className="gap-2">
                                 <Edit className="w-4 h-4" />
-                                Edit
+                                {t('common.edit')}
                             </Button>
                         )}
                     </div>
@@ -224,7 +225,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                         <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                             <Calendar className="w-4 h-4" />
                             <p className="font-medium">
-                                {formatReservationDateTime(reservation.reservationDate)}
+                                {formatReservationDateTime(reservation.reservationDate, undefined, locale)}
                             </p>
                         </div>
                     </div>
@@ -237,7 +238,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                                 className="bg-linear-to-r from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 hover:from-blue-700 hover:to-blue-800 dark:hover:from-blue-600 dark:hover:to-blue-700 shadow-lg shadow-blue-500/30 dark:shadow-blue-400/20"
                             >
                                 <CheckCircle className="w-4 h-4 mr-2" />
-                                Confirm
+                                {t('common.confirm')}
                             </Button>
                         )}
                         {availableActions.includes('seat') && (
@@ -246,7 +247,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                                 className="bg-linear-to-r from-green-600 to-green-700 dark:from-green-500 dark:to-green-600 hover:from-green-700 hover:to-green-800 dark:hover:from-green-600 dark:hover:to-green-700 shadow-lg shadow-green-500/30 dark:shadow-green-400/20"
                             >
                                 <UserCheck className="w-4 h-4 mr-2" />
-                                Check In
+                                {t('reservations.checkIn')}
                             </Button>
                         )}
                         {availableActions.includes('complete') && (
@@ -255,7 +256,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                                 className="bg-linear-to-r from-emerald-600 to-emerald-700 dark:from-emerald-500 dark:to-emerald-600 hover:from-emerald-700 hover:to-emerald-800 dark:hover:from-emerald-600 dark:hover:to-emerald-700 shadow-lg shadow-emerald-500/30 dark:shadow-emerald-400/20"
                             >
                                 <CheckCircle className="w-4 h-4 mr-2" />
-                                Complete
+                                {t('reservations.complete')}
                             </Button>
                         )}
                         {reservation.status === 'confirmed' && (
@@ -265,7 +266,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                                 className="border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300 hover:bg-orange-50 dark:hover:bg-orange-950"
                             >
                                 <AlertCircle className="w-4 h-4 mr-2" />
-                                No Show
+                                {t('reservations.markNoShow')}
                             </Button>
                         )}
                         {availableActions.includes('cancel') && (
@@ -275,7 +276,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                                 className="border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-950"
                             >
                                 <XCircle className="w-4 h-4 mr-2" />
-                                Cancel
+                                {t('common.cancel')}
                             </Button>
                         )}
                     </div>
@@ -290,14 +291,14 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                         className="rounded-lg data-[state=active]:bg-linear-to-r data-[state=active]:from-blue-600 data-[state=active]:to-blue-700 dark:data-[state=active]:from-blue-500 dark:data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md"
                     >
                         <FileText className="w-4 h-4 mr-2" />
-                        Details
+                        {t('common.viewDetails')}
                     </TabsTrigger>
                     <TabsTrigger
                         value="history"
                         className="rounded-lg data-[state=active]:bg-linear-to-r data-[state=active]:from-purple-600 data-[state=active]:to-purple-700 dark:data-[state=active]:from-purple-500 dark:data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-md"
                     >
                         <Clock className="w-4 h-4 mr-2" />
-                        History
+                        {t('reservations.history')}
                     </TabsTrigger>
                 </TabsList>
 
@@ -309,7 +310,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                                 <div className="w-8 h-8 bg-blue-600 dark:bg-blue-500 rounded-lg flex items-center justify-center">
                                     <Users className="w-4 h-4 text-white" />
                                 </div>
-                                Customer Information
+                                {t('reservations.customerInfo')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-5">
@@ -318,7 +319,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                                     <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">Name</p>
+                                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">{t('common.name')}</p>
                                     <p className="font-semibold text-gray-900 dark:text-gray-100 text-lg">{reservation.customer?.name}</p>
                                 </div>
                             </div>
@@ -327,7 +328,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                                     <Phone className="w-5 h-5 text-green-600 dark:text-green-400" />
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">Phone</p>
+                                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">{t('reservations.customerPhone')}</p>
                                     <p className="font-semibold text-gray-900 dark:text-gray-100 text-lg">
                                         {formatPhoneNumber(reservation.customer?.phoneNumber || '')}
                                     </p>
@@ -339,7 +340,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                                         <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                                     </div>
                                     <div className="flex-1">
-                                        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">Email</p>
+                                        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">{t('reservations.customerEmail')}</p>
                                         <p className="font-semibold text-gray-900 dark:text-gray-100">{reservation.customer?.email}</p>
                                     </div>
                                 </div>
@@ -354,7 +355,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                                 <div className="w-8 h-8 bg-purple-600 dark:bg-purple-500 rounded-lg flex items-center justify-center">
                                     <Calendar className="w-4 h-4 text-white" />
                                 </div>
-                                Reservation Details
+                                {t('reservations.reservationDetails')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-5">
@@ -363,9 +364,9 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                                     <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">Date & Time</p>
+                                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">{t('reservations.dateTime')}</p>
                                     <p className="font-semibold text-gray-900 dark:text-gray-100 text-lg">
-                                        {formatReservationDateTime(reservation.reservationDate, reservation.reservationTime)}
+                                        {formatReservationDateTime(reservation.reservationDate, reservation.reservationTime, locale)}
                                     </p>
                                 </div>
                             </div>
@@ -374,9 +375,9 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                                     <Clock className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">Duration</p>
+                                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">{t('reservations.duration')}</p>
                                     <p className="font-semibold text-gray-900 dark:text-gray-100 text-lg">
-                                        {formatDuration(reservation.duration)}
+                                        {formatDuration(reservation.duration, locale)}
                                     </p>
                                 </div>
                             </div>
@@ -385,8 +386,8 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                                     <Users className="w-5 h-5 text-green-600 dark:text-green-400" />
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">Party Size</p>
-                                    <p className="font-semibold text-gray-900 dark:text-gray-100 text-lg">{reservation.partySize} guests</p>
+                                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">{t('reservations.partySize')}</p>
+                                    <p className="font-semibold text-gray-900 dark:text-gray-100 text-lg">{reservation.partySize} {t('reservations.guests')}</p>
                                 </div>
                             </div>
                             {reservation.table && (
@@ -395,7 +396,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                                         <MapPin className="w-5 h-5 text-orange-600 dark:text-orange-400" />
                                     </div>
                                     <div className="flex-1">
-                                        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">Table</p>
+                                        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">{t('reservations.table')}</p>
                                         <p className="font-semibold text-gray-900 dark:text-gray-100 text-lg">
                                             Table {reservation.table.tableNumber}
                                             {reservation.table.tableName &&
@@ -417,7 +418,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                                         <FileText className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                                     </div>
                                     <div className="flex-1">
-                                        <p className="text-xs font-semibold text-amber-900 dark:text-amber-100 uppercase tracking-wide mb-1">Special Requests</p>
+                                        <p className="text-xs font-semibold text-amber-900 dark:text-amber-100 uppercase tracking-wide mb-1">{t('reservations.specialRequests')}</p>
                                         <p className="font-medium text-amber-900 dark:text-amber-200 leading-relaxed">{reservation.specialRequest}</p>
                                     </div>
                                 </div>
@@ -433,7 +434,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                                     <div className="w-8 h-8 bg-red-600 dark:bg-red-500 rounded-lg flex items-center justify-center">
                                         <XCircle className="w-4 h-4 text-white" />
                                     </div>
-                                    Cancellation Information
+                                    {t('reservations.cancellationReason')}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
@@ -452,7 +453,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                                 <div className="w-8 h-8 bg-purple-600 dark:bg-purple-500 rounded-lg flex items-center justify-center">
                                     <Clock className="w-4 h-4 text-white" />
                                 </div>
-                                Activity History
+                                {t('reservations.activityHistory')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -500,21 +501,21 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <Keyboard className="w-5 h-5" />
-                            Keyboard Shortcuts
+                            {t('common.keyboardShortcuts')}
                         </DialogTitle>
                         <DialogDescription>
-                            Quick keyboard shortcuts to navigate the reservation details
+                            {t('reservations.keyboard.description')}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-3">
                         <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                            <span className="text-sm text-gray-600 dark:text-gray-400">Back to List</span>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('reservations.keyboard.back')}</span>
                             <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
                                 B
                             </kbd>
                         </div>
                         <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                            <span className="text-sm text-gray-600 dark:text-gray-400">Print</span>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('reservations.keyboard.print')}</span>
                             <div className="flex items-center gap-2">
                                 <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
                                     Ctrl
@@ -526,31 +527,31 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                             </div>
                         </div>
                         <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                            <span className="text-sm text-gray-600 dark:text-gray-400">Confirm Reservation</span>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('reservations.keyboard.confirmReservation')}</span>
                             <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
                                 C
                             </kbd>
                         </div>
                         <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                            <span className="text-sm text-gray-600 dark:text-gray-400">Cancel Reservation</span>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('reservations.keyboard.cancelReservation')}</span>
                             <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
                                 X
                             </kbd>
                         </div>
                         <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                            <span className="text-sm text-gray-600 dark:text-gray-400">Fullscreen</span>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('common.fullscreen')}</span>
                             <div className="flex items-center gap-2">
                                 <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
                                     F
                                 </kbd>
-                                <span className="text-xs text-gray-500">or</span>
+                                <span className="text-xs text-gray-500">{t('common.or')}</span>
                                 <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
                                     F11
                                 </kbd>
                             </div>
                         </div>
                         <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                            <span className="text-sm text-gray-600 dark:text-gray-400">Show Help</span>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('reservations.keyboard.showHelp')}</span>
                             <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
                                 Shift + ?
                             </kbd>

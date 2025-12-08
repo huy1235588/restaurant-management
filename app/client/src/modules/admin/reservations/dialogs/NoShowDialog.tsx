@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useReservationActions } from '../hooks/useReservationActions';
 import { Reservation } from '../types';
 import { Loader2, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface NoShowDialogProps {
     open: boolean;
@@ -24,6 +25,7 @@ export function NoShowDialog({
     onClose,
     onSuccess,
 }: NoShowDialogProps) {
+    const { t } = useTranslation();
     const { markNoShow, loading } = useReservationActions();
 
     const handleMarkNoShow = async () => {
@@ -46,28 +48,29 @@ export function NoShowDialog({
                 <DialogHeader>
                     <div className="flex items-center gap-2">
                         <AlertCircle className="w-5 h-5 text-orange-600" />
-                        <DialogTitle>Mark as No Show</DialogTitle>
+                        <DialogTitle>{t('reservations.dialogs.noShowTitle')}</DialogTitle>
                     </div>
                     <DialogDescription>
-                        Mark reservation {reservation.reservationCode} for{' '}
-                        {reservation.customer?.name} as no-show
+                        {t('reservations.dialogs.noShowDesc', {
+                            code: reservation.reservationCode,
+                            name: reservation.customer?.name
+                        })}
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="py-4">
                     <p className="text-sm text-gray-600">
-                        This will record that the customer did not arrive for their reservation and
-                        free up the table.
+                        {t('reservations.dialogs.noShowMessage')}
                     </p>
                 </div>
 
                 <DialogFooter>
                     <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
-                        Cancel
+                        {t('common.cancel')}
                     </Button>
                     <Button variant="destructive" onClick={handleMarkNoShow} disabled={loading}>
                         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Mark No Show
+                        {t('reservations.dialogs.markNoShow')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

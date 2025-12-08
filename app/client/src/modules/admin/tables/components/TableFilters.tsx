@@ -47,7 +47,7 @@ export function TableFilters({
 
                 <Select value={statusFilter} onValueChange={onStatusFilterChange}>
                     <SelectTrigger aria-label={t('tables.filterByStatus', 'Filter by table status')}>
-                        <SelectValue placeholder={t('tables.statusFilter', 'All Status')} />
+                        <SelectValue placeholder={t('tables.allStatus', 'All status')} />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">{t('common.all', 'All')}</SelectItem>
@@ -60,10 +60,10 @@ export function TableFilters({
 
                 <Select value={floorFilter} onValueChange={onFloorFilterChange}>
                     <SelectTrigger aria-label={t('tables.filterByFloor', 'Filter by floor')}>
-                        <SelectValue placeholder={t('tables.floorFilter', 'All Floors')} />
+                        <SelectValue placeholder={t('tables.allFloors', 'All floors')} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">{t('common.all', 'All Floors')}</SelectItem>
+                        <SelectItem value="all">{t('tables.allFloors', 'All floors')}</SelectItem>
                         <SelectItem value="1">{t('tables.floor', 'Floor')} 1</SelectItem>
                         <SelectItem value="2">{t('tables.floor', 'Floor')} 2</SelectItem>
                         <SelectItem value="3">{t('tables.floor', 'Floor')} 3</SelectItem>
@@ -73,10 +73,10 @@ export function TableFilters({
 
                 <Select value={sectionFilter} onValueChange={onSectionFilterChange}>
                     <SelectTrigger aria-label={t('tables.filterBySection', 'Filter by section')}>
-                        <SelectValue placeholder={t('tables.sectionFilter', 'All Sections')} />
+                        <SelectValue placeholder={t('tables.allSections', 'All sections')} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">{t('common.all', 'All Sections')}</SelectItem>
+                        <SelectItem value="all">{t('tables.allSections', 'All sections')}</SelectItem>
                         <SelectItem value="main">{t('tables.sections.main', 'Main')}</SelectItem>
                         <SelectItem value="patio">{t('tables.sections.patio', 'Patio')}</SelectItem>
                         <SelectItem value="vip">{t('tables.sections.vip', 'VIP')}</SelectItem>
@@ -86,10 +86,10 @@ export function TableFilters({
 
                 <Select value={activeFilter} onValueChange={onActiveFilterChange}>
                     <SelectTrigger aria-label={t('tables.filterByActive', 'Filter by active status')}>
-                        <SelectValue placeholder={t('tables.activeFilter', 'All Tables')} />
+                        <SelectValue placeholder={t('tables.allTables', 'All tables')} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">{t('common.all', 'All Tables')}</SelectItem>
+                        <SelectItem value="all">{t('tables.allTables', 'All tables')}</SelectItem>
                         <SelectItem value="true">{t('tables.active', 'Active')}</SelectItem>
                         <SelectItem value="false">{t('tables.inactive', 'Inactive')}</SelectItem>
                     </SelectContent>

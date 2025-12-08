@@ -31,10 +31,12 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { hasPermission } from '@/types/permissions';
+import { useTranslation } from 'react-i18next';
 
 export default function CategoriesPage() {
     const router = useRouter();
     const { user } = useAuth();
+    const { t } = useTranslation();
 
     // Permission checks - admin/manager only for write operations
     const canCreate = user ? hasPermission(user.role, 'category.create') : false;
@@ -117,7 +119,7 @@ export default function CategoriesPage() {
         // Check if category has items
         if (selectedCategory.menuItems && selectedCategory.menuItems.length > 0) {
             toast.error(
-                `Cannot delete category with ${selectedCategory.menuItems.length} menu items. Please move or delete the items first.`
+                t('categories.cannotDeleteWithItems')
             );
             return;
         }
@@ -148,15 +150,15 @@ export default function CategoriesPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold">Menu Categories</h1>
+                    <h1 className="text-3xl font-bold">{t('categories.title')}</h1>
                     <p className="text-muted-foreground mt-1">
-                        Organize your menu items into categories
+                        {t('categories.pageDescription')}
                     </p>
                 </div>
                 {canCreate && (
                     <Button onClick={() => setCreateDialogOpen(true)}>
                         <Plus className="w-4 h-4 mr-2" />
-                        Add Category
+                        {t('categories.createCategory')}
                     </Button>
                 )}
             </div>
@@ -164,15 +166,15 @@ export default function CategoriesPage() {
             {/* Statistics */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="p-4 border rounded-lg">
-                    <div className="text-sm text-muted-foreground">Total Categories</div>
+                    <div className="text-sm text-muted-foreground">{t('categories.totalCategories')}</div>
                     <div className="text-2xl font-bold mt-1">{stats.total}</div>
                 </div>
                 <div className="p-4 border rounded-lg">
-                    <div className="text-sm text-muted-foreground">Active</div>
+                    <div className="text-sm text-muted-foreground">{t('categories.active')}</div>
                     <div className="text-2xl font-bold mt-1 text-green-600 dark:text-green-400">{stats.active}</div>
                 </div>
                 <div className="p-4 border rounded-lg">
-                    <div className="text-sm text-muted-foreground">Inactive</div>
+                    <div className="text-sm text-muted-foreground">{t('categories.inactive')}</div>
                     <div className="text-2xl font-bold mt-1 text-gray-600 dark:text-gray-400">{stats.inactive}</div>
                 </div>
             </div>
@@ -184,7 +186,7 @@ export default function CategoriesPage() {
                     <Input
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search categories..."
+                        placeholder={t('categories.searchPlaceholder')}
                         className="pl-9"
                     />
                 </div>
@@ -199,12 +201,12 @@ export default function CategoriesPage() {
                     }}
                 >
                     <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Status" />
+                        <SelectValue placeholder={t('common.status')} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="inactive">Inactive</SelectItem>
+                        <SelectItem value="all">{t('tables.allStatus')}</SelectItem>
+                        <SelectItem value="active">{t('categories.active')}</SelectItem>
+                        <SelectItem value="inactive">{t('categories.inactive')}</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
@@ -223,7 +225,7 @@ export default function CategoriesPage() {
             <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>Create New Category</DialogTitle>
+                        <DialogTitle>{t('categories.createCategory')}</DialogTitle>
                     </DialogHeader>
                     <CategoryForm
                         onSubmit={handleCreateFormSubmit}
@@ -237,7 +239,7 @@ export default function CategoriesPage() {
             <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>Edit Category</DialogTitle>
+                        <DialogTitle>{t('categories.editCategory')}</DialogTitle>
                     </DialogHeader>
                     <CategoryForm
                         category={selectedCategory}
@@ -255,17 +257,17 @@ export default function CategoriesPage() {
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Category</AlertDialogTitle>
+                        <AlertDialogTitle>{t('categories.deleteCategory')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete "{selectedCategory?.categoryName}"?
+                            {t('categories.deleteConfirmDescription')}
+                            <span className="block mt-2 font-medium">"{selectedCategory?.categoryName}"</span>
                             {selectedCategory?.menuItems && selectedCategory.menuItems.length > 0 ? (
                                 <span className="block mt-2 text-destructive font-medium">
-                                    This category has {selectedCategory.menuItems.length} menu items.
-                                    You cannot delete a category with items.
+                                    {t('categories.cannotDeleteWithItems')}
                                 </span>
                             ) : (
                                 <span className="block mt-2">
-                                    This action cannot be undone.
+                                    {t('tables.deleteDescription', { number: '' }).replace(/\s+$/, '')}
                                 </span>
                             )}
                         </AlertDialogDescription>
@@ -277,7 +279,7 @@ export default function CategoriesPage() {
                                 setSelectedCategory(null);
                             }}
                         >
-                            Cancel
+                            {t('common.cancel')}
                         </AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleDeleteConfirm}
@@ -288,7 +290,7 @@ export default function CategoriesPage() {
                             }
                             className="bg-destructive hover:bg-destructive/90"
                         >
-                            {deleting ? 'Deleting...' : 'Delete'}
+                            {deleting ? t('common.processing') : t('common.delete')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

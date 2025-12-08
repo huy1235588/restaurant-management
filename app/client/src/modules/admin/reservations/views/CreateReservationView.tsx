@@ -176,7 +176,7 @@ export function CreateReservationView() {
                             className="gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
                         >
                             <ArrowLeft className="w-4 h-4" />
-                            Back to Reservations
+                            {t('reservations.backToReservations')}
                         </Button>
                         <div className="flex items-center gap-2">
                             <Button
@@ -188,18 +188,18 @@ export function CreateReservationView() {
                                 className="gap-2"
                             >
                                 <Keyboard className="w-4 h-4" />
-                                <span className="hidden sm:inline">Help</span>
+                                <span className="hidden sm:inline">{t('common.help')}</span>
                             </Button>
                             <Button
                                 type="button"
                                 onClick={toggleFullscreen}
                                 variant="outline"
                                 size="sm"
-                                title={isFullscreen ? 'Exit fullscreen (F)' : 'Enter fullscreen (F)'}
+                                title={isFullscreen ? t('common.exitFullscreen') + ' (F)' : t('common.fullscreen') + ' (F)'}
                                 className="gap-2"
                             >
                                 {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-                                <span className="hidden sm:inline">{isFullscreen ? 'Exit' : 'Fullscreen'}</span>
+                                <span className="hidden sm:inline">{isFullscreen ? t('common.exitFullscreen') : t('common.fullscreen')}</span>
                             </Button>
                         </div>
                     </div>
@@ -210,10 +210,10 @@ export function CreateReservationView() {
                         </div>
                         <div>
                             <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
-                                Create Reservation
+                                {t('reservations.createReservation')}
                             </h1>
                             <p className="text-gray-600 dark:text-gray-400 mt-1">
-                                Fill in the details to create a new reservation
+                                {t('reservations.fillDetails')}
                             </p>
                         </div>
                     </div>
@@ -229,8 +229,8 @@ export function CreateReservationView() {
                                         <User className="w-5 h-5 text-white" />
                                     </div>
                                     <div>
-                                        <CardTitle className="text-xl">Customer Information</CardTitle>
-                                        <CardDescription>Enter the customer's contact details</CardDescription>
+                                        <CardTitle className="text-xl">{t('reservations.customerInfo')}</CardTitle>
+                                        <CardDescription>{t('reservations.enterCustomerDetails')}</CardDescription>
                                     </div>
                                 </div>
                             </CardHeader>
@@ -242,7 +242,7 @@ export function CreateReservationView() {
                                         <FormItem>
                                             <FormLabel className="flex items-center gap-2">
                                                 <User className="w-4 h-4 text-gray-500" />
-                                                Full Name *
+                                                {t('reservations.fullName')} *
                                             </FormLabel>
                                             <FormControl>
                                                 <Input
@@ -264,7 +264,7 @@ export function CreateReservationView() {
                                             <FormItem>
                                                 <FormLabel className="flex items-center gap-2">
                                                     <Phone className="w-4 h-4 text-gray-500" />
-                                                    Phone Number *
+                                                    {t('reservations.phoneNumber')} *
                                                 </FormLabel>
                                                 <FormControl>
                                                     <Input
@@ -285,7 +285,7 @@ export function CreateReservationView() {
                                             <FormItem>
                                                 <FormLabel className="flex items-center gap-2">
                                                     <Mail className="w-4 h-4 text-gray-500" />
-                                                    Email (Optional)
+                                                    {t('reservations.emailOptional')}
                                                 </FormLabel>
                                                 <FormControl>
                                                     <Input
@@ -311,8 +311,8 @@ export function CreateReservationView() {
                                         <Calendar className="w-5 h-5 text-white" />
                                     </div>
                                     <div>
-                                        <CardTitle className="text-xl">Reservation Details</CardTitle>
-                                        <CardDescription>Set the date, time, and party size</CardDescription>
+                                        <CardTitle className="text-xl">{t('reservations.reservationDetails')}</CardTitle>
+                                        <CardDescription>{t('reservations.setReservationDetails')}</CardDescription>
                                     </div>
                                 </div>
                             </CardHeader>
@@ -324,7 +324,7 @@ export function CreateReservationView() {
                                         <FormItem>
                                             <FormLabel className="flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-gray-500" />
-                                                Date & Time *
+                                                {t('reservations.dateTime')} *
                                             </FormLabel>
                                             <FormControl>
                                                 <Input
@@ -334,7 +334,7 @@ export function CreateReservationView() {
                                                 />
                                             </FormControl>
                                             <FormDescription>
-                                                Select the reservation date and time
+                                                {t('reservations.selectDateTime')}
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
@@ -349,7 +349,7 @@ export function CreateReservationView() {
                                             <FormItem>
                                                 <FormLabel className="flex items-center gap-2">
                                                     <Users className="w-4 h-4 text-gray-500" />
-                                                    Party Size *
+                                                    {t('reservations.partySize')} *
                                                 </FormLabel>
                                                 <FormControl>
                                                     <Input
@@ -364,7 +364,7 @@ export function CreateReservationView() {
                                                     />
                                                 </FormControl>
                                                 <FormDescription>
-                                                    Number of guests (1-50)
+                                                    {t('reservations.numberOfGuests')}
                                                 </FormDescription>
                                                 <FormMessage />
                                             </FormItem>
@@ -378,7 +378,7 @@ export function CreateReservationView() {
                                             <FormItem>
                                                 <FormLabel className="flex items-center gap-2">
                                                     <Clock className="w-4 h-4 text-gray-500" />
-                                                    Duration (minutes) *
+                                                    {t('reservations.duration')} ({t('common.minutes')}) *
                                                 </FormLabel>
                                                 <FormControl>
                                                     <Input
@@ -394,7 +394,7 @@ export function CreateReservationView() {
                                                     />
                                                 </FormControl>
                                                 <FormDescription>
-                                                    Expected duration (30-480 min)
+                                                    {t('reservations.expectedDuration')}
                                                 </FormDescription>
                                                 <FormMessage />
                                             </FormItem>
@@ -426,8 +426,8 @@ export function CreateReservationView() {
                                         <FileText className="w-5 h-5 text-white" />
                                     </div>
                                     <div>
-                                        <CardTitle className="text-xl">Special Requests</CardTitle>
-                                        <CardDescription>Any additional notes or requests</CardDescription>
+                                        <CardTitle className="text-xl">{t('reservations.specialRequests')}</CardTitle>
+                                        <CardDescription>{t('reservations.anyAdditionalNotes')}</CardDescription>
                                     </div>
                                 </div>
                             </CardHeader>
@@ -439,13 +439,13 @@ export function CreateReservationView() {
                                         <FormItem>
                                             <FormControl>
                                                 <Textarea
-                                                    placeholder="Any special requests, dietary restrictions, occasion details..."
+                                                    placeholder={t('reservations.anySpecialRequests')}
                                                     className="resize-none min-h-32 text-base"
                                                     {...field}
                                                 />
                                             </FormControl>
                                             <FormDescription>
-                                                Maximum 500 characters
+                                                {t('reservations.maximum500Characters')}
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
@@ -464,7 +464,7 @@ export function CreateReservationView() {
                                 disabled={loading}
                                 className="px-8"
                             >
-                                Cancel
+                                {t('common.cancel')}
                             </Button>
                             <Button
                                 type="submit"
@@ -473,7 +473,7 @@ export function CreateReservationView() {
                                 className="bg-linear-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 hover:from-blue-700 hover:to-purple-700 dark:hover:from-blue-600 dark:hover:to-purple-600 shadow-xl shadow-blue-500/30 dark:shadow-blue-400/20 px-8"
                             >
                                 {loading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
-                                Create Reservation
+                                {t('reservations.createReservation')}
                             </Button>
                         </div>
                     </form>
@@ -485,15 +485,15 @@ export function CreateReservationView() {
                         <DialogHeader>
                             <DialogTitle className="flex items-center gap-2">
                                 <Keyboard className="w-5 h-5" />
-                                Keyboard Shortcuts
+                                {t('common.keyboardShortcuts')}
                             </DialogTitle>
                             <DialogDescription>
-                                Quick keyboard shortcuts to navigate the reservation creation form
+                                {t('reservations.keyboard.quickShortcuts')}
                             </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-3">
                             <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                <span className="text-sm text-gray-600 dark:text-gray-400">Submit Form</span>
+                                <span className="text-sm text-gray-600 dark:text-gray-400">{t('reservations.keyboard.submitForm')}</span>
                                 <div className="flex items-center gap-2">
                                     <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
                                         Ctrl
@@ -505,31 +505,31 @@ export function CreateReservationView() {
                                 </div>
                             </div>
                             <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                <span className="text-sm text-gray-600 dark:text-gray-400">Back</span>
+                                <span className="text-sm text-gray-600 dark:text-gray-400">{t('reservations.keyboard.back')}</span>
                                 <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
                                     B
                                 </kbd>
                             </div>
                             <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                <span className="text-sm text-gray-600 dark:text-gray-400">Fullscreen</span>
+                                <span className="text-sm text-gray-600 dark:text-gray-400">{t('common.fullscreen')}</span>
                                 <div className="flex items-center gap-2">
                                     <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
                                         F
                                     </kbd>
-                                    <span className="text-xs text-gray-500">or</span>
+                                    <span className="text-xs text-gray-500">{t('common.or')}</span>
                                     <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
                                         F11
                                     </kbd>
                                 </div>
                             </div>
                             <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                <span className="text-sm text-gray-600 dark:text-gray-400">Cancel</span>
+                                <span className="text-sm text-gray-600 dark:text-gray-400">{t('reservations.keyboard.cancel')}</span>
                                 <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
                                     Esc
                                 </kbd>
                             </div>
                             <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                <span className="text-sm text-gray-600 dark:text-gray-400">Show Help</span>
+                                <span className="text-sm text-gray-600 dark:text-gray-400">{t('reservations.keyboard.showHelp')}</span>
                                 <kbd className="px-3 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
                                     Shift + ?
                                 </kbd>

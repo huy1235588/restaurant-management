@@ -89,7 +89,7 @@ export function combineDateTime(dateStr: string, timeStr: string): Date {
 }
 
 // Format date and time for display
-export function formatReservationDateTime(date: string | Date, time?: string): string {
+export function formatReservationDateTime(date: string | Date, time?: string, locale: string = 'vi-VN'): string {
     let d: Date;
     
     if (typeof date === 'string' && time) {
@@ -100,7 +100,7 @@ export function formatReservationDateTime(date: string | Date, time?: string): s
         d = typeof date === 'string' ? new Date(date) : date;
     }
     
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat(locale, {
         weekday: 'short',
         month: 'short',
         day: 'numeric',
@@ -111,18 +111,18 @@ export function formatReservationDateTime(date: string | Date, time?: string): s
 }
 
 // Format time only
-export function formatTime(date: string | Date): string {
+export function formatTime(date: string | Date, locale: string = 'vi-VN'): string {
     const d = typeof date === 'string' ? new Date(date) : date;
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat(locale, {
         hour: '2-digit',
         minute: '2-digit',
     }).format(d);
 }
 
 // Format date only
-export function formatDate(date: string | Date): string {
+export function formatDate(date: string | Date, locale: string = 'vi-VN'): string {
     const d = typeof date === 'string' ? new Date(date) : date;
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat(locale, {
         weekday: 'short',
         month: 'short',
         day: 'numeric',
@@ -131,17 +131,21 @@ export function formatDate(date: string | Date): string {
 }
 
 // Calculate duration in readable format
-export function formatDuration(minutes: number): string {
+export function formatDuration(minutes: number, locale: string = 'vi-VN'): string {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
 
+    const isVietnamese = locale.startsWith('vi');
+    const minText = isVietnamese ? 'phút' : 'min';
+    const hourText = isVietnamese ? 'giờ' : 'hr';
+
     if (hours === 0) {
-        return `${mins} min`;
+        return `${mins} ${minText}`;
     }
     if (mins === 0) {
-        return `${hours} hr`;
+        return `${hours} ${hourText}`;
     }
-    return `${hours}h ${mins}m`;
+    return isVietnamese ? `${hours} giờ ${mins} phút` : `${hours}h ${mins}m`;
 }
 
 // Check if reservation is upcoming (within next 24 hours)

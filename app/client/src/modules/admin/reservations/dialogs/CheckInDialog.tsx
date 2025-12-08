@@ -13,6 +13,7 @@ import { Loader2, UserCheck, Receipt } from 'lucide-react';
 import { formatReservationDateTime } from '../utils';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 
 interface CheckInDialogProps {
     open: boolean;
@@ -27,6 +28,8 @@ export function CheckInDialog({
     onClose,
     onSuccess,
 }: CheckInDialogProps) {
+    const { t, i18n } = useTranslation();
+    const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
     const { seatReservation, loading } = useReservationActions();
     const [result, setResult] = useState<SeatReservationResponse | null>(null);
     const router = useRouter();
@@ -85,6 +88,7 @@ export function CheckInDialog({
                                         {formatReservationDateTime(
                                             reservation.reservationDate,
                                             reservation.reservationTime,
+                                            locale
                                         )}
                                     </span>
                                 </div>

@@ -98,7 +98,7 @@ export function ImageUploadField({
 
     return (
         <div className="space-y-2">
-            {label && <Label>{label}</Label>}
+            {/* {label && <Label>{label}</Label>} */}
 
             {value ? (
                 <div className="relative w-full aspect-video rounded-lg overflow-hidden border bg-muted">

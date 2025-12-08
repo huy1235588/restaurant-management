@@ -42,6 +42,26 @@ export function TableListView({
     const { t } = useTranslation();
     const [localSelectedIds, setLocalSelectedIds] = useState<number[]>(selectedTableIds);
 
+    const getStatusLabel = (status: string) => {
+        const statusMap: Record<string, string> = {
+            available: t('tables.tableStatus.available'),
+            occupied: t('tables.tableStatus.occupied', 'Occupied'),
+            reserved: t('tables.tableStatus.reserved', 'Reserved'),
+            maintenance: t('tables.tableStatus.maintenance', 'Maintenance'),
+        };
+        return statusMap[status] || status;
+    };
+
+    const getSectionLabel = (section: string) => {
+        const sectionMap: Record<string, string> = {
+            main: t('tables.sections.main', 'Main'),
+            patio: t('tables.sections.patio', 'Patio'),
+            vip: t('tables.sections.vip', 'VIP'),
+            bar: t('tables.sections.bar', 'Bar'),
+        };
+        return sectionMap[section] || section;
+    };
+
     const handleSelectAll = (checked: boolean) => {
         const newSelection = checked ? tables.map(t => t.tableId) : [];
         setLocalSelectedIds(newSelection);
@@ -183,7 +203,7 @@ export function TableListView({
                             role="row"
                             aria-label={t('tables.tableRow', 'Table {{number}}: {{status}}', { 
                                 number: table.tableNumber,
-                                status: table.status 
+                                status: getStatusLabel(table.status)
                             })}
                         >
                             {onSelectionChange && (
@@ -207,13 +227,13 @@ export function TableListView({
                             </TableCell>
                             <TableCell>
                                 {table.section ? (
-                                    <Badge variant="outline">{table.section}</Badge>
+                                    <Badge variant="outline">{getSectionLabel(table.section)}</Badge>
                                 ) : (
                                     '-'
                                 )}
                             </TableCell>
                             <TableCell>
-                                <TableStatusBadge status={table.status} />
+                                <TableStatusBadge status={(table.status)} />
                             </TableCell>
                             <TableCell className="text-right">
                                 <DropdownMenu>

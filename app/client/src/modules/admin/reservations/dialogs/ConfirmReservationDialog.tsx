@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useReservationActions } from '../hooks/useReservationActions';
 import { Reservation } from '../types';
 import { Loader2, CheckCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ConfirmReservationDialogProps {
     open: boolean;
@@ -24,6 +25,7 @@ export function ConfirmReservationDialog({
     onClose,
     onSuccess,
 }: ConfirmReservationDialogProps) {
+    const { t } = useTranslation();
     const { confirmReservation, loading } = useReservationActions();
 
     const handleConfirm = async () => {
@@ -46,27 +48,29 @@ export function ConfirmReservationDialog({
                 <DialogHeader>
                     <div className="flex items-center gap-2">
                         <CheckCircle className="w-5 h-5 text-green-600" />
-                        <DialogTitle>Confirm Reservation</DialogTitle>
+                        <DialogTitle>{t('reservations.dialogs.confirmTitle')}</DialogTitle>
                     </div>
                     <DialogDescription>
-                        Confirm reservation {reservation.reservationCode} for{' '}
-                        {reservation.customer?.name}
+                        {t('reservations.dialogs.confirmDesc', {
+                            code: reservation.reservationCode,
+                            name: reservation.customer?.name
+                        })}
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="py-4">
                     <p className="text-sm text-gray-600">
-                        This will notify the customer that their reservation has been confirmed.
+                        {t('reservations.dialogs.confirmMessage')}
                     </p>
                 </div>
 
                 <DialogFooter>
                     <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
-                        Cancel
+                        {t('common.cancel')}
                     </Button>
                     <Button onClick={handleConfirm} disabled={loading}>
                         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Confirm Reservation
+                        {t('reservations.confirmReservation')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

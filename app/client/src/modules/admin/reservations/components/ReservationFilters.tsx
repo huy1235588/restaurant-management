@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ReservationStatus } from '../types';
 import { Search, Filter, X, ChevronDown, Calendar } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 
 interface ReservationFiltersProps {
     onFilterChange: (filters: {
@@ -12,6 +13,7 @@ interface ReservationFiltersProps {
 }
 
 export function ReservationFilters({ onFilterChange }: ReservationFiltersProps) {
+    const { t } = useTranslation();
     const searchParams = useSearchParams();
 
     const [status, setStatus] = useState<ReservationStatus | ''>(() =>
@@ -81,7 +83,7 @@ export function ReservationFilters({ onFilterChange }: ReservationFiltersProps) 
                         <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 group-focus-within:text-blue-600 dark:group-focus-within:text-blue-400 transition-colors" />
                         <input
                             type="text"
-                            placeholder="Search by name, phone, or code..."
+                            placeholder={t('filters.searchPlaceholder')}
                             value={searchInput}
                             onChange={(e) => handleSearchChange(e.target.value)}
                             className="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all text-sm font-medium placeholder:text-gray-400 dark:placeholder:text-gray-500 hover:border-gray-400 dark:hover:border-gray-500"
@@ -113,7 +115,7 @@ export function ReservationFilters({ onFilterChange }: ReservationFiltersProps) 
                             }`}
                     >
                         <Filter className="w-5 h-5" />
-                        <span className="hidden sm:inline">Filters</span>
+                        <span className="hidden sm:inline">{t('filters.filters')}</span>
                         {activeFilterCount > 0 && (
                             <span className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-red-500 dark:bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg ring-2 ring-white dark:ring-gray-800">
                                 {activeFilterCount}
@@ -129,7 +131,7 @@ export function ReservationFilters({ onFilterChange }: ReservationFiltersProps) 
                             className="px-5 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-red-300 dark:hover:border-red-600 hover:bg-red-50 dark:hover:bg-red-950 hover:text-red-700 dark:hover:text-red-300 transition-all duration-300 font-semibold flex items-center gap-2 group"
                         >
                             <X className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
-                            <span className="hidden sm:inline">Clear</span>
+                            <span className="hidden sm:inline">{t('filters.clear')}</span>
                         </button>
                     )}
                 </div>
@@ -145,7 +147,7 @@ export function ReservationFilters({ onFilterChange }: ReservationFiltersProps) 
                             <div>
                                 <label className="flex text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 items-center gap-2">
                                     <div className="w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full"></div>
-                                    Status
+                                    {t('filters.status')}
                                 </label>
                                 <div className="relative">
                                     <select
@@ -153,13 +155,13 @@ export function ReservationFilters({ onFilterChange }: ReservationFiltersProps) 
                                         onChange={(e) => handleStatusChange(e.target.value as ReservationStatus | '')}
                                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all text-sm font-medium appearance-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 hover:border-gray-400 dark:hover:border-gray-500 cursor-pointer"
                                     >
-                                        <option value="">All Statuses</option>
-                                        <option value="pending">Pending</option>
-                                        <option value="confirmed">Confirmed</option>
-                                        <option value="seated">Seated</option>
-                                        <option value="completed">Completed</option>
-                                        <option value="cancelled">Cancelled</option>
-                                        <option value="no_show">No Show</option>
+                                        <option value="">{t('filters.allStatuses')}</option>
+                                        <option value="pending">{t('filters.pending')}</option>
+                                        <option value="confirmed">{t('filters.confirmed')}</option>
+                                        <option value="seated">{t('filters.seated')}</option>
+                                        <option value="completed">{t('filters.completed')}</option>
+                                        <option value="cancelled">{t('filters.cancelled')}</option>
+                                        <option value="no_show">{t('filters.noShow')}</option>
                                     </select>
                                     <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
                                 </div>
@@ -169,7 +171,7 @@ export function ReservationFilters({ onFilterChange }: ReservationFiltersProps) 
                             <div>
                                 <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
                                     <div className="w-2 h-2 bg-purple-600 dark:bg-purple-400 rounded-full"></div>
-                                    Date
+                                    {t('filters.date')}
                                 </label>
                                 <div className="relative">
                                     <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
@@ -186,11 +188,11 @@ export function ReservationFilters({ onFilterChange }: ReservationFiltersProps) 
                         {/* Active Filters Summary */}
                         {hasActiveFilters && (
                             <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-xl">
-                                <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">Active Filters:</p>
+                                <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">{t('filters.activeFilters')}</p>
                                 <div className="flex flex-wrap gap-2">
                                     {status && (
                                         <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-gray-900 text-blue-700 dark:text-blue-300 rounded-full text-xs font-semibold border border-blue-200 dark:border-blue-700 shadow-sm">
-                                            Status: {status}
+                                            {t('filters.status')}: {t(`filters.${status === 'no_show' ? 'noShow' : status}`)}
                                             <button
                                                 onClick={() => handleStatusChange('')}
                                                 className="hover:bg-blue-100 dark:hover:bg-blue-900 rounded-full p-0.5 transition-colors"
@@ -201,7 +203,7 @@ export function ReservationFilters({ onFilterChange }: ReservationFiltersProps) 
                                     )}
                                     {date && (
                                         <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-gray-900 text-purple-700 dark:text-purple-300 rounded-full text-xs font-semibold border border-purple-200 dark:border-purple-700 shadow-sm">
-                                            Date: {date}
+                                            {t('filters.date')}: {date}
                                             <button
                                                 onClick={() => handleDateChange('')}
                                                 className="hover:bg-purple-100 dark:hover:bg-purple-900 rounded-full p-0.5 transition-colors"
@@ -212,7 +214,7 @@ export function ReservationFilters({ onFilterChange }: ReservationFiltersProps) 
                                     )}
                                     {search && (
                                         <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-gray-900 text-green-700 dark:text-green-300 rounded-full text-xs font-semibold border border-green-200 dark:border-green-700 shadow-sm">
-                                            Search: &quot;{search}&quot;
+                                            {t('common.search')}: &quot;{search}&quot;
                                             <button
                                                 onClick={() => handleSearchChange('')}
                                                 className="hover:bg-green-100 dark:hover:bg-green-900 rounded-full p-0.5 transition-colors"
