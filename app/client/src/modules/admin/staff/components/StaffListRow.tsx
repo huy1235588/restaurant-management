@@ -52,18 +52,18 @@ export function StaffListRow({
         .slice(0, 2);
 
     return (
-        <tr className="border-b hover:bg-muted/50 transition-colors">
+        <tr 
+            className="border-b hover:bg-muted/70 transition-all duration-200 cursor-pointer group"
+            onClick={() => onViewDetails(staff)}
+        >
             {/* Name & Avatar */}
             <td className="py-3 px-4">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
                         <span className="text-sm font-semibold text-primary">{initials}</span>
                     </div>
                     <div className="min-w-0">
-                        <p
-                            className="font-medium truncate cursor-pointer hover:text-primary"
-                            onClick={() => onViewDetails(staff)}
-                        >
+                        <p className="font-medium truncate group-hover:text-primary transition-colors">
                             {staff.fullName}
                         </p>
                         {staff.account?.email && (
@@ -98,7 +98,7 @@ export function StaffListRow({
 
             {/* Status */}
             <td className="py-3 px-4">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                     <Switch
                         checked={staff.isActive}
                         onCheckedChange={handleToggleStatus}
@@ -116,7 +116,7 @@ export function StaffListRow({
             </td>
 
             {/* Actions */}
-            <td className="py-3 px-4">
+            <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-8 w-8">

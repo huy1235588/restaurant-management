@@ -53,20 +53,20 @@ export function StaffCard({
         .slice(0, 2);
 
     return (
-        <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 group">
+        <Card 
+            className="overflow-hidden hover:shadow-lg hover:scale-[1.02] hover:border-primary/50 transition-all duration-300 group cursor-pointer"
+            onClick={() => onViewDetails(staff)}
+        >
             <CardContent className="p-4">
                 {/* Header with avatar and actions */}
                 <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
                         {/* Avatar */}
-                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                             <span className="text-lg font-semibold text-primary">{initials}</span>
                         </div>
                         <div className="min-w-0">
-                            <h3
-                                className="font-semibold text-base truncate cursor-pointer hover:text-primary"
-                                onClick={() => onViewDetails(staff)}
-                            >
+                            <h3 className="font-semibold text-base truncate group-hover:text-primary transition-colors">
                                 {staff.fullName}
                             </h3>
                             <RoleBadge role={staff.role} size="sm" />
@@ -75,7 +75,12 @@ export function StaffCard({
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-8 w-8"
+                                onClick={(e) => e.stopPropagation()}
+                            >
                                 <MoreHorizontal className="w-4 h-4" />
                             </Button>
                         </DropdownMenuTrigger>
@@ -133,7 +138,7 @@ export function StaffCard({
             </CardContent>
 
             <CardFooter className="px-4 py-3 bg-muted/30 flex justify-between items-center">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                     <Switch
                         checked={staff.isActive}
                         onCheckedChange={handleToggleStatus}

@@ -54,7 +54,7 @@ export function useStaff(params?: StaffQueryParams) {
 }
 
 // Hook to fetch single staff by ID
-export function useStaffById(id: number | null) {
+export function useStaffById(id: string | number | null) {
     const [staff, setStaff] = useState<Staff | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -69,7 +69,11 @@ export function useStaffById(id: number | null) {
         try {
             setLoading(true);
             setError(null);
-            const data = await staffApi.getById(id);
+            const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+            if (isNaN(numericId)) {
+                throw new Error('Invalid staff ID');
+            }
+            const data = await staffApi.getById(numericId);
             setStaff(data);
         } catch (err: any) {
             setError(err.response?.data?.message || 'Failed to fetch staff');

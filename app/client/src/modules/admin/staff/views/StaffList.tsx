@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Staff, ViewMode, Role, StaffQueryParams } from '../types';
 import { useStaff, useStaffStats, useToggleStaffStatus } from '../hooks';
 import {
@@ -12,7 +13,6 @@ import {
     ViewModeSwitcher,
 } from '../components';
 import {
-    StaffDetailDialog,
     ChangeRoleDialog,
     DeleteStaffDialog,
     CreateStaffWithAccountDialog,
@@ -35,6 +35,7 @@ import { useAuth } from '@/hooks/useAuth';
 export function StaffList() {
     const { t } = useTranslation();
     const { user } = useAuth();
+    const router = useRouter();
 
     // View state
     const [viewMode, setViewMode] = useState<ViewMode>('grid');
@@ -48,7 +49,6 @@ export function StaffList() {
 
     // Dialog state
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
-    const [detailDialogOpen, setDetailDialogOpen] = useState(false);
     const [changeRoleDialogOpen, setChangeRoleDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
@@ -83,13 +83,11 @@ export function StaffList() {
     };
 
     const handleEdit = (staff: Staff) => {
-        setSelectedStaff(staff);
-        setDetailDialogOpen(true);
+        router.push(`/admin/staff/${staff.staffId}`);
     };
 
     const handleViewDetails = (staff: Staff) => {
-        setSelectedStaff(staff);
-        setDetailDialogOpen(true);
+        router.push(`/admin/staff/${staff.staffId}`);
     };
 
     const handleChangeRole = (staff: Staff) => {
@@ -311,11 +309,6 @@ export function StaffList() {
                 open={createDialogOpen}
                 onOpenChange={setCreateDialogOpen}
                 onSuccess={handleSuccess}
-            />
-            <StaffDetailDialog
-                open={detailDialogOpen}
-                onOpenChange={setDetailDialogOpen}
-                staff={selectedStaff}
             />
             <ChangeRoleDialog
                 open={changeRoleDialogOpen}
