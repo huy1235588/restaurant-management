@@ -33,7 +33,7 @@ export function TableFilters({
 
     return (
         <Card className="p-4" role="region" aria-label={t('tables.filters', 'Table filters')}>
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="flex gap-4 flex-wrap">
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input

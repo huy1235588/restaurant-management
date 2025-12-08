@@ -199,6 +199,50 @@ export default function MenuItemDetailPage({
                             )}
                         </CardContent>
                     </Card>
+
+                    {/* Details */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-lg">Details</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3 text-sm">
+                            {menuItem.preparationTime && (
+                                <div className="flex items-center justify-between">
+                                    <span className="text-muted-foreground">Preparation Time</span>
+                                    <span className="font-medium">
+                                        {formatPreparationTime(menuItem.preparationTime)}
+                                    </span>
+                                </div>
+                            )}
+                            {menuItem.spicyLevel !== undefined && menuItem.spicyLevel !== null && (
+                                <div className="flex items-center justify-between">
+                                    <span className="text-muted-foreground">Spicy Level</span>
+                                    <span className="font-medium">
+                                        {getSpicyLevelLabel(menuItem.spicyLevel)}
+                                    </span>
+                                </div>
+                            )}
+                            {menuItem.calories && (
+                                <div className="flex items-center justify-between">
+                                    <span className="text-muted-foreground">Calories</span>
+                                    <span className="font-medium">{menuItem.calories} kcal</span>
+                                </div>
+                            )}
+                            <div className="flex items-center justify-between">
+                                <span className="text-muted-foreground">Display Order</span>
+                                <span className="font-medium">{menuItem.displayOrder || 0}</span>
+                            </div>
+                            <Separator />
+                            <div className="flex items-center justify-between">
+                                <span className="text-muted-foreground">Created</span>
+                                <span className="font-medium">{formatDate(menuItem.createdAt)}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-muted-foreground">Last Updated</span>
+                                <span className="font-medium">{formatDate(menuItem.updatedAt)}</span>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
 
                 {/* Details Sidebar */}
@@ -257,50 +301,6 @@ export default function MenuItemDetailPage({
                                     </div>
                                 </>
                             )}
-                        </CardContent>
-                    </Card>
-
-                    {/* Details */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-lg">Details</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3 text-sm">
-                            {menuItem.preparationTime && (
-                                <div className="flex items-center justify-between">
-                                    <span className="text-muted-foreground">Preparation Time</span>
-                                    <span className="font-medium">
-                                        {formatPreparationTime(menuItem.preparationTime)}
-                                    </span>
-                                </div>
-                            )}
-                            {menuItem.spicyLevel !== undefined && menuItem.spicyLevel !== null && (
-                                <div className="flex items-center justify-between">
-                                    <span className="text-muted-foreground">Spicy Level</span>
-                                    <span className="font-medium">
-                                        {getSpicyLevelLabel(menuItem.spicyLevel)}
-                                    </span>
-                                </div>
-                            )}
-                            {menuItem.calories && (
-                                <div className="flex items-center justify-between">
-                                    <span className="text-muted-foreground">Calories</span>
-                                    <span className="font-medium">{menuItem.calories} kcal</span>
-                                </div>
-                            )}
-                            <div className="flex items-center justify-between">
-                                <span className="text-muted-foreground">Display Order</span>
-                                <span className="font-medium">{menuItem.displayOrder || 0}</span>
-                            </div>
-                            <Separator />
-                            <div className="flex items-center justify-between">
-                                <span className="text-muted-foreground">Created</span>
-                                <span className="font-medium">{formatDate(menuItem.createdAt)}</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-muted-foreground">Last Updated</span>
-                                <span className="font-medium">{formatDate(menuItem.updatedAt)}</span>
-                            </div>
                         </CardContent>
                     </Card>
                 </div>

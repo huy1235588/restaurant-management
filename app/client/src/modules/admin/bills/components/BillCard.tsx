@@ -9,6 +9,7 @@ import { formatCurrency, formatDateTime } from "../utils";
 import { Eye, CreditCard, Percent, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import { formatOrderNumber } from "../../order";
 
 export interface BillCardProps {
     bill: Bill;
@@ -45,24 +46,22 @@ export const BillCard = memo(
         return (
             <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={handleViewDetails}>
                 <CardHeader>
-                    <div className="flex items-start justify-between">
-                        <div className="space-y-1">
-                            <CardTitle className="text-lg">
-                                {bill.billNumber}
-                            </CardTitle>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                {bill.table && (
-                                    <span>
-                                        {t("billing.table", "Bàn")}{" "}
-                                        {bill.table.tableNumber}
-                                    </span>
-                                )}
-                                {bill.order && (
-                                    <span>• #{bill.order.orderNumber}</span>
-                                )}
-                            </div>
+                    <div className="space-y-1">
+                        <CardTitle className="text-lg flex items-center gap-3">
+                            {bill.billNumber}
+                            <BillStatusBadge status={bill.paymentStatus} />
+                        </CardTitle>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            {bill.table && (
+                                <span>
+                                    {t("billing.table", "Bàn")}{" "}
+                                    {bill.table.tableNumber}
+                                </span>
+                            )}
+                            {bill.order && (
+                                <span>• {formatOrderNumber(bill.order.orderNumber)}</span>
+                            )}
                         </div>
-                        <BillStatusBadge status={bill.paymentStatus} />
                     </div>
                 </CardHeader>
                 <CardContent>

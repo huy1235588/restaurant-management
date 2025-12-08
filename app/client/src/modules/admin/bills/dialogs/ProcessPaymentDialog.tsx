@@ -145,7 +145,7 @@ export function ProcessPaymentDialog({
     if (step === "method") {
         return (
             <Dialog open={open} onOpenChange={onOpenChange}>
-                <DialogContent className="sm:max-w-lg">
+                <DialogContent className="sm:max-w-xl">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <Receipt className="h-5 w-5" />
@@ -429,7 +429,7 @@ export function ProcessPaymentDialog({
     // Step 3: Success
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-xl">
                 <div className="text-center py-8">
                     <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-linear-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 border-4 border-green-200 dark:border-green-800">
                         <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400" />

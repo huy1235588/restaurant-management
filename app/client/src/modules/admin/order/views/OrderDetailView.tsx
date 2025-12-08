@@ -20,7 +20,7 @@ import { OrderSummaryCard } from '../components/OrderSummaryCard';
 import { OrderTimeline } from '../components/OrderTimeline';
 import { CancelItemDialog } from '../dialogs/CancelItemDialog';
 import { CancelOrderDialog } from '../dialogs/CancelOrderDialog';
-import { useOrderById, useOrderSocket, useUpdateOrderStatus, useFullscreen } from '../hooks';
+import { useOrderById, useOrderSocket, useConfirmOrder, useFullscreen } from '../hooks';
 import { Order, OrderItem } from '../types';
 import { formatOrderNumber, formatDateTime, canAddItems, canCancelOrder, canCreateBill } from '../utils';
 import { ArrowLeft, Plus, XCircle, Printer, Receipt, Check, Keyboard, Maximize2, Minimize2 } from 'lucide-react';
@@ -38,7 +38,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
     const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
 
     const { data: order, isLoading, error } = useOrderById(orderId);
-    const updateStatusMutation = useUpdateOrderStatus();
+    const confirmOrderMutation = useConfirmOrder();
 
     // Use custom fullscreen hook
     const { isFullscreen, toggleFullscreen } = useFullscreen();
@@ -132,10 +132,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
     };
 
     const handleConfirmOrder = () => {
-        updateStatusMutation.mutate({
-            orderId,
-            data: { status: 'confirmed' },
-        });
+        confirmOrderMutation.mutate(orderId);
     };
 
     const handlePrint = () => {
@@ -204,15 +201,15 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                         ) : (
                             <Maximize2 className="mr-2 h-4 w-4" />
                         )}
-                        {isFullscreen ? "Exit" : "Fullscreen"}
+                        {isFullscreen ? t('common.exitFullscreen') : t('common.fullscreen')}
                     </Button>
                     {order.status === 'pending' && (
                         <Button
                             onClick={handleConfirmOrder}
-                            disabled={updateStatusMutation.isPending}
+                            disabled={confirmOrderMutation.isPending}
                         >
                             <Check className="mr-2 h-4 w-4" />
-                            {updateStatusMutation.isPending ? t('orders.confirming') : t('orders.confirmOrder')}
+                            {confirmOrderMutation.isPending ? t('orders.confirming') : t('orders.confirmOrder')}
                         </Button>
                     )}
                     {canAddItems(order) && (
@@ -227,10 +224,10 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
                             {t('orders.cancelOrder')}
                         </Button>
                     )}
-                    <Button variant="outline" onClick={handlePrint}>
+                    {/* <Button variant="outline" onClick={handlePrint}>
                         <Printer className="mr-2 h-4 w-4" />
                         {t('orders.print')}
-                    </Button>
+                    </Button> */}
                     {canCreateBill(order) && (
                         <Button variant="outline" onClick={handleCreateBill}>
                             <Receipt className="mr-2 h-4 w-4" />

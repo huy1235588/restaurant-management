@@ -82,7 +82,7 @@ const ActionButtons = memo(({ table, onEdit, onChangeStatus, onViewHistory, onCl
             )}
         </div>
 
-        {onViewHistory && (
+        {/* {onViewHistory && (
             <Button
                 size="sm"
                 variant="ghost"
@@ -92,7 +92,7 @@ const ActionButtons = memo(({ table, onEdit, onChangeStatus, onViewHistory, onCl
                 <Clock className="h-4 w-4 mr-2" />
                 {t('tables.viewHistory', 'View History')}
             </Button>
-        )}
+        )} */}
     </>
 ));
 

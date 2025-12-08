@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Upload, X, AlertCircle } from 'lucide-react';
+import { getImageUrl } from '@/lib/utils';
 
 interface ImageUploadFieldProps {
     value?: string | null;
@@ -102,7 +103,7 @@ export function ImageUploadField({
             {value ? (
                 <div className="relative w-full aspect-video rounded-lg overflow-hidden border bg-muted">
                     <Image
-                        src={value}
+                        src={getImageUrl(value) || ''}
                         alt="Uploaded image"
                         fill
                         className="object-cover"

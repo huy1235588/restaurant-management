@@ -32,6 +32,8 @@ import {
     Keyboard,
     Receipt,
 } from 'lucide-react';
+import { settingsApi } from '@/modules/admin/settings/services/settings.service';
+import { RestaurantSettings } from '@/modules/admin/settings/types';
 
 interface BillDetailViewProps {
     billId: number;
@@ -46,8 +48,22 @@ export function BillDetailView({ billId }: BillDetailViewProps) {
     const [showPaymentDialog, setShowPaymentDialog] = useState(false);
     const [showVoidDialog, setShowVoidDialog] = useState(false);
     const [showPrintPreview, setShowPrintPreview] = useState(false);
+    const [restaurantSettings, setRestaurantSettings] = useState<RestaurantSettings | null>(null);
 
     const { data: bill, isLoading, error } = useBill(billId);
+
+    // Fetch restaurant settings
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const data = await settingsApi.getSettings();
+                setRestaurantSettings(data);
+            } catch (error) {
+                console.error('Failed to fetch restaurant settings:', error);
+            }
+        };
+        fetchSettings();
+    }, []);
 
     // Keyboard shortcuts
     useEffect(() => {
@@ -523,6 +539,7 @@ export function BillDetailView({ billId }: BillDetailViewProps) {
                         <PrintableBill
                             ref={printRef}
                             bill={bill}
+                            restaurantSettings={restaurantSettings}
                         />
                     </div>
 
@@ -544,7 +561,7 @@ export function BillDetailView({ billId }: BillDetailViewProps) {
 
             {/* Hidden Printable Bill for actual printing */}
             <div className="hidden print:block">
-                <PrintableBill ref={printRef} bill={bill} />
+                <PrintableBill ref={printRef} bill={bill} restaurantSettings={restaurantSettings} />
             </div>
         </div>
     );

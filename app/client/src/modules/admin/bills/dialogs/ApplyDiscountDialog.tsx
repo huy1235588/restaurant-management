@@ -59,7 +59,9 @@ export function ApplyDiscountDialog({
 
     if (!bill) return null;
 
-    const subtotal = bill.subtotal;
+    const subtotal = Number(bill.subtotal) || 0;
+    const taxAmount = Number(bill.taxAmount) || 0;
+    const serviceCharge = Number(bill.serviceCharge) || 0;
     const percentageNum = parseFloat(percentage) || 0;
     const amountNum = parseFloat(amount) || 0;
 
@@ -70,8 +72,8 @@ export function ApplyDiscountDialog({
 
     const newTotal =
         subtotal +
-        bill.taxAmount +
-        bill.serviceCharge -
+        taxAmount +
+        serviceCharge -
         calculatedDiscount;
 
     const isValidDiscount =

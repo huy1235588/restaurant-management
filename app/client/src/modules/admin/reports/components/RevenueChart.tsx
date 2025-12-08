@@ -81,12 +81,12 @@ export function RevenueChart({ data, loading = false, title }: RevenueChartProps
                             <XAxis
                                 dataKey="displayDate"
                                 className="text-xs"
-                                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                                // tick={{ fill: 'hsl(var(--muted-foreground))' }}
                             />
                             <YAxis
                                 tickFormatter={formatCurrency}
                                 className="text-xs"
-                                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                                // tick={{ fill: 'hsl(var(--muted-foreground))' }}
                             />
                             <Tooltip
                                 contentStyle={{

@@ -72,12 +72,12 @@ export function OrdersChart({
                             <XAxis
                                 dataKey="displayLabel"
                                 className="text-xs"
-                                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                                // tick={{ fill: 'hsl(var(--muted-foreground))' }}
                                 interval={groupBy === 'hour' ? 2 : 0}
                             />
                             <YAxis
                                 className="text-xs"
-                                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                                // tick={{ fill: 'hsl(var(--muted-foreground))' }}
                             />
                             <Tooltip
                                 contentStyle={{

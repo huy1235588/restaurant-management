@@ -80,6 +80,14 @@ export const orderApi = {
         return response.data.data;
     },
 
+    // Confirm order (change status from pending to confirmed)
+    confirmOrder: async (id: number): Promise<Order> => {
+        const response = await axiosInstance.patch<ApiResponse<Order>>(
+            `/orders/${id}/confirm`
+        );
+        return response.data.data;
+    },
+
     // Update order status
     updateStatus: async (
         id: number,

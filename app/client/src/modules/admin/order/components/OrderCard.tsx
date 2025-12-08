@@ -47,22 +47,20 @@ export const OrderCard = memo(function OrderCard({ order, onCancelOrder }: Order
     return (
         <Card>
             <CardHeader>
-                <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                        <CardTitle className="text-lg">
-                            {formatOrderNumber(order.orderNumber)}
-                        </CardTitle>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <span>{t('orders.table', { number: order.table.tableNumber })}</span>
-                            {order.table.tableName && (
-                                <span>• {order.table.tableName}</span>
-                            )}
-                            {order.staff && (
-                                <span>• {order.staff.fullName}</span>
-                            )}
-                        </div>
+                <div className="space-y-1">
+                    <CardTitle className="text-lg flex items-center gap-3">
+                        {formatOrderNumber(order.orderNumber)}
+                        <OrderStatusBadge status={order.status} />
+                    </CardTitle>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span>{t('orders.table', { number: order.table.tableNumber })}</span>
+                        {order.table.tableName && (
+                            <span>• {order.table.tableName}</span>
+                        )}
+                        {order.staff && (
+                            <span>• {order.staff.fullName}</span>
+                        )}
                     </div>
-                    <OrderStatusBadge status={order.status} />
                 </div>
             </CardHeader>
             <CardContent>

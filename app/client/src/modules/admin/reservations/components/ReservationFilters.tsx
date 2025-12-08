@@ -154,12 +154,12 @@ export function ReservationFilters({ onFilterChange }: ReservationFiltersProps) 
                                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all text-sm font-medium appearance-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 hover:border-gray-400 dark:hover:border-gray-500 cursor-pointer"
                                     >
                                         <option value="">All Statuses</option>
-                                        <option value="pending">⏳ Pending</option>
-                                        <option value="confirmed">✅ Confirmed</option>
-                                        <option value="seated">👥 Seated</option>
-                                        <option value="completed">✔️ Completed</option>
-                                        <option value="cancelled">❌ Cancelled</option>
-                                        <option value="no_show">⚠️ No Show</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="confirmed">Confirmed</option>
+                                        <option value="seated">Seated</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="cancelled">Cancelled</option>
+                                        <option value="no_show">No Show</option>
                                     </select>
                                     <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
                                 </div>

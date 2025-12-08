@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
     Dialog,
     DialogContent,
@@ -19,6 +19,8 @@ import { formatDateTime, getPaymentMethodLabel } from "../utils";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import { Printer, Eye } from "lucide-react";
+import { settingsApi } from "@/modules/admin/settings/services/settings.service";
+import { RestaurantSettings } from "@/modules/admin/settings/types";
 
 interface BillDetailDialogProps {
     open: boolean;
@@ -35,6 +37,21 @@ export function BillDetailDialog({
     const router = useRouter();
     const printRef = useRef<HTMLDivElement>(null);
     const [showPrintPreview, setShowPrintPreview] = useState(false);
+    const [restaurantSettings, setRestaurantSettings] = useState<RestaurantSettings | null>(null);
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const data = await settingsApi.getSettings();
+                setRestaurantSettings(data);
+            } catch (error) {
+                console.error('Failed to fetch restaurant settings:', error);
+            }
+        };
+        if (open) {
+            fetchSettings();
+        }
+    }, [open]);
 
     if (!bill) return null;
 
@@ -61,7 +78,7 @@ export function BillDetailDialog({
                     }
                     onOpenChange(isOpen);
                 }}>
-                    <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+                    <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
                         <DialogHeader>
                             <DialogTitle className="flex items-center gap-2">
                                 <Printer className="h-5 w-5" />
@@ -77,6 +94,7 @@ export function BillDetailDialog({
                             <PrintableBill
                                 ref={printRef}
                                 bill={bill}
+                                restaurantSettings={restaurantSettings}
                             />
                         </div>
 
@@ -98,7 +116,7 @@ export function BillDetailDialog({
 
                 {/* Hidden Printable Bill for actual printing */}
                 <div className="hidden print:block">
-                    <PrintableBill ref={printRef} bill={bill} />
+                    <PrintableBill ref={printRef} bill={bill} restaurantSettings={restaurantSettings} />
                 </div>
             </>
         );
@@ -106,9 +124,9 @@ export function BillDetailDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
                         <DialogTitle>{bill.billNumber}</DialogTitle>
                         <BillStatusBadge status={bill.paymentStatus} />
                     </div>

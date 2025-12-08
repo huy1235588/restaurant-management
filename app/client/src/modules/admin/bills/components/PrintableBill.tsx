@@ -1,15 +1,16 @@
 "use client";
 
-import { forwardRef } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import { Bill } from "../types";
 import { formatCurrency, formatDateTime } from "../utils";
 import { useTranslation } from "react-i18next";
+import { settingsApi } from "@/modules/admin/settings/services/settings.service";
+import { RestaurantSettings } from "@/modules/admin/settings/types";
+import { formatOrderNumber } from "../../order";
 
 interface PrintableBillProps {
     bill: Bill;
-    restaurantName?: string;
-    restaurantAddress?: string;
-    restaurantPhone?: string;
+    restaurantSettings?: RestaurantSettings | null;
     showLogo?: boolean;
 }
 
@@ -17,13 +18,33 @@ export const PrintableBill = forwardRef<HTMLDivElement, PrintableBillProps>(
     function PrintableBill(
         {
             bill,
-            restaurantName = "NHÀ HÀNG ABC",
-            restaurantAddress = "123 Đường ABC, Quận 1, TP.HCM",
-            restaurantPhone = "0123 456 789",
+            restaurantSettings: providedSettings,
             showLogo = true,
         },
         ref
     ) {
+        const [settings, setSettings] = useState<RestaurantSettings | null>(providedSettings || null);
+        const [isLoading, setIsLoading] = useState(!providedSettings);
+
+        useEffect(() => {
+            if (!providedSettings) {
+                const fetchSettings = async () => {
+                    try {
+                        const data = await settingsApi.getSettings();
+                        setSettings(data);
+                    } catch (error) {
+                        console.error('Failed to fetch restaurant settings:', error);
+                    } finally {
+                        setIsLoading(false);
+                    }
+                };
+                fetchSettings();
+            }
+        }, [providedSettings]);
+
+        const restaurantName = settings?.name || "NHÀ HÀNG ABC";
+        const restaurantAddress = settings?.address || "123 Đường ABC, Quận 1, TP.HCM";
+        const restaurantPhone = settings?.phone || "0123 456 789";
         const { t } = useTranslation();
 
         const getPaymentMethodText = (method: string | null) => {
@@ -86,7 +107,7 @@ export const PrintableBill = forwardRef<HTMLDivElement, PrintableBillProps>(
                     {bill.order?.orderNumber && (
                         <div className="flex justify-between">
                             <span>{t("billing.orderNumber", "Đơn hàng")}:</span>
-                            <span>#{bill.order.orderNumber}</span>
+                            <span>{formatOrderNumber(bill.order.orderNumber)}</span>
                         </div>
                     )}
                 </div>

@@ -198,6 +198,11 @@ export class BillingService {
             throw new BillNotPendingException(billId, bill.paymentStatus);
         }
 
+        // Validate that at least one of amount or percentage is provided
+        if (!discountData.amount && !discountData.percentage) {
+            throw new InvalidDiscountAmountException(0, Number(bill.subtotal));
+        }
+
         let discountAmount = discountData.amount || 0;
 
         // Calculate percentage discount if provided

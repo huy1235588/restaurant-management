@@ -77,13 +77,13 @@ export function TopItemsChart({ data, loading = false, title }: TopItemsChartPro
                             <XAxis
                                 type="number"
                                 className="text-xs"
-                                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                                // tick={{ fill: 'hsl(var(--muted-foreground))' }}
                             />
                             <YAxis
                                 type="category"
                                 dataKey="displayName"
                                 className="text-xs"
-                                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                                // tick={{ fill: 'hsl(var(--muted-foreground))' }}
                                 width={100}
                             />
                             <Tooltip

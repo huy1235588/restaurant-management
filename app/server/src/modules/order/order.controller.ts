@@ -186,7 +186,10 @@ export class OrderController {
         description: ORDER_MESSAGES.SUCCESS.ORDER_CREATED,
     })
     @ApiResponse({ status: 400, description: 'Bad request' })
-    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager/Waiter only' })
+    @ApiResponse({
+        status: 403,
+        description: 'Forbidden - Admin/Manager/Waiter only',
+    })
     @ApiResponse({
         status: 404,
         description: 'Table or menu item not found',
@@ -224,7 +227,10 @@ export class OrderController {
         description: ORDER_MESSAGES.SUCCESS.ITEMS_ADDED,
     })
     @ApiResponse({ status: 400, description: 'Bad request' })
-    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager/Waiter only' })
+    @ApiResponse({
+        status: 403,
+        description: 'Forbidden - Admin/Manager/Waiter only',
+    })
     @ApiResponse({
         status: 404,
         description: 'Order or menu item not found',
@@ -256,7 +262,10 @@ export class OrderController {
         description: ORDER_MESSAGES.SUCCESS.ITEM_CANCELLED,
     })
     @ApiResponse({ status: 400, description: 'Bad request' })
-    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager/Waiter only' })
+    @ApiResponse({
+        status: 403,
+        description: 'Forbidden - Admin/Manager/Waiter only',
+    })
     @ApiResponse({ status: 404, description: 'Order or item not found' })
     async cancelItem(
         @Param('id', ParseIntPipe) id: number,
@@ -306,6 +315,37 @@ export class OrderController {
         };
     }
 
+    @Patch(':id/confirm')
+    @UseGuards(RolesGuard)
+    @Roles('admin', 'manager', 'waiter')
+    @ApiOperation({
+        summary: 'Confirm order (admin/manager/waiter only)',
+        description: 'Confirm a pending order by changing status to confirmed',
+    })
+    @ApiParam({ name: 'id', description: 'Order ID' })
+    @ApiResponse({
+        status: 200,
+        description: ORDER_MESSAGES.SUCCESS.ORDER_STATUS_UPDATED,
+    })
+    @ApiResponse({
+        status: 403,
+        description: 'Forbidden - Admin/Manager/Waiter only',
+    })
+    @ApiResponse({
+        status: 404,
+        description: ORDER_MESSAGES.ERROR.ORDER_NOT_FOUND,
+    })
+    async confirmOrder(@Param('id', ParseIntPipe) id: number) {
+        const order = await this.orderService.updateOrderStatus(id, {
+            status: 'confirmed',
+        });
+
+        return {
+            message: ORDER_MESSAGES.SUCCESS.ORDER_STATUS_UPDATED,
+            data: order,
+        };
+    }
+
     @Patch(':id/status')
     @UseGuards(RolesGuard)
     @Roles('admin', 'manager')
@@ -351,7 +391,10 @@ export class OrderController {
         status: 200,
         description: ORDER_MESSAGES.SUCCESS.ITEM_SERVED,
     })
-    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager/Waiter only' })
+    @ApiResponse({
+        status: 403,
+        description: 'Forbidden - Admin/Manager/Waiter only',
+    })
     @ApiResponse({
         status: 404,
         description: 'Order or item not found',

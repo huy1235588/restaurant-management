@@ -156,7 +156,7 @@ export default function TablesPage() {
         // Set new timeout for debounced search (300ms)
         searchTimeoutRef.current = setTimeout(() => {
             updateURL({ search: term, page: '1' });
-        }, 300);
+        }, 1000);
     }, [updateURL]);
 
     const handleStatusFilter = useCallback((status: string) => {
