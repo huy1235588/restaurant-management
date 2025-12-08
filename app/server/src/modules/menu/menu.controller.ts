@@ -29,12 +29,14 @@ import {
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
+import { Public } from '@/common/decorators/public.decorator';
 
 @ApiTags('menu')
 @Controller('menu')
 export class MenuController {
     constructor(private readonly menuService: MenuService) {}
 
+    @Public()
     @Get('count')
     @ApiOperation({ summary: 'Count menu items (public)' })
     @ApiQuery({ name: 'categoryId', required: false, type: Number })
@@ -67,6 +69,7 @@ export class MenuController {
         };
     }
 
+    @Public()
     @Get()
     @ApiOperation({ summary: 'Get all menu items with pagination (public)' })
     @ApiQuery({ name: 'page', required: false, type: Number })
@@ -123,6 +126,7 @@ export class MenuController {
         };
     }
 
+    @Public()
     @Get('category/:categoryId')
     @ApiOperation({ summary: 'Get menu items by category (public)' })
     @ApiResponse({
@@ -137,6 +141,7 @@ export class MenuController {
         };
     }
 
+    @Public()
     @Get('code/:code')
     @ApiOperation({ summary: 'Get menu item by code (public)' })
     @ApiResponse({
@@ -152,6 +157,7 @@ export class MenuController {
         };
     }
 
+    @Public()
     @Get(':id')
     @ApiOperation({ summary: 'Get menu item by ID (public)' })
     @ApiResponse({

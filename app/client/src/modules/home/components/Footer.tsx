@@ -54,10 +54,10 @@ export function Footer() {
                     {/* Brand */}
                     <div className="space-y-4">
                         <h3 className="text-2xl font-bold text-primary">
-                            {settings.name}
+                            {settings.name || t("home.hero.title")}
                         </h3>
                         <p className="text-muted-foreground">
-                            {settings.description}
+                            {settings.description || t("home.hero.description")}
                         </p>
                         
                         {/* Social Links */}
@@ -82,7 +82,7 @@ export function Footer() {
                     {/* Quick Links */}
                     <div>
                         <h4 className="font-semibold mb-4">
-                            {t("home.footer.quickLinks", { defaultValue: "Liên kết nhanh" })}
+                            {t("home.footer.quickLinks") || "Liên kết nhanh"}
                         </h4>
                         <nav className="space-y-2">
                             {navSections.map((section) => (
@@ -91,7 +91,7 @@ export function Footer() {
                                     onClick={() => scrollToSection(section.id)}
                                     className="block text-muted-foreground hover:text-primary transition-colors"
                                 >
-                                    {t(`home.nav.${section.id}`, { defaultValue: section.label })}
+                                    {t(`home.nav.${section.id}`) || section.label}
                                 </button>
                             ))}
                         </nav>
@@ -100,24 +100,24 @@ export function Footer() {
                     {/* Contact Info */}
                     <div>
                         <h4 className="font-semibold mb-4">
-                            {t("home.footer.contact", { defaultValue: "Thông tin liên hệ" })}
+                            {t("home.footer.contact") || "Thông tin liên hệ"}
                         </h4>
                         <address className="not-italic space-y-2 text-muted-foreground">
-                            <p>{settings.contact.address}</p>
+                            <p>{settings.address || t("home.contact.address")}</p>
                             <p>
                                 <a
-                                    href={`tel:${settings.contact.phone.replace(/-/g, "")}`}
+                                    href={`tel:${settings.phone.replace(/-/g, "")}`}
                                     className="hover:text-primary transition-colors"
                                 >
-                                    {settings.contact.phone}
+                                    {settings.phone || t("home.contact.phone")}
                                 </a>
                             </p>
                             <p>
                                 <a
-                                    href={`mailto:${settings.contact.email}`}
+                                    href={`mailto:${settings.email}`}
                                     className="hover:text-primary transition-colors"
                                 >
-                                    {settings.contact.email}
+                                    {settings.email || t("home.contact.email")}
                                 </a>
                             </p>
                         </address>
@@ -127,8 +127,8 @@ export function Footer() {
                 {/* Bottom Bar */}
                 <div className="border-t mt-10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p className="text-sm text-muted-foreground text-center sm:text-left">
-                        © {currentYear} {settings.name}.{" "}
-                        {t("home.footer.copyright", { defaultValue: "Đã đăng ký bản quyền." })}
+                        © {currentYear} {settings.name || t("home.hero.title")}.{" "}
+                        {t("home.footer.copyright") || "Đã đăng ký bản quyền."}
                     </p>
 
                     {/* Back to Top */}
@@ -139,7 +139,7 @@ export function Footer() {
                         className="gap-2"
                     >
                         <ArrowUp className="h-4 w-4" />
-                        {t("home.footer.backToTop", { defaultValue: "Về đầu trang" })}
+                        {t("home.footer.backToTop") || "Về đầu trang"}
                     </Button>
                 </div>
             </div>

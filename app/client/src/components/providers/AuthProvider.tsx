@@ -47,14 +47,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const isAdmin = isAdminRoute(pathname);
 
         // For public routes, don't do anything - just render children
+        // Don't call any auth APIs for non-admin pages
         if (isPublic && !isAdmin) {
-            // Optionally check auth silently in background (only once)
-            if (!hasCheckedAuth.current) {
-                hasCheckedAuth.current = true;
-                authApi.me()
-                    .then(user => setAuth(user, ''))
-                    .catch(() => clearAuth());
-            }
             return;
         }
 

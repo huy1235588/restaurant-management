@@ -61,30 +61,25 @@ export function useRestaurantSettings(): UseRestaurantSettingsReturn {
             name: apiSettings.name || restaurantConfig.name,
             tagline: apiSettings.tagline || restaurantConfig.tagline,
             description: apiSettings.description || restaurantConfig.description,
-            about: {
-                title: apiSettings.aboutTitle || restaurantConfig.about.title,
-                paragraphs: apiSettings.aboutContent
-                    ? apiSettings.aboutContent.split('\n\n').filter(p => p.trim())
-                    : restaurantConfig.about.paragraphs,
-                highlights: apiSettings.highlights.length > 0
-                    ? apiSettings.highlights
-                    : restaurantConfig.about.highlights,
-            },
-            contact: {
-                address: apiSettings.address || restaurantConfig.contact.address,
-                phone: apiSettings.phone || restaurantConfig.contact.phone,
-                email: apiSettings.email || restaurantConfig.contact.email,
-                mapEmbedUrl: apiSettings.mapEmbedUrl || restaurantConfig.contact.mapEmbedUrl,
-            },
+            aboutTitle: apiSettings.aboutTitle || restaurantConfig.aboutTitle,
+            aboutContent: apiSettings.aboutContent || restaurantConfig.aboutContent,
+            address: apiSettings.address || restaurantConfig.address,
+            phone: apiSettings.phone || restaurantConfig.phone,
+            email: apiSettings.email || restaurantConfig.email,
+            mapEmbedUrl: apiSettings.mapEmbedUrl || restaurantConfig.mapEmbedUrl,
+            heroImage: getImageUrl(apiSettings.heroImage) || restaurantConfig.heroImage,
+            aboutImage: getImageUrl(apiSettings.aboutImage) || restaurantConfig.aboutImage,
+            logoUrl: getImageUrl(apiSettings.logoUrl) || restaurantConfig.logoUrl,
             operatingHours: apiSettings.operatingHours.length > 0
                 ? apiSettings.operatingHours
                 : restaurantConfig.operatingHours,
             socialLinks: apiSettings.socialLinks.length > 0
                 ? apiSettings.socialLinks
                 : restaurantConfig.socialLinks,
-            heroImage: getImageUrl(apiSettings.heroImage) || restaurantConfig.heroImage,
-            aboutImage: getImageUrl(apiSettings.aboutImage) || restaurantConfig.aboutImage,
-            logoUrl: getImageUrl(apiSettings.logoUrl),
+            highlights: apiSettings.highlights.length > 0
+                ? apiSettings.highlights
+                : restaurantConfig.highlights,
+            bankConfig: apiSettings.bankConfig || restaurantConfig.bankConfig,
         };
     }, [apiSettings]);
 

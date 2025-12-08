@@ -38,6 +38,15 @@ export interface HighlightData {
     value: string;
 }
 
+// Bank configuration for QR payment
+export interface BankConfigData {
+    bankId: string;
+    bankName: string;
+    accountNo: string;
+    accountName: string;
+    template?: string;
+}
+
 // Restaurant settings response from API
 export interface RestaurantSettingsApiResponse {
     id: number;
@@ -56,6 +65,7 @@ export interface RestaurantSettingsApiResponse {
     operatingHours: OperatingHoursData[];
     socialLinks: SocialLinkData[];
     highlights: HighlightData[];
+    bankConfig?: BankConfigData | null;
     createdAt: string;
     updatedAt: string;
 }

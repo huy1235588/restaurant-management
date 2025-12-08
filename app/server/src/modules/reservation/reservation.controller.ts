@@ -38,18 +38,18 @@ import {
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
+import { Public } from '@/common/decorators/public.decorator';
 import { RESERVATION_MESSAGES } from './constants/reservation.constants';
 
 @ApiTags('reservations')
 @Controller('reservations')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
 export class ReservationController {
     constructor(private readonly reservationService: ReservationService) {}
 
     @Get()
-    @UseGuards(RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager', 'waiter')
+    @ApiBearerAuth()
     @ApiOperation({
         summary: 'Get all reservations with filters and pagination (admin/manager/waiter only)',
     })
@@ -68,8 +68,9 @@ export class ReservationController {
     }
 
     @Get('check-availability')
-    @UseGuards(RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager', 'waiter')
+    @ApiBearerAuth()
     @ApiOperation({
         summary: 'Check available tables for a specific date/time (admin/manager/waiter only)',
     })
@@ -85,8 +86,9 @@ export class ReservationController {
     }
 
     @Get('phone/:phone')
-    @UseGuards(RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager', 'waiter')
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Get reservations by phone number (admin/manager/waiter only)' })
     @ApiParam({ name: 'phone', description: 'Customer phone number' })
     @ApiResponse({ status: 200, description: 'Reservations retrieved' })
@@ -101,8 +103,9 @@ export class ReservationController {
     }
 
     @Get('code/:code')
-    @UseGuards(RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager', 'waiter')
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Get reservation by reservation code (admin/manager/waiter only)' })
     @ApiParam({ name: 'code', description: 'Unique reservation code' })
     @ApiResponse({ status: 200, description: 'Reservation retrieved' })
@@ -118,8 +121,9 @@ export class ReservationController {
     }
 
     @Get(':id')
-    @UseGuards(RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager', 'waiter')
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Get reservation by ID (admin/manager/waiter only)' })
     @ApiParam({ name: 'id', description: 'Reservation ID' })
     @ApiResponse({ status: 200, description: 'Reservation retrieved' })
@@ -134,24 +138,20 @@ export class ReservationController {
         };
     }
 
+    @Public()
     @Post()
-    @UseGuards(RolesGuard)
-    @Roles('admin', 'manager', 'waiter')
-    @ApiOperation({ summary: 'Create a new reservation (admin/manager/waiter only)' })
+    @ApiOperation({ summary: 'Create a new reservation (public - for customers)' })
     @ApiResponse({
         status: 201,
         description: 'Reservation created successfully',
     })
     @ApiResponse({ status: 400, description: 'Bad request - validation error' })
-    @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 409, description: 'Conflict - table not available' })
     @HttpCode(HttpStatus.CREATED)
     async create(
         @Body() dto: CreateReservationDto,
-        @RequestDecorator() req: RequestWithUser,
     ) {
-        const userId = req.user?.staffId;
-        const reservation = await this.reservationService.create(dto, userId);
+        const reservation = await this.reservationService.create(dto);
         return {
             success: true,
             message: RESERVATION_MESSAGES.SUCCESS.RESERVATION_CREATED,
@@ -160,8 +160,9 @@ export class ReservationController {
     }
 
     @Put(':id')
-    @UseGuards(RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager', 'waiter')
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Update reservation (admin/manager/waiter only)' })
     @ApiParam({ name: 'id', description: 'Reservation ID' })
     @ApiResponse({ status: 200, description: 'Reservation updated' })
@@ -187,8 +188,9 @@ export class ReservationController {
     }
 
     @Patch(':id/confirm')
-    @UseGuards(RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager', 'waiter')
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Confirm a pending reservation (admin/manager/waiter only)' })
     @ApiParam({ name: 'id', description: 'Reservation ID' })
     @ApiResponse({ status: 200, description: 'Reservation confirmed' })
@@ -208,8 +210,9 @@ export class ReservationController {
     }
 
     @Patch(':id/seated')
-    @UseGuards(RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager', 'waiter')
+    @ApiBearerAuth()
     @ApiOperation({
         summary: 'Mark reservation as seated (check-in) and auto-create order (admin/manager/waiter only)',
     })
@@ -234,8 +237,9 @@ export class ReservationController {
     }
 
     @Patch(':id/complete')
-    @UseGuards(RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager', 'waiter')
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Mark reservation as completed (admin/manager/waiter only)' })
     @ApiParam({ name: 'id', description: 'Reservation ID' })
     @ApiResponse({ status: 200, description: 'Reservation completed' })
@@ -254,8 +258,9 @@ export class ReservationController {
     }
 
     @Patch(':id/cancel')
-    @UseGuards(RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager')
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Cancel a reservation (admin/manager only)' })
     @ApiParam({ name: 'id', description: 'Reservation ID' })
     @ApiResponse({ status: 200, description: 'Reservation cancelled' })
@@ -279,8 +284,9 @@ export class ReservationController {
     }
 
     @Patch(':id/no-show')
-    @UseGuards(RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager')
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Mark reservation as no-show (admin/manager only)' })
     @ApiParam({ name: 'id', description: 'Reservation ID' })
     @ApiResponse({ status: 200, description: 'Reservation marked as no-show' })

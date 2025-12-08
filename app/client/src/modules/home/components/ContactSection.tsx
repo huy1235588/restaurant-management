@@ -15,21 +15,21 @@ export function ContactSection() {
     const contactInfo = [
         {
             icon: MapPin,
-            label: t("home.contact.address", { defaultValue: "Địa chỉ" }),
-            value: settings.contact.address,
-            href: `https://maps.google.com/?q=${encodeURIComponent(settings.contact.address)}`,
+            label: t("home.contact.address") || "Địa chỉ",
+            value: settings.address,
+            href: `https://maps.google.com/?q=${encodeURIComponent(settings.address)}`,
         },
         {
             icon: Phone,
-            label: t("home.contact.phone", { defaultValue: "Điện thoại" }),
-            value: settings.contact.phone,
-            href: `tel:${settings.contact.phone.replace(/-/g, "")}`,
+            label: t("home.contact.phone") || "Điện thoại",
+            value: settings.phone,
+            href: `tel:${settings.phone.replace(/-/g, "")}`,
         },
         {
             icon: Mail,
-            label: t("home.contact.email", { defaultValue: "Email" }),
-            value: settings.contact.email,
-            href: `mailto:${settings.contact.email}`,
+            label: t("home.contact.email") || "Email",
+            value: settings.email,
+            href: `mailto:${settings.email}`,
         },
     ];
 
@@ -118,9 +118,9 @@ export function ContactSection() {
                         transition={{ duration: 0.6, delay: 0.3 }}
                         className="relative aspect-square md:aspect-auto md:h-full min-h-[300px] rounded-2xl overflow-hidden shadow-lg border"
                     >
-                        {settings.contact.mapEmbedUrl ? (
+                        {settings.mapEmbedUrl ? (
                             <iframe
-                                src={settings.contact.mapEmbedUrl}
+                                src={settings.mapEmbedUrl}
                                 width="100%"
                                 height="100%"
                                 style={{ border: 0 }}
@@ -134,7 +134,7 @@ export function ContactSection() {
                                 <div className="text-center">
                                     <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                                     <p className="text-muted-foreground">
-                                        {settings.contact.address}
+                                        {settings.address}
                                     </p>
                                 </div>
                             </div>

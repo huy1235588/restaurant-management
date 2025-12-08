@@ -24,7 +24,7 @@ export function MenuSection() {
         setIsLoading(true);
         setError(null);
         try {
-            const items = await homeApi.getFeaturedMenuItems(8);
+            const items = await homeApi.getFeaturedMenuItems(12);
             setMenuItems(items);
         } catch (err) {
             console.error("Failed to fetch menu items:", err);

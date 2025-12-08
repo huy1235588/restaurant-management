@@ -24,14 +24,14 @@ import { CreateCategoryDto, UpdateCategoryDto } from '@/modules/category/dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
+import { Public } from '@/common/decorators/public.decorator';
 
 @ApiTags('categories')
 @Controller('categories')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
 export class CategoryController {
     constructor(private readonly categoryService: CategoryService) {}
 
+    @Public()
     @Get('count')
     @ApiOperation({ summary: 'Count categories' })
     @ApiQuery({ name: 'isActive', required: false, type: Boolean })
@@ -51,6 +51,7 @@ export class CategoryController {
         };
     }
 
+    @Public()
     @Get()
     @ApiOperation({ summary: 'Get all categories' })
     @ApiQuery({ name: 'isActive', required: false, type: Boolean })
@@ -73,6 +74,7 @@ export class CategoryController {
         };
     }
 
+    @Public()
     @Get(':id')
     @ApiOperation({ summary: 'Get category by ID' })
     @ApiResponse({
@@ -88,6 +90,7 @@ export class CategoryController {
         };
     }
 
+    @Public()
     @Get(':id/items')
     @ApiOperation({ summary: 'Get category with menu items' })
     @ApiResponse({
@@ -104,8 +107,9 @@ export class CategoryController {
     }
 
     @Post()
-    @UseGuards(RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager')
+    @ApiBearerAuth()
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({ summary: 'Create a new category (admin/manager only)' })
     @ApiResponse({ status: 201, description: 'Category created successfully' })
@@ -121,8 +125,9 @@ export class CategoryController {
     }
 
     @Put(':id')
-    @UseGuards(RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager')
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Update a category (admin/manager only)' })
     @ApiResponse({ status: 200, description: 'Category updated successfully' })
     @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })
@@ -142,8 +147,9 @@ export class CategoryController {
     }
 
     @Delete(':id')
-    @UseGuards(RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager')
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Delete a category (admin/manager only)' })
     @ApiResponse({ status: 200, description: 'Category deleted successfully' })
     @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })

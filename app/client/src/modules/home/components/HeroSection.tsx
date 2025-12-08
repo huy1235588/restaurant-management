@@ -68,7 +68,7 @@ export function HeroSection() {
                                 : "bg-linear-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent"
                         }`}
                     >
-                        {t("home.hero.title", { defaultValue: settings.name })}
+                        {settings.name || t("home.hero.title")}
                     </motion.h1>
 
                     {/* Tagline */}
@@ -80,7 +80,7 @@ export function HeroSection() {
                             heroImageUrl ? "text-white/90" : "text-muted-foreground"
                         }`}
                     >
-                        {t("home.hero.tagline", { defaultValue: settings.tagline })}
+                        {settings.tagline || t("home.hero.tagline")}
                     </motion.p>
 
                     {/* Description */}
@@ -92,7 +92,7 @@ export function HeroSection() {
                             heroImageUrl ? "text-white/80" : "text-muted-foreground/80"
                         }`}
                     >
-                        {t("home.hero.description", { defaultValue: settings.description })}
+                        {settings.description || t("home.hero.description")}
                     </motion.p>
 
                     {/* CTA Buttons */}

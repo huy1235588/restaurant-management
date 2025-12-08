@@ -67,7 +67,7 @@ export function Header() {
                             onClick={() => handleNavClick("home")}
                             className="font-bold text-xl md:text-2xl text-primary hover:opacity-80 transition-opacity"
                         >
-                            {settings.name}
+                            {settings.name || t("home.hero.title")}
                         </button>
 
                         {/* Desktop Navigation */}
@@ -83,7 +83,7 @@ export function Header() {
                                             : "text-muted-foreground hover:text-foreground hover:bg-accent"
                                     )}
                                 >
-                                    {t(`home.nav.${section.id}`, { defaultValue: section.label })}
+                                    {t(`home.nav.${section.id}`) || section.label}
                                 </button>
                             ))}
                         </nav>
@@ -164,7 +164,7 @@ export function Header() {
                                             : "text-muted-foreground hover:text-foreground"
                                     )}
                                 >
-                                    {t(`home.nav.${section.id}`, { defaultValue: section.label })}
+                                    {t(`home.nav.${section.id}`) || section.label}
                                 </motion.button>
                             ))}
 
@@ -196,7 +196,7 @@ export function Header() {
                                     onClick={() => handleNavClick("reservation")}
                                     className="mt-4"
                                 >
-                                    {t("home.nav.bookTable", { defaultValue: "Đặt Bàn Ngay" })}
+                                    {t("home.nav.bookTable") || "Đặt Bàn Ngay"}
                                 </Button>
                             </motion.div>
                         </motion.nav>

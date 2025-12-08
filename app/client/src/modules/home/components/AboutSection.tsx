@@ -50,7 +50,7 @@ export function AboutSection() {
                     {/* Section Title */}
                     <motion.div variants={itemVariants} className="text-center mb-12 md:mb-16">
                         <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-                            {t("home.about.title", { defaultValue: settings.about.title })}
+                            {settings.aboutTitle || t("home.about.title")}
                         </h2>
                         <div className="w-24 h-1 bg-primary mx-auto rounded-full" />
                     </motion.div>
@@ -65,7 +65,7 @@ export function AboutSection() {
                             {aboutImageUrl ? (
                                 <Image
                                     src={aboutImageUrl}
-                                    alt={settings.about.title}
+                                    alt={settings.aboutTitle}
                                     fill
                                     className="object-cover"
                                     sizes="(max-width: 768px) 100vw, 50vw"
@@ -83,12 +83,12 @@ export function AboutSection() {
 
                         {/* Text Content */}
                         <motion.div variants={itemVariants} className="space-y-6">
-                            {settings.about.paragraphs.map((paragraph, index) => (
+                            {settings.aboutContent.split('\n\n').filter(p => p.trim()).map((paragraph, index) => (
                                 <p
                                     key={index}
                                     className="text-muted-foreground leading-relaxed text-base md:text-lg"
                                 >
-                                    {t(`home.about.paragraph${index + 1}`, { defaultValue: paragraph })}
+                                    {paragraph || t(`home.about.paragraph${index + 1}`)}
                                 </p>
                             ))}
                         </motion.div>
@@ -99,7 +99,7 @@ export function AboutSection() {
                         variants={itemVariants}
                         className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16"
                     >
-                        {settings.about.highlights.map((highlight, index) => (
+                        {settings.highlights.map((highlight, index) => (
                             <motion.div
                                 key={index}
                                 whileHover={{ scale: 1.05 }}
@@ -110,7 +110,7 @@ export function AboutSection() {
                                     {highlight.value}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                    {t(`home.about.highlight${index + 1}`, { defaultValue: highlight.label })}
+                                    {highlight.label || t(`home.about.highlight${index + 1}`)}
                                 </p>
                             </motion.div>
                         ))}

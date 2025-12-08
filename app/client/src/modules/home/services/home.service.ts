@@ -41,7 +41,7 @@ export const homeApi = {
      * Get featured menu items for landing page
      * Returns limited items that are available and active
      */
-    getFeaturedMenuItems: async (limit: number = 8): Promise<FeaturedMenuItem[]> => {
+    getFeaturedMenuItems: async (limit: number = 12): Promise<FeaturedMenuItem[]> => {
         const response = await publicAxios.get<ApiResponse<PaginatedMenuResponse>>(
             "/menu",
             {
