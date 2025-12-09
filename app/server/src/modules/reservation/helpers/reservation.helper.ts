@@ -16,6 +16,58 @@ const DEFAULT_TIMEZONE = process.env['TZ'] || 'Asia/Ho_Chi_Minh';
 
 export class ReservationHelper {
     /**
+     * Get current date and time in local timezone as components
+     * Returns { year, month, day, hours, minutes, seconds } in local timezone
+     */
+    static getNowInLocalTimezone(): {
+        year: number;
+        month: number;
+        day: number;
+        hours: number;
+        minutes: number;
+        seconds: number;
+    } {
+        const now = new Date();
+
+        // Get local date string (YYYY-MM-DD)
+        const localDateStr = now.toLocaleDateString('en-CA', {
+            timeZone: DEFAULT_TIMEZONE,
+        });
+
+        // Get local time string (HH:mm:ss)
+        const localTimeStr = now.toLocaleTimeString('en-GB', {
+            timeZone: DEFAULT_TIMEZONE,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false,
+        });
+
+        const [year, month, day] = localDateStr.split('-').map(Number);
+        const [hours, minutes, seconds] = localTimeStr.split(':').map(Number);
+
+        return { year, month, day, hours, minutes, seconds };
+    }
+
+    /**
+     * Get current time as a comparable number (minutes since midnight in local timezone)
+     */
+    static getCurrentTimeMinutes(): number {
+        const { hours, minutes } = this.getNowInLocalTimezone();
+        return hours * 60 + minutes;
+    }
+
+    /**
+     * Get current date string in local timezone (YYYY-MM-DD)
+     */
+    static getCurrentDateString(): string {
+        const now = new Date();
+        return now.toLocaleDateString('en-CA', {
+            timeZone: DEFAULT_TIMEZONE,
+        });
+    }
+
+    /**
      * Combine date and time strings into a Date object
      * Both date and time are interpreted in local timezone
      *
@@ -84,36 +136,110 @@ export class ReservationHelper {
 
     /**
      * Check if reservation date/time is in the future
+     * Compares using local timezone to ensure correct validation
      */
     static isFutureDateTime(date: string, time: string): boolean {
-        const reservationDateTime = this.combineDateTime(date, time);
-        return reservationDateTime > new Date();
+        // Parse the reservation date
+        let datePart = date;
+        if (date.includes('T')) {
+            datePart = date.split('T')[0];
+        }
+
+        // Get current date/time in local timezone
+        const currentDateStr = this.getCurrentDateString();
+        const currentTimeMinutes = this.getCurrentTimeMinutes();
+
+        // Parse reservation time to minutes
+        const timeParts = time.split(':').map(Number);
+        const reservationTimeMinutes = timeParts[0] * 60 + timeParts[1];
+
+        // Compare dates first
+        if (datePart > currentDateStr) {
+            // Reservation is on a future date
+            return true;
+        }
+
+        if (datePart < currentDateStr) {
+            // Reservation is on a past date
+            return false;
+        }
+
+        // Same day - compare times
+        return reservationTimeMinutes > currentTimeMinutes;
     }
 
     /**
      * Check if reservation is within minimum advance booking time
+     * Uses local timezone for accurate comparison
      */
     static isWithinMinAdvanceTime(date: string, time: string): boolean {
-        const reservationDateTime = this.combineDateTime(date, time);
-        const minDateTime = new Date();
-        minDateTime.setMinutes(
-            minDateTime.getMinutes() +
-                RESERVATION_CONSTANTS.MIN_ADVANCE_BOOKING_MINUTES,
+        // Parse the reservation date
+        let datePart = date;
+        if (date.includes('T')) {
+            datePart = date.split('T')[0];
+        }
+
+        // Parse reservation time
+        const timeParts = time.split(':').map(Number);
+        const reservationHours = timeParts[0];
+        const reservationMinutes = timeParts[1];
+
+        // Get current time in local timezone
+        const now = this.getNowInLocalTimezone();
+
+        // Calculate reservation datetime in minutes since a reference point
+        const [resYear, resMonth, resDay] = datePart.split('-').map(Number);
+        const reservationTotalMinutes =
+            resYear * 525600 * 12 + // approximate
+            resMonth * 525600 +
+            resDay * 1440 +
+            reservationHours * 60 +
+            reservationMinutes;
+
+        const currentTotalMinutes =
+            now.year * 525600 * 12 +
+            now.month * 525600 +
+            now.day * 1440 +
+            now.hours * 60 +
+            now.minutes;
+
+        const minAdvanceMinutes =
+            RESERVATION_CONSTANTS.MIN_ADVANCE_BOOKING_MINUTES;
+
+        return (
+            reservationTotalMinutes - currentTotalMinutes >= minAdvanceMinutes
         );
-        return reservationDateTime >= minDateTime;
     }
 
     /**
      * Check if reservation is within maximum advance booking time
+     * Uses local timezone for accurate comparison
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     static isWithinMaxAdvanceTime(date: string, time: string): boolean {
-        const reservationDateTime = this.combineDateTime(date, time);
-        const maxDateTime = new Date();
-        maxDateTime.setDate(
-            maxDateTime.getDate() +
-                RESERVATION_CONSTANTS.MAX_ADVANCE_BOOKING_DAYS,
+        // Parse the reservation date
+        let datePart = date;
+        if (date.includes('T')) {
+            datePart = date.split('T')[0];
+        }
+
+        // Get current date in local timezone
+        const currentDateStr = this.getCurrentDateString();
+        const [currentYear, currentMonth, currentDay] = currentDateStr
+            .split('-')
+            .map(Number);
+        const [resYear, resMonth, resDay] = datePart.split('-').map(Number);
+
+        // Calculate days difference
+        const currentDate = new Date(currentYear, currentMonth - 1, currentDay);
+        const reservationDate = new Date(resYear, resMonth - 1, resDay);
+
+        const daysDiff = Math.floor(
+            (reservationDate.getTime() - currentDate.getTime()) /
+                (1000 * 60 * 60 * 24),
         );
-        return reservationDateTime <= maxDateTime;
+
+        return daysDiff <= RESERVATION_CONSTANTS.MAX_ADVANCE_BOOKING_DAYS;
     }
 
     /**
@@ -222,30 +348,72 @@ export class ReservationHelper {
 
     /**
      * Check if reservation is expired (past grace period)
+     * Uses local timezone for accurate comparison
      */
     static isExpired(date: string, time: string): boolean {
-        const reservationDateTime = this.combineDateTime(date, time);
-        const expiryTime = new Date(reservationDateTime);
-        expiryTime.setMinutes(
-            expiryTime.getMinutes() +
-                RESERVATION_CONSTANTS.GRACE_PERIOD_MINUTES,
-        );
-        return new Date() > expiryTime;
+        // Parse the reservation date
+        let datePart = date;
+        if (date.includes('T')) {
+            datePart = date.split('T')[0];
+        }
+
+        // Parse reservation time
+        const timeParts = time.split(':').map(Number);
+        let reservationMinutes = timeParts[0] * 60 + timeParts[1];
+
+        // Add grace period
+        reservationMinutes += RESERVATION_CONSTANTS.GRACE_PERIOD_MINUTES;
+
+        // Get current date/time in local timezone
+        const currentDateStr = this.getCurrentDateString();
+        const currentTimeMinutes = this.getCurrentTimeMinutes();
+
+        // Compare dates first
+        if (datePart > currentDateStr) {
+            // Reservation is on a future date - not expired
+            return false;
+        }
+
+        if (datePart < currentDateStr) {
+            // Reservation is on a past date - expired
+            return true;
+        }
+
+        // Same day - compare times (including grace period)
+        return currentTimeMinutes > reservationMinutes;
     }
 
     /**
      * Check if within grace period
+     * Uses local timezone for accurate comparison
      */
     static isWithinGracePeriod(date: string, time: string): boolean {
-        const reservationDateTime = this.combineDateTime(date, time);
-        const now = new Date();
-        const gracePeriodEnd = new Date(reservationDateTime);
-        gracePeriodEnd.setMinutes(
-            gracePeriodEnd.getMinutes() +
-                RESERVATION_CONSTANTS.GRACE_PERIOD_MINUTES,
-        );
+        // Parse the reservation date
+        let datePart = date;
+        if (date.includes('T')) {
+            datePart = date.split('T')[0];
+        }
 
-        return now >= reservationDateTime && now <= gracePeriodEnd;
+        // Parse reservation time
+        const timeParts = time.split(':').map(Number);
+        const reservationMinutes = timeParts[0] * 60 + timeParts[1];
+        const gracePeriodEnd =
+            reservationMinutes + RESERVATION_CONSTANTS.GRACE_PERIOD_MINUTES;
+
+        // Get current date/time in local timezone
+        const currentDateStr = this.getCurrentDateString();
+        const currentTimeMinutes = this.getCurrentTimeMinutes();
+
+        // Must be same day
+        if (datePart !== currentDateStr) {
+            return false;
+        }
+
+        // Check if current time is between reservation time and grace period end
+        return (
+            currentTimeMinutes >= reservationMinutes &&
+            currentTimeMinutes <= gracePeriodEnd
+        );
     }
 
     /**
