@@ -225,7 +225,7 @@ export function ReservationDetailView({ reservationId }: ReservationDetailViewPr
                         <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                             <Calendar className="w-4 h-4" />
                             <p className="font-medium">
-                                {formatReservationDateTime(reservation.reservationDate, undefined, locale)}
+                                {formatReservationDateTime(reservation.reservationDate, reservation.reservationTime, locale)}
                             </p>
                         </div>
                     </div>
