@@ -183,7 +183,9 @@ export class DateTimeService {
 
     /**
      * Create a Time-only Date object for storing in @db.Time fields
-     * This creates a Date with date part 1970-01-01 and the specified time
+     * This creates a Date with date part 1970-01-01 and the specified time in UTC
+     *
+     * IMPORTANT: Uses UTC to avoid timezone conversion issues when storing to DB
      *
      * @param timeString - Time in HH:mm or HH:mm:ss format
      */
@@ -197,8 +199,9 @@ export class DateTimeService {
         const minutes = parts[1];
         const seconds = parts[2] || 0;
 
-        // Create date with epoch date but specified time
-        const date = new Date(1970, 0, 1, hours, minutes, seconds, 0);
+        // Create date with epoch date but specified time in UTC
+        // Using Date.UTC prevents timezone conversion issues
+        const date = new Date(Date.UTC(1970, 0, 1, hours, minutes, seconds, 0));
 
         return date;
     }
