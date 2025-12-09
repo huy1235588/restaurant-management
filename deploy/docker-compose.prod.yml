@@ -46,6 +46,7 @@ services:
     # Backend Server (NestJS)
     server:
         image: ${SERVER_IMAGE:-ghcr.io/huy1235588/restaurant-management/server:latest}
+        pull_policy: always
         build:
             context: ../app/server
             dockerfile: Dockerfile
@@ -92,6 +93,7 @@ services:
     # Frontend Client (Next.js)
     client:
         image: ${CLIENT_IMAGE:-ghcr.io/huy1235588/restaurant-management/client:latest}
+        pull_policy: always
         build:
             context: ../app/client
             dockerfile: Dockerfile

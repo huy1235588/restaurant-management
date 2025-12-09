@@ -87,6 +87,8 @@ jobs:
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
             NEXT_PUBLIC_SOCKET_URL=${{ secrets.NEXT_PUBLIC_SOCKET_URL }}
             NEXT_PUBLIC_STORAGE_URL=${{ secrets.NEXT_PUBLIC_STORAGE_URL }}
+            GITHUB_SHA=${{ github.sha }}
+          no-cache: true
 
       - name: Get Client image tag
         id: get-client-tag
@@ -116,6 +118,9 @@ jobs:
           labels: ${{ steps.meta-server.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            GITHUB_SHA=${{ github.sha }}
+          no-cache: true
 
       - name: Get Server image tag
         id: get-server-tag
@@ -173,10 +178,15 @@ jobs:
           echo "=== Logging in to GitHub Container Registry ==="
           echo "$GITHUB_TOKEN" | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
 
-          # Pull pre-built images
+          # Remove old containers and images to force fresh pull
+          echo "=== Removing old containers and images ==="
+          docker compose -f docker-compose.prod.yml down --rmi local || true
+          docker image prune -f || true
+
+          # Pull pre-built images (force pull, no cache)
           echo "=== Pulling pre-built Docker images ==="
-          docker pull "$CLIENT_IMAGE" || echo "Warning: Failed to pull client image"
-          docker pull "$SERVER_IMAGE" || echo "Warning: Failed to pull server image"
+          docker pull "$CLIENT_IMAGE" --no-cache || echo "Warning: Failed to pull client image"
+          docker pull "$SERVER_IMAGE" --no-cache || echo "Warning: Failed to pull server image"
 
           # Tag images for docker-compose
           echo "=== Tagging images ==="

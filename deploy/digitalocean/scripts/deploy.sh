@@ -214,13 +214,17 @@ fi
 # Stop Current Containers
 ################################################################################
 
-log_step "Stopping current containers"
+log_step "Stopping and removing current containers"
 
-# Graceful shutdown with timeout
-log_info "Stopping containers gracefully (30s timeout)..."
-docker compose -f docker-compose.prod.yml stop -t 30 || true
+# Stop and remove containers to force fresh start
+log_info "Stopping and removing containers..."
+docker compose -f docker-compose.prod.yml down || true
 
-log_info "✓ Containers stopped"
+# Remove dangling images
+log_info "Cleaning up dangling images..."
+docker image prune -f || true
+
+log_info "✓ Containers stopped and removed"
 
 ################################################################################
 # Start New Containers
@@ -360,6 +364,12 @@ else
     # Check backend
     if curl -f http://localhost:5000/api/v1/health &> /dev/null; then
         log_info "✓ Backend health check passed"
+        
+        # Get and display version info
+        VERSION_INFO=$(curl -s http://localhost:5000/api/v1/version 2>/dev/null || echo "{}")
+        if [ -n "$VERSION_INFO" ] && [ "$VERSION_INFO" != "{}" ]; then
+            log_info "Backend version: $(echo $VERSION_INFO | grep -o '"version":"[^"]*"' | cut -d'"' -f4)"
+        fi
     else
         log_warn "✗ Backend health check failed"
     fi
@@ -397,6 +407,15 @@ echo "Time: $(date)" | tee -a "$LOG_FILE"
 echo "Commit: $(git rev-parse --short HEAD 2>/dev/null || echo 'N/A')" | tee -a "$LOG_FILE"
 echo "Branch: $(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo 'N/A')" | tee -a "$LOG_FILE"
 echo "" | tee -a "$LOG_FILE"
+
+# Display deployed version
+BACKEND_VERSION=$(curl -s http://localhost:5000/api/v1/version 2>/dev/null | grep -o '"version":"[^"]*"' | cut -d'"' -f4)
+if [ -n "$BACKEND_VERSION" ] && [ "$BACKEND_VERSION" != "dev" ]; then
+    echo "Deployed Version: $BACKEND_VERSION" | tee -a "$LOG_FILE"
+    echo "" | tee -a "$LOG_FILE"
+fi
+
+
 echo "Running Containers:" | tee -a "$LOG_FILE"
 docker compose -f docker-compose.prod.yml ps | tee -a "$LOG_FILE"
 echo "" | tee -a "$LOG_FILE"

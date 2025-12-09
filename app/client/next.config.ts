@@ -42,6 +42,41 @@ const nextConfig: NextConfig = {
     // Turbopack configuration (Next.js 16 uses Turbopack by default)
     // Empty config to suppress webpack warning
     turbopack: {},
+
+    // Generate build ID based on git commit to force cache invalidation
+    generateBuildId: async () => {
+        // Use git commit hash as build ID, fallback to timestamp
+        if (process.env.GITHUB_SHA) {
+            return process.env.GITHUB_SHA.substring(0, 7);
+        }
+        return `build-${Date.now()}`;
+    },
+
+    // Headers for cache control
+    async headers() {
+        return [
+            {
+                source: "/:path*",
+                headers: [
+                    {
+                        key: "Cache-Control",
+                        value: process.env.NODE_ENV === "production"
+                            ? "public, max-age=0, must-revalidate"
+                            : "no-store, must-revalidate",
+                    },
+                ],
+            },
+            {
+                source: "/_next/static/:path*",
+                headers: [
+                    {
+                        key: "Cache-Control",
+                        value: "public, max-age=31536000, immutable",
+                    },
+                ],
+            },
+        ];
+    },
 };
 
 export default nextConfig;

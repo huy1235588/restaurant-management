@@ -30,6 +30,10 @@ COPY --from=deps /app/package.json ./package.json
 # Copy source files and prisma schema
 COPY . .
 
+# Build argument for versioning
+ARG GITHUB_SHA
+ENV GITHUB_SHA=${GITHUB_SHA}
+
 # Generate Prisma Client in builder stage (after dependencies installed)
 # Use a dummy DATABASE_URL for generation since we don't need actual DB connection
 RUN DATABASE_URL="postgresql://user:password@localhost:5432/dummy" pnpm exec prisma generate

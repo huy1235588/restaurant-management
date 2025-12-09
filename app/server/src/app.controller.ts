@@ -17,6 +17,19 @@ export class AppController {
         return {
             status: 'ok',
             timestamp: new Date().toISOString(),
+            version: process.env.GITHUB_SHA || 'dev',
+            environment: process.env.NODE_ENV || 'development',
+        };
+    }
+
+    @Public()
+    @Get('version')
+    getVersion() {
+        return {
+            version: process.env.GITHUB_SHA || 'dev',
+            buildTime: process.env.BUILD_TIME || new Date().toISOString(),
+            environment: process.env.NODE_ENV || 'development',
+            nodeVersion: process.version,
         };
     }
 }
