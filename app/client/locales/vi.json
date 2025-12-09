@@ -65,7 +65,8 @@
         "today": "Hôm nay",
         "all": "Tất cả",
         "clear": "Xóa",
-        "details": "Chi tiết"
+        "details": "Chi tiết",
+        "complete": "Hoàn thành"
     },
     "sidebar": {
         "overview": "Tổng quan",
@@ -1015,15 +1016,41 @@
             "reservationDetails": "Chi tiết đặt bàn"
         },
         "validation": {
-            "nameRequired": "Tên là bắt buộc",
-            "phoneRequired": "Số điện thoại là bắt buộc",
+            "nameRequired": "Vui lòng nhập tên",
+            "nameMax": "Tên không được vượt quá 100 ký tự",
+            "phoneRequired": "Vui lòng nhập số điện thoại hợp lệ",
+            "phoneMin": "Vui lòng nhập số điện thoại hợp lệ",
             "phoneInvalid": "Số điện thoại không hợp lệ",
             "emailInvalid": "Email không hợp lệ",
-            "partySizeMin": "Yêu cầu ít nhất 1 khách",
+            "partySizeMin": "Ít nhất 1 khách",
             "partySizeMax": "Tối đa 50 khách",
-            "dateRequired": "Ngày và giờ là bắt buộc",
+            "dateRequired": "Vui lòng chọn ngày giờ",
             "durationMin": "Tối thiểu 30 phút",
-            "durationMax": "Tối đa 8 giờ"
+            "durationMax": "Tối đa 480 phút",
+            "specialRequestsMax": "Tối đa 500 ký tự"
+        },
+        "dialog": {
+            "createTitle": "Tạo Đặt Bàn Mới",
+            "createDescription": "Điền thông tin để tạo đặt bàn mới",
+            "customerInformationSection": "Thông Tin Khách Hàng",
+            "nameLabel": "Họ Tên *",
+            "namePlaceholder": "Nguyễn Văn A",
+            "phoneLabel": "Điện Thoại *",
+            "phonePlaceholder": "0912 345 678",
+            "emailLabel": "Email",
+            "emailPlaceholder": "email@example.com",
+            "reservationDetailsSection": "Chi Tiết Đặt Bàn",
+            "partySizeLabel": "Số Người *",
+            "durationLabel": "Thời Gian (phút) *",
+            "dateTimeLabel": "Ngày & Giờ *",
+            "availableTablesSection": "Bàn Trống",
+            "tableNumberLabel": "Bàn {{number}}",
+            "seatsLabel": "{{count}} chỗ",
+            "checkingAvailabilityText": "Đang kiểm tra bàn trống...",
+            "specialRequestsLabel": "Yêu Cầu Đặc Biệt",
+            "specialRequestsPlaceholder": "Các yêu cầu đặc biệt hoặc hạn chế chế độ ăn uống...",
+            "cancelButton": "Hủy",
+            "createButton": "Tạo Đặt Bàn"
         },
         "empty": {
             "title": "Không tìm thấy đặt bàn",

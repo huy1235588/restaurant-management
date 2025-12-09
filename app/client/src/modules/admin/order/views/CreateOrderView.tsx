@@ -432,7 +432,7 @@ export function CreateOrderView() {
                                         </p>
                                     )}
                                 </div>
-                                <div className="space-y-2">
+                                {/* <div className="space-y-2">
                                     <Label htmlFor="specialRequests">{t('orders.create.specialRequests')}</Label>
                                     <Textarea
                                         id="specialRequests"
@@ -445,7 +445,7 @@ export function CreateOrderView() {
                                             {customerForm.formState.errors.specialRequests.message}
                                         </p>
                                     )}
-                                </div>
+                                </div> */}
                             </CardContent>
                         </Card>
                     )}

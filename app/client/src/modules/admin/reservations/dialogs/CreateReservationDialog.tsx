@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
 import {
     Dialog,
     DialogContent,
@@ -26,18 +27,16 @@ import { useTableAvailability } from '@/modules/admin/reservations/hooks/useTabl
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const reservationSchema = z.object({
-    customerName: z.string().min(1, 'Name is required').max(100),
-    phoneNumber: z.string().min(10, 'Valid phone number required'),
-    email: z.string().email('Valid email required').optional().or(z.literal('')),
-    partySize: z.number().min(1, 'At least 1 guest').max(50),
-    reservationDate: z.string().min(1, 'Date is required'),
-    duration: z.number().min(30, 'Minimum 30 minutes').max(480),
-    specialRequests: z.string().max(500).optional(),
-    tableId: z.number().optional(),
-});
-
-type ReservationFormData = z.infer<typeof reservationSchema>;
+type ReservationFormData = {
+    customerName: string;
+    phoneNumber: string;
+    email?: string;
+    partySize: number;
+    reservationDate: string;
+    duration: number;
+    specialRequests?: string;
+    tableId?: number;
+};
 
 interface CreateReservationDialogProps {
     open: boolean;
@@ -59,7 +58,19 @@ export function CreateReservationDialog({
     defaultDate,
     defaultTime,
 }: CreateReservationDialogProps) {
+    const { t } = useTranslation();
     const { createReservation, loading } = useReservationActions();
+    
+    const reservationSchema = z.object({
+        customerName: z.string().min(1, t('reservations.validation.nameRequired')).max(100, t('reservations.validation.nameMax')),
+        phoneNumber: z.string().min(10, t('reservations.validation.phoneMin')),
+        email: z.string().email(t('reservations.validation.emailInvalid')).optional().or(z.literal('')),
+        partySize: z.number().min(1, t('reservations.validation.partySizeMin')).max(50, t('reservations.validation.partySizeMax')),
+        reservationDate: z.string().min(1, t('reservations.validation.dateRequired')),
+        duration: z.number().min(30, t('reservations.validation.durationMin')).max(480, t('reservations.validation.durationMax')),
+        specialRequests: z.string().max(500, t('reservations.validation.specialRequestsMax')).optional(),
+        tableId: z.number().optional(),
+    });
     const [availabilityParams, setAvailabilityParams] = useState<any>(null);
     const { tables, loading: loadingTables } = useTableAvailability(availabilityParams);
 
@@ -137,9 +148,9 @@ export function CreateReservationDialog({
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>Create New Reservation</DialogTitle>
+                    <DialogTitle>{t('reservations.dialog.createTitle')}</DialogTitle>
                     <DialogDescription>
-                        Fill in the details to create a new reservation
+                        {t('reservations.dialog.createDescription')}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -148,7 +159,7 @@ export function CreateReservationDialog({
                         {/* Customer Information */}
                         <div className="space-y-3">
                             <h3 className="font-medium text-sm text-gray-700">
-                                Customer Information
+                                {t('reservations.dialog.customerInformationSection')}
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <FormField
@@ -156,9 +167,9 @@ export function CreateReservationDialog({
                                     name="customerName"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Name *</FormLabel>
+                                            <FormLabel>{t('reservations.dialog.nameLabel')}</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="John Doe" {...field} />
+                                                <Input placeholder={t('reservations.dialog.namePlaceholder')} {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -169,10 +180,10 @@ export function CreateReservationDialog({
                                     name="phoneNumber"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Phone *</FormLabel>
+                                            <FormLabel>{t('reservations.dialog.phoneLabel')}</FormLabel>
                                             <FormControl>
                                                 <Input
-                                                    placeholder="(555) 123-4567"
+                                                    placeholder={t('reservations.dialog.phonePlaceholder')}
                                                     {...field}
                                                 />
                                             </FormControl>
@@ -186,11 +197,11 @@ export function CreateReservationDialog({
                                 name="email"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Email</FormLabel>
+                                        <FormLabel>{t('reservations.dialog.emailLabel')}</FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="email"
-                                                placeholder="john@example.com"
+                                                placeholder={t('reservations.dialog.emailPlaceholder')}
                                                 {...field}
                                             />
                                         </FormControl>
@@ -203,7 +214,7 @@ export function CreateReservationDialog({
                         {/* Reservation Details */}
                         <div className="space-y-3">
                             <h3 className="font-medium text-sm text-gray-700">
-                                Reservation Details
+                                {t('reservations.dialog.reservationDetailsSection')}
                             </h3>
                             <div className="grid grid-cols-2 gap-4">
                                 <FormField
@@ -211,7 +222,7 @@ export function CreateReservationDialog({
                                     name="partySize"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Party Size *</FormLabel>
+                                            <FormLabel>{t('reservations.dialog.partySizeLabel')}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="number"
@@ -231,7 +242,7 @@ export function CreateReservationDialog({
                                     name="duration"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Duration (min) *</FormLabel>
+                                            <FormLabel>{t('reservations.dialog.durationLabel')}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="number"
@@ -253,7 +264,7 @@ export function CreateReservationDialog({
                                 name="reservationDate"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Date & Time *</FormLabel>
+                                        <FormLabel>{t('reservations.dialog.dateTimeLabel')}</FormLabel>
                                         <FormControl>
                                             <Input type="datetime-local" {...field} />
                                         </FormControl>
@@ -267,7 +278,7 @@ export function CreateReservationDialog({
                         {tables.length > 0 && (
                             <div className="space-y-2">
                                 <h3 className="font-medium text-sm text-gray-700">
-                                    Available Tables
+                                    {t('reservations.dialog.availableTablesSection')}
                                 </h3>
                                 <FormField
                                     control={form.control}
@@ -287,10 +298,10 @@ export function CreateReservationDialog({
                                                                     : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
                                                             }`}
                                                         >
-                                                            Table {table.tableNumber}
+                                                            {t('reservations.dialog.tableNumberLabel', { number: table.tableNumber })}
                                                             <br />
                                                             <span className="text-xs text-gray-500">
-                                                                {table.capacity} seats
+                                                                {t('reservations.dialog.seatsLabel', { count: table.capacity })}
                                                             </span>
                                                         </button>
                                                     ))}
@@ -302,7 +313,7 @@ export function CreateReservationDialog({
                                 />
                                 {loadingTables && (
                                     <p className="text-sm text-gray-500">
-                                        Checking availability...
+                                        {t('reservations.dialog.checkingAvailabilityText')}
                                     </p>
                                 )}
                             </div>
@@ -314,10 +325,10 @@ export function CreateReservationDialog({
                             name="specialRequests"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Special Requests</FormLabel>
+                                    <FormLabel>{t('reservations.dialog.specialRequestsLabel')}</FormLabel>
                                     <FormControl>
                                         <Textarea
-                                            placeholder="Any special requests or dietary restrictions..."
+                                            placeholder={t('reservations.dialog.specialRequestsPlaceholder')}
                                             className="resize-none"
                                             rows={3}
                                             {...field}
@@ -335,11 +346,11 @@ export function CreateReservationDialog({
                                 onClick={onClose}
                                 disabled={loading}
                             >
-                                Cancel
+                                {t('reservations.dialog.cancelButton')}
                             </Button>
                             <Button type="submit" disabled={loading}>
                                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Create Reservation
+                                {t('reservations.dialog.createButton')}
                             </Button>
                         </DialogFooter>
                     </form>

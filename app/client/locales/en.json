@@ -65,7 +65,8 @@
         "today": "Today",
         "all": "All",
         "clear": "Clear",
-        "details": "Details"
+        "details": "Details",
+        "complete": "Complete"
     },
     "sidebar": {
         "overview": "Overview",
@@ -1016,14 +1017,40 @@
         },
         "validation": {
             "nameRequired": "Name is required",
-            "phoneRequired": "Phone number is required",
+            "nameMax": "Name must be at most 100 characters",
+            "phoneRequired": "Valid phone number required",
+            "phoneMin": "Valid phone number required",
             "phoneInvalid": "Invalid phone number",
-            "emailInvalid": "Invalid email address",
-            "partySizeMin": "At least 1 guest required",
-            "partySizeMax": "Maximum 50 guests allowed",
-            "dateRequired": "Date and time required",
+            "emailInvalid": "Valid email required",
+            "partySizeMin": "At least 1 guest",
+            "partySizeMax": "Maximum 50 guests",
+            "dateRequired": "Date is required",
             "durationMin": "Minimum 30 minutes",
-            "durationMax": "Maximum 8 hours"
+            "durationMax": "Maximum 480 minutes",
+            "specialRequestsMax": "Maximum 500 characters"
+        },
+        "dialog": {
+            "createTitle": "Create New Reservation",
+            "createDescription": "Fill in the details to create a new reservation",
+            "customerInformationSection": "Customer Information",
+            "nameLabel": "Name *",
+            "namePlaceholder": "John Doe",
+            "phoneLabel": "Phone *",
+            "phonePlaceholder": "(555) 123-4567",
+            "emailLabel": "Email",
+            "emailPlaceholder": "john@example.com",
+            "reservationDetailsSection": "Reservation Details",
+            "partySizeLabel": "Party Size *",
+            "durationLabel": "Duration (min) *",
+            "dateTimeLabel": "Date & Time *",
+            "availableTablesSection": "Available Tables",
+            "tableNumberLabel": "Table {{number}}",
+            "seatsLabel": "{{count}} seats",
+            "checkingAvailabilityText": "Checking availability...",
+            "specialRequestsLabel": "Special Requests",
+            "specialRequestsPlaceholder": "Any special requests or dietary restrictions...",
+            "cancelButton": "Cancel",
+            "createButton": "Create Reservation"
         },
         "empty": {
             "title": "No reservations found",
