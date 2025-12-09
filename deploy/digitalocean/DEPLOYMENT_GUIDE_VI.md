@@ -21,6 +21,7 @@ Hướng dẫn chi tiết từng bước để deploy Restaurant Management Syst
     - [5.4 Seed Dữ Liệu](#54-seed-dữ-liệu-demo-tùy-chọn)
     - [5.5 Xác Minh Deployment](#55-xác-minh-deployment-thành-công)
   - [Bước 6: Cấu Hình SSL/HTTPS](#bước-6-cấu-hình-sslhttps)
+  - [Bước 7: GitHub Actions Auto Deploy](#bước-7-github-actions-auto-deploy)
 - [Sau Khi Deploy](#sau-khi-deploy)
 - [Troubleshooting](#troubleshooting)
 - [Bảo Trì và Quản Lý](#bảo-trì-và-quản-lý)
@@ -126,10 +127,11 @@ Hướng dẫn chi tiết từng bước để deploy Restaurant Management Syst
 
 **Thời gian:** ~1-2 giờ cho lần đầu
 
-### Tóm Tắt Các Bước
+### Phương Pháp 1: Manual Deploy (Lần Đầu)
 
 ```bash
 # 1. Tạo Droplet trên DigitalOcean (Ubuntu 22.04, 1GB RAM)
+
 # 2. SSH vào server
 ssh root@YOUR_DROPLET_IP
 
@@ -149,12 +151,43 @@ nano .env  # Chỉnh sửa các giá trị
 bash deploy/digitalocean/scripts/deploy.sh
 
 # 7. Cấu hình domain (nếu có) và SSL
-# Chỉnh sửa Caddyfile với domain của bạn
 nano deploy/digitalocean/Caddyfile
 docker-compose restart caddy
 
 # ✅ Xong! Truy cập https://yourdomain.com
 ```
+
+### Phương Pháp 2: Auto Deploy với GitHub Actions (Khuyến Nghị)
+
+**Sau khi setup lần đầu, sử dụng GitHub Actions để auto deploy:**
+
+```bash
+# 1. Cấu hình GitHub Secrets (làm 1 lần)
+# - Vào GitHub repo → Settings → Secrets
+# - Thêm DIGITALOCEAN_SSH_KEY, DIGITALOCEAN_HOST, etc.
+
+# 2. Tạo GitHub Personal Access Token (làm 1 lần)
+# - https://github.com/settings/tokens/new
+# - Token name: VPS GHCR Access
+# - Expiration: No expiration
+# - Scope: read:packages
+
+# 3. VPS login vào GHCR (làm 1 lần)
+ssh root@YOUR_DROPLET_IP
+echo "YOUR_TOKEN" | docker login ghcr.io -u YOUR_USERNAME --password-stdin
+
+# 4. Deploy tự động mỗi khi push code
+git add .
+git commit -m "Update features"
+git push origin main
+# → GitHub Actions tự động build & deploy!
+```
+
+**Lợi ích GitHub Actions:**
+- ✅ Build trên GitHub servers (không tốn tài nguyên VPS)
+- ✅ Deploy nhanh hơn (1-2 phút thay vì 10-15 phút)
+- ✅ Không bị lỗi SSH timeout
+- ✅ Versioning tốt hơn (mỗi commit có image riêng)
 
 **Nếu gặp lỗi hoặc cần hiểu rõ hơn:** Đọc [Hướng Dẫn Chi Tiết](#hướng-dẫn-chi-tiết) bên dưới.
 
@@ -775,6 +808,173 @@ docker-compose -f deploy/digitalocean/docker-compose.nginx.yml up -d
 ```
 
 </details>
+
+---
+
+### Bước 7: GitHub Actions Auto Deploy
+
+#### Tổng Quan
+
+Thay vì build Docker images trên VPS (tốn thời gian và tài nguyên), chúng ta sử dụng **GitHub Actions** để:
+1. Build images trên GitHub servers
+2. Push lên GitHub Container Registry (GHCR)
+3. VPS chỉ cần pull images đã build sẵn
+
+**Lợi ích:**
+- ✅ **Không còn lỗi SSH timeout** khi build lâu
+- ✅ **Deploy nhanh hơn** (VPS chỉ mất 1-2 phút pull image)
+- ✅ **Tiết kiệm tài nguyên VPS** (không tốn CPU/RAM cho build)
+- ✅ **Versioning tốt hơn** (mỗi commit có image tag riêng)
+
+#### 7.1 Cấu Hình GitHub Repository
+
+**1. Enable GitHub Container Registry:**
+
+GHCR được enable tự động cho mọi repo. Không cần setup gì thêm.
+
+**2. Thêm Secrets vào GitHub:**
+
+Vào repository của bạn trên GitHub:
+- Settings → Secrets and variables → Actions → New repository secret
+
+Tạo các secrets sau:
+
+| Secret Name | Value | Ghi Chú |
+|------------|-------|---------|
+| `DIGITALOCEAN_SSH_KEY` | SSH private key | Copy từ `~/.ssh/id_rsa` |
+| `DIGITALOCEAN_HOST` | IP hoặc domain VPS | VD: `157.245.x.x` |
+| `APP_URL` | URL ứng dụng | VD: `https://yourdomain.com` |
+| `NEXT_PUBLIC_API_URL` | API URL cho client | VD: `https://yourdomain.com/api/v1` |
+| `NEXT_PUBLIC_SOCKET_URL` | Socket URL | VD: `https://yourdomain.com` |
+| `NEXT_PUBLIC_STORAGE_URL` | Storage URL | URL của Cloudinary/R2 |
+
+**Lấy SSH private key:**
+```bash
+# Trên máy local
+cat ~/.ssh/id_rsa
+```
+
+Copy toàn bộ nội dung (bao gồm `-----BEGIN` và `-----END`) vào secret `DIGITALOCEAN_SSH_KEY`.
+
+**3. Verify workflow file:**
+
+File `.github/workflows/deploy-digitalocean.yml` đã được cấu hình sẵn. Không cần chỉnh sửa gì.
+
+#### 7.2 Setup VPS để Pull Images từ GHCR
+
+**Tạo GitHub Personal Access Token:**
+
+1. Truy cập: https://github.com/settings/tokens/new
+2. Token name: `VPS GHCR Access`
+3. Expiration: `No expiration` (hoặc 1 year)
+4. Scopes: Chọn **`read:packages`**
+5. Generate token → Copy token
+
+**Login GHCR trên VPS:**
+
+```bash
+# SSH vào VPS
+ssh root@YOUR_DROPLET_IP
+
+# Login vào GHCR
+echo "YOUR_GITHUB_TOKEN" | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
+```
+
+**Verify:**
+```bash
+# Test pull image
+docker pull ghcr.io/YOUR_GITHUB_USERNAME/restaurant-management/server:latest
+```
+
+Nếu thành công → Setup hoàn tất!
+
+#### 7.3 Trigger Deployment
+
+**Automatic Deploy (Push to main):**
+
+```bash
+# Trên máy local, trong project repository
+git add .
+git commit -m "Update application"
+git push origin main
+```
+
+GitHub Actions sẽ tự động:
+1. Build Client & Server images
+2. Push lên GHCR
+3. SSH vào VPS
+4. Pull images mới
+5. Restart services
+6. Health check
+
+**Manual Deploy (Workflow Dispatch):**
+
+Vào GitHub repository:
+1. Actions tab
+2. Chọn "Deploy to DigitalOcean VPS"
+3. Click "Run workflow"
+4. Chọn branch và options
+5. Click "Run workflow"
+
+#### 7.4 Monitor Deployment
+
+**Xem workflow progress:**
+
+GitHub → Actions → Workflow đang chạy
+
+**Check logs trên VPS:**
+
+```bash
+# SSH vào VPS
+ssh root@YOUR_DROPLET_IP
+
+# Xem deploy logs
+tail -f /opt/restaurant-management/logs/deploy_*.log
+
+# Xem container logs
+docker logs -f restaurant_server_prod
+docker logs -f restaurant_client_prod
+```
+
+#### 7.5 Troubleshooting GitHub Actions
+
+**Lỗi: "unauthorized: authentication required"**
+
+VPS chưa login GHCR. Làm lại bước 7.2.
+
+**Lỗi: "Permission denied (publickey)"**
+
+SSH key không đúng. Kiểm tra:
+1. SSH key trong GitHub Secrets đúng format
+2. Key đã được add vào VPS: `cat ~/.ssh/authorized_keys`
+
+**Lỗi: "Health check failed"**
+
+Services không start được. Kiểm tra:
+```bash
+docker ps -a
+docker logs restaurant_server_prod
+```
+
+**Build timeout:**
+
+Image quá lớn. Tối ưu Dockerfile hoặc tăng timeout trong workflow.
+
+#### 7.6 Image Management
+
+**Xem images trên GHCR:**
+
+Truy cập: `https://github.com/YOUR_USERNAME?tab=packages`
+
+**Cleanup old images trên VPS:**
+
+```bash
+# Xóa images cũ (giữ trong 7 ngày)
+docker image prune -a --filter "until=168h"
+
+# Xóa tất cả unused images
+docker image prune -a
+```
 
 ---
 

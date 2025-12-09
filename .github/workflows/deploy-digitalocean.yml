@@ -34,11 +34,20 @@ on:
 env:
   APP_DIR: /opt/restaurant-management
   DEPLOY_USER: root
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  # Job 1: Build và test trước khi deploy
-  build-and-test:
+  # Job 1: Build và push Docker images lên GitHub Container Registry
+  build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    outputs:
+      client_image: ${{ steps.meta-client.outputs.tags }}
+      server_image: ${{ steps.meta-server.outputs.tags }}
     
     steps:
       - name: Checkout code
@@ -47,28 +56,63 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Client image (test)
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Client
+        id: meta-client
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/client
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Client image
         uses: docker/build-push-action@v5
         with:
           context: ./app/client
           file: ./app/client/Dockerfile
-          push: false
+          push: true
+          tags: ${{ steps.meta-client.outputs.tags }}
+          labels: ${{ steps.meta-client.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+            NEXT_PUBLIC_SOCKET_URL=${{ secrets.NEXT_PUBLIC_SOCKET_URL }}
+            NEXT_PUBLIC_STORAGE_URL=${{ secrets.NEXT_PUBLIC_STORAGE_URL }}
 
-      - name: Build Server image (test)
+      - name: Extract metadata for Server
+        id: meta-server
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/server
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Server image
         uses: docker/build-push-action@v5
         with:
           context: ./app/server
           file: ./app/server/Dockerfile
-          push: false
+          push: true
+          tags: ${{ steps.meta-server.outputs.tags }}
+          labels: ${{ steps.meta-server.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
   # Job 2: Deploy lên DigitalOcean
   deploy:
     runs-on: ubuntu-latest
-    needs: build-and-test
+    needs: build-and-push
     environment: ${{ github.event.inputs.environment || 'production' }}
     
     steps:
@@ -86,6 +130,9 @@ jobs:
           ssh-keyscan -H ${{ secrets.DIGITALOCEAN_HOST }} >> ~/.ssh/known_hosts
 
       - name: Create deployment script
+        env:
+          CLIENT_IMAGE: ${{ needs.build-and-push.outputs.client_image }}
+          SERVER_IMAGE: ${{ needs.build-and-push.outputs.server_image }}
         run: |
           cat << 'EOF' > deploy-remote.sh
           #!/bin/bash
@@ -95,27 +142,43 @@ jobs:
           echo "Time: $(date)"
           echo "Branch: $GITHUB_REF_NAME"
           echo "Commit: $GITHUB_SHA"
+          echo "Client Image: $CLIENT_IMAGE"
+          echo "Server Image: $SERVER_IMAGE"
 
           # Navigate to app directory
           cd $APP_DIR
 
-          # Pull latest code
+          # Pull latest code (for docker-compose files and configs)
           echo "=== Pulling latest code ==="
           git fetch origin
           git reset --hard origin/$GITHUB_REF_NAME
 
-          # Build deploy flags
-          DEPLOY_FLAGS=""
+          # Login to GitHub Container Registry
+          echo "=== Logging in to GitHub Container Registry ==="
+          echo "$GITHUB_TOKEN" | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+
+          # Pull pre-built images
+          echo "=== Pulling pre-built Docker images ==="
+          docker pull "$CLIENT_IMAGE" || echo "Warning: Failed to pull client image"
+          docker pull "$SERVER_IMAGE" || echo "Warning: Failed to pull server image"
+
+          # Tag images for docker-compose
+          echo "=== Tagging images ==="
+          docker tag "$CLIENT_IMAGE" ghcr.io/$GITHUB_REPOSITORY/client:latest
+          docker tag "$SERVER_IMAGE" ghcr.io/$GITHUB_REPOSITORY/server:latest
+
+          # Navigate to deploy directory
+          cd deploy
+
+          # Build deploy flags (skip backup if requested, always skip build)
+          DEPLOY_FLAGS="--no-build"
           if [ "$SKIP_BACKUP" = "true" ]; then
             DEPLOY_FLAGS="$DEPLOY_FLAGS --skip-backup"
-          fi
-          if [ "$NO_BUILD" = "true" ]; then
-            DEPLOY_FLAGS="$DEPLOY_FLAGS --no-build"
           fi
 
           # Run deploy script
           echo "=== Running deploy script with flags: $DEPLOY_FLAGS ==="
-          bash deploy/digitalocean/scripts/deploy.sh $DEPLOY_FLAGS
+          bash digitalocean/scripts/deploy.sh $DEPLOY_FLAGS
 
           echo "=== Deployment completed successfully ==="
           EOF
@@ -124,16 +187,24 @@ jobs:
       - name: Deploy to DigitalOcean VPS
         env:
           SKIP_BACKUP: ${{ github.event.inputs.skip_backup || 'false' }}
-          NO_BUILD: ${{ github.event.inputs.no_build || 'false' }}
           GITHUB_REF_NAME: ${{ github.ref_name }}
           GITHUB_SHA: ${{ github.sha }}
+          CLIENT_IMAGE: ${{ needs.build-and-push.outputs.client_image }}
+          SERVER_IMAGE: ${{ needs.build-and-push.outputs.server_image }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
           ssh ${{ env.DEPLOY_USER }}@${{ secrets.DIGITALOCEAN_HOST }} \
             "export APP_DIR='${{ env.APP_DIR }}' && \
              export SKIP_BACKUP='$SKIP_BACKUP' && \
-             export NO_BUILD='$NO_BUILD' && \
              export GITHUB_REF_NAME='$GITHUB_REF_NAME' && \
              export GITHUB_SHA='$GITHUB_SHA' && \
+             export CLIENT_IMAGE='$CLIENT_IMAGE' && \
+             export SERVER_IMAGE='$SERVER_IMAGE' && \
+             export GITHUB_TOKEN='$GITHUB_TOKEN' && \
+             export GITHUB_ACTOR='$GITHUB_ACTOR' && \
+             export GITHUB_REPOSITORY='$GITHUB_REPOSITORY' && \
              bash -s" < deploy-remote.sh
 
       - name: Health Check
