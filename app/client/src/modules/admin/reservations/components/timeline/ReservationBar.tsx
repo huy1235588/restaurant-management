@@ -25,11 +25,9 @@ export function ReservationBar({ reservation, onClick }: ReservationBarProps) {
     const hoverColor = TIMELINE_STATUS_HOVER_COLORS[reservation.status];
 
     // Format display time
+    // Extract time directly from ISO string to avoid timezone conversion
     const startTime = reservation.reservationTime.includes('T')
-        ? new Date(reservation.reservationTime).toLocaleTimeString('vi-VN', {
-              hour: '2-digit',
-              minute: '2-digit',
-          })
+        ? reservation.reservationTime.substring(11, 16) // Extract HH:mm from "1970-01-01T16:00:00.000Z"
         : reservation.reservationTime.substring(0, 5);
 
     // Truncate name if bar is too small
