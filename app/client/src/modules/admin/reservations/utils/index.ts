@@ -49,29 +49,33 @@ export function canCancelReservation(status: ReservationStatus): boolean {
 
 /**
  * Combine date and time strings from backend into a single Date object
- * Interprets both date and time in local timezone (APP_TIMEZONE)
+ * The backend stores time as UTC (e.g., "1970-01-01T21:00:00.000Z" means 21:00)
+ * We need to extract the TIME component as-is (ignoring timezone) and combine with the date
  * 
- * @param dateStr - Date in "YYYY-MM-DD" or ISO format
- * @param timeStr - Time in "HH:mm:ss" or ISO format
- * @returns Date object in local timezone
+ * @param dateStr - Date in "YYYY-MM-DD" or ISO format (e.g., "2025-12-09T00:00:00.000Z")
+ * @param timeStr - Time in "HH:mm:ss" or ISO format (e.g., "1970-01-01T21:00:00.000Z")
+ * @returns Date object representing the reservation datetime in local timezone
  */
 export function combineDateTime(dateStr: string, timeStr: string): Date {
-    // Extract date part
+    // Extract date part (YYYY-MM-DD)
     let datePart = dateStr;
     if (dateStr.includes('T')) {
         datePart = dateStr.split('T')[0];
     }
     
-    // Extract time part
+    // Extract time part from the ISO string
+    // The time is stored as UTC but represents the actual reservation time
+    // e.g., "1970-01-01T21:00:00.000Z" means 21:00 (9 PM)
     let timePart: string;
     if (timeStr.includes('T')) {
-        // If it's an ISO timestamp, extract HH:mm:ss
-        // Use local timezone extraction instead of UTC
-        const timeDate = new Date(timeStr);
-        const hours = timeDate.getHours().toString().padStart(2, '0');
-        const minutes = timeDate.getMinutes().toString().padStart(2, '0');
-        const seconds = timeDate.getSeconds().toString().padStart(2, '0');
-        timePart = `${hours}:${minutes}:${seconds}`;
+        // Extract HH:mm:ss from ISO format directly (between T and . or Z)
+        const timeMatch = timeStr.match(/T(\d{2}:\d{2}:\d{2})/);
+        if (timeMatch) {
+            timePart = timeMatch[1];
+        } else {
+            // Fallback: extract time portion after T
+            timePart = timeStr.split('T')[1]?.split('.')[0]?.split('Z')[0] || '00:00:00';
+        }
     } else {
         timePart = timeStr;
     }
