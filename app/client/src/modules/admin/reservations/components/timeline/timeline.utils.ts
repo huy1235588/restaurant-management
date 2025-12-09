@@ -8,15 +8,25 @@ import { Reservation } from '../../types';
 
 /**
  * Convert time string to minutes from midnight
- * @param timeStr - Time in format "HH:mm:ss" or "HH:mm"
+ * @param timeStr - Time in format "HH:mm:ss" or "HH:mm" or ISO timestamp "YYYY-MM-DDTHH:mm:ss.sssZ"
+ * 
+ * IMPORTANT: For ISO timestamps, we extract HH:mm directly from the string
+ * to avoid timezone conversion issues. The server sends "1970-01-01T16:00:00.000Z"
+ * where the actual time is in the HH:mm part, not subject to Date() parsing.
  */
 export function timeToMinutes(timeStr: string): number {
-    // Handle ISO timestamp format
+    // Handle ISO timestamp format - extract HH:mm directly from string
+    // This avoids timezone conversion that happens with new Date().getHours()
     if (timeStr.includes('T')) {
-        const date = new Date(timeStr);
-        return date.getHours() * 60 + date.getMinutes();
+        const timeMatch = timeStr.match(/T(\d{2}):(\d{2})/);
+        if (timeMatch) {
+            const hours = parseInt(timeMatch[1], 10);
+            const minutes = parseInt(timeMatch[2], 10);
+            return hours * 60 + minutes;
+        }
     }
     
+    // Handle HH:mm:ss or HH:mm format
     const parts = timeStr.split(':');
     const hours = parseInt(parts[0], 10);
     const minutes = parseInt(parts[1], 10) || 0;
