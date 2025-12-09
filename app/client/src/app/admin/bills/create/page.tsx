@@ -159,7 +159,7 @@ export default function CreateBillPage() {
                                 <p className="font-medium">{order.orderItems?.length || 0}</p>
                             </div>
                             <div>
-                                <p className="text-muted-foreground">{t('billing.status', 'Trạng thái')}</p>
+                                <p className="text-muted-foreground">{t('billing.statusLabel', 'Trạng thái')}</p>
                                 <p className="font-medium capitalize">{order.status}</p>
                             </div>
                         </div>
