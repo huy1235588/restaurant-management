@@ -72,12 +72,18 @@ export class BankConfigDto {
     @MaxLength(30)
     accountNo: string;
 
-    @ApiProperty({ example: 'NGUYEN VAN A', description: 'Account holder name' })
+    @ApiProperty({
+        example: 'NGUYEN VAN A',
+        description: 'Account holder name',
+    })
     @IsString()
     @MaxLength(100)
     accountName: string;
 
-    @ApiPropertyOptional({ example: 'compact2', description: 'VietQR template' })
+    @ApiPropertyOptional({
+        example: 'compact2',
+        description: 'VietQR template',
+    })
     @IsOptional()
     @IsString()
     @MaxLength(20)
@@ -180,7 +186,10 @@ export class UpdateRestaurantSettingsDto {
     @Type(() => HighlightDto)
     highlights?: HighlightDto[];
 
-    @ApiPropertyOptional({ type: BankConfigDto, description: 'Bank configuration for QR payment' })
+    @ApiPropertyOptional({
+        type: BankConfigDto,
+        description: 'Bank configuration for QR payment',
+    })
     @IsOptional()
     @ValidateNested()
     @Type(() => BankConfigDto)

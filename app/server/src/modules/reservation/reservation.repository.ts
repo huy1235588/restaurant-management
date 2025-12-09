@@ -1,10 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/database/prisma.service';
-import {
-    Prisma,
-    Reservation,
-    ReservationStatus,
-} from '@/lib/prisma';
+import { Prisma, Reservation, ReservationStatus } from '@/lib/prisma';
 
 export interface ReservationFilters {
     status?: ReservationStatus;

@@ -32,7 +32,9 @@ export class KitchenController {
     @Get('orders')
     @UseGuards(RolesGuard)
     @Roles('admin', 'manager', 'chef', 'waiter')
-    @ApiOperation({ summary: 'Get all kitchen orders (admin/manager/chef/waiter only)' })
+    @ApiOperation({
+        summary: 'Get all kitchen orders (admin/manager/chef/waiter only)',
+    })
     @ApiQuery({
         name: 'status',
         required: false,
@@ -60,7 +62,9 @@ export class KitchenController {
     @Get('orders/:id')
     @UseGuards(RolesGuard)
     @Roles('admin', 'manager', 'chef', 'waiter')
-    @ApiOperation({ summary: 'Get kitchen order by ID (admin/manager/chef/waiter only)' })
+    @ApiOperation({
+        summary: 'Get kitchen order by ID (admin/manager/chef/waiter only)',
+    })
     @ApiParam({ name: 'id', description: 'Kitchen order ID' })
     @ApiResponse({
         status: 200,
@@ -75,11 +79,16 @@ export class KitchenController {
     @Patch('orders/:id/start')
     @UseGuards(RolesGuard)
     @Roles('admin', 'manager', 'chef')
-    @ApiOperation({ summary: 'Start preparing order (admin/manager/chef only)' })
+    @ApiOperation({
+        summary: 'Start preparing order (admin/manager/chef only)',
+    })
     @ApiParam({ name: 'id', description: 'Kitchen order ID' })
     @ApiResponse({ status: 200, description: 'Order preparation started' })
     @ApiResponse({ status: 400, description: 'Bad request' })
-    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager/Chef only' })
+    @ApiResponse({
+        status: 403,
+        description: 'Forbidden - Admin/Manager/Chef only',
+    })
     @ApiResponse({ status: 404, description: 'Kitchen order not found' })
     async startPreparing(
         @Param('id', ParseIntPipe) id: number,
@@ -92,11 +101,16 @@ export class KitchenController {
     @Patch('orders/:id/complete')
     @UseGuards(RolesGuard)
     @Roles('admin', 'manager', 'chef')
-    @ApiOperation({ summary: 'Complete kitchen order (admin/manager/chef only)' })
+    @ApiOperation({
+        summary: 'Complete kitchen order (admin/manager/chef only)',
+    })
     @ApiParam({ name: 'id', description: 'Kitchen order ID' })
     @ApiResponse({ status: 200, description: 'Order completed' })
     @ApiResponse({ status: 400, description: 'Bad request' })
-    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager/Chef only' })
+    @ApiResponse({
+        status: 403,
+        description: 'Forbidden - Admin/Manager/Chef only',
+    })
     @ApiResponse({ status: 404, description: 'Kitchen order not found' })
     async completeOrder(@Param('id', ParseIntPipe) id: number) {
         return this.kitchenService.completeOrder(id);
@@ -109,7 +123,10 @@ export class KitchenController {
     @ApiParam({ name: 'id', description: 'Kitchen order ID' })
     @ApiResponse({ status: 200, description: 'Order cancelled' })
     @ApiResponse({ status: 400, description: 'Bad request' })
-    @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager/Chef only' })
+    @ApiResponse({
+        status: 403,
+        description: 'Forbidden - Admin/Manager/Chef only',
+    })
     @ApiResponse({ status: 404, description: 'Kitchen order not found' })
     async cancelOrder(@Param('id', ParseIntPipe) id: number) {
         return this.kitchenService.cancelKitchenOrder(id);

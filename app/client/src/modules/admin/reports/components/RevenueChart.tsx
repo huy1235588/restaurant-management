@@ -81,17 +81,17 @@ export function RevenueChart({ data, loading = false, title }: RevenueChartProps
                             <XAxis
                                 dataKey="displayDate"
                                 className="text-xs"
-                                // tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                                tick={{ fill: 'var(--muted-foreground)' }}
                             />
                             <YAxis
                                 tickFormatter={formatCurrency}
                                 className="text-xs"
-                                // tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                                tick={{ fill: 'var(--muted-foreground)' }}
                             />
                             <Tooltip
                                 contentStyle={{
-                                    backgroundColor: 'hsl(var(--card))',
-                                    border: '1px solid hsl(var(--border))',
+                                    backgroundColor: 'var(--card)',
+                                    border: '1px solid var(--border)',
                                     borderRadius: '8px',
                                 }}
                                 formatter={(value: number) => [
@@ -108,10 +108,20 @@ export function RevenueChart({ data, loading = false, title }: RevenueChartProps
                                 type="monotone"
                                 dataKey="revenue"
                                 name={t('reports.revenue')}
-                                stroke="hsl(var(--primary))"
+                                stroke="var(--primary)"
                                 strokeWidth={2}
-                                dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2 }}
-                                activeDot={{ r: 6 }}
+                                dot={{ 
+                                    fill: 'var(--card)', 
+                                    stroke: 'var(--primary)',
+                                    strokeWidth: 2,
+                                    r: 4
+                                }}
+                                activeDot={{ 
+                                    r: 6,
+                                    fill: 'var(--primary)',
+                                    stroke: 'var(--card)',
+                                    strokeWidth: 3
+                                }}
                             />
                         </LineChart>
                     </ResponsiveContainer>

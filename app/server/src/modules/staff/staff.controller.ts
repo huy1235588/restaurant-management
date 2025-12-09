@@ -37,7 +37,9 @@ export class StaffController {
     @Get()
     @UseGuards(RolesGuard)
     @Roles('admin', 'manager')
-    @ApiOperation({ summary: 'Get all staff with pagination (admin/manager only)' })
+    @ApiOperation({
+        summary: 'Get all staff with pagination (admin/manager only)',
+    })
     @ApiQuery({ name: 'page', required: false, type: Number })
     @ApiQuery({ name: 'limit', required: false, type: Number })
     @ApiQuery({ name: 'role', required: false, enum: Role })
@@ -84,7 +86,9 @@ export class StaffController {
     @Get('available-accounts')
     @UseGuards(RolesGuard)
     @Roles('admin', 'manager')
-    @ApiOperation({ summary: 'Get accounts without staff profile (admin/manager only)' })
+    @ApiOperation({
+        summary: 'Get accounts without staff profile (admin/manager only)',
+    })
     @ApiResponse({
         status: 200,
         description: 'Available accounts retrieved successfully',

@@ -68,22 +68,30 @@ export function CheckInDialog({
                         <DialogHeader>
                             <div className="flex items-center gap-2">
                                 <UserCheck className="w-5 h-5 text-green-600 dark:text-green-400" />
-                                <DialogTitle>Check In Guest</DialogTitle>
+                                <DialogTitle>{t('reservations.dialogs.checkInTitle')}</DialogTitle>
                             </div>
                             <DialogDescription>
-                                Check in {reservation.customer?.name} for reservation{' '}
-                                {reservation.reservationCode}
+                                {t('reservations.dialogs.checkInDesc', {
+                                    name: reservation.customer?.name,
+                                    code: reservation.reservationCode,
+                                })}
                             </DialogDescription>
                         </DialogHeader>
 
                         <div className="py-4 space-y-3">
                             <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded-lg space-y-2">
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-gray-600 dark:text-gray-400">Party Size:</span>
-                                    <span className="font-medium">{reservation.partySize} guests</span>
+                                    <span className="text-gray-600 dark:text-gray-400">
+                                        {t('reservations.partySize')}:
+                                    </span>
+                                    <span className="font-medium">
+                                        {reservation.partySize} {t('reservations.guests')}
+                                    </span>
                                 </div>
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-gray-600 dark:text-gray-400">Time:</span>
+                                    <span className="text-gray-600 dark:text-gray-400">
+                                        {t('reservations.reservationTime')}:
+                                    </span>
                                     <span className="font-medium">
                                         {formatReservationDateTime(
                                             reservation.reservationDate,
@@ -94,16 +102,17 @@ export function CheckInDialog({
                                 </div>
                                 {reservation.table && (
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-gray-600 dark:text-gray-400">Table:</span>
+                                        <span className="text-gray-600 dark:text-gray-400">
+                                            {t('reservations.table')}:
+                                        </span>
                                         <span className="font-medium">
-                                            Table {reservation.table.tableNumber}
+                                            {t('reservations.table')} {reservation.table.tableNumber}
                                         </span>
                                     </div>
                                 )}
                             </div>
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                                The table will be marked as occupied and an order will be
-                                created.
+                                {t('reservations.dialogs.checkInMessage')}
                             </p>
                         </div>
 
@@ -114,11 +123,11 @@ export function CheckInDialog({
                                 onClick={handleClose}
                                 disabled={loading}
                             >
-                                Cancel
+                                {t('common.cancel')}
                             </Button>
                             <Button onClick={handleCheckIn} disabled={loading}>
                                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Check In
+                                {t('reservations.checkIn')}
                             </Button>
                         </DialogFooter>
                     </>
@@ -127,46 +136,52 @@ export function CheckInDialog({
                         <DialogHeader>
                             <div className="flex items-center gap-2">
                                 <Receipt className="w-5 h-5 text-green-600 dark:text-green-400" />
-                                <DialogTitle>Guest Checked In</DialogTitle>
+                                <DialogTitle>{t('reservations.dialogs.guestCheckedIn')}</DialogTitle>
                             </div>
                             <DialogDescription>
-                                Order created successfully
+                                {t('reservations.dialogs.orderCreatedSuccessfully')}
                             </DialogDescription>
                         </DialogHeader>
 
                         <div className="py-4 space-y-3">
                             <div className="bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-800 p-4 rounded-lg space-y-2">
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-gray-600 dark:text-gray-400">Reservation:</span>
+                                    <span className="text-gray-600 dark:text-gray-400">
+                                        {t('reservations.reservationCode')}:
+                                    </span>
                                     <span className="font-medium">
                                         {result.reservation.reservationCode}
                                     </span>
                                 </div>
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-gray-600 dark:text-gray-400">Order Number:</span>
+                                    <span className="text-gray-600 dark:text-gray-400">
+                                        {t('reservations.dialogs.orderNumber')}:
+                                    </span>
                                     <span className="font-semibold text-green-700 dark:text-green-300">
                                         {result.order.orderNumber}
                                     </span>
                                 </div>
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-gray-600 dark:text-gray-400">Table:</span>
+                                    <span className="text-gray-600 dark:text-gray-400">
+                                        {t('reservations.table')}:
+                                    </span>
                                     <span className="font-medium">
                                         {result.reservation.table?.tableNumber}
                                     </span>
                                 </div>
                             </div>
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                                You can now add items to the order.
+                                {t('reservations.dialogs.addItemsMessage')}
                             </p>
                         </div>
 
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={handleClose}>
-                                Close
+                                {t('common.close')}
                             </Button>
                             <Button onClick={handleViewOrder}>
                                 <Receipt className="mr-2 h-4 w-4" />
-                                View Order
+                                {t('reservations.dialogs.viewOrder')}
                             </Button>
                         </DialogFooter>
                     </>

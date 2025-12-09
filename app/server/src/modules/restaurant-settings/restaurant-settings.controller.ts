@@ -22,9 +22,7 @@ import { RolesGuard } from '@/common/guards/roles.guard';
 @ApiTags('restaurant-settings')
 @Controller('restaurant-settings')
 export class RestaurantSettingsController {
-    constructor(
-        private readonly settingsService: RestaurantSettingsService,
-    ) {}
+    constructor(private readonly settingsService: RestaurantSettingsService) {}
 
     @Get()
     @Public()
@@ -46,7 +44,9 @@ export class RestaurantSettingsController {
     @Roles('admin', 'manager')
     @HttpCode(HttpStatus.OK)
     @ApiBearerAuth()
-    @ApiOperation({ summary: 'Update restaurant settings (admin/manager only)' })
+    @ApiOperation({
+        summary: 'Update restaurant settings (admin/manager only)',
+    })
     @ApiResponse({
         status: 200,
         description: 'Restaurant settings updated successfully',

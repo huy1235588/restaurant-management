@@ -894,6 +894,7 @@
             "orderCreatedSuccessfully": "Order created successfully",
             "orderNumber": "Order Number",
             "viewOrder": "View Order",
+            "addItemsMessage": "You can now add items to the order.",
             "completeTitle": "Complete Reservation",
             "completeDesc": "Mark reservation {{code}} as completed",
             "completeMessage": "This will mark the reservation as completed and free up the table.",

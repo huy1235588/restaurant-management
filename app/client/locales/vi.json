@@ -894,6 +894,7 @@
             "orderCreatedSuccessfully": "Tạo đơn hàng thành công",
             "orderNumber": "Số Đơn Hàng",
             "viewOrder": "Xem Đơn Hàng",
+            "addItemsMessage": "Bạn có thể thêm món vào đơn hàng ngay bây giờ.",
             "completeTitle": "Hoàn thành đặt bàn",
             "completeDesc": "Đánh dấu đặt bàn {{code}} là hoàn thành",
             "completeMessage": "Việc này sẽ đánh dấu đặt bàn là hoàn thành và giải phóng bàn.",

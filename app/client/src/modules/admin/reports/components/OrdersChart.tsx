@@ -72,17 +72,17 @@ export function OrdersChart({
                             <XAxis
                                 dataKey="displayLabel"
                                 className="text-xs"
-                                // tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                                tick={{ fill: 'var(--muted-foreground)' }}
                                 interval={groupBy === 'hour' ? 2 : 0}
                             />
                             <YAxis
                                 className="text-xs"
-                                // tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                                tick={{ fill: 'var(--muted-foreground)' }}
                             />
                             <Tooltip
                                 contentStyle={{
-                                    backgroundColor: 'hsl(var(--card))',
-                                    border: '1px solid hsl(var(--border))',
+                                    backgroundColor: 'var(--card)',
+                                    border: '1px solid var(--border)',
                                     borderRadius: '8px',
                                 }}
                                 formatter={(value: number, name: string) => {
@@ -101,7 +101,7 @@ export function OrdersChart({
                             <Bar
                                 dataKey="count"
                                 name="count"
-                                fill="hsl(var(--primary))"
+                                fill="var(--primary)"
                                 radius={[4, 4, 0, 0]}
                             />
                         </BarChart>
