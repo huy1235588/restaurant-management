@@ -427,14 +427,13 @@ export class ReservationService {
         }
 
         // Check if reservation time has passed grace period
-        // Use DateTimeService to properly extract date and time in local timezone
-        const reservationDate = this.dateTimeService.extractDateString(
-            reservation.reservationDate,
-        );
-        const reservationTime = this.dateTimeService.extractTimeString(
-            reservation.reservationTime,
-        );
-        if (ReservationHelper.isExpired(reservationDate, reservationTime)) {
+        // Use Date object directly to avoid timezone ambiguity
+        if (
+            ReservationHelper.isExpiredDate(
+                reservation.reservationDate,
+                reservation.reservationTime,
+            )
+        ) {
             throw new ReservationExpiredException(reservation.reservationCode);
         }
 

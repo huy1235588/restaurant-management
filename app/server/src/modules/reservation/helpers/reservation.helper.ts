@@ -384,6 +384,51 @@ export class ReservationHelper {
     }
 
     /**
+     * Check if reservation has expired using Date objects
+     * This method handles timezone conversion properly
+     *
+     * @param reservationDate - Date object from database (reservationDate)
+     * @param reservationTime - Date object from database (reservationTime in UTC)
+     * @returns true if reservation has expired (passed grace period)
+     */
+    static isExpiredDate(
+        reservationDate: Date,
+        reservationTime: Date,
+    ): boolean {
+        // Extract date string from reservation date in local timezone
+        const datePart = reservationDate.toLocaleDateString('en-CA', {
+            timeZone: DEFAULT_TIMEZONE,
+        }); // Format: YYYY-MM-DD
+
+        // Extract time from reservation time (which is stored as 1970-01-01T16:00:00.000Z in UTC)
+        // When we extract with local timezone, it converts properly
+        const hours = reservationTime.getUTCHours(); // Use UTC hours since stored in UTC
+        const minutes = reservationTime.getUTCMinutes();
+        let reservationMinutes = hours * 60 + minutes;
+
+        // Add grace period
+        reservationMinutes += RESERVATION_CONSTANTS.GRACE_PERIOD_MINUTES;
+
+        // Get current date/time in local timezone
+        const currentDateStr = this.getCurrentDateString();
+        const currentTimeMinutes = this.getCurrentTimeMinutes();
+
+        // Compare dates first
+        if (datePart > currentDateStr) {
+            // Reservation is on a future date - not expired
+            return false;
+        }
+
+        if (datePart < currentDateStr) {
+            // Reservation is on a past date - expired
+            return true;
+        }
+
+        // Same day - compare times (including grace period)
+        return currentTimeMinutes > reservationMinutes;
+    }
+
+    /**
      * Check if within grace period
      * Uses local timezone for accurate comparison
      */
