@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+
 import {
     AlertDialog,
     AlertDialogAction,
@@ -23,12 +23,9 @@ import { ArrowLeft, Edit, Trash2, Copy, Package } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import {
     useMenuItem,
-    useUpdateMenuItem,
     useDeleteMenuItem,
-    MenuItemForm,
-    useMenuItemHandlers,
 } from '@/modules/admin/menu';
-import { useCategories } from '@/modules/admin/categories';
+
 import {
     formatPrice,
     formatMargin,
@@ -50,46 +47,21 @@ export default function MenuItemDetailPage({
     const { t } = useTranslation();
     const itemId = parseInt(id);
 
-    const { menuItem, loading, error, refetch } = useMenuItem(itemId);
-    const { updateMenuItem, loading: updating } = useUpdateMenuItem();
+    const { menuItem, loading, error } = useMenuItem(itemId);
     const { deleteMenuItem, loading: deleting } = useDeleteMenuItem();
-    const { categories } = useCategories({ isActive: true });
 
-    const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
     // Menu item handlers
-    const { handleUpdate, handleDelete: handleDeleteItem } = useMenuItemHandlers({
-        onUpdateMenuItem: async (id, data) => {
-            await updateMenuItem(id, data);
-        },
-        onDeleteMenuItem: async (id) => {
-            await deleteMenuItem(id);
-        },
-        onUpdateSuccess: () => {
-            setEditDialogOpen(false);
-            refetch();
-        },
-        onDeleteSuccess: () => {
-            router.push('/admin/menu');
-        },
-    });
-
-    const handleUpdateFormSubmit = async (data: any, imageFile?: File | null) => {
-        try {
-            await handleUpdate(itemId, menuItem!, data, imageFile);
-        } catch (error) {
-            // Error already handled in hook
-        }
-    };
-
     const handleDeleteConfirm = async () => {
         if (!menuItem) return;
 
         try {
-            await handleDeleteItem(itemId, menuItem);
-        } catch (error) {
-            // Error already handled in hook
+            await deleteMenuItem(itemId);
+            toast.success(t('menu.messages.deleteSuccess'));
+            router.push('/admin/menu');
+        } catch (error: any) {
+            toast.error(error.message || t('menu.messages.deleteError'));
         }
     };
 
@@ -155,7 +127,7 @@ export default function MenuItemDetailPage({
                     </div>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => setEditDialogOpen(true)}>
+                    <Button variant="outline" onClick={() => router.push(`/admin/menu/${itemId}/edit`)}>
                         <Edit className="w-4 h-4 mr-2" />
                         {t('menu.edit')}
                     </Button>
@@ -307,22 +279,6 @@ export default function MenuItemDetailPage({
                     </Card>
                 </div>
             </div>
-
-            {/* Edit Dialog */}
-            <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-                <DialogContent className="sm:max-w-6xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle>{t('menu.editMenuItem')}</DialogTitle>
-                    </DialogHeader>
-                    <MenuItemForm
-                        menuItem={menuItem}
-                        categories={categories}
-                        onSubmit={handleUpdateFormSubmit}
-                        onCancel={() => setEditDialogOpen(false)}
-                        loading={updating}
-                    />
-                </DialogContent>
-            </Dialog>
 
             {/* Delete Dialog */}
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

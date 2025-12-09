@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { MenuItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -22,18 +21,14 @@ import {
     ViewMode,
     MenuFilters,
     MenuItemList,
-    MenuItemForm,
     MenuItemFilters,
     MenuSearch,
     MenuStatistics,
     ViewModeSwitcher,
     useMenuItems,
     useMenuItemCount,
-    useCreateMenuItem,
-    useUpdateMenuItem,
     useDeleteMenuItem,
     useUpdateAvailability,
-    useMenuItemHandlers,
 } from '@/modules/admin/menu';
 import { useCategories } from '@/modules/admin/categories';
 import {
@@ -77,11 +72,8 @@ export default function MenuPage() {
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
     // Dialogs state
-    const [createDialogOpen, setCreateDialogOpen] = useState(false);
-    const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(null);
-    const [duplicateMode, setDuplicateMode] = useState(false);
     const [isInitialized, setIsInitialized] = useState(false);
 
     // Data fetching
@@ -100,8 +92,6 @@ export default function MenuPage() {
     const { count: outOfStockCount } = useMenuItemCount({ isAvailable: false });
 
     // Mutations
-    const { createMenuItem, loading: creating } = useCreateMenuItem();
-    const { updateMenuItem, loading: updating } = useUpdateMenuItem();
     const { deleteMenuItem, loading: deleting } = useDeleteMenuItem();
     const { updateAvailability } = useUpdateAvailability();
 
@@ -141,20 +131,12 @@ export default function MenuPage() {
             setIsInitialized(true);
         }
 
-        // Handle edit/duplicate from URL
+        // Handle edit/duplicate from URL - now handled by routing
         if (editId) {
-            const item = menuItems.find((m) => m.itemId === Number(editId));
-            if (item) {
-                setSelectedMenuItem(item);
-                setEditDialogOpen(true);
-            }
+            router.push(`/admin/menu/${editId}/edit`);
         } else if (duplicateId) {
-            const item = menuItems.find((m) => m.itemId === Number(duplicateId));
-            if (item) {
-                setSelectedMenuItem(item);
-                setDuplicateMode(true);
-                setCreateDialogOpen(true);
-            }
+            // TODO: Implement duplicate functionality in new page
+            // router.push(`/admin/menu/new?duplicate=${duplicateId}`);
         }
     }, [searchParams]);
 
@@ -191,66 +173,22 @@ export default function MenuPage() {
     }, [viewMode]);
 
     // Menu item handlers
-    const { handleCreate, handleUpdate, handleDelete: handleDeleteItem } = useMenuItemHandlers({
-        onCreateMenuItem: async (data) => {
-            await createMenuItem(data);
-        },
-        onUpdateMenuItem: async (itemId, data) => {
-            await updateMenuItem(itemId, data);
-        },
-        onDeleteMenuItem: async (itemId) => {
-            await deleteMenuItem(itemId);
-        },
-        onCreateSuccess: () => {
-            setCreateDialogOpen(false);
-            setDuplicateMode(false);
-            setSelectedMenuItem(null);
-            refetch();
-        },
-        onUpdateSuccess: () => {
-            setEditDialogOpen(false);
-            setSelectedMenuItem(null);
-            refetch();
-        },
-        onDeleteSuccess: () => {
-            setDeleteDialogOpen(false);
-            setSelectedMenuItem(null);
-            refetch();
-        },
-    });
-
-    // Wrapper for form submissions
-    const handleCreateFormSubmit = async (data: any, imageFile?: File | null) => {
-        try {
-            await handleCreate(data, imageFile);
-        } catch (error) {
-            // Error already handled in hook
-        }
-    };
-
-    const handleUpdateFormSubmit = async (data: any, imageFile?: File | null) => {
-        if (!selectedMenuItem) return;
-
-        try {
-            await handleUpdate(selectedMenuItem.itemId, selectedMenuItem, data, imageFile);
-        } catch (error) {
-            // Error already handled in hook
-        }
-    };
-
     const handleDeleteConfirm = async () => {
         if (!selectedMenuItem) return;
 
         try {
-            await handleDeleteItem(selectedMenuItem.itemId, selectedMenuItem);
-        } catch (error) {
-            // Error already handled in hook
+            await deleteMenuItem(selectedMenuItem.itemId);
+            toast.success(t('menu.messages.deleteSuccess'));
+            setDeleteDialogOpen(false);
+            setSelectedMenuItem(null);
+            refetch();
+        } catch (error: any) {
+            toast.error(error.message || t('menu.messages.deleteError'));
         }
     };
 
     const handleEdit = (item: MenuItem) => {
-        setSelectedMenuItem(item);
-        setEditDialogOpen(true);
+        router.push(`/admin/menu/${item.itemId}/edit`);
     };
 
     const handleDeleteClick = (item: MenuItem) => {
@@ -259,9 +197,8 @@ export default function MenuPage() {
     };
 
     const handleDuplicate = (item: MenuItem) => {
-        setSelectedMenuItem(item);
-        setDuplicateMode(true);
-        setCreateDialogOpen(true);
+        // TODO: Implement duplicate in new page
+        router.push(`/admin/menu/new?duplicate=${item.itemId}`);
     };
 
     const handleViewDetails = (item: MenuItem) => {
@@ -306,7 +243,7 @@ export default function MenuPage() {
                 </div>
                 <div className="flex gap-2">
                     {canCreate && (
-                        <Button onClick={() => setCreateDialogOpen(true)}>
+                        <Button onClick={() => router.push('/admin/menu/new')}>
                             <Plus className="w-4 h-4 mr-2" />
                             {t('menu.addMenuItem')}
                         </Button>
@@ -438,61 +375,7 @@ export default function MenuPage() {
                 </div>
             )}
 
-            {/* Create/Duplicate Dialog */}
-            <Dialog
-                open={createDialogOpen}
-                onOpenChange={(open) => {
-                    setCreateDialogOpen(open);
-                    if (!open) {
-                        setDuplicateMode(false);
-                        setSelectedMenuItem(null);
-                    }
-                }}
-            >
-                <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle>
-                            {duplicateMode ? t('menu.duplicateMenuItem') : t('menu.createNewMenuItem')}
-                        </DialogTitle>
-                    </DialogHeader>
-                    <MenuItemForm
-                        menuItem={duplicateMode ? { ...selectedMenuItem!, itemCode: '' } : null}
-                        categories={categories}
-                        onSubmit={handleCreateFormSubmit}
-                        onCancel={() => {
-                            setCreateDialogOpen(false);
-                            setDuplicateMode(false);
-                            setSelectedMenuItem(null);
-                        }}
-                        loading={creating}
-                    />
-                </DialogContent>
-            </Dialog>
 
-            {/* Edit Dialog */}
-            <Dialog
-                open={editDialogOpen}
-                onOpenChange={(open) => {
-                    setEditDialogOpen(open);
-                    if (!open) setSelectedMenuItem(null);
-                }}
-            >
-                <DialogContent className="sm:max-w-6xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle>{t('menu.editMenuItem')}</DialogTitle>
-                    </DialogHeader>
-                    <MenuItemForm
-                        menuItem={selectedMenuItem}
-                        categories={categories}
-                        onSubmit={handleUpdateFormSubmit}
-                        onCancel={() => {
-                            setEditDialogOpen(false);
-                            setSelectedMenuItem(null);
-                        }}
-                        loading={updating}
-                    />
-                </DialogContent>
-            </Dialog>
 
             {/* Delete Dialog */}
             <AlertDialog
