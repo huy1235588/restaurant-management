@@ -10,7 +10,7 @@ const DEFAULT_TIMEZONE = process.env['TZ'] || 'Asia/Ho_Chi_Minh';
 /**
  * Reservation Module Helper Functions
  * Contains reusable business logic and utility functions
- * 
+ *
  * IMPORTANT: All date/time operations use local timezone (Asia/Ho_Chi_Minh by default)
  */
 
@@ -18,7 +18,7 @@ export class ReservationHelper {
     /**
      * Combine date and time strings into a Date object
      * Both date and time are interpreted in local timezone
-     * 
+     *
      * @param date - Date string in YYYY-MM-DD format
      * @param time - Time string in HH:mm or HH:mm:ss format
      * @returns Date object in local timezone
@@ -29,29 +29,33 @@ export class ReservationHelper {
         if (date.includes('T')) {
             datePart = date.split('T')[0];
         }
-        
+
         // Validate date format
         if (!/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
-            throw new Error(`Invalid date format: ${date}. Expected YYYY-MM-DD`);
+            throw new Error(
+                `Invalid date format: ${date}. Expected YYYY-MM-DD`,
+            );
         }
-        
+
         // Validate and normalize time format
-        let timePart = time;
+        const timePart = time;
         if (!/^\d{2}:\d{2}(:\d{2})?$/.test(time)) {
-            throw new Error(`Invalid time format: ${time}. Expected HH:mm or HH:mm:ss`);
+            throw new Error(
+                `Invalid time format: ${time}. Expected HH:mm or HH:mm:ss`,
+            );
         }
-        
+
         // Parse date and time parts
         const [year, month, day] = datePart.split('-').map(Number);
         const timeParts = timePart.split(':').map(Number);
         const hours = timeParts[0];
         const minutes = timeParts[1];
         const seconds = timeParts[2] || 0;
-        
+
         // Create date in local timezone
         // Using new Date(year, month-1, day, hours, minutes, seconds) creates in local timezone
         const result = new Date(year, month - 1, day, hours, minutes, seconds);
-        
+
         return result;
     }
 
@@ -60,8 +64,8 @@ export class ReservationHelper {
      * Uses local timezone
      */
     static extractDateString(date: Date): string {
-        return date.toLocaleDateString('en-CA', { 
-            timeZone: DEFAULT_TIMEZONE 
+        return date.toLocaleDateString('en-CA', {
+            timeZone: DEFAULT_TIMEZONE,
         }); // Format: YYYY-MM-DD
     }
 

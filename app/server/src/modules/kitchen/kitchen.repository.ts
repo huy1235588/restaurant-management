@@ -1,10 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/database/prisma.service';
-import {
-    Prisma,
-    KitchenOrder,
-    KitchenOrderStatus,
-} from '@/lib/prisma';
+import { Prisma, KitchenOrder, KitchenOrderStatus } from '@/lib/prisma';
 import { KitchenQueryHelper } from './helpers/kitchen-query.helper';
 
 export interface KitchenOrderFilters {

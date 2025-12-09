@@ -242,7 +242,9 @@ export class ReservationService {
             email: dto.email,
             customer: { connect: { customerId: customer.customerId } },
             table: { connect: { tableId } },
-            reservationDate: this.dateTimeService.parseLocalDate(dto.reservationDate),
+            reservationDate: this.dateTimeService.parseLocalDate(
+                dto.reservationDate,
+            ),
             reservationTime: reservationTimeDate,
             duration:
                 dto.duration ||
@@ -288,10 +290,14 @@ export class ReservationService {
             // Use DateTimeService to properly extract date and time in local timezone
             const newDate =
                 dto.reservationDate ||
-                this.dateTimeService.extractDateString(existing.reservationDate);
+                this.dateTimeService.extractDateString(
+                    existing.reservationDate,
+                );
             const newTime =
                 dto.reservationTime ||
-                this.dateTimeService.extractTimeString(existing.reservationTime);
+                this.dateTimeService.extractTimeString(
+                    existing.reservationTime,
+                );
 
             if (!ReservationHelper.isFutureDateTime(newDate, newTime)) {
                 throw new InvalidReservationDateException();

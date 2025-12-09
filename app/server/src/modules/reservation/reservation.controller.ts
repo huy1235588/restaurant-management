@@ -51,7 +51,8 @@ export class ReservationController {
     @Roles('admin', 'manager', 'waiter')
     @ApiBearerAuth()
     @ApiOperation({
-        summary: 'Get all reservations with filters and pagination (admin/manager/waiter only)',
+        summary:
+            'Get all reservations with filters and pagination (admin/manager/waiter only)',
     })
     @ApiResponse({
         status: 200,
@@ -72,7 +73,8 @@ export class ReservationController {
     @Roles('admin', 'manager', 'waiter')
     @ApiBearerAuth()
     @ApiOperation({
-        summary: 'Check available tables for a specific date/time (admin/manager/waiter only)',
+        summary:
+            'Check available tables for a specific date/time (admin/manager/waiter only)',
     })
     @ApiResponse({ status: 200, description: 'Available tables retrieved' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -89,7 +91,9 @@ export class ReservationController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager', 'waiter')
     @ApiBearerAuth()
-    @ApiOperation({ summary: 'Get reservations by phone number (admin/manager/waiter only)' })
+    @ApiOperation({
+        summary: 'Get reservations by phone number (admin/manager/waiter only)',
+    })
     @ApiParam({ name: 'phone', description: 'Customer phone number' })
     @ApiResponse({ status: 200, description: 'Reservations retrieved' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -106,7 +110,10 @@ export class ReservationController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager', 'waiter')
     @ApiBearerAuth()
-    @ApiOperation({ summary: 'Get reservation by reservation code (admin/manager/waiter only)' })
+    @ApiOperation({
+        summary:
+            'Get reservation by reservation code (admin/manager/waiter only)',
+    })
     @ApiParam({ name: 'code', description: 'Unique reservation code' })
     @ApiResponse({ status: 200, description: 'Reservation retrieved' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -124,7 +131,9 @@ export class ReservationController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager', 'waiter')
     @ApiBearerAuth()
-    @ApiOperation({ summary: 'Get reservation by ID (admin/manager/waiter only)' })
+    @ApiOperation({
+        summary: 'Get reservation by ID (admin/manager/waiter only)',
+    })
     @ApiParam({ name: 'id', description: 'Reservation ID' })
     @ApiResponse({ status: 200, description: 'Reservation retrieved' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -140,7 +149,9 @@ export class ReservationController {
 
     @Public()
     @Post()
-    @ApiOperation({ summary: 'Create a new reservation (public - for customers)' })
+    @ApiOperation({
+        summary: 'Create a new reservation (public - for customers)',
+    })
     @ApiResponse({
         status: 201,
         description: 'Reservation created successfully',
@@ -148,9 +159,7 @@ export class ReservationController {
     @ApiResponse({ status: 400, description: 'Bad request - validation error' })
     @ApiResponse({ status: 409, description: 'Conflict - table not available' })
     @HttpCode(HttpStatus.CREATED)
-    async create(
-        @Body() dto: CreateReservationDto,
-    ) {
+    async create(@Body() dto: CreateReservationDto) {
         const reservation = await this.reservationService.create(dto);
         return {
             success: true,
@@ -191,7 +200,9 @@ export class ReservationController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager', 'waiter')
     @ApiBearerAuth()
-    @ApiOperation({ summary: 'Confirm a pending reservation (admin/manager/waiter only)' })
+    @ApiOperation({
+        summary: 'Confirm a pending reservation (admin/manager/waiter only)',
+    })
     @ApiParam({ name: 'id', description: 'Reservation ID' })
     @ApiResponse({ status: 200, description: 'Reservation confirmed' })
     @ApiResponse({ status: 400, description: 'Invalid status transition' })
@@ -214,7 +225,8 @@ export class ReservationController {
     @Roles('admin', 'manager', 'waiter')
     @ApiBearerAuth()
     @ApiOperation({
-        summary: 'Mark reservation as seated (check-in) and auto-create order (admin/manager/waiter only)',
+        summary:
+            'Mark reservation as seated (check-in) and auto-create order (admin/manager/waiter only)',
     })
     @ApiParam({ name: 'id', description: 'Reservation ID' })
     @ApiResponse({
@@ -240,7 +252,9 @@ export class ReservationController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager', 'waiter')
     @ApiBearerAuth()
-    @ApiOperation({ summary: 'Mark reservation as completed (admin/manager/waiter only)' })
+    @ApiOperation({
+        summary: 'Mark reservation as completed (admin/manager/waiter only)',
+    })
     @ApiParam({ name: 'id', description: 'Reservation ID' })
     @ApiResponse({ status: 200, description: 'Reservation completed' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -287,7 +301,9 @@ export class ReservationController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin', 'manager')
     @ApiBearerAuth()
-    @ApiOperation({ summary: 'Mark reservation as no-show (admin/manager only)' })
+    @ApiOperation({
+        summary: 'Mark reservation as no-show (admin/manager only)',
+    })
     @ApiParam({ name: 'id', description: 'Reservation ID' })
     @ApiResponse({ status: 200, description: 'Reservation marked as no-show' })
     @ApiResponse({ status: 403, description: 'Forbidden - Admin/Manager only' })

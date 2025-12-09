@@ -58,7 +58,8 @@ export class ReportsController {
     })
     async getDashboard(@Query() query: DashboardQueryDto) {
         const now = new Date();
-        const startDate = query.startDate || format(startOfDay(now), 'yyyy-MM-dd');
+        const startDate =
+            query.startDate || format(startOfDay(now), 'yyyy-MM-dd');
         const endDate = query.endDate || format(endOfDay(now), 'yyyy-MM-dd');
 
         // Check cache first (unless refresh is requested)
@@ -140,7 +141,10 @@ export class ReportsController {
 
         // Set headers for file download
         res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.setHeader(
+            'Content-Disposition',
+            `attachment; filename="${filename}"`,
+        );
         res.setHeader('Content-Length', Buffer.byteLength(csv, 'utf-8'));
 
         // Add BOM for Excel compatibility with UTF-8
