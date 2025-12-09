@@ -46,8 +46,8 @@ jobs:
       packages: write
     
     outputs:
-      client_image: ${{ steps.meta-client.outputs.tags }}
-      server_image: ${{ steps.meta-server.outputs.tags }}
+      client_image: ${{ steps.get-client-tag.outputs.tag }}
+      server_image: ${{ steps.get-server-tag.outputs.tag }}
     
     steps:
       - name: Checkout code
@@ -88,6 +88,14 @@ jobs:
             NEXT_PUBLIC_SOCKET_URL=${{ secrets.NEXT_PUBLIC_SOCKET_URL }}
             NEXT_PUBLIC_STORAGE_URL=${{ secrets.NEXT_PUBLIC_STORAGE_URL }}
 
+      - name: Get Client image tag
+        id: get-client-tag
+        run: |
+          TAGS="${{ steps.meta-client.outputs.tags }}"
+          FIRST_TAG=$(echo "$TAGS" | head -n1)
+          echo "tag=$FIRST_TAG" >> $GITHUB_OUTPUT
+          echo "Selected client tag: $FIRST_TAG"
+
       - name: Extract metadata for Server
         id: meta-server
         uses: docker/metadata-action@v5
@@ -108,6 +116,14 @@ jobs:
           labels: ${{ steps.meta-server.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Get Server image tag
+        id: get-server-tag
+        run: |
+          TAGS="${{ steps.meta-server.outputs.tags }}"
+          FIRST_TAG=$(echo "$TAGS" | head -n1)
+          echo "tag=$FIRST_TAG" >> $GITHUB_OUTPUT
+          echo "Selected server tag: $FIRST_TAG"
 
   # Job 2: Deploy lên DigitalOcean
   deploy:
