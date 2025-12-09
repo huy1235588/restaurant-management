@@ -278,6 +278,115 @@
         "preparationTimeLabel": "Preparation Time",
         "spicyLevelLabel": "Spicy Level",
         "caloriesLabel": "Calories",
+        "form": {
+            "tabs": {
+                "basic": "Basic",
+                "pricing": "Pricing",
+                "details": "Details",
+                "media": "Media"
+            },
+            "sections": {
+                "basicInfo": {
+                    "title": "Basic Information",
+                    "description": "Essential details about the menu item"
+                },
+                "pricingInfo": {
+                    "title": "Pricing Information",
+                    "description": "Set the price and cost for this item"
+                },
+                "additionalDetails": {
+                    "title": "Additional Details",
+                    "description": "Dietary info and characteristics"
+                },
+                "imageUpload": {
+                    "title": "Image Upload",
+                    "description": "Upload a photo of this dish"
+                }
+            },
+            "fields": {
+                "itemCode": {
+                    "label": "Item Code",
+                    "placeholder": "e.g., APP-001",
+                    "description": "Unique code for this item (uppercase letters, numbers, hyphens)",
+                    "required": true
+                },
+                "itemName": {
+                    "label": "Item Name",
+                    "placeholder": "e.g., Grilled Chicken Salad",
+                    "required": true
+                },
+                "category": {
+                    "label": "Category",
+                    "placeholder": "Select a category",
+                    "required": true
+                },
+                "description": {
+                    "label": "Description",
+                    "placeholder": "Describe the dish...",
+                    "description": "Appealing description for customers (max 1000 characters)"
+                },
+                "price": {
+                    "label": "Selling Price",
+                    "unit": "VND",
+                    "placeholder": "0",
+                    "required": true
+                },
+                "cost": {
+                    "label": "Cost Price",
+                    "unit": "VND",
+                    "placeholder": "0",
+                    "description": "Cost to prepare this item (for profit calculation)"
+                },
+                "profitMargin": {
+                    "label": "Profit Margin"
+                },
+                "displayOrder": {
+                    "label": "Display Order",
+                    "placeholder": "0",
+                    "description": "Lower numbers appear first in the menu"
+                },
+                "preparationTime": {
+                    "label": "Preparation Time",
+                    "unit": "minutes",
+                    "placeholder": "0",
+                    "description": "Estimated time to prepare this dish"
+                },
+                "spicyLevel": {
+                    "label": "Spicy Level",
+                    "placeholder": "Select spicy level",
+                    "options": {
+                        "0": "Not spicy",
+                        "1": "🌶️ Mild",
+                        "2": "🌶️🌶️ Medium",
+                        "3": "🌶️🌶️🌶️ Hot",
+                        "4": "🌶️🌶️🌶️🌶️ Very hot",
+                        "5": "🌶️🌶️🌶️🌶️🌶️ Extremely hot"
+                    }
+                },
+                "calories": {
+                    "label": "Calories",
+                    "placeholder": "0",
+                    "description": "Approximate calorie content"
+                },
+                "isVegetarian": {
+                    "label": "🌱 Vegetarian",
+                    "description": "This item is suitable for vegetarians"
+                },
+                "isAvailable": {
+                    "label": "Available",
+                    "description": "Item is currently in stock and can be ordered"
+                },
+                "isActive": {
+                    "label": "Active Status",
+                    "description": "Inactive items won't be visible in the menu"
+                }
+            },
+            "buttons": {
+                "cancel": "Cancel",
+                "create": "Create Menu Item",
+                "update": "Update Menu Item"
+            }
+        },
         "displayOrder": "Display Order",
         "created": "Created",
         "lastUpdated": "Last Updated",

@@ -26,6 +26,7 @@ import { Loader2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { calculateMargin, formatMargin } from '../../utils';
+import { useTranslation } from 'react-i18next';
 
 interface MenuItemFormProps {
     menuItem?: MenuItem | null;
@@ -42,6 +43,7 @@ export function MenuItemForm({
     onCancel,
     loading = false,
 }: MenuItemFormProps) {
+    const { t } = useTranslation();
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const form = useForm<MenuItemFormData>({
@@ -84,17 +86,17 @@ export function MenuItemForm({
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
                 <Tabs defaultValue="basic" className="w-full">
                     <TabsList className="grid w-full grid-cols-4">
-                        <TabsTrigger value="basic">Basic</TabsTrigger>
-                        <TabsTrigger value="pricing">Pricing</TabsTrigger>
-                        <TabsTrigger value="details">Details</TabsTrigger>
-                        <TabsTrigger value="media">Media</TabsTrigger>
+                        <TabsTrigger value="basic">{t('menu.form.tabs.basic')}</TabsTrigger>
+                        <TabsTrigger value="pricing">{t('menu.form.tabs.pricing')}</TabsTrigger>
+                        <TabsTrigger value="details">{t('menu.form.tabs.details')}</TabsTrigger>
+                        <TabsTrigger value="media">{t('menu.form.tabs.media')}</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="basic" className="space-y-4">
                         <Card>
                             <CardHeader>
-                                <CardTitle>Basic Information</CardTitle>
-                                <CardDescription>Essential details about the menu item</CardDescription>
+                                <CardTitle>{t('menu.form.sections.basicInfo.title')}</CardTitle>
+                                <CardDescription>{t('menu.form.sections.basicInfo.description')}</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <FormField
@@ -102,17 +104,17 @@ export function MenuItemForm({
                                     name="itemCode"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Item Code *</FormLabel>
+                                            <FormLabel>{t('menu.form.fields.itemCode.label')} *</FormLabel>
                                             <FormControl>
                                                 <Input
-                                                    placeholder="e.g., APP-001"
+                                                    placeholder={t('menu.form.fields.itemCode.placeholder')}
                                                     {...field}
                                                     disabled={loading}
                                                     className="font-mono"
                                                 />
                                             </FormControl>
                                             <FormDescription>
-                                                Unique code for this item (uppercase letters, numbers, hyphens)
+                                                {t('menu.form.fields.itemCode.description')}
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
@@ -124,10 +126,10 @@ export function MenuItemForm({
                                     name="itemName"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Item Name *</FormLabel>
+                                            <FormLabel>{t('menu.form.fields.itemName.label')} *</FormLabel>
                                             <FormControl>
                                                 <Input
-                                                    placeholder="e.g., Grilled Chicken Salad"
+                                                    placeholder={t('menu.form.fields.itemName.placeholder')}
                                                     {...field}
                                                     disabled={loading}
                                                 />
@@ -142,7 +144,7 @@ export function MenuItemForm({
                                     name="categoryId"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Category *</FormLabel>
+                                            <FormLabel>{t('menu.form.fields.category.label')} *</FormLabel>
                                             <Select
                                                 onValueChange={(value) => field.onChange(Number(value))}
                                                 value={field.value?.toString()}
@@ -150,7 +152,7 @@ export function MenuItemForm({
                                             >
                                                 <FormControl>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="Select a category" />
+                                                        <SelectValue placeholder={t('menu.form.fields.category.placeholder')} />
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
@@ -174,10 +176,10 @@ export function MenuItemForm({
                                     name="description"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Description</FormLabel>
+                                            <FormLabel>{t('menu.form.fields.description.label')}</FormLabel>
                                             <FormControl>
                                                 <Textarea
-                                                    placeholder="Describe the dish..."
+                                                    placeholder={t('menu.form.fields.description.placeholder')}
                                                     rows={4}
                                                     {...field}
                                                     value={field.value || ''}
@@ -185,7 +187,7 @@ export function MenuItemForm({
                                                 />
                                             </FormControl>
                                             <FormDescription>
-                                                Appealing description for customers (max 1000 characters)
+                                                {t('menu.form.fields.description.description')}
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
@@ -198,8 +200,8 @@ export function MenuItemForm({
                     <TabsContent value="pricing" className="space-y-4">
                         <Card>
                             <CardHeader>
-                                <CardTitle>Pricing Information</CardTitle>
-                                <CardDescription>Set the price and cost for this item</CardDescription>
+                                <CardTitle>{t('menu.form.sections.pricingInfo.title')}</CardTitle>
+                                <CardDescription>{t('menu.form.sections.pricingInfo.description')}</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <FormField
@@ -207,13 +209,13 @@ export function MenuItemForm({
                                     name="price"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Selling Price * (VND)</FormLabel>
+                                            <FormLabel>{t('menu.form.fields.price.label')} * ({t('menu.form.fields.price.unit')})</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="number"
                                                     min={0}
                                                     step="1000"
-                                                    placeholder="0"
+                                                    placeholder={t('menu.form.fields.price.placeholder')}
                                                     {...field}
                                                     onChange={(e) => field.onChange(Number(e.target.value))}
                                                     disabled={loading}
@@ -229,13 +231,13 @@ export function MenuItemForm({
                                     name="cost"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Cost Price (VND)</FormLabel>
+                                            <FormLabel>{t('menu.form.fields.cost.label')} ({t('menu.form.fields.cost.unit')})</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="number"
                                                     min={0}
                                                     step="1000"
-                                                    placeholder="0"
+                                                    placeholder={t('menu.form.fields.cost.placeholder')}
                                                     {...field}
                                                     value={field.value || ''}
                                                     onChange={(e) =>
@@ -247,7 +249,7 @@ export function MenuItemForm({
                                                 />
                                             </FormControl>
                                             <FormDescription>
-                                                Cost to prepare this item (for profit calculation)
+                                                {t('menu.form.fields.cost.description')}
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
@@ -257,7 +259,7 @@ export function MenuItemForm({
                                 {margin !== null && (
                                     <div className="p-4 bg-muted rounded-lg">
                                         <div className="flex items-center justify-between">
-                                            <span className="text-sm font-medium">Profit Margin:</span>
+                                            <span className="text-sm font-medium">{t('menu.form.fields.profitMargin.label')}:</span>
                                             <span
                                                 className={`text-lg font-bold ${margin > 50
                                                     ? 'text-green-600'
@@ -277,12 +279,12 @@ export function MenuItemForm({
                                     name="displayOrder"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Display Order</FormLabel>
+                                            <FormLabel>{t('menu.form.fields.displayOrder.label')}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="number"
                                                     min={0}
-                                                    placeholder="0"
+                                                    placeholder={t('menu.form.fields.displayOrder.placeholder')}
                                                     {...field}
                                                     value={field.value || 0}
                                                     onChange={(e) => field.onChange(Number(e.target.value))}
@@ -290,7 +292,7 @@ export function MenuItemForm({
                                                 />
                                             </FormControl>
                                             <FormDescription>
-                                                Lower numbers appear first in the menu
+                                                {t('menu.form.fields.displayOrder.description')}
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
@@ -303,8 +305,8 @@ export function MenuItemForm({
                     <TabsContent value="details" className="space-y-4">
                         <Card>
                             <CardHeader>
-                                <CardTitle>Additional Details</CardTitle>
-                                <CardDescription>Dietary info and characteristics</CardDescription>
+                                <CardTitle>{t('menu.form.sections.additionalDetails.title')}</CardTitle>
+                                <CardDescription>{t('menu.form.sections.additionalDetails.description')}</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <FormField
@@ -312,13 +314,13 @@ export function MenuItemForm({
                                     name="preparationTime"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Preparation Time (minutes)</FormLabel>
+                                            <FormLabel>{t('menu.form.fields.preparationTime.label')} ({t('menu.form.fields.preparationTime.unit')})</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="number"
                                                     min={0}
                                                     max={300}
-                                                    placeholder="0"
+                                                    placeholder={t('menu.form.fields.preparationTime.placeholder')}
                                                     {...field}
                                                     value={field.value || ''}
                                                     onChange={(e) =>
@@ -330,7 +332,7 @@ export function MenuItemForm({
                                                 />
                                             </FormControl>
                                             <FormDescription>
-                                                Estimated time to prepare this dish
+                                                {t('menu.form.fields.preparationTime.description')}
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
@@ -342,7 +344,7 @@ export function MenuItemForm({
                                     name="spicyLevel"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Spicy Level</FormLabel>
+                                            <FormLabel>{t('menu.form.fields.spicyLevel.label')}</FormLabel>
                                             <Select
                                                 onValueChange={(value) => field.onChange(Number(value))}
                                                 value={field.value?.toString()}
@@ -350,18 +352,16 @@ export function MenuItemForm({
                                             >
                                                 <FormControl>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="Select spicy level" />
+                                                        <SelectValue placeholder={t('menu.form.fields.spicyLevel.placeholder')} />
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    <SelectItem value="0">Not spicy</SelectItem>
-                                                    <SelectItem value="1">🌶️ Mild</SelectItem>
-                                                    <SelectItem value="2">🌶️🌶️ Medium</SelectItem>
-                                                    <SelectItem value="3">🌶️🌶️🌶️ Hot</SelectItem>
-                                                    <SelectItem value="4">🌶️🌶️🌶️🌶️ Very hot</SelectItem>
-                                                    <SelectItem value="5">
-                                                        🌶️🌶️🌶️🌶️🌶️ Extremely hot
-                                                    </SelectItem>
+                                                    <SelectItem value="0">{t('menu.form.fields.spicyLevel.options.0')}</SelectItem>
+                                                    <SelectItem value="1">{t('menu.form.fields.spicyLevel.options.1')}</SelectItem>
+                                                    <SelectItem value="2">{t('menu.form.fields.spicyLevel.options.2')}</SelectItem>
+                                                    <SelectItem value="3">{t('menu.form.fields.spicyLevel.options.3')}</SelectItem>
+                                                    <SelectItem value="4">{t('menu.form.fields.spicyLevel.options.4')}</SelectItem>
+                                                    <SelectItem value="5">{t('menu.form.fields.spicyLevel.options.5')}</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
@@ -374,12 +374,12 @@ export function MenuItemForm({
                                     name="calories"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Calories</FormLabel>
+                                            <FormLabel>{t('menu.form.fields.calories.label')}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="number"
                                                     min={0}
-                                                    placeholder="0"
+                                                    placeholder={t('menu.form.fields.calories.placeholder')}
                                                     {...field}
                                                     value={field.value || ''}
                                                     onChange={(e) =>
@@ -391,7 +391,7 @@ export function MenuItemForm({
                                                 />
                                             </FormControl>
                                             <FormDescription>
-                                                Approximate calorie content
+                                                {t('menu.form.fields.calories.description')}
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
@@ -405,10 +405,10 @@ export function MenuItemForm({
                                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                                             <div className="space-y-0.5">
                                                 <FormLabel className="text-base">
-                                                    🌱 Vegetarian
+                                                    {t('menu.form.fields.isVegetarian.label')}
                                                 </FormLabel>
                                                 <FormDescription>
-                                                    This item is suitable for vegetarians
+                                                    {t('menu.form.fields.isVegetarian.description')}
                                                 </FormDescription>
                                             </div>
                                             <FormControl>
@@ -428,9 +428,9 @@ export function MenuItemForm({
                                     render={({ field }) => (
                                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                                             <div className="space-y-0.5">
-                                                <FormLabel className="text-base">Available</FormLabel>
+                                                <FormLabel className="text-base">{t('menu.form.fields.isAvailable.label')}</FormLabel>
                                                 <FormDescription>
-                                                    Item is currently in stock and can be ordered
+                                                    {t('menu.form.fields.isAvailable.description')}
                                                 </FormDescription>
                                             </div>
                                             <FormControl>
@@ -450,9 +450,9 @@ export function MenuItemForm({
                                     render={({ field }) => (
                                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                                             <div className="space-y-0.5">
-                                                <FormLabel className="text-base">Active Status</FormLabel>
+                                                <FormLabel className="text-base">{t('menu.form.fields.isActive.label')}</FormLabel>
                                                 <FormDescription>
-                                                    Inactive items won't be visible in the menu
+                                                    {t('menu.form.fields.isActive.description')}
                                                 </FormDescription>
                                             </div>
                                             <FormControl>
@@ -472,8 +472,8 @@ export function MenuItemForm({
                     <TabsContent value="media" className="space-y-4">
                         <Card>
                             <CardHeader>
-                                <CardTitle>Image Upload</CardTitle>
-                                <CardDescription>Upload a photo of this dish</CardDescription>
+                                <CardTitle>{t('menu.form.sections.imageUpload.title')}</CardTitle>
+                                <CardDescription>{t('menu.form.sections.imageUpload.description')}</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <FormField
@@ -508,11 +508,11 @@ export function MenuItemForm({
 
                 <div className="flex justify-end gap-2 pt-4 border-t">
                     <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
-                        Cancel
+                        {t('menu.form.buttons.cancel')}
                     </Button>
                     <Button type="submit" disabled={loading}>
                         {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                        {menuItem ? 'Update Menu Item' : 'Create Menu Item'}
+                        {menuItem ? t('menu.form.buttons.update') : t('menu.form.buttons.create')}
                     </Button>
                 </div>
             </form>

@@ -278,6 +278,115 @@
         "preparationTimeLabel": "Thời gian chuẩn bị",
         "spicyLevelLabel": "Mức độ cay",
         "caloriesLabel": "Calories",
+        "form": {
+            "tabs": {
+                "basic": "Thông tin cơ bản",
+                "pricing": "Giá cả",
+                "details": "Chi tiết",
+                "media": "Hình ảnh"
+            },
+            "sections": {
+                "basicInfo": {
+                    "title": "Thông Tin Cơ Bản",
+                    "description": "Các thông tin chi tiết cơ bản về món ăn"
+                },
+                "pricingInfo": {
+                    "title": "Thông Tin Giá Cả",
+                    "description": "Thiết lập giá bán và giá vốn cho món ăn"
+                },
+                "additionalDetails": {
+                    "title": "Thông Tin Bổ Sung",
+                    "description": "Thông tin về dinh dưỡng và đặc điểm"
+                },
+                "imageUpload": {
+                    "title": "Tải Ảnh Lên",
+                    "description": "Tải lên ảnh của món ăn này"
+                }
+            },
+            "fields": {
+                "itemCode": {
+                    "label": "Mã Món",
+                    "placeholder": "Ví dụ: APP-001",
+                    "description": "Mã duy nhất cho món này (chữ in hoa, số, dấu gạch ngang)",
+                    "required": true
+                },
+                "itemName": {
+                    "label": "Tên Món",
+                    "placeholder": "Ví dụ: Salad Gà Nướng",
+                    "required": true
+                },
+                "category": {
+                    "label": "Danh Mục",
+                    "placeholder": "Chọn danh mục",
+                    "required": true
+                },
+                "description": {
+                    "label": "Mô Tả",
+                    "placeholder": "Mô tả món ăn...",
+                    "description": "Mô tả hấp dẫn cho khách hàng (tối đa 1000 ký tự)"
+                },
+                "price": {
+                    "label": "Giá Bán",
+                    "unit": "VND",
+                    "placeholder": "0",
+                    "required": true
+                },
+                "cost": {
+                    "label": "Giá Vốn",
+                    "unit": "VND",
+                    "placeholder": "0",
+                    "description": "Chi phí để chuẩn bị món này (dùng để tính lợi nhuận)"
+                },
+                "profitMargin": {
+                    "label": "Biên Lợi Nhuận"
+                },
+                "displayOrder": {
+                    "label": "Thứ Tự Hiển Thị",
+                    "placeholder": "0",
+                    "description": "Số nhỏ hơn sẽ hiển thị trước trong menu"
+                },
+                "preparationTime": {
+                    "label": "Thời Gian Chuẩn Bị",
+                    "unit": "phút",
+                    "placeholder": "0",
+                    "description": "Thời gian ước tính để chuẩn bị món này"
+                },
+                "spicyLevel": {
+                    "label": "Độ Cay",
+                    "placeholder": "Chọn mức độ cay",
+                    "options": {
+                        "0": "Không cay",
+                        "1": "🌶️ Cay nhẹ",
+                        "2": "🌶️🌶️ Cay vừa",
+                        "3": "🌶️🌶️🌶️ Cay",
+                        "4": "🌶️🌶️🌶️🌶️ Rất cay",
+                        "5": "🌶️🌶️🌶️🌶️🌶️ Cực kỳ cay"
+                    }
+                },
+                "calories": {
+                    "label": "Calories",
+                    "placeholder": "0",
+                    "description": "Lượng calo xấp xỉ"
+                },
+                "isVegetarian": {
+                    "label": "🌱 Món Chay",
+                    "description": "Món này phù hợp cho người ăn chay"
+                },
+                "isAvailable": {
+                    "label": "Còn Hàng",
+                    "description": "Món đang có sẵn và có thể đặt hàng"
+                },
+                "isActive": {
+                    "label": "Trạng Thái Hoạt Động",
+                    "description": "Món không hoạt động sẽ không hiển thị trong menu"
+                }
+            },
+            "buttons": {
+                "cancel": "Hủy",
+                "create": "Tạo Món Ăn",
+                "update": "Cập Nhật Món Ăn"
+            }
+        },
         "displayOrder": "Thứ tự hiển thị",
         "created": "Ngày tạo",
         "lastUpdated": "Cập nhật lần cuối",
