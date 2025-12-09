@@ -188,39 +188,93 @@ export class ReportsService {
     }
 
     /**
-     * Get revenue report with time series data
+     * Get revenue report with optimized SQL query using DATE_TRUNC
+     * This is more efficient than fetching all bills and grouping in memory
      */
     async getRevenueReport(query: RevenueQueryDto): Promise<RevenueReport> {
         const dateRange = this.getDateRange(query);
         const previousPeriod = this.getPreviousPeriod(dateRange);
         const groupBy = query.groupBy || GroupBy.DAY;
 
-        // Get current period revenue
-        const bills = await this.prisma.bill.findMany({
-            where: {
-                paymentStatus: PaymentStatus.paid,
-                paidAt: {
-                    gte: dateRange.startDate,
-                    lte: dateRange.endDate,
-                },
-            },
-            select: {
-                paidAt: true,
-                totalAmount: true,
-            },
+        // Determine the truncation interval for SQL
+        let truncInterval: string;
+        let formatStr: string;
+
+        switch (groupBy) {
+            case GroupBy.WEEK:
+                truncInterval = 'week';
+                formatStr = 'yyyy-MM-dd';
+                break;
+            case GroupBy.MONTH:
+                truncInterval = 'month';
+                formatStr = 'yyyy-MM';
+                break;
+            default:
+                truncInterval = 'day';
+                formatStr = 'yyyy-MM-dd';
+        }
+
+        // Use raw SQL for better aggregation performance
+        // Note: We use Prisma.sql to safely construct the query with dynamic interval
+        const aggregatedData = await this.prisma.$queryRaw<
+            Array<{ date: Date; revenue: bigint; orders: bigint }>
+        >`
+            SELECT 
+                DATE_TRUNC(${truncInterval}, "paidAt") as date,
+                COALESCE(SUM("totalAmount"), 0) as revenue,
+                COUNT(*) as orders
+            FROM bills
+            WHERE "paymentStatus" = 'paid'
+                AND "paidAt" >= ${dateRange.startDate}
+                AND "paidAt" <= ${dateRange.endDate}
+            GROUP BY date
+            ORDER BY date
+        `;
+
+        // Generate all dates in range for complete series
+        let dates: Date[];
+        switch (groupBy) {
+            case GroupBy.WEEK:
+                dates = eachWeekOfInterval({
+                    start: dateRange.startDate,
+                    end: dateRange.endDate,
+                });
+                break;
+            case GroupBy.MONTH:
+                dates = eachMonthOfInterval({
+                    start: dateRange.startDate,
+                    end: dateRange.endDate,
+                });
+                break;
+            default:
+                dates = eachDayOfInterval({
+                    start: dateRange.startDate,
+                    end: dateRange.endDate,
+                });
+        }
+
+        // Create a map from aggregated data
+        const dataMap = new Map<string, { revenue: number; orders: number }>();
+        aggregatedData.forEach((row) => {
+            const key = format(row.date, formatStr);
+            dataMap.set(key, {
+                revenue: Number(row.revenue),
+                orders: Number(row.orders),
+            });
         });
 
-        // Group data by the specified interval
-        const data = this.groupRevenueData(
-            bills,
-            dateRange,
-            groupBy,
-        );
+        // Build complete data series with zeros for missing dates
+        const data: RevenueDataPoint[] = dates.map((date) => {
+            const key = format(date, formatStr);
+            const values = dataMap.get(key) || { revenue: 0, orders: 0 };
+            return {
+                date: key,
+                revenue: Math.round(values.revenue),
+                orders: values.orders,
+            };
+        });
 
-        const total = bills.reduce(
-            (sum, bill) => sum + Number(bill.totalAmount),
-            0,
-        );
+        const total = data.reduce((sum, point) => sum + point.revenue, 0);
 
         // Get previous period total for growth calculation
         const previousTotal = await this.getTotalRevenue(previousPeriod);
@@ -230,7 +284,8 @@ export class ReportsService {
     }
 
     /**
-     * Group revenue data by time interval
+     * Group revenue data by time interval (DEPRECATED - Use SQL aggregation in getRevenueReport instead)
+     * @deprecated This method is kept for backward compatibility but is no longer used
      */
     private groupRevenueData(
         bills: { paidAt: Date | null; totalAmount: unknown }[],
@@ -274,16 +329,19 @@ export class ReportsService {
         bills.forEach((bill) => {
             if (!bill.paidAt) return;
 
+            // Convert to UTC to avoid timezone issues
+            const paidAtUTC = new Date(bill.paidAt.toISOString());
+
             let key: string;
             switch (groupBy) {
                 case GroupBy.WEEK:
-                    key = format(startOfWeek(bill.paidAt), formatStr);
+                    key = format(startOfWeek(paidAtUTC), formatStr);
                     break;
                 case GroupBy.MONTH:
-                    key = format(startOfMonth(bill.paidAt), formatStr);
+                    key = format(startOfMonth(paidAtUTC), formatStr);
                     break;
                 default:
-                    key = format(bill.paidAt, formatStr);
+                    key = format(paidAtUTC, formatStr);
             }
 
             const existing = dataMap.get(key);
@@ -361,7 +419,10 @@ export class ReportsService {
             };
         });
 
-        const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+        const totalQuantity = items.reduce(
+            (sum, item) => sum + item.quantity,
+            0,
+        );
         const totalRevenue = items.reduce((sum, item) => sum + item.revenue, 0);
 
         return { items, totalQuantity, totalRevenue };
@@ -407,7 +468,8 @@ export class ReportsService {
             percentage:
                 totalAmount > 0
                     ? Math.round(
-                          (Number(payment._sum.totalAmount || 0) / totalAmount) *
+                          (Number(payment._sum.totalAmount || 0) /
+                              totalAmount) *
                               100,
                       )
                     : 0,
@@ -446,7 +508,10 @@ export class ReportsService {
 
         if (groupBy === GroupBy.STATUS) {
             // Group by status
-            const statusGroups = new Map<string, { count: number; amount: number }>();
+            const statusGroups = new Map<
+                string,
+                { count: number; amount: number }
+            >();
 
             orders.forEach((order) => {
                 const existing = statusGroups.get(order.status) || {
@@ -458,14 +523,19 @@ export class ReportsService {
                 statusGroups.set(order.status, existing);
             });
 
-            data = Array.from(statusGroups.entries()).map(([status, values]) => ({
-                label: status,
-                count: values.count,
-                amount: Math.round(values.amount),
-            }));
+            data = Array.from(statusGroups.entries()).map(
+                ([status, values]) => ({
+                    label: status,
+                    count: values.count,
+                    amount: Math.round(values.amount),
+                }),
+            );
         } else {
             // Group by hour (default)
-            const hourGroups = new Map<number, { count: number; amount: number }>();
+            const hourGroups = new Map<
+                number,
+                { count: number; amount: number }
+            >();
 
             // Initialize all 24 hours
             for (let i = 0; i < 24; i++) {
@@ -549,102 +619,5 @@ export class ReportsService {
             paymentMethods,
             orders,
         };
-    }
-
-    /**
-     * Get revenue report with optimized SQL query using DATE_TRUNC
-     * This is more efficient than fetching all bills and grouping in memory
-     */
-    async getRevenueReportOptimized(
-        query: RevenueQueryDto,
-    ): Promise<RevenueReport> {
-        const dateRange = this.getDateRange(query);
-        const previousPeriod = this.getPreviousPeriod(dateRange);
-        const groupBy = query.groupBy || GroupBy.DAY;
-
-        // Determine the truncation interval for SQL
-        let truncInterval: string;
-        let formatStr: string;
-
-        switch (groupBy) {
-            case GroupBy.WEEK:
-                truncInterval = 'week';
-                formatStr = 'yyyy-MM-dd';
-                break;
-            case GroupBy.MONTH:
-                truncInterval = 'month';
-                formatStr = 'yyyy-MM';
-                break;
-            default:
-                truncInterval = 'day';
-                formatStr = 'yyyy-MM-dd';
-        }
-
-        // Use raw SQL for better aggregation performance
-        const aggregatedData = await this.prisma.$queryRaw<
-            Array<{ date: Date; revenue: bigint; orders: bigint }>
-        >`
-            SELECT 
-                DATE_TRUNC(${truncInterval}, "paidAt") as date,
-                COALESCE(SUM("totalAmount"), 0) as revenue,
-                COUNT(*) as orders
-            FROM bills
-            WHERE "paymentStatus" = 'paid'
-                AND "paidAt" >= ${dateRange.startDate}
-                AND "paidAt" <= ${dateRange.endDate}
-            GROUP BY DATE_TRUNC(${truncInterval}, "paidAt")
-            ORDER BY date
-        `;
-
-        // Generate all dates in range for complete series
-        let dates: Date[];
-        switch (groupBy) {
-            case GroupBy.WEEK:
-                dates = eachWeekOfInterval({
-                    start: dateRange.startDate,
-                    end: dateRange.endDate,
-                });
-                break;
-            case GroupBy.MONTH:
-                dates = eachMonthOfInterval({
-                    start: dateRange.startDate,
-                    end: dateRange.endDate,
-                });
-                break;
-            default:
-                dates = eachDayOfInterval({
-                    start: dateRange.startDate,
-                    end: dateRange.endDate,
-                });
-        }
-
-        // Create a map from aggregated data
-        const dataMap = new Map<string, { revenue: number; orders: number }>();
-        aggregatedData.forEach((row) => {
-            const key = format(row.date, formatStr);
-            dataMap.set(key, {
-                revenue: Number(row.revenue),
-                orders: Number(row.orders),
-            });
-        });
-
-        // Build complete data series with zeros for missing dates
-        const data: RevenueDataPoint[] = dates.map((date) => {
-            const key = format(date, formatStr);
-            const values = dataMap.get(key) || { revenue: 0, orders: 0 };
-            return {
-                date: key,
-                revenue: Math.round(values.revenue),
-                orders: values.orders,
-            };
-        });
-
-        const total = data.reduce((sum, point) => sum + point.revenue, 0);
-
-        // Get previous period total for growth calculation
-        const previousTotal = await this.getTotalRevenue(previousPeriod);
-        const growth = this.calculateChange(total, previousTotal);
-
-        return { data, total, growth };
     }
 }

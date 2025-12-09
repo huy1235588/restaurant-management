@@ -23,11 +23,11 @@ interface TopItemsChartProps {
 }
 
 const COLORS = [
-    'hsl(var(--chart-1))',
-    'hsl(var(--chart-2))',
-    'hsl(var(--chart-3))',
-    'hsl(var(--chart-4))',
-    'hsl(var(--chart-5))',
+    'var(--chart-1)',
+    'var(--chart-2)',
+    'var(--chart-3)',
+    'var(--chart-4)',
+    'var(--chart-5)',
 ];
 
 export function TopItemsChart({ data, loading = false, title }: TopItemsChartProps) {
@@ -77,19 +77,19 @@ export function TopItemsChart({ data, loading = false, title }: TopItemsChartPro
                             <XAxis
                                 type="number"
                                 className="text-xs"
-                                // tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                                tick={{ fill: 'var(--muted-foreground)' }}
                             />
                             <YAxis
                                 type="category"
                                 dataKey="displayName"
                                 className="text-xs"
-                                // tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                                tick={{ fill: 'var(--muted-foreground)' }}
                                 width={100}
                             />
                             <Tooltip
                                 contentStyle={{
-                                    backgroundColor: 'hsl(var(--card))',
-                                    border: '1px solid hsl(var(--border))',
+                                    backgroundColor: 'var(--card)',
+                                    border: '1px solid var(--border)',
                                     borderRadius: '8px',
                                 }}
                                 formatter={(value: number, name: string) => {
