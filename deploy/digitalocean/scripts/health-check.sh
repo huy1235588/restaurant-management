@@ -251,16 +251,6 @@ else
     check_fail "Disk usage: ${DISK_USAGE}% (${DISK_AVAIL} available) - Too high!"
 fi
 
-# Docker disk usage
-DOCKER_IMAGES_SIZE=$(docker system df 2>/dev/null | awk '/Images/ {print $4}' || echo "N/A")
-DOCKER_CONTAINERS_SIZE=$(docker system df 2>/dev/null | awk '/Containers/ {print $4}' || echo "N/A")
-DOCKER_VOLUMES_SIZE=$(docker system df 2>/dev/null | awk '/Local Volumes/ {print $4}' || echo "N/A")
-
-if [ "$DOCKER_IMAGES_SIZE" != "N/A" ]; then
-    check_pass "Docker images size: $DOCKER_IMAGES_SIZE"
-    check_pass "Docker volumes size: $DOCKER_VOLUMES_SIZE"
-fi
-
 ################################################################################
 # 8. Firewall Status
 ################################################################################

@@ -40,7 +40,7 @@ export function CheckInDialog({
         try {
             const seatResult = await seatReservation(reservation.reservationId);
             setResult(seatResult);
-            onSuccess();
+            // Don't call onSuccess here - wait until dialog is closed
         } catch (error) {
             // Error handled by hook
         }
@@ -48,12 +48,16 @@ export function CheckInDialog({
 
     const handleViewOrder = () => {
         if (result?.order) {
-            router.push(`/admin/orders?orderId=${result.order.orderId}`);
+            router.push(`/admin/orders/${result.order.orderId}`);
             handleClose();
         }
     };
 
     const handleClose = () => {
+        // Call onSuccess when closing if check-in was successful
+        if (result) {
+            onSuccess();
+        }
         setResult(null);
         onClose();
     };

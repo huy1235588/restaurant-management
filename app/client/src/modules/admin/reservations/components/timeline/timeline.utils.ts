@@ -197,3 +197,46 @@ export function checkOverlap(res1: Reservation, res2: Reservation): boolean {
     
     return start1 < end2 && start2 < end1;
 }
+
+/**
+ * Calculate track (row) positions for reservations to prevent overlap
+ * Returns a map of reservation ID to track number (0-based)
+ */
+export function calculateReservationTracks(reservations: Reservation[]): Map<number, number> {
+    const tracks = new Map<number, number>();
+    
+    // Sort by start time
+    const sorted = [...reservations].sort((a, b) => {
+        return timeToMinutes(a.reservationTime) - timeToMinutes(b.reservationTime);
+    });
+    
+    for (const reservation of sorted) {
+        // Find the first available track (row)
+        let track = 0;
+        let foundTrack = false;
+        
+        while (!foundTrack) {
+            // Check if this track has any overlapping reservations
+            let hasOverlap = false;
+            
+            for (const [otherId, otherTrack] of tracks.entries()) {
+                if (otherTrack === track) {
+                    const other = sorted.find(r => r.reservationId === otherId);
+                    if (other && checkOverlap(reservation, other)) {
+                        hasOverlap = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (!hasOverlap) {
+                tracks.set(reservation.reservationId, track);
+                foundTrack = true;
+            } else {
+                track++;
+            }
+        }
+    }
+    
+    return tracks;
+}

@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Table } from '@/types';
 import { Reservation } from '../../types';
 import { ReservationBar } from './ReservationBar';
 import { TIMELINE_CONFIG, getHourLabels } from './timeline.constants';
-import { getTimeFromPosition } from './timeline.utils';
+import { getTimeFromPosition, calculateReservationTracks } from './timeline.utils';
 import { Plus } from 'lucide-react';
 
 interface TimelineRowProps {
@@ -30,6 +30,20 @@ export function TimelineRow({
     const { hourWidth, tableColumnWidth, rowHeight } = TIMELINE_CONFIG;
     const hourLabels = getHourLabels();
     const gridWidth = hourLabels.length * hourWidth;
+
+    // Calculate tracks to prevent overlap
+    const reservationTracks = useMemo(() => {
+        return calculateReservationTracks(reservations);
+    }, [reservations]);
+    
+    // Calculate number of tracks needed (max track + 1)
+    const trackCount = useMemo(() => {
+        if (reservationTracks.size === 0) return 1;
+        return Math.max(...Array.from(reservationTracks.values())) + 1;
+    }, [reservationTracks]);
+    
+    // Dynamic height based on tracks (48px per track + 16px padding)
+    const dynamicHeight = Math.max(rowHeight, trackCount * 48 + 16);
 
     // Track mouse position for ghost bar
     const [ghostPosition, setGhostPosition] = useState<{ x: number; time: string } | null>(null);
@@ -60,7 +74,7 @@ export function TimelineRow({
     return (
         <div
             className="flex border-b border-gray-100 dark:border-gray-700"
-            style={{ height: rowHeight }}
+            style={{ height: dynamicHeight }}
         >
             {/* Table info column */}
             <div
@@ -115,6 +129,7 @@ export function TimelineRow({
                     <ReservationBar
                         key={reservation.reservationId}
                         reservation={reservation}
+                        track={reservationTracks.get(reservation.reservationId) || 0}
                         onClick={onReservationClick}
                     />
                 ))}

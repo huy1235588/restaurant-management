@@ -146,7 +146,7 @@ export function CreateReservationDialog({
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>{t('reservations.dialog.createTitle')}</DialogTitle>
                     <DialogDescription>
@@ -274,8 +274,8 @@ export function CreateReservationDialog({
                             />
                         </div>
 
-                        {/* Table Selection */}
-                        {tables.length > 0 && (
+                        {/* Table Selection - Only show if no default table is selected from timeline */}
+                        {!defaultTableId && tables.length > 0 && (
                             <div className="space-y-2">
                                 <h3 className="font-medium text-sm text-gray-700">
                                     {t('reservations.dialog.availableTablesSection')}
@@ -318,6 +318,34 @@ export function CreateReservationDialog({
                                 )}
                             </div>
                         )}
+                        
+                        {/* Show selected table info when pre-selected from timeline */}
+                        {/* {defaultTableId && tables.length > 0 && (
+                            <div className="space-y-2">
+                                <h3 className="font-medium text-sm text-gray-700">
+                                    {t('reservations.dialog.selectedTableSection') || 'Bàn đã chọn'}
+                                </h3>
+                                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                    {tables.filter((table: any) => table.id === defaultTableId).map((table: any) => (
+                                        <div key={table.id} className="flex items-center justify-between">
+                                            <div>
+                                                <p className="font-medium text-blue-900 dark:text-blue-100">
+                                                    {t('reservations.dialog.tableNumberLabel', { number: table.tableNumber })}
+                                                </p>
+                                                <p className="text-sm text-blue-700 dark:text-blue-300">
+                                                    {t('reservations.dialog.seatsLabel', { count: table.capacity })}
+                                                </p>
+                                            </div>
+                                            <div className="text-blue-600 dark:text-blue-400">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )} */}
 
                         {/* Special Requests */}
                         <FormField

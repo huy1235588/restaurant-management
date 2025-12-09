@@ -11,15 +11,19 @@ import { TimelineTooltip } from './TimelineTooltip';
 
 interface ReservationBarProps {
     reservation: Reservation;
+    track?: number; // Track number for vertical positioning (0-based)
     onClick?: (reservation: Reservation) => void;
 }
 
 /**
  * ReservationBar - Individual reservation bar component
  */
-export function ReservationBar({ reservation, onClick }: ReservationBarProps) {
+export function ReservationBar({ reservation, track = 0, onClick }: ReservationBarProps) {
     const [showTooltip, setShowTooltip] = useState(false);
     const { left, width } = getBarStyle(reservation);
+    
+    // Calculate vertical position based on track (48px per track + 8px top padding)
+    const topPosition = 8 + (track * 48);
 
     const bgColor = TIMELINE_STATUS_BG_COLORS[reservation.status];
     const hoverColor = TIMELINE_STATUS_HOVER_COLORS[reservation.status];
@@ -53,7 +57,7 @@ export function ReservationBar({ reservation, onClick }: ReservationBarProps) {
             <button
                 onClick={handleClick}
                 className={`
-                    absolute top-2 rounded-md shadow-sm
+                    absolute rounded-md shadow-sm
                     flex items-center gap-1 px-2 text-white text-xs font-medium
                     cursor-pointer transition-all duration-200
                     ${bgColor} ${hoverColor}
@@ -62,6 +66,7 @@ export function ReservationBar({ reservation, onClick }: ReservationBarProps) {
                 `}
                 style={{
                     left,
+                    top: topPosition,
                     width: Math.max(width - 4, 26),
                     height: 44,
                 }}
@@ -85,7 +90,7 @@ export function ReservationBar({ reservation, onClick }: ReservationBarProps) {
                     className="absolute z-50"
                     style={{
                         left: left + width / 2,
-                        top: -8,
+                        top: topPosition - 8,
                         transform: 'translate(-50%, -100%)',
                     }}
                 >

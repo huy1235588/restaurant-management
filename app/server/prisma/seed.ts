@@ -1006,269 +1006,269 @@ async function main() {
     // ============================================
     // TẠO KHÁCH HÀNG MẪU
     // ============================================
-    console.log('👥 Tạo khách hàng mẫu...');
+    // console.log('👥 Tạo khách hàng mẫu...');
 
-    const customers = await Promise.all([
-        prisma.customer.create({
-            data: {
-                name: 'Nguyễn Nhật Minh',
-                phoneNumber: '0905000001',
-                email: 'minh.nguyen@example.com',
-                birthday: new Date('1988-03-15'),
-                preferences: { seating: 'window', favoriteTable: 'T05' },
-                notes: 'Ưu tiên bàn gần cửa sổ cho các dịp kỷ niệm.',
-                isVip: true,
-            },
-        }),
-        prisma.customer.create({
-            data: {
-                name: 'Trần Khánh Vy',
-                phoneNumber: '0905000002',
-                email: 'vy.tran@example.com',
-                birthday: new Date('1992-07-22'),
-                preferences: { dietary: ['vegetarian'], favoriteFloor: 2 },
-                notes: 'Ăn chay, tránh đậu phộng.',
-                isVip: false,
-            },
-        }),
-        prisma.customer.create({
-            data: {
-                name: 'Lê Quốc Huy',
-                phoneNumber: '0905000003',
-                email: 'huy.le@example.com',
-                birthday: new Date('1985-11-02'),
-                preferences: { seating: 'garden', drinks: ['red-wine'] },
-                notes: 'Ưu tiên khu vườn, nhóm khách doanh nhân.',
-                isVip: true,
-            },
-        }),
-        prisma.customer.create({
-            data: {
-                name: 'Phạm Diễm Quỳnh',
-                phoneNumber: '0905000004',
-                email: 'quynh.pham@example.com',
-                birthday: new Date('1996-01-18'),
-                preferences: { favoriteSlot: '18:30', dessert: 'cheesecake' },
-                notes: 'Thường đặt trước 1 tuần.',
-                isVip: false,
-            },
-        }),
-        prisma.customer.create({
-            data: {
-                name: 'Võ Anh Tú',
-                phoneNumber: '0905000005',
-                email: 'tu.vo@example.com',
-                birthday: new Date('1990-09-09'),
-                preferences: { seating: 'vip', specialOccasion: true },
-                notes: 'Khách doanh nghiệp, thường đi nhóm lớn.',
-                isVip: true,
-            },
-        }),
-    ]);
+    // const customers = await Promise.all([
+    //     prisma.customer.create({
+    //         data: {
+    //             name: 'Nguyễn Nhật Minh',
+    //             phoneNumber: '0905000001',
+    //             email: 'minh.nguyen@example.com',
+    //             birthday: new Date('1988-03-15'),
+    //             preferences: { seating: 'window', favoriteTable: 'T05' },
+    //             notes: 'Ưu tiên bàn gần cửa sổ cho các dịp kỷ niệm.',
+    //             isVip: true,
+    //         },
+    //     }),
+    //     prisma.customer.create({
+    //         data: {
+    //             name: 'Trần Khánh Vy',
+    //             phoneNumber: '0905000002',
+    //             email: 'vy.tran@example.com',
+    //             birthday: new Date('1992-07-22'),
+    //             preferences: { dietary: ['vegetarian'], favoriteFloor: 2 },
+    //             notes: 'Ăn chay, tránh đậu phộng.',
+    //             isVip: false,
+    //         },
+    //     }),
+    //     prisma.customer.create({
+    //         data: {
+    //             name: 'Lê Quốc Huy',
+    //             phoneNumber: '0905000003',
+    //             email: 'huy.le@example.com',
+    //             birthday: new Date('1985-11-02'),
+    //             preferences: { seating: 'garden', drinks: ['red-wine'] },
+    //             notes: 'Ưu tiên khu vườn, nhóm khách doanh nhân.',
+    //             isVip: true,
+    //         },
+    //     }),
+    //     prisma.customer.create({
+    //         data: {
+    //             name: 'Phạm Diễm Quỳnh',
+    //             phoneNumber: '0905000004',
+    //             email: 'quynh.pham@example.com',
+    //             birthday: new Date('1996-01-18'),
+    //             preferences: { favoriteSlot: '18:30', dessert: 'cheesecake' },
+    //             notes: 'Thường đặt trước 1 tuần.',
+    //             isVip: false,
+    //         },
+    //     }),
+    //     prisma.customer.create({
+    //         data: {
+    //             name: 'Võ Anh Tú',
+    //             phoneNumber: '0905000005',
+    //             email: 'tu.vo@example.com',
+    //             birthday: new Date('1990-09-09'),
+    //             preferences: { seating: 'vip', specialOccasion: true },
+    //             notes: 'Khách doanh nghiệp, thường đi nhóm lớn.',
+    //             isVip: true,
+    //         },
+    //     }),
+    // ]);
 
     // ============================================
     // TẠO ĐẶT BÀN MẪU
     // ============================================
-    console.log('📅 Tạo đặt bàn mẫu...');
+    // console.log('📅 Tạo đặt bàn mẫu...');
 
-    const tables = await prisma.restaurantTable.findMany();
-    const staffMembers = await prisma.staff.findMany();
-    const manager = staffMembers.find((member) => member.role === 'manager');
-    const host = staffMembers.find((member) => member.role === 'waiter');
+    // const tables = await prisma.restaurantTable.findMany();
+    // const staffMembers = await prisma.staff.findMany();
+    // const manager = staffMembers.find((member) => member.role === 'manager');
+    // const host = staffMembers.find((member) => member.role === 'waiter');
 
-    const daysFromNow = (offset: number) => {
-        const date = new Date();
-        date.setDate(date.getDate() + offset);
-        date.setHours(0, 0, 0, 0);
-        return date;
-    };
+    // const daysFromNow = (offset: number) => {
+    //     const date = new Date();
+    //     date.setDate(date.getDate() + offset);
+    //     date.setHours(0, 0, 0, 0);
+    //     return date;
+    // };
 
-    const timeOfDay = (hour: number, minute: number = 0) => {
-        const time = new Date();
-        time.setHours(hour, minute, 0, 0);
-        return time;
-    };
+    // const timeOfDay = (hour: number, minute: number = 0) => {
+    //     const time = new Date();
+    //     time.setHours(hour, minute, 0, 0);
+    //     return time;
+    // };
 
-    type SeedStatus =
-        | 'pending'
-        | 'confirmed'
-        | 'seated'
-        | 'completed'
-        | 'cancelled'
-        | 'no_show';
+    // type SeedStatus =
+    //     | 'pending'
+    //     | 'confirmed'
+    //     | 'seated'
+    //     | 'completed'
+    //     | 'cancelled'
+    //     | 'no_show';
 
-    const reservationSeeds: Array<{
-        customer: Awaited<typeof customers>[number];
-        table: (typeof tables)[number];
-        dateOffset: number;
-        time: { hour: number; minute?: number };
-        partySize: number;
-        status: SeedStatus;
-        duration?: number;
-        specialRequest?: string;
-        depositAmount?: number;
-        notes?: string;
-        tags?: string[];
-        createdBy?: number;
-        confirmedAt?: Date;
-        seatedAt?: Date;
-        completedAt?: Date;
-        cancelledAt?: Date;
-        cancellationReason?: string;
-    }> = [
-        {
-            customer: customers[0]!,
-            table: tables[0]!,
-            dateOffset: 1,
-            time: { hour: 18 },
-            partySize: 4,
-            status: 'pending',
-            specialRequest: 'Cần bàn gần cửa sổ',
-            tags: ['window'],
-            createdBy: host?.staffId,
-        },
-        {
-            customer: customers[1]!,
-            table: tables[5]!,
-            dateOffset: 2,
-            time: { hour: 19 },
-            partySize: 6,
-            status: 'confirmed',
-            specialRequest: 'Bữa tối gia đình, cần ghế trẻ em',
-            tags: ['family'],
-            createdBy: manager?.staffId,
-            confirmedAt: new Date(),
-        },
-        {
-            customer: customers[2]!,
-            table: tables[11]!,
-            dateOffset: 0,
-            time: { hour: 20, minute: 30 },
-            partySize: 8,
-            status: 'seated',
-            tags: ['vip'],
-            createdBy: manager?.staffId,
-            confirmedAt: new Date(),
-            seatedAt: new Date(),
-        },
-        {
-            customer: customers[3]!,
-            table: tables[2]!,
-            dateOffset: -1,
-            time: { hour: 12, minute: 30 },
-            partySize: 2,
-            status: 'completed',
-            notes: 'Khách hài lòng, tip cao',
-            createdBy: host?.staffId,
-            confirmedAt: new Date(),
-            seatedAt: new Date(),
-            completedAt: new Date(),
-        },
-        {
-            customer: customers[4]!,
-            table: tables[10]!,
-            dateOffset: 3,
-            time: { hour: 19, minute: 30 },
-            partySize: 10,
-            status: 'cancelled',
-            specialRequest: 'Tiệc doanh nghiệp',
-            tags: ['business'],
-            createdBy: manager?.staffId,
-            confirmedAt: new Date(),
-            cancelledAt: new Date(),
-            cancellationReason: 'Khách hủy do thay đổi lịch',
-        },
-        {
-            customer: customers[1]!,
-            table: tables[3]!,
-            dateOffset: -2,
-            time: { hour: 18 },
-            partySize: 2,
-            status: 'no_show',
-            notes: 'Không liên lạc được khách',
-            tags: ['follow-up'],
-            createdBy: host?.staffId,
-            confirmedAt: new Date(),
-        },
-        {
-            customer: customers[0]!,
-            table: tables[7]!,
-            dateOffset: 5,
-            time: { hour: 21 },
-            partySize: 4,
-            status: 'confirmed',
-            tags: ['vip', 'anniversary'],
-            specialRequest: 'Trang trí hoa cho lễ kỷ niệm',
-            createdBy: manager?.staffId,
-            confirmedAt: new Date(),
-        },
-        {
-            customer: customers[2]!,
-            table: tables[8]!,
-            dateOffset: 4,
-            time: { hour: 17, minute: 30 },
-            partySize: 6,
-            status: 'pending',
-            depositAmount: 300000,
-            tags: ['team-dinner'],
-            createdBy: host?.staffId,
-        },
-        {
-            customer: customers[3]!,
-            table: tables[1]!,
-            dateOffset: 0,
-            time: { hour: 13 },
-            partySize: 3,
-            status: 'completed',
-            notes: 'Bữa trưa công sở',
-            createdBy: host?.staffId,
-            confirmedAt: new Date(),
-            seatedAt: new Date(),
-            completedAt: new Date(),
-        },
-        {
-            customer: customers[4]!,
-            table: tables[12]!,
-            dateOffset: 7,
-            time: { hour: 18 },
-            partySize: 12,
-            status: 'confirmed',
-            tags: ['vip', 'corporate'],
-            specialRequest: 'Cần máy chiếu mini',
-            createdBy: manager?.staffId,
-            confirmedAt: new Date(),
-        },
-    ];
+    // const reservationSeeds: Array<{
+    //     customer: Awaited<typeof customers>[number];
+    //     table: (typeof tables)[number];
+    //     dateOffset: number;
+    //     time: { hour: number; minute?: number };
+    //     partySize: number;
+    //     status: SeedStatus;
+    //     duration?: number;
+    //     specialRequest?: string;
+    //     depositAmount?: number;
+    //     notes?: string;
+    //     tags?: string[];
+    //     createdBy?: number;
+    //     confirmedAt?: Date;
+    //     seatedAt?: Date;
+    //     completedAt?: Date;
+    //     cancelledAt?: Date;
+    //     cancellationReason?: string;
+    // }> = [
+    //     {
+    //         customer: customers[0]!,
+    //         table: tables[0]!,
+    //         dateOffset: 1,
+    //         time: { hour: 18 },
+    //         partySize: 4,
+    //         status: 'pending',
+    //         specialRequest: 'Cần bàn gần cửa sổ',
+    //         tags: ['window'],
+    //         createdBy: host?.staffId,
+    //     },
+    //     {
+    //         customer: customers[1]!,
+    //         table: tables[5]!,
+    //         dateOffset: 2,
+    //         time: { hour: 19 },
+    //         partySize: 6,
+    //         status: 'confirmed',
+    //         specialRequest: 'Bữa tối gia đình, cần ghế trẻ em',
+    //         tags: ['family'],
+    //         createdBy: manager?.staffId,
+    //         confirmedAt: new Date(),
+    //     },
+    //     {
+    //         customer: customers[2]!,
+    //         table: tables[11]!,
+    //         dateOffset: 0,
+    //         time: { hour: 20, minute: 30 },
+    //         partySize: 8,
+    //         status: 'seated',
+    //         tags: ['vip'],
+    //         createdBy: manager?.staffId,
+    //         confirmedAt: new Date(),
+    //         seatedAt: new Date(),
+    //     },
+    //     {
+    //         customer: customers[3]!,
+    //         table: tables[2]!,
+    //         dateOffset: -1,
+    //         time: { hour: 12, minute: 30 },
+    //         partySize: 2,
+    //         status: 'completed',
+    //         notes: 'Khách hài lòng, tip cao',
+    //         createdBy: host?.staffId,
+    //         confirmedAt: new Date(),
+    //         seatedAt: new Date(),
+    //         completedAt: new Date(),
+    //     },
+    //     {
+    //         customer: customers[4]!,
+    //         table: tables[10]!,
+    //         dateOffset: 3,
+    //         time: { hour: 19, minute: 30 },
+    //         partySize: 10,
+    //         status: 'cancelled',
+    //         specialRequest: 'Tiệc doanh nghiệp',
+    //         tags: ['business'],
+    //         createdBy: manager?.staffId,
+    //         confirmedAt: new Date(),
+    //         cancelledAt: new Date(),
+    //         cancellationReason: 'Khách hủy do thay đổi lịch',
+    //     },
+    //     {
+    //         customer: customers[1]!,
+    //         table: tables[3]!,
+    //         dateOffset: -2,
+    //         time: { hour: 18 },
+    //         partySize: 2,
+    //         status: 'no_show',
+    //         notes: 'Không liên lạc được khách',
+    //         tags: ['follow-up'],
+    //         createdBy: host?.staffId,
+    //         confirmedAt: new Date(),
+    //     },
+    //     {
+    //         customer: customers[0]!,
+    //         table: tables[7]!,
+    //         dateOffset: 5,
+    //         time: { hour: 21 },
+    //         partySize: 4,
+    //         status: 'confirmed',
+    //         tags: ['vip', 'anniversary'],
+    //         specialRequest: 'Trang trí hoa cho lễ kỷ niệm',
+    //         createdBy: manager?.staffId,
+    //         confirmedAt: new Date(),
+    //     },
+    //     {
+    //         customer: customers[2]!,
+    //         table: tables[8]!,
+    //         dateOffset: 4,
+    //         time: { hour: 17, minute: 30 },
+    //         partySize: 6,
+    //         status: 'pending',
+    //         depositAmount: 300000,
+    //         tags: ['team-dinner'],
+    //         createdBy: host?.staffId,
+    //     },
+    //     {
+    //         customer: customers[3]!,
+    //         table: tables[1]!,
+    //         dateOffset: 0,
+    //         time: { hour: 13 },
+    //         partySize: 3,
+    //         status: 'completed',
+    //         notes: 'Bữa trưa công sở',
+    //         createdBy: host?.staffId,
+    //         confirmedAt: new Date(),
+    //         seatedAt: new Date(),
+    //         completedAt: new Date(),
+    //     },
+    //     {
+    //         customer: customers[4]!,
+    //         table: tables[12]!,
+    //         dateOffset: 7,
+    //         time: { hour: 18 },
+    //         partySize: 12,
+    //         status: 'confirmed',
+    //         tags: ['vip', 'corporate'],
+    //         specialRequest: 'Cần máy chiếu mini',
+    //         createdBy: manager?.staffId,
+    //         confirmedAt: new Date(),
+    //     },
+    // ];
 
-    for (const seed of reservationSeeds) {
-        await prisma.reservation.create({
-            data: {
-                customerName: seed.customer.name,
-                phoneNumber: seed.customer.phoneNumber,
-                email: seed.customer.email,
-                customerId: seed.customer.customerId,
-                tableId: seed.table.tableId,
-                reservationDate: daysFromNow(seed.dateOffset),
-                reservationTime: timeOfDay(
-                    seed.time.hour,
-                    seed.time.minute ?? 0,
-                ),
-                duration: seed.duration ?? 120,
-                partySize: seed.partySize,
-                specialRequest: seed.specialRequest,
-                depositAmount: seed.depositAmount,
-                status: seed.status,
-                notes: seed.notes,
-                tags: seed.tags ?? [],
-                createdBy: seed.createdBy,
-                confirmedAt: seed.confirmedAt,
-                seatedAt: seed.seatedAt,
-                completedAt: seed.completedAt,
-                cancelledAt: seed.cancelledAt,
-                cancellationReason: seed.cancellationReason,
-            },
-        });
-    }
+    // for (const seed of reservationSeeds) {
+    //     await prisma.reservation.create({
+    //         data: {
+    //             customerName: seed.customer.name,
+    //             phoneNumber: seed.customer.phoneNumber,
+    //             email: seed.customer.email,
+    //             customerId: seed.customer.customerId,
+    //             tableId: seed.table.tableId,
+    //             reservationDate: daysFromNow(seed.dateOffset),
+    //             reservationTime: timeOfDay(
+    //                 seed.time.hour,
+    //                 seed.time.minute ?? 0,
+    //             ),
+    //             duration: seed.duration ?? 120,
+    //             partySize: seed.partySize,
+    //             specialRequest: seed.specialRequest,
+    //             depositAmount: seed.depositAmount,
+    //             status: seed.status,
+    //             notes: seed.notes,
+    //             tags: seed.tags ?? [],
+    //             createdBy: seed.createdBy,
+    //             confirmedAt: seed.confirmedAt,
+    //             seatedAt: seed.seatedAt,
+    //             completedAt: seed.completedAt,
+    //             cancelledAt: seed.cancelledAt,
+    //             cancellationReason: seed.cancellationReason,
+    //         },
+    //     });
+    // }
 
     // ============================================
     // TẠO CÀI ĐẶT NHÀ HÀNG

@@ -389,9 +389,6 @@ docker image prune -f &> /dev/null || true
 log_info "Current disk usage:"
 df -h / | grep -v "Filesystem" | tee -a "$LOG_FILE"
 
-log_info "Docker disk usage:"
-docker system df | tee -a "$LOG_FILE"
-
 ################################################################################
 # Display Deployment Summary
 ################################################################################

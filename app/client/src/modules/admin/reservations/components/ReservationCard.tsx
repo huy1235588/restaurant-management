@@ -49,12 +49,12 @@ export function ReservationCard({
                             <span className="text-xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
                                 {reservation.reservationCode}
                             </span>
-                            {upcoming && (
+                            {/* {upcoming && (
                                 <span className="flex items-center gap-1 text-xs font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900 px-2.5 py-1 rounded-full">
                                     <Clock className="w-3 h-3" />
                                     {t('reservations.upcoming')}
                                 </span>
-                            )}
+                            )} */}
                         </div>
                         <p className="text-base font-medium text-gray-700 dark:text-gray-300">
                             {reservation.customer?.name}
