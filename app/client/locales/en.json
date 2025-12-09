@@ -1236,6 +1236,7 @@
             "pleaseSelectTable": "Please select a table",
             "pleaseAddItem": "Please add at least one item",
             "errorOccurred": "An error occurred",
+            "tablePreSelected": "Table has been automatically selected from your previous action",
             "keyboard": {
                 "title": "Keyboard Shortcuts - Create Order",
                 "description": "Available shortcuts when creating a new order",

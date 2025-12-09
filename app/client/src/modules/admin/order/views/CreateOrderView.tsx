@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -39,6 +39,7 @@ const STORAGE_KEY = 'order-draft';
 const STORAGE_DEBOUNCE_DELAY = 1000;
 export function CreateOrderView() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { t } = useTranslation();
     const [currentStep, setCurrentStep] = useState(1);
     const [cartItems, setCartItems] = useState<ShoppingCartItem[]>([]);
@@ -54,7 +55,11 @@ export function CreateOrderView() {
     ];
 
     // Step 1: Table Selection
-    const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
+    // Check for pre-selected table from URL query parameter
+    const preSelectedTableId = searchParams?.get('tableId');
+    const [selectedTableId, setSelectedTableId] = useState<number | null>(
+        preSelectedTableId ? parseInt(preSelectedTableId) : null
+    );
 
     // Step 2: Customer Information
     const customerForm = useForm({
@@ -120,14 +125,17 @@ export function CreateOrderView() {
             try {
                 const data = JSON.parse(draft);
                 setCurrentStep(data.step || 1);
-                setSelectedTableId(data.tableId || null);
+                // Only load table from draft if not pre-selected from URL
+                if (!preSelectedTableId) {
+                    setSelectedTableId(data.tableId || null);
+                }
                 setCartItems(data.cartItems || []);
                 customerForm.reset(data.customerInfo || {});
             } catch (e) {
                 console.error('Failed to load draft:', e);
             }
         }
-    }, []);
+    }, [preSelectedTableId]);
 
     // Save draft to localStorage with debouncing
     useEffect(() => {
@@ -354,7 +362,15 @@ export function CreateOrderView() {
                                     {t('orders.create.selectTableDesc')}
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="space-y-4">
+                                {preSelectedTableId && (
+                                    <Alert className="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800">
+                                        <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                        <AlertDescription className="text-blue-900 dark:text-blue-100">
+                                            {t('orders.create.tablePreSelected', 'Table has been automatically selected from your previous action')}
+                                        </AlertDescription>
+                                    </Alert>
+                                )}
                                 <TableSelector
                                     selectedTableId={selectedTableId}
                                     onSelect={setSelectedTableId}
