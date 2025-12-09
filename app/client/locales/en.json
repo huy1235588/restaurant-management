@@ -66,7 +66,8 @@
         "all": "All",
         "clear": "Clear",
         "details": "Details",
-        "complete": "Complete"
+        "complete": "Complete",
+        "viewAll": "View All"
     },
     "sidebar": {
         "overview": "Overview",
@@ -403,7 +404,7 @@
         "profitMarginLabel": "Profit Margin",
         "editMenuItem": "Edit Menu Item",
         "deleteMenuItem": "Delete Menu Item",
-        "deleteMenuItemConfirm": "Are you sure you want to delete \"{itemName}\"? This action cannot be undone.",
+        "deleteMenuItemConfirm": "Are you sure you want to delete \"{{itemName}}\"? This action cannot be undone.",
         "deleting": "Deleting...",
         "addMenuItem": "Add Menu Item",
         "sortBy": "Sort by",

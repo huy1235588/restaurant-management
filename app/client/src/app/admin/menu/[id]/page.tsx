@@ -131,10 +131,10 @@ export default function MenuItemDetailPage({
                         <Edit className="w-4 h-4 mr-2" />
                         {t('menu.edit')}
                     </Button>
-                    <Button variant="outline" onClick={handleDuplicate}>
+                    {/* <Button variant="outline" onClick={handleDuplicate}>
                         <Copy className="w-4 h-4 mr-2" />
                         {t('menu.duplicate')}
-                    </Button>
+                    </Button> */}
                     <Button variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
                         <Trash2 className="w-4 h-4 mr-2" />
                         {t('menu.delete')}

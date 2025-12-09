@@ -389,7 +389,7 @@ export default function MenuPage() {
                     <AlertDialogHeader>
                         <AlertDialogTitle>{t('menu.deleteMenuItem')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            {t('menu.deleteMenuItemConfirm', { itemName: selectedMenuItem?.itemName })}
+                            {t('menu.deleteMenuItemConfirm', { itemName: selectedMenuItem?.itemName || '' })}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

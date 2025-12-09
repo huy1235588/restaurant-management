@@ -115,7 +115,7 @@ export default function EditMenuItemPage({
                 
                 <div className="space-y-1">
                     <h1 className="text-3xl font-bold tracking-tight">
-                        {t('menu.actions.edit')}
+                        {t('menu.editDescription')}
                     </h1>
                     <p className="text-muted-foreground">
                         {t('menu.form.sections.basicInfo.description')}

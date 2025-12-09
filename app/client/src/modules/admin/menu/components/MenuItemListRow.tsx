@@ -120,12 +120,12 @@ export function MenuItemListRow({
                                 {t('common.edit')}
                             </DropdownMenuItem>
                         )}
-                        {onDuplicate && (
+                        {/* {onDuplicate && (
                             <DropdownMenuItem onClick={() => onDuplicate(item)}>
                                 <Copy className="w-4 h-4 mr-2" />
                                 {t('common.duplicate')}
                             </DropdownMenuItem>
-                        )}
+                        )} */}
                         {onDelete && (
                             <DropdownMenuItem
                                 onClick={() => onDelete(item)}

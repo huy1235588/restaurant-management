@@ -66,7 +66,8 @@
         "all": "Tất cả",
         "clear": "Xóa",
         "details": "Chi tiết",
-        "complete": "Hoàn thành"
+        "complete": "Hoàn thành",
+        "viewAll": "Xem tất cả"
     },
     "sidebar": {
         "overview": "Tổng quan",
@@ -403,7 +404,7 @@
         "profitMarginLabel": "Lợi nhuận",
         "editMenuItem": "Sửa món ăn",
         "deleteMenuItem": "Xóa món ăn",
-        "deleteMenuItemConfirm": "Bạn có chắc chắn muốn xóa \"{itemName}\"? Hành động này không thể hoàn tác.",
+        "deleteMenuItemConfirm": "Bạn có chắc chắn muốn xóa \"{{itemName}}\"? Hành động này không thể hoàn tác.",
         "deleting": "Đang xóa...",
         "addMenuItem": "Thêm món ăn",
         "sortBy": "Sắp xếp theo",
