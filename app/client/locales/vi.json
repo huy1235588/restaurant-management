@@ -1236,6 +1236,7 @@
             "pleaseSelectTable": "Vui lòng chọn bàn",
             "pleaseAddItem": "Vui lòng thêm ít nhất một món",
             "errorOccurred": "Đã xảy ra lỗi",
+            "tablePreSelected": "Bàn đã được tự động chọn từ thao tác trước đó",
             "keyboard": {
                 "title": "Phím tắt - Tạo đơn hàng",
                 "description": "Các phím tắt có sẵn khi tạo đơn hàng mới",
