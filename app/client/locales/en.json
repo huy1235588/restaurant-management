@@ -578,7 +578,8 @@
             "occupied": "Occupied",
             "reserved": "Reserved",
             "maintenance": "Maintenance",
-            "occupancyRate": "Occupancy Rate"
+            "occupancyRate": "Occupancy Rate",
+            "occupancyDesc": "{{occupied}} of {{total}} tables in use"
         },
         "selectedCount": "{{count}} tables selected",
         "noTablesSelected": "Please select at least one table",

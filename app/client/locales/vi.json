@@ -578,7 +578,8 @@
             "occupied": "Đang Sử Dụng",
             "reserved": "Đã Đặt",
             "maintenance": "Bảo Trì",
-            "occupancyRate": "Tỷ Lệ Sử Dụng"
+            "occupancyRate": "Tỷ Lệ Sử Dụng",
+            "occupancyDesc": "{{occupied}} trong tổng số {{total}} bàn đang sử dụng"
         },
         "selectedCount": "Đã chọn {{count}} bàn",
         "noTablesSelected": "Vui lòng chọn ít nhất một bàn",

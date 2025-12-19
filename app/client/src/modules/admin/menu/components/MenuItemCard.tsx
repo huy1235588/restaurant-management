@@ -43,9 +43,9 @@ export function MenuItemCard({
     };
 
     return (
-        <Card className="p-0 gap-6 overflow-hidden hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group cursor-pointer border-0 hover:border-primary/20">
+        <Card className="p-0 gap-2 overflow-hidden hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group cursor-pointer border-0 hover:border-primary/20">
             <div
-                className="relative aspect-4/3 bg-muted cursor-pointer"
+                className="relative aspect-7/4 bg-muted cursor-pointer"
                 onClick={() => onViewDetails(item)}
             >
                 {getImageUrl(item.imagePath) ? (
