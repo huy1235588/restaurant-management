@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '@/database/prisma.service';
+import { DateTimeService } from '@/shared/utils';
 import {
     ReportQueryDto,
     RevenueQueryDto,
@@ -25,8 +26,6 @@ import {
     PaymentMethod,
 } from '@/lib/prisma';
 import {
-    startOfDay,
-    endOfDay,
     subDays,
     format,
     startOfWeek,
@@ -40,19 +39,23 @@ import {
 export class ReportsService {
     private readonly logger = new Logger(ReportsService.name);
 
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly dateTimeService: DateTimeService,
+    ) {}
 
     /**
      * Get date range from query params or use default (today)
+     * Uses DateTimeService for timezone-aware date handling
      */
     private getDateRange(query: ReportQueryDto): DateRange {
         const now = new Date();
         const startDate = query.startDate
-            ? startOfDay(new Date(query.startDate))
-            : startOfDay(now);
+            ? this.dateTimeService.startOfDay(new Date(query.startDate))
+            : this.dateTimeService.startOfDay(now);
         const endDate = query.endDate
-            ? endOfDay(new Date(query.endDate))
-            : endOfDay(now);
+            ? this.dateTimeService.endOfDay(new Date(query.endDate))
+            : this.dateTimeService.endOfDay(now);
 
         return { startDate, endDate };
     }
@@ -216,11 +219,13 @@ export class ReportsService {
 
         // Use raw SQL for better aggregation performance
         // Note: We use Prisma.sql to safely construct the query with dynamic interval
+        // IMPORTANT: Convert to local timezone (Asia/Ho_Chi_Minh) before DATE_TRUNC
+        // This ensures that dates are grouped according to local time, not UTC
         const aggregatedData = await this.prisma.$queryRaw<
             Array<{ date: Date; revenue: bigint; orders: bigint }>
         >`
             SELECT 
-                DATE_TRUNC(${truncInterval}, "paidAt") as date,
+                DATE_TRUNC(${truncInterval}, "paidAt" AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Ho_Chi_Minh') as date,
                 COALESCE(SUM("totalAmount"), 0) as revenue,
                 COUNT(*) as orders
             FROM bills
