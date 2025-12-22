@@ -20,11 +20,13 @@ interface PaymentMethodChartProps {
     title?: string;
 }
 
-const COLORS = {
-    cash: '#22c55e', // green
-    card: '#3b82f6', // blue
-    momo: '#ec4899', // pink
-    bank_transfer: '#f59e0b', // amber
+const COLORS: Record<PaymentMethod, string> = {
+    // Use CSS custom properties so colors adapt to light/dark themes.
+    // Each entry provides a fallback hex if the CSS var is not defined.
+    cash: 'var(--payment-cash, #22c55e)', // green
+    card: 'var(--payment-card, #3b82f6)', // blue
+    momo: 'var(--payment-momo, #ec4899)', // pink
+    bank_transfer: 'var(--payment-bank-transfer, #f59e0b)', // amber
 };
 
 export function PaymentMethodChart({
@@ -88,10 +90,12 @@ export function PaymentMethodChart({
                             </Pie>
                             <Tooltip
                                 contentStyle={{
-                                    backgroundColor: '(var(--card)',
-                                    border: '1px solid (var(--border)',
+                                    backgroundColor: 'var(--card)',
+                                    border: '1px solid var(--border)',
                                     borderRadius: '8px',
                                 }}
+                                labelStyle={{ color: 'var(--muted-foreground)', fontWeight: 600 }}
+                                itemStyle={{ color: 'var(--muted-foreground)' }}
                                 formatter={(value: number) => [
                                     new Intl.NumberFormat('vi-VN', {
                                         style: 'currency',

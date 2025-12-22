@@ -51,7 +51,7 @@ export function calculateChange(paidAmount: number, totalAmount: number): number
 export function getPaymentMethodLabel(method: PaymentMethod): string {
     const labels: Record<PaymentMethod, string> = {
         cash: "billing.paymentMethods.cash",
-        transfer: "billing.paymentMethods.transfer",
+        bank_transfer: "billing.paymentMethods.bank_transfer",
     };
     return labels[method];
 }

@@ -793,7 +793,7 @@
         },
         "paymentMethods": {
             "cash": "Tiền mặt",
-            "transfer": "Chuyển khoản"
+            "bank_transfer": "Chuyển khoản"
         },
         "messages": {
             "billCreated": "Hóa đơn đã được tạo thành công",
@@ -1669,7 +1669,24 @@
             "card": "Thẻ",
             "momo": "MoMo",
             "bank_transfer": "Chuyển Khoản"
-        }
+        },
+        "cached": "Đã lưu",
+        "cachedAt": "Lưu lúc {{time}}"
+    },
+    "dateRangePicker": {
+        "today": "Hôm nay",
+        "yesterday": "Hôm qua",
+        "last7": "7 ngày qua",
+        "last14": "14 ngày qua",
+        "last30": "30 ngày qua",
+        "thisWeek": "Tuần này",
+        "lastWeek": "Tuần trước",
+        "thisMonth": "Tháng này",
+        "lastMonth": "Tháng trước",
+        "compare": "So sánh",
+        "cancel": "Hủy",
+        "update": "Cập nhật",
+        "selectPreset": "Chọn..."
     },
     "profile": {
         "title": "Hồ Sơ Cá Nhân",

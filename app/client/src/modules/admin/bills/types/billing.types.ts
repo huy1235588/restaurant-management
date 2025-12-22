@@ -2,7 +2,7 @@
 export type PaymentStatus = "pending" | "paid" | "refunded" | "cancelled";
 
 // Payment method enum - Chỉ hỗ trợ tiền mặt và chuyển khoản (có QR)
-export type PaymentMethod = "cash" | "transfer";
+export type PaymentMethod = "cash" | "bank_transfer";
 
 // Menu Item interface (minimal - full version in menu module)
 export interface MenuItem {

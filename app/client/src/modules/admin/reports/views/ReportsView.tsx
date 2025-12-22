@@ -2,7 +2,8 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { format, subDays } from 'date-fns';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { format, subDays, isValid, parseISO } from 'date-fns';
 import {
     DollarSign,
     ShoppingCart,
@@ -25,24 +26,57 @@ import {
     TopItemsChart,
     PaymentMethodChart,
     OrdersChart,
-    DateRangePicker,
+    // DateRangePicker,
     DashboardSkeleton,
     ExportButton,
 } from '../components';
 import { useDashboardReport, usePrefetchDashboard } from '../hooks';
-import { DateRange } from '../types';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
 
 export function ReportsView() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const today = new Date();
 
-    const [dateRange, setDateRange] = useState<DateRange>({
-        startDate: format(subDays(today, 6), 'yyyy-MM-dd'),
-        endDate: format(today, 'yyyy-MM-dd'),
-        preset: 'week',
-    });
+    // Map i18n language to locale format
+    const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
+
+    // Initialize date range from URL or default to last 7 days
+    const getInitialDateRange = () => {
+        const startDateParam = searchParams.get('startDate');
+        const endDateParam = searchParams.get('endDate');
+
+        if (startDateParam && endDateParam) {
+            const startDate = parseISO(startDateParam);
+            const endDate = parseISO(endDateParam);
+
+            if (isValid(startDate) && isValid(endDate)) {
+                return {
+                    startDate: format(startDate, 'yyyy-MM-dd'),
+                    endDate: format(endDate, 'yyyy-MM-dd'),
+                };
+            }
+        }
+
+        return {
+            startDate: format(subDays(today, 6), 'yyyy-MM-dd'),
+            endDate: format(today, 'yyyy-MM-dd'),
+        };
+    };
+
+    const [dateRange, setDateRange] = useState(getInitialDateRange);
 
     const [forceRefresh, setForceRefresh] = useState(false);
+
+    // Update URL when date range changes
+    useEffect(() => {
+        const params = new URLSearchParams();
+        params.set('startDate', dateRange.startDate);
+        params.set('endDate', dateRange.endDate);
+
+        router.replace(`?${params.toString()}`, { scroll: false });
+    }, [dateRange, router]);
 
     const queryParams = useMemo(
         () => ({
@@ -145,7 +179,36 @@ export function ReportsView() {
                     </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                    <DateRangePicker value={dateRange} onChange={setDateRange} />
+                    <DateRangePicker
+                        initialDateFrom={parseISO(dateRange.startDate)}
+                        initialDateTo={parseISO(dateRange.endDate)}
+                        onUpdate={(values) => {
+                            if (values.range.from && values.range.to) {
+                                setDateRange({
+                                    startDate: format(values.range.from, 'yyyy-MM-dd'),
+                                    endDate: format(values.range.to, 'yyyy-MM-dd'),
+                                });
+                            }
+                        }}
+                        align="center"
+                        locale={locale}
+                        showCompare={false}
+                        translations={{
+                            today: t('dateRangePicker.today'),
+                            yesterday: t('dateRangePicker.yesterday'),
+                            last7: t('dateRangePicker.last7'),
+                            last14: t('dateRangePicker.last14'),
+                            last30: t('dateRangePicker.last30'),
+                            thisWeek: t('dateRangePicker.thisWeek'),
+                            lastWeek: t('dateRangePicker.lastWeek'),
+                            thisMonth: t('dateRangePicker.thisMonth'),
+                            lastMonth: t('dateRangePicker.lastMonth'),
+                            compare: t('dateRangePicker.compare'),
+                            cancel: t('dateRangePicker.cancel'),
+                            update: t('dateRangePicker.update'),
+                            selectPreset: t('dateRangePicker.selectPreset'),
+                        }}
+                    />
                     <ExportButton
                         params={{
                             startDate: dateRange.startDate,
@@ -231,7 +294,7 @@ export function ReportsView() {
             />
 
             {/* Summary Stats */}
-            {orders?.summary && (
+            {/* {orders?.summary && (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <div className="rounded-lg border bg-card p-4">
                         <p className="text-sm text-muted-foreground">
@@ -266,7 +329,7 @@ export function ReportsView() {
                         </div>
                     )}
                 </div>
-            )}
+            )} */}
         </div>
     );
 }

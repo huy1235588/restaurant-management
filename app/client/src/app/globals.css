@@ -90,6 +90,18 @@
     --shadow-2xl: 0 1px 3px 0px #000000;
 
     --spacing: 0.25rem;
+
+    /* Payment method colors (used by charts) */
+    --payment-cash: #22c55e;
+    --payment-card: #3b82f6;
+    --payment-momo: #ec4899;
+    --payment-bank-transfer: #f59e0b;
+
+    /* Payment method colors for dark theme (tweaked for contrast) */
+    --payment-cash: #16a34a;
+    --payment-card: #2b7cd9;
+    --payment-momo: #db2777;
+    --payment-bank-transfer: #d97706;
 }
 
 .dark {

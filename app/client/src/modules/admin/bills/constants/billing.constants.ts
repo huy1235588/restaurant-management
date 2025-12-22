@@ -19,8 +19,8 @@ export const PAYMENT_METHODS: {
 }[] = [
     { value: "cash", labelKey: "billing.paymentMethods.cash", icon: "Banknote" },
     {
-        value: "transfer",
-        labelKey: "billing.paymentMethods.transfer",
+        value: "bank_transfer",
+        labelKey: "billing.paymentMethods.bank_transfer",
         icon: "QrCode",
     },
 ];

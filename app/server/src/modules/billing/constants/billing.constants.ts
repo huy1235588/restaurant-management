@@ -25,7 +25,7 @@ export const BILLING_CONSTANTS = {
     BILL_NUMBER_LENGTH: 8,
 
     // Payment methods - Chỉ hỗ trợ tiền mặt và chuyển khoản (có QR)
-    PAYMENT_METHODS: ['cash', 'transfer'] as const,
+    PAYMENT_METHODS: ['cash', 'bank_transfer'] as const,
 
     // Business rules
     MIN_PAYMENT_AMOUNT: 0,

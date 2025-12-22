@@ -91,7 +91,10 @@ export function TopItemsChart({ data, loading = false, title }: TopItemsChartPro
                                     backgroundColor: 'var(--card)',
                                     border: '1px solid var(--border)',
                                     borderRadius: '8px',
+                                    color: 'var(--foreground)',
                                 }}
+                                labelStyle={{ color: 'var(--muted-foreground)', fontWeight: 600 }}
+                                itemStyle={{ color: 'var(--foreground)' }}
                                 formatter={(value: number, name: string) => {
                                     if (name === 'quantity') {
                                         return [value, t('reports.quantitySold')];

@@ -50,6 +50,12 @@ const config: Config = {
                     DEFAULT: "hsl(var(--card))",
                     foreground: "hsl(var(--card-foreground))",
                 },
+                payment: {
+                    cash: "var(--payment-cash)",
+                    card: "var(--payment-card)",
+                    momo: "var(--payment-momo)",
+                    "bank-transfer": "var(--payment-bank-transfer)",
+                },
             },
             borderRadius: {
                 lg: "var(--radius)",

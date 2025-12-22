@@ -51,7 +51,7 @@ export const PrintableBill = forwardRef<HTMLDivElement, PrintableBillProps>(
             if (!method) return "";
             const methods: Record<string, string> = {
                 cash: "Tiền mặt",
-                transfer: "Chuyển khoản",
+                bank_transfer: "Chuyển khoản",
             };
             return methods[method] || method;
         };

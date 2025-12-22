@@ -793,7 +793,7 @@
         },
         "paymentMethods": {
             "cash": "Cash",
-            "transfer": "Bank Transfer"
+            "bank_transfer": "Bank Transfer"
         },
         "messages": {
             "billCreated": "Bill created successfully",
@@ -1669,7 +1669,24 @@
             "card": "Card",
             "momo": "MoMo",
             "bank_transfer": "Bank Transfer"
-        }
+        },
+        "cached": "Cached",
+        "cachedAt": "Cached at {{time}}"
+    },
+    "dateRangePicker": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "last7": "Last 7 days",
+        "last14": "Last 14 days",
+        "last30": "Last 30 days",
+        "thisWeek": "This Week",
+        "lastWeek": "Last Week",
+        "thisMonth": "This Month",
+        "lastMonth": "Last Month",
+        "compare": "Compare",
+        "cancel": "Cancel",
+        "update": "Update",
+        "selectPreset": "Select..."
     },
     "profile": {
         "title": "My Profile",

@@ -283,7 +283,7 @@ export function ProcessPaymentDialog({
                             </div>
                         )}
 
-                        {paymentMethod === "transfer" && (
+                        {paymentMethod === "bank_transfer" && (
                             <div className="space-y-4">
                                 {!settings?.bankConfig && (
                                     <div className="rounded-lg border-2 border-yellow-500/50 bg-yellow-50 dark:bg-yellow-900/20 p-3 flex items-start gap-2">
