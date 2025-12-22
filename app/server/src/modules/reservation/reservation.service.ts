@@ -402,7 +402,7 @@ export class ReservationService {
 
         const updated = await this.reservationRepository.update(id, {
             status: ReservationStatus.confirmed,
-            confirmedAt: new Date(),
+            confirmedAt: this.dateTimeService.nowUtc(),
         });
 
         await this.auditService.create(id, 'confirm', userId, {
@@ -453,7 +453,7 @@ export class ReservationService {
                 where: { reservationId: id },
                 data: {
                     status: ReservationStatus.seated,
-                    seatedAt: new Date(),
+                    seatedAt: this.dateTimeService.nowUtc(),
                 },
                 include: {
                     table: true,
@@ -538,7 +538,7 @@ export class ReservationService {
 
         const updated = await this.reservationRepository.update(id, {
             status: ReservationStatus.completed,
-            completedAt: new Date(),
+            completedAt: this.dateTimeService.nowUtc(),
         });
 
         await this.auditService.create(id, 'complete', userId, {
@@ -587,7 +587,7 @@ export class ReservationService {
 
         const updated = await this.reservationRepository.update(id, {
             status: ReservationStatus.cancelled,
-            cancelledAt: new Date(),
+            cancelledAt: this.dateTimeService.nowUtc(),
             cancellationReason: dto.reason,
         });
 
@@ -618,7 +618,7 @@ export class ReservationService {
 
         const updated = await this.reservationRepository.update(id, {
             status: ReservationStatus.no_show,
-            cancelledAt: new Date(),
+            cancelledAt: this.dateTimeService.nowUtc(),
         });
 
         await this.auditService.create(id, 'no_show', userId, {

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/database/prisma.service';
+import { DateTimeService } from '@/shared/utils';
 import { Prisma, Reservation, ReservationStatus } from '@/lib/prisma';
 
 export interface ReservationFilters {
@@ -22,7 +23,10 @@ export interface FindOptions {
 
 @Injectable()
 export class ReservationRepository {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly dateTimeService: DateTimeService,
+    ) {}
 
     private buildWhereClause(
         filters?: ReservationFilters,
@@ -36,16 +40,23 @@ export class ReservationRepository {
         }
 
         if (filters.date) {
-            where.reservationDate = new Date(filters.date);
+            // Parse the date and use it for exact date matching
+            where.reservationDate = this.dateTimeService.parseLocalDate(
+                filters.date,
+            );
         }
 
         if (filters.startDate || filters.endDate) {
             where.reservationDate = {};
             if (filters.startDate) {
-                where.reservationDate.gte = new Date(filters.startDate);
+                where.reservationDate.gte = this.dateTimeService.parseLocalDate(
+                    filters.startDate,
+                );
             }
             if (filters.endDate) {
-                where.reservationDate.lte = new Date(filters.endDate);
+                where.reservationDate.lte = this.dateTimeService.parseLocalDate(
+                    filters.endDate,
+                );
             }
         }
 

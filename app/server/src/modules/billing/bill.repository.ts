@@ -1,11 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/database/prisma.service';
-import {
-    Prisma,
-    Bill,
-    PaymentStatus,
-    PaymentMethod,
-} from '@/lib/prisma';
+import { DateTimeService } from '@/shared/utils';
+import { Prisma, Bill, PaymentStatus, PaymentMethod } from '@/lib/prisma';
 
 export interface BillFilters {
     paymentStatus?: PaymentStatus;
@@ -23,7 +19,10 @@ export interface FindOptions {
 
 @Injectable()
 export class BillRepository {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly dateTimeService: DateTimeService,
+    ) {}
 
     private buildWhereClause(filters?: BillFilters): Prisma.BillWhereInput {
         if (!filters) return {};
@@ -39,13 +38,14 @@ export class BillRepository {
         }
 
         if (filters.date) {
-            const startDate = new Date(filters.date);
-            const endDate = new Date(filters.date);
-            endDate.setDate(endDate.getDate() + 1);
+            // Use DateTimeService for timezone-aware date range
+            const date = new Date(filters.date);
+            const startDate = this.dateTimeService.startOfDay(date);
+            const endDate = this.dateTimeService.endOfDay(date);
 
             where.createdAt = {
                 gte: startDate,
-                lt: endDate,
+                lte: endDate,
             };
         }
 

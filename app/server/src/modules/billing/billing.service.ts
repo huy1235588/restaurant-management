@@ -8,6 +8,7 @@ import {
 import { BillRepository, FindOptions } from './bill.repository';
 import { PaymentRepository } from './payment.repository';
 import { PrismaService } from '@/database/prisma.service';
+import { DateTimeService } from '@/shared/utils';
 import { CreateBillDto, ApplyDiscountDto, ProcessPaymentDto } from './dto';
 import { PaymentStatus, OrderStatus, TableStatus } from '@/lib/prisma';
 import { ConfigService } from '@nestjs/config';
@@ -43,6 +44,7 @@ export class BillingService {
         private readonly paymentRepository: PaymentRepository,
         private readonly prisma: PrismaService,
         private readonly configService: ConfigService,
+        private readonly dateTimeService: DateTimeService,
         @Inject(forwardRef(() => ReportsCacheService))
         private readonly reportsCacheService: ReportsCacheService,
         private readonly kitchenRepository: KitchenRepository,
@@ -348,7 +350,7 @@ export class BillingService {
                     changeAmount,
                     paymentStatus: PaymentStatus.paid,
                     paymentMethod: paymentData.paymentMethod,
-                    paidAt: new Date(),
+                    paidAt: this.dateTimeService.nowUtc(),
                 },
                 include: {
                     order: true,
@@ -367,7 +369,7 @@ export class BillingService {
                 where: { orderId: bill.orderId },
                 data: {
                     status: OrderStatus.completed,
-                    completedAt: new Date(),
+                    completedAt: this.dateTimeService.nowUtc(),
                 },
             });
 

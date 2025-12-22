@@ -22,6 +22,7 @@ import {
     ApiParam,
 } from '@nestjs/swagger';
 import { OrderService } from './order.service';
+import { DateTimeService } from '@/shared/utils';
 import {
     CreateOrderDto,
     AddItemsDto,
@@ -45,7 +46,10 @@ import { ORDER_MESSAGES, ORDER_CONSTANTS } from './constants/order.constants';
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class OrderController {
-    constructor(private readonly orderService: OrderService) {}
+    constructor(
+        private readonly orderService: OrderService,
+        private readonly dateTimeService: DateTimeService,
+    ) {}
 
     @Get('count')
     @ApiOperation({
@@ -72,8 +76,12 @@ export class OrderController {
             status,
             tableId: tableId ? parseInt(tableId) : undefined,
             staffId: staffId ? parseInt(staffId) : undefined,
-            startDate: startDate ? new Date(startDate) : undefined,
-            endDate: endDate ? new Date(endDate) : undefined,
+            startDate: startDate
+                ? this.dateTimeService.startOfDay(new Date(startDate))
+                : undefined,
+            endDate: endDate
+                ? this.dateTimeService.endOfDay(new Date(endDate))
+                : undefined,
         });
 
         return {
@@ -133,8 +141,12 @@ export class OrderController {
                 status,
                 tableId: tableId ? parseInt(tableId) : undefined,
                 staffId: staffId ? parseInt(staffId) : undefined,
-                startDate: startDate ? new Date(startDate) : undefined,
-                endDate: endDate ? new Date(endDate) : undefined,
+                startDate: startDate
+                    ? this.dateTimeService.startOfDay(new Date(startDate))
+                    : undefined,
+                endDate: endDate
+                    ? this.dateTimeService.endOfDay(new Date(endDate))
+                    : undefined,
                 search,
             },
             pagination: {

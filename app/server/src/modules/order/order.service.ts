@@ -1,5 +1,6 @@
 import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { PrismaService } from '@/database/prisma.service';
+import { DateTimeService } from '@/shared/utils';
 import { OrderRepository, FindOrdersOptions } from './order.repository';
 import { OrderGateway } from './order.gateway';
 import { KitchenService } from '@/modules/kitchen/kitchen.service';
@@ -42,6 +43,7 @@ export class OrderService {
     constructor(
         private readonly orderRepository: OrderRepository,
         private readonly prisma: PrismaService,
+        private readonly dateTimeService: DateTimeService,
         private readonly orderGateway: OrderGateway,
         @Inject(forwardRef(() => KitchenService))
         private readonly kitchenService: KitchenService,
@@ -470,7 +472,7 @@ export class OrderService {
                 where: { orderId },
                 data: {
                     status: OrderStatus.cancelled,
-                    cancelledAt: new Date(),
+                    cancelledAt: this.dateTimeService.nowUtc(),
                     cancellationReason: data.reason,
                 },
                 include: {
@@ -530,9 +532,9 @@ export class OrderService {
 
         // Set timestamps based on status
         if (data.status === OrderStatus.confirmed) {
-            updateData.confirmedAt = new Date();
+            updateData.confirmedAt = this.dateTimeService.nowUtc();
         } else if (data.status === OrderStatus.completed) {
-            updateData.completedAt = new Date();
+            updateData.completedAt = this.dateTimeService.nowUtc();
         }
 
         const updatedOrder = await this.orderRepository.update(
