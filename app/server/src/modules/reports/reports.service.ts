@@ -219,11 +219,14 @@ export class ReportsService {
 
         // Use raw SQL for better aggregation performance
         // Note: We use Prisma.sql to safely construct the query with dynamic interval
+        // IMPORTANT: Use AT TIME ZONE to convert to local timezone before DATE_TRUNC
+        // This ensures dates are grouped correctly in the restaurant's local timezone
+        const timezone = this.dateTimeService.getTimezone();
         const aggregatedData = await this.prisma.$queryRaw<
             Array<{ date: Date; revenue: bigint; orders: bigint }>
         >`
             SELECT 
-                DATE_TRUNC(${truncInterval}, "paidAt") as date,
+                DATE_TRUNC(${truncInterval}, "paidAt" AT TIME ZONE 'UTC' AT TIME ZONE ${timezone}) as date,
                 COALESCE(SUM("totalAmount"), 0) as revenue,
                 COUNT(*) as orders
             FROM bills
