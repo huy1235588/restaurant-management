@@ -219,19 +219,17 @@ export class ReportsService {
 
         // Use raw SQL for better aggregation performance
         // Note: We use Prisma.sql to safely construct the query with dynamic interval
-        // IMPORTANT: Convert to local timezone (Asia/Ho_Chi_Minh) before DATE_TRUNC
-        // This ensures that dates are grouped according to local time, not UTC
         const aggregatedData = await this.prisma.$queryRaw<
             Array<{ date: Date; revenue: bigint; orders: bigint }>
         >`
             SELECT 
-                DATE_TRUNC(${truncInterval}, "paidAt" AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Ho_Chi_Minh') as date,
+                DATE_TRUNC(${truncInterval}, "paidAt") as date,
                 COALESCE(SUM("totalAmount"), 0) as revenue,
                 COUNT(*) as orders
             FROM bills
             WHERE "paymentStatus" = 'paid'
-                AND "paidAt" >= ${dateRange.startDate}
-                AND "paidAt" <= ${dateRange.endDate}
+                AND ("paidAt") >= ${dateRange.startDate}
+                AND ("paidAt") <= ${dateRange.endDate}
             GROUP BY date
             ORDER BY date
         `;

@@ -30,7 +30,7 @@ import {
     DashboardSkeleton,
     ExportButton,
 } from '../components';
-import { useDashboardReport, usePrefetchDashboard } from '../hooks';
+import { useDashboardReport } from '../hooks';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 
 export function ReportsView() {
@@ -94,22 +94,6 @@ export function ReportsView() {
         isFetching,
         refetch,
     } = useDashboardReport(queryParams);
-
-    // Prefetch common date ranges
-    const prefetch = usePrefetchDashboard();
-
-    useEffect(() => {
-        // Prefetch today's data
-        prefetch({
-            startDate: format(today, 'yyyy-MM-dd'),
-            endDate: format(today, 'yyyy-MM-dd'),
-        });
-        // Prefetch last 30 days
-        prefetch({
-            startDate: format(subDays(today, 29), 'yyyy-MM-dd'),
-            endDate: format(today, 'yyyy-MM-dd'),
-        });
-    }, [prefetch, today]);
 
     // Reset forceRefresh after fetch
     useEffect(() => {

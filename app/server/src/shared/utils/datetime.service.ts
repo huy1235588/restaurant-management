@@ -392,8 +392,17 @@ export class DateTimeService {
      * Get the end of a day for a given date in local timezone
      */
     endOfDay(date: Date): Date {
-        const start = this.startOfDay(date);
-        return new Date(start.getTime() + 24 * 60 * 60 * 1000 - 1);
+        // Get the date string in local timezone (YYYY-MM-DD)
+        const dateString = this.formatDate(date);
+
+        // Parse date parts
+        const [year, month, day] = dateString.split('-').map(Number);
+
+        // Create date at 23:59:59.999 using local time constructor
+        // This automatically handles timezone conversion
+        const result = new Date(year, month - 1, day, 23, 59, 59, 999);
+
+        return result;
     }
 
     /**
