@@ -548,9 +548,17 @@ export class ReportsService {
                 hourGroups.set(i, { count: 0, amount: 0 });
             }
 
+            // Get timezone for proper hour extraction
+            const timezone = this.dateTimeService.getTimezone();
+
             orders.forEach((order) => {
-                const hour = order.createdAt.getHours();
-                const existing = hourGroups.get(hour)!;
+                // Convert UTC time to local timezone before extracting hour
+                const localHour = new Date(
+                    order.createdAt.toLocaleString('en-US', {
+                        timeZone: timezone,
+                    }),
+                ).getHours();
+                const existing = hourGroups.get(localHour)!;
                 existing.count += 1;
                 existing.amount += Number(order.finalAmount);
             });
