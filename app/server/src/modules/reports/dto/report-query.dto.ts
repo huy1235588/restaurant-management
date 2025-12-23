@@ -17,6 +17,11 @@ export enum GroupBy {
     STATUS = 'status',
 }
 
+export enum ExportFormatType {
+    CSV = 'csv',
+    XLSX = 'xlsx',
+}
+
 export class ReportQueryDto {
     @ApiPropertyOptional({
         description: 'Start date for the report period (ISO 8601 format)',
@@ -33,6 +38,15 @@ export class ReportQueryDto {
     @IsOptional()
     @IsDateString()
     endDate?: string;
+
+    @ApiPropertyOptional({
+        description: 'Export format for file downloads',
+        enum: ExportFormatType,
+        default: ExportFormatType.CSV,
+    })
+    @IsOptional()
+    @IsEnum(ExportFormatType)
+    format?: ExportFormatType = ExportFormatType.CSV;
 }
 
 export class RevenueQueryDto extends ReportQueryDto {

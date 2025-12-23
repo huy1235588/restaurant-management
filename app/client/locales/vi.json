@@ -1664,6 +1664,7 @@
         "exportRevenue": "Xuất Báo Cáo Doanh Thu",
         "exportTopItems": "Xuất Món Bán Chạy",
         "exportOrders": "Xuất Danh Sách Đơn Hàng",
+        "selectReportType": "Chọn loại báo cáo",
         "paymentMethodLabels": {
             "cash": "Tiền Mặt",
             "card": "Thẻ",

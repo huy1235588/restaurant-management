@@ -2,12 +2,17 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Download, FileSpreadsheet, Loader2 } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useExportReport } from '../hooks';
@@ -24,13 +29,18 @@ interface ExportButtonProps {
 export function ExportButton({ params, disabled }: ExportButtonProps) {
     const { t } = useTranslation();
     const { exportReport } = useExportReport();
-    const [isExporting, setIsExporting] = useState<ExportType | null>(null);
+    const [isExporting, setIsExporting] = useState<string | null>(null);
 
-    const handleExport = async (type: ExportType) => {
+    const handleExport = async (type: ExportType, format: 'csv' | 'xlsx') => {
         try {
-            setIsExporting(type);
-            await exportReport(type, params);
-            toast.success(t('reports.exportSuccess'));
+            const exportKey = `${type}-${format}`;
+            setIsExporting(exportKey);
+            await exportReport(type, params, format);
+            toast.success(
+                t('reports.exportSuccess', {
+                    format: format.toUpperCase(),
+                })
+            );
         } catch (error) {
             console.error('Export failed:', error);
             toast.error(t('reports.exportError'));
@@ -57,19 +67,38 @@ export function ExportButton({ params, disabled }: ExportButtonProps) {
                     {t('reports.export')}
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-64">
+                <DropdownMenuLabel>{t('reports.selectReportType')}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
                 {exportOptions.map(({ type, label }) => (
-                    <DropdownMenuItem
-                        key={type}
-                        onClick={() => handleExport(type)}
-                        disabled={isExporting !== null}
-                    >
-                        <FileSpreadsheet className="mr-2 h-4 w-4" />
-                        {label}
-                        {isExporting === type && (
-                            <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                        )}
-                    </DropdownMenuItem>
+                    <DropdownMenuSub key={type}>
+                        <DropdownMenuSubTrigger disabled={isExporting !== null}>
+                            <FileSpreadsheet className="mr-2 h-4 w-4" />
+                            {label}
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent>
+                            <DropdownMenuItem
+                                onClick={() => handleExport(type, 'csv')}
+                                disabled={isExporting !== null}
+                            >
+                                <FileText className="mr-2 h-4 w-4" />
+                                CSV
+                                {isExporting === `${type}-csv` && (
+                                    <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                                )}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => handleExport(type, 'xlsx')}
+                                disabled={isExporting !== null}
+                            >
+                                <FileSpreadsheet className="mr-2 h-4 w-4" />
+                                Excel (XLSX)
+                                {isExporting === `${type}-xlsx` && (
+                                    <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                                )}
+                            </DropdownMenuItem>
+                        </DropdownMenuSubContent>
+                    </DropdownMenuSub>
                 ))}
             </DropdownMenuContent>
         </DropdownMenu>

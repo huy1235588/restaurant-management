@@ -1664,6 +1664,7 @@
         "exportRevenue": "Export Revenue",
         "exportTopItems": "Export Top Items",
         "exportOrders": "Export Orders",
+        "selectReportType": "Select Report Type",
         "paymentMethodLabels": {
             "cash": "Cash",
             "card": "Card",

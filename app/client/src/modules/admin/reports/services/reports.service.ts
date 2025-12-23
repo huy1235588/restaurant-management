@@ -84,23 +84,34 @@ export const reportsApi = {
     },
 
     /**
-     * Export report to CSV file
+     * Export report to CSV or Excel file - OPTIMIZED
+     * Supports streaming for better performance
      * Triggers browser file download
      */
-    exportReport: async (type: ExportType, params?: ReportQueryParams): Promise<void> => {
+    exportReport: async (
+        type: ExportType,
+        params?: ReportQueryParams,
+        format: 'csv' | 'xlsx' = 'csv'
+    ): Promise<void> => {
         const response = await axiosInstance.get(`/reports/export/${type}`, {
-            params,
+            params: { ...params, format },
             responseType: 'blob',
         });
 
+        // Determine MIME type based on format
+        const mimeType =
+            format === 'xlsx'
+                ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                : 'text/csv;charset=utf-8;';
+
         // Create download link
-        const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8;' });
+        const blob = new Blob([response.data], { type: mimeType });
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
 
         // Extract filename from Content-Disposition header or generate one
         const contentDisposition = response.headers['content-disposition'];
-        let filename = `report-${type}.csv`;
+        let filename = `report-${type}.${format}`;
         if (contentDisposition) {
             const filenameMatch = contentDisposition.match(/filename="(.+)"/);
             if (filenameMatch) {

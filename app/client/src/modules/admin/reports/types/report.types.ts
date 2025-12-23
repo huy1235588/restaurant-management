@@ -6,6 +6,8 @@ export type PaymentMethod = 'cash' | 'card' | 'momo' | 'bank_transfer';
 
 export type ExportType = 'revenue' | 'top-items' | 'orders';
 
+export type ExportFormat = 'csv' | 'xlsx';
+
 // Query params
 export interface ReportQueryParams {
     startDate?: string;

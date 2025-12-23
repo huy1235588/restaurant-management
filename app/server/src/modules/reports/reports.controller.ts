@@ -13,6 +13,7 @@ import {
     ApiResponse,
     ApiBearerAuth,
     ApiParam,
+    ApiQuery,
 } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { ReportsService } from './reports.service';
@@ -105,17 +106,24 @@ export class ReportsController {
     @Get('export/:type')
     @Roles('admin', 'manager')
     @ApiOperation({
-        summary: 'Export report to CSV',
-        description: 'Downloads a CSV file for the specified report type',
+        summary: 'Export report to CSV or Excel - OPTIMIZED',
+        description:
+            'Downloads a CSV or Excel file for the specified report type. Uses streaming for better performance with large datasets.',
     })
     @ApiParam({
         name: 'type',
         enum: ['revenue', 'top-items', 'orders'],
         description: 'Type of report to export',
     })
+    @ApiQuery({
+        name: 'format',
+        enum: ['csv', 'xlsx'],
+        required: false,
+        description: 'Export format (default: csv)',
+    })
     @ApiResponse({
         status: 200,
-        description: 'CSV file downloaded successfully',
+        description: 'File downloaded successfully',
     })
     @ApiResponse({
         status: 400,
@@ -134,22 +142,40 @@ export class ReportsController {
             );
         }
 
-        const { csv, filename } = await this.reportsExportService.generateCSV(
-            type as ExportType,
-            query,
-        );
+        // Get format from query (default to csv)
+        const format = query.format || 'csv';
+
+        // Validate format
+        const validFormats = ['csv', 'xlsx'];
+        if (!validFormats.includes(format)) {
+            throw new BadRequestException(
+                `Invalid format. Must be one of: ${validFormats.join(', ')}`,
+            );
+        }
+
+        // Generate export stream
+        const { stream, filename, contentType } =
+            await this.reportsExportService.generateExportStream(
+                type as ExportType,
+                query,
+                format as 'csv' | 'xlsx',
+            );
 
         // Set headers for file download
-        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+        res.setHeader('Content-Type', contentType);
         res.setHeader(
             'Content-Disposition',
             `attachment; filename="${filename}"`,
         );
-        res.setHeader('Content-Length', Buffer.byteLength(csv, 'utf-8'));
 
-        // Add BOM for Excel compatibility with UTF-8
-        const bom = '\uFEFF';
-        res.send(bom + csv);
+        // Add BOM for CSV Excel compatibility with UTF-8
+        if (format === 'csv') {
+            const bom = '\uFEFF';
+            res.write(bom);
+        }
+
+        // Pipe stream to response
+        stream.pipe(res);
     }
 
     @Get('overview')

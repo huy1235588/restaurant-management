@@ -63,12 +63,17 @@ export const usePrefetchDashboard = () => {
 };
 
 /**
- * Hook to export reports
+ * Hook to export reports - OPTIMIZED
+ * Supports CSV and Excel formats
  */
 export const useExportReport = () => {
     const exportReport = useCallback(
-        async (type: ExportType, params?: ReportQueryParams) => {
-            await reportsApi.exportReport(type, params);
+        async (
+            type: ExportType,
+            params?: ReportQueryParams,
+            format: 'csv' | 'xlsx' = 'csv'
+        ) => {
+            await reportsApi.exportReport(type, params, format);
         },
         []
     );
