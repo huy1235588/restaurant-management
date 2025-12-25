@@ -74,9 +74,21 @@ export function SettingsImageUpload({
         setUploading(true);
 
         try {
+            // Store old value to delete if upload succeeds
+            const oldImagePath = value;
+
             const result = await uploadApi.uploadSingle(file, 'settings');
-            // Save relative path to form (stored in DB)
+            
+            // Update form with new image path FIRST
             onChange(result.path);
+            
+            // Delete old image in background (don't block on this)
+            if (oldImagePath) {
+                uploadApi.deleteFile(oldImagePath).catch((err) => {
+                    console.warn('Failed to delete old image:', err);
+                    // Don't show error to user - file might already be deleted or be external
+                });
+            }
         } catch (err) {
             setError(
                 err instanceof Error 

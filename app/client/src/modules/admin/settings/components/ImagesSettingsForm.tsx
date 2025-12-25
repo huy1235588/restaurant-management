@@ -21,7 +21,7 @@ export function ImagesSettingsForm({ form }: ImagesSettingsFormProps) {
     return (
         <div className="space-y-8">
             {/* Logo */}
-            <FormField
+            {/* <FormField
                 control={form.control}
                 name="logoUrl"
                 render={({ field }) => (
@@ -39,7 +39,7 @@ export function ImagesSettingsForm({ form }: ImagesSettingsFormProps) {
                         <FormMessage />
                     </FormItem>
                 )}
-            />
+            /> */}
 
             {/* Hero Image */}
             <FormField

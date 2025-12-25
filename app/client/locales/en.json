@@ -1573,6 +1573,8 @@
         "deleteError": "Failed to delete staff",
         "deleteConfirmTitle": "Delete Staff?",
         "deleteConfirmDescription": "Are you sure you want to delete {{name}}? This action cannot be undone.",
+        "activate": "Activate",
+        "deactivate": "Deactivate",
         "activateSuccess": "Staff activated successfully",
         "deactivateSuccess": "Staff deactivated successfully",
         "noStaffFound": "No staff found",
@@ -1610,6 +1612,13 @@
         "changeRoleDescription": "Change role for {{name}}",
         "roleUpdateSuccess": "Role updated successfully",
         "roleUpdateError": "Failed to update role",
+        "roles": {
+            "admin": "Administrator",
+            "manager": "Manager",
+            "waiter": "Waiter",
+            "chef": "Chef",
+            "cashier": "Cashier"
+        },
         "address": "Address",
         "addressPlaceholder": "Enter address",
         "dateOfBirth": "Date of Birth",

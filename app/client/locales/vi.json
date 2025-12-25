@@ -1573,6 +1573,8 @@
         "deleteError": "Không thể xóa nhân viên",
         "deleteConfirmTitle": "Xóa Nhân Viên?",
         "deleteConfirmDescription": "Bạn có chắc chắn muốn xóa nhân viên {{name}}? Hành động này không thể hoàn tác.",
+        "activate": "Kích hoạt",
+        "deactivate": "Vô hiệu hóa",
         "activateSuccess": "Kích hoạt nhân viên thành công",
         "deactivateSuccess": "Vô hiệu hóa nhân viên thành công",
         "noStaffFound": "Không tìm thấy nhân viên",
@@ -1610,6 +1612,13 @@
         "changeRoleDescription": "Thay đổi vai trò cho nhân viên {{name}}",
         "roleUpdateSuccess": "Cập nhật vai trò thành công",
         "roleUpdateError": "Không thể cập nhật vai trò",
+        "roles": {
+            "admin": "Quản trị viên",
+            "manager": "Quản lý",
+            "waiter": "Phục vụ",
+            "chef": "Đầu bếp",
+            "cashier": "Thu ngân"
+        },
         "address": "Địa chỉ",
         "addressPlaceholder": "Nhập địa chỉ",
         "dateOfBirth": "Ngày sinh",

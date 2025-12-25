@@ -90,7 +90,8 @@ export function SettingsView() {
 
     const onSubmit = async (data: SettingsFormValues) => {
         try {
-            await updateSettings({
+            // Track old image paths to send to backend for deletion
+            const updateData = {
                 name: data.name,
                 tagline: data.tagline || undefined,
                 description: data.description || undefined,
@@ -107,7 +108,13 @@ export function SettingsView() {
                 socialLinks: data.socialLinks,
                 highlights: data.highlights,
                 bankConfig: data.bankConfig?.bankId ? data.bankConfig : undefined,
-            });
+                // Send old image paths for backend to delete
+                ...(settings?.logoUrl && data.logoUrl !== settings.logoUrl && { oldLogoUrl: settings.logoUrl }),
+                ...(settings?.heroImage && data.heroImage !== settings.heroImage && { oldHeroImage: settings.heroImage }),
+                ...(settings?.aboutImage && data.aboutImage !== settings.aboutImage && { oldAboutImage: settings.aboutImage }),
+            };
+
+            await updateSettings(updateData as any);
             toast.success(t('settings.saveSuccess'));
             refetch();
         } catch {

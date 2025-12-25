@@ -165,6 +165,37 @@ export class UpdateRestaurantSettingsDto {
     @MaxLength(500)
     logoUrl?: string;
 
+    // Old image paths for deletion when images are replaced
+    @ApiPropertyOptional({ 
+        example: 'settings/old-logo.png', 
+        maxLength: 500,
+        description: 'Old logo path to delete (used when replacing image)' 
+    })
+    @IsOptional()
+    @IsString()
+    @MaxLength(500)
+    oldLogoUrl?: string;
+
+    @ApiPropertyOptional({ 
+        example: 'settings/old-hero.jpg', 
+        maxLength: 500,
+        description: 'Old hero image path to delete (used when replacing image)' 
+    })
+    @IsOptional()
+    @IsString()
+    @MaxLength(500)
+    oldHeroImage?: string;
+
+    @ApiPropertyOptional({ 
+        example: 'settings/old-about.jpg', 
+        maxLength: 500,
+        description: 'Old about image path to delete (used when replacing image)' 
+    })
+    @IsOptional()
+    @IsString()
+    @MaxLength(500)
+    oldAboutImage?: string;
+
     @ApiPropertyOptional({ type: [OperatingHoursDto] })
     @IsOptional()
     @IsArray()

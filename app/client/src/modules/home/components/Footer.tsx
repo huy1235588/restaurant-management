@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { navSections } from "../config/restaurant.config";
 import { useScrollSpy } from "../hooks/useScrollSpy";
 import { useRestaurantSettingsContext } from "../context";
+import Image from "next/image";
 
 // TikTok icon component (not available in lucide-react)
 function TikTokIcon({ className }: { className?: string }) {
@@ -53,13 +54,20 @@ export function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
                     {/* Brand */}
                     <div className="space-y-4">
+                        <Image
+                            src={settings.logoUrl || "/images/logo/logo.png"}
+                            alt={settings.name || "Restaurant Logo"}
+                            width={40}
+                            height={40}
+                            className="inline-block mr-2 rounded-full object-cover"
+                        />
                         <h3 className="text-2xl font-bold text-primary">
                             {settings.name || t("home.hero.title")}
                         </h3>
                         <p className="text-muted-foreground">
                             {settings.description || t("home.hero.description")}
                         </p>
-                        
+
                         {/* Social Links */}
                         <div className="flex gap-3 pt-2">
                             {settings.socialLinks.map((social) => (

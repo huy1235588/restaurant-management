@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { RestaurantSettingsRepository } from './restaurant-settings.repository';
 import { UpdateRestaurantSettingsDto } from './dto';
+import { StorageService } from '@/modules/storage/storage.service';
 import { Prisma } from '@/lib/prisma';
 
 @Injectable()
@@ -9,6 +10,7 @@ export class RestaurantSettingsService {
 
     constructor(
         private readonly settingsRepository: RestaurantSettingsRepository,
+        private readonly storageService: StorageService,
     ) {}
 
     /**
@@ -23,8 +25,20 @@ export class RestaurantSettingsService {
     /**
      * Update restaurant settings
      * Creates settings if they don't exist
+     * Deletes old images from storage when images are updated
      */
     async updateSettings(dto: UpdateRestaurantSettingsDto) {
+        // Delete old images if they changed and new ones are different
+        if (dto.oldLogoUrl && dto.logoUrl !== dto.oldLogoUrl) {
+            this.deleteOldImage(dto.oldLogoUrl);
+        }
+        if (dto.oldHeroImage && dto.heroImage !== dto.oldHeroImage) {
+            this.deleteOldImage(dto.oldHeroImage);
+        }
+        if (dto.oldAboutImage && dto.aboutImage !== dto.oldAboutImage) {
+            this.deleteOldImage(dto.oldAboutImage);
+        }
+
         const settings = await this.settingsRepository.upsertSettings({
             name: dto.name,
             tagline: dto.tagline,
@@ -47,5 +61,20 @@ export class RestaurantSettingsService {
 
         this.logger.log('Restaurant settings updated successfully');
         return settings;
+    }
+
+    /**
+     * Delete old image from storage (background task)
+     * Logs errors but doesn't throw to avoid blocking updates
+     */
+    private deleteOldImage(imagePath: string) {
+        this.storageService.deleteFile(imagePath)
+            .catch((err) => {
+                this.logger.warn(
+                    `Failed to delete old image "${imagePath}":`,
+                    err.message
+                );
+                // Don't throw - file might already be deleted or be external
+            });
     }
 }

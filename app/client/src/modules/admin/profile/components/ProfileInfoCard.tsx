@@ -70,7 +70,7 @@ export function ProfileInfoCard({ profile }: ProfileInfoCardProps) {
                 {/* Profile Header */}
                 <div className="flex flex-col sm:flex-row items-center gap-4">
                     <Avatar className="h-20 w-20 ring-4 ring-primary/10">
-                        <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-xl font-semibold">
+                        <AvatarFallback className="bg-linear-to-br from-primary to-primary/80 text-primary-foreground text-xl font-semibold">
                             {getInitials(profile.fullName)}
                         </AvatarFallback>
                     </Avatar>

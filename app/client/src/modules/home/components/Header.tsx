@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { navSections } from "../config/restaurant.config";
 import { useScrollSpy } from "../hooks/useScrollSpy";
 import { useRestaurantSettingsContext } from "../context";
+import Image from "next/image";
 
 export function Header() {
     const { t, i18n } = useTranslation();
@@ -67,6 +68,13 @@ export function Header() {
                             onClick={() => handleNavClick("home")}
                             className="font-bold text-xl md:text-2xl text-primary hover:opacity-80 transition-opacity"
                         >
+                            <Image
+                                src={settings.logoUrl || "/images/logo/logo.png"}
+                                alt={settings.name || "Restaurant Logo"}
+                                width={40}
+                                height={40}
+                                className="inline-block mr-2 rounded-full object-cover"
+                            />
                             {settings.name || t("home.hero.title")}
                         </button>
 
