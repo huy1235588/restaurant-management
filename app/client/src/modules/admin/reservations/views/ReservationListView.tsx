@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useReservations } from '../hooks/useReservations';
-import { 
-    ReservationList, 
-    ReservationFilters, 
+import {
+    ReservationList,
+    ReservationFilters,
     GanttTimeline,
     ViewMode,
     DEFAULT_VIEW_MODE,
@@ -293,9 +293,6 @@ export function ReservationListView() {
                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-linear-to-br from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 rounded-xl flex items-center justify-center shadow-lg shrink-0">
-                                <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                            </div>
                             <div className="min-w-0">
                                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 tracking-tight truncate">
                                     {t('reservations.title')}
@@ -357,7 +354,7 @@ export function ReservationListView() {
                             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
                             <span className="hidden xl:inline">{isFullscreen ? t('common.exitFullscreen') : t('common.fullscreen')}</span>
                         </Button>
-                        
+
                         {/* View Toggle Buttons */}
                         <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
                             <Button

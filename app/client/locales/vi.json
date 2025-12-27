@@ -945,7 +945,8 @@
         "pagination": {
             "showing": "Hiển thị",
             "of": "trong",
-            "reservations": "đặt bàn"
+            "reservations": "đặt bàn",
+            "reservation": "đặt bàn"
         },
         "reservationStatus": {
             "pending": "Chờ xác nhận",

@@ -945,7 +945,8 @@
         "pagination": {
             "showing": "Showing",
             "of": "of",
-            "reservations": "reservations"
+            "reservations": "reservations",
+            "reservation": "reservation"
         },
         "reservationStatus": {
             "pending": "Pending",

@@ -1,6 +1,7 @@
 import { Reservation } from '../types';
 import { ReservationCard } from './ReservationCard';
 import { Loader2, CalendarX, Filter } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ReservationListProps {
     reservations: Reservation[];
@@ -21,6 +22,7 @@ export function ReservationList({
     onCheckIn,
     showActions = false,
 }: ReservationListProps) {
+    const { t } = useTranslation();
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-16">
@@ -71,7 +73,7 @@ export function ReservationList({
             {/* Results Header */}
             <div className="flex items-center justify-between px-1">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Showing <span className="font-bold text-gray-900 dark:text-gray-100">{reservations.length}</span> reservation{reservations.length !== 1 ? 's' : ''}
+                    {t('reservations.pagination.showing')} <span className="font-bold text-gray-900 dark:text-gray-100">{reservations.length}</span> {reservations.length === 1 ? t('reservations.pagination.reservation') : t('reservations.pagination.reservations')}
                 </p>
             </div>
 
