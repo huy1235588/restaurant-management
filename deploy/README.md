@@ -491,6 +491,14 @@ See [deploy/.env.example](./. env.example) for complete list.
 
 ## Troubleshooting
 
+### General Issues
+
+**🔧 [Migration Issues & Fixes](./MIGRATION_TROUBLESHOOTING.md)** - Complete guide for Prisma migration errors
+- P3015 error (empty migration folders)
+- Column does not exist errors
+- Schema drift issues
+- Migration workflow best practices
+
 ### Local Development
 
 **Docker services won't start:**
@@ -531,6 +539,9 @@ docker exec -it restaurant_postgres_dev psql -U restaurant_admin -d restaurant_d
 
 # Verify DATABASE_URL in .env
 ```
+
+**Migration errors (P3015, column not found):**
+See [MIGRATION_TROUBLESHOOTING.md](./MIGRATION_TROUBLESHOOTING.md) for detailed solutions.
 
 ---
 

@@ -92,6 +92,52 @@ else
 fi
 
 ################################################################################
+# Validate Migrations Directory
+################################################################################
+
+log_step "Validating migrations directory"
+
+# Check for empty migration folders that can cause P3015 error
+PRISMA_MIGRATIONS_DIR="$APP_DIR/app/server/prisma/migrations"
+
+if [ -d "$PRISMA_MIGRATIONS_DIR" ]; then
+    log_info "Checking for empty migration folders..."
+    
+    # Find and remove empty migration folders
+    EMPTY_FOLDERS=$(find "$PRISMA_MIGRATIONS_DIR" -mindepth 1 -maxdepth 1 -type d -empty 2>/dev/null || true)
+    
+    if [ -n "$EMPTY_FOLDERS" ]; then
+        log_warn "Found empty migration folders:"
+        echo "$EMPTY_FOLDERS" | while read -r folder; do
+            log_warn "  - $(basename "$folder")"
+            rm -rf "$folder"
+            log_info "  ✓ Removed empty folder: $(basename "$folder")"
+        done
+    else
+        log_info "✓ No empty migration folders found"
+    fi
+    
+    # Also check for migration folders without migration.sql
+    log_info "Checking for incomplete migration folders..."
+    
+    for dir in "$PRISMA_MIGRATIONS_DIR"/*/ ; do
+        if [ -d "$dir" ]; then
+            if [ ! -f "$dir/migration.sql" ]; then
+                FOLDER_NAME=$(basename "$dir")
+                log_warn "Found incomplete migration folder: $FOLDER_NAME"
+                log_warn "  - Missing migration.sql file"
+                rm -rf "$dir"
+                log_info "  ✓ Removed incomplete folder: $FOLDER_NAME"
+            fi
+        fi
+    done
+    
+    log_info "✓ Migrations directory validated"
+else
+    log_warn "Migrations directory not found at: $PRISMA_MIGRATIONS_DIR"
+fi
+
+################################################################################
 # Run Migrations
 ################################################################################
 
@@ -105,6 +151,16 @@ if docker exec \
     restaurant_server_prod \
     npx prisma migrate deploy --schema prisma/schema.prisma 2>&1 | tee -a "$LOG_FILE"; then
     log_info "✓ Database migrations completed successfully"
+    
+    # Regenerate Prisma Client to ensure it's in sync
+    log_info "Regenerating Prisma Client..."
+    if docker exec restaurant_server_prod \
+        npx prisma generate --schema prisma/schema.prisma 2>&1 | tee -a "$LOG_FILE"; then
+        log_info "✓ Prisma Client regenerated successfully"
+    else
+        log_warn "✗ Prisma Client regeneration failed (non-critical)"
+    fi
+    
     exit 0
 else
     log_error "✗ Database migrations failed"
@@ -117,6 +173,7 @@ else
     log_error "  - Database connection string is incorrect"
     log_error "  - Database is not accessible from container"
     log_error "  - Schema migration has syntax errors"
+    log_error "  - Empty or incomplete migration folders (check P3015 error)"
     log_error ""
     log_error "Check logs above and retry after fixing issues"
     
