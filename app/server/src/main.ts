@@ -34,8 +34,12 @@ async function bootstrap() {
     // Global prefix
     app.setGlobalPrefix(`api/${apiVersion}`);
 
-    // Security middleware
-    app.use(helmet());
+    // Security middleware with relaxed CORS policy for images/uploads
+    app.use(
+        helmet({
+            crossOriginResourcePolicy: { policy: 'cross-origin' },
+        }),
+    );
 
     // CORS - use array of origins or function to handle dynamic origins
     app.enableCors({
