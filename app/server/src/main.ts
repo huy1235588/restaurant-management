@@ -75,6 +75,27 @@ async function bootstrap() {
         next();
     });
 
+    // CORS middleware for static files (uploads)
+    app.use('/uploads', (request: Request, response: Response, next: NextFunction) => {
+        const origin = request.headers.origin;
+        const allowedOrigins = corsOrigins;
+
+        // Allow requests from configured origins
+        if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+            response.header('Access-Control-Allow-Origin', origin || '*');
+            response.header('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+            response.header('Access-Control-Allow-Headers', 'Content-Type, Range');
+            response.header('Access-Control-Expose-Headers', 'Content-Range, Content-Length');
+        }
+
+        // Handle preflight OPTIONS requests
+        if (request.method === 'OPTIONS') {
+            response.sendStatus(200);
+        } else {
+            next();
+        }
+    });
+
     // Static file serving for uploads
     app.useStaticAssets(join(__dirname, '..', 'uploads'), {
         prefix: '/uploads/',
