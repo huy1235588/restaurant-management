@@ -1,53 +1,58 @@
 # Caddyfile - Automatic HTTPS with Let's Encrypt
 # Replace yourdomain.com with your actual domain
 
-# 1. Cấu hình cho Frontend
-yourdomain.com {
-    # Nén dữ liệu [cite: 5]
-    encode gzip zstd
+# Configuration for your domain
+{ $DOMAIN:localhost } {
+    # Automatic HTTPS
+    # Caddy automatically obtains and renews SSL certificates from Let's Encrypt
     
-    # Proxy toàn bộ yêu cầu đến container client
-    handle {
-        reverse_proxy client:3000
-    }
-
-    # Giữ nguyên các header bảo mật của bạn [cite: 2, 3]
+    # Security headers
     header {
+        # Enable HSTS
         Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        
+        # Prevent MIME sniffing
         X-Content-Type-Options "nosniff"
+        
+        # Prevent clickjacking
         X-Frame-Options "SAMEORIGIN"
+        
+        # XSS Protection
+        X-XSS-Protection "1; mode=block"
+        
+        # Referrer Policy
         Referrer-Policy "strict-origin-when-cross-origin"
+        
+        # Permissions Policy
         Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+        
+        # Remove server header
         -Server
     }
-
-    log {
-        output file /var/log/caddy/frontend_access.log
-        format json [cite: 5]
-    }
-}
-
-# 2. Cấu hình cho Backend (API)
-api.yourdomain.com {
+    
+    # Gzip compression
     encode gzip zstd
-
-    # Proxy các route API và Socket.IO đến container server [cite: 4]
+    
+    # API routes - proxy to backend
     handle /api/* {
         reverse_proxy server:5000
     }
     
+    # Socket.IO - WebSocket proxy to backend
     handle /socket.io/* {
         reverse_proxy server:5000
     }
-
-    # Trả về 404 cho các route không xác định trên subdomain api
+    
+    # Static files and pages - proxy to frontend
     handle {
-        abort
+        reverse_proxy client:3000
     }
-
+    
+    # Logging
     log {
-        output file /var/log/caddy/backend_access.log
-        format json [cite: 5]
+        output file /var/log/caddy/access.log
+        format json
+        level INFO
     }
 }
 

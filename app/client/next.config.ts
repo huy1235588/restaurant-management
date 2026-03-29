@@ -1,5 +1,46 @@
 import type { NextConfig } from "next";
 
+const imageRemotePatterns = (process.env.NEXT_PUBLIC_IMAGE_DOMAINS || "")
+    .split(",")
+    .map((entry: string) => entry.trim())
+    .filter(Boolean)
+    .map((entry: string) => {
+        let value = entry;
+        if (!/^https?:\/\//i.test(value)) {
+            value = `https://${value}`;
+        }
+
+        try {
+            const parsed = new URL(value);
+            const isLocalhost = parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1";
+
+            return {
+                protocol: isLocalhost ? "http" : (parsed.protocol.replace(":", "") as "http" | "https"),
+                hostname: parsed.hostname,
+                port: parsed.port,
+                pathname: "/**",
+            };
+        } catch {
+            // Skip invalid domain entries to keep Next config resilient.
+            return null;
+        }
+    })
+    .filter(
+        (
+            pattern: {
+                protocol: "http" | "https";
+                hostname: string;
+                port: string;
+                pathname: string;
+            } | null
+        ): pattern is {
+            protocol: "http" | "https";
+            hostname: string;
+            port: string;
+            pathname: string;
+        } => pattern !== null
+    );
+
 const nextConfig: NextConfig = {
     /* config options here */
     // Use `standalone` output for production builds on non-Windows platforms
@@ -17,16 +58,7 @@ const nextConfig: NextConfig = {
     // Image optimization for Docker
     images: {
         unoptimized: process.env.NODE_ENV === "production",
-        remotePatterns: process.env.NEXT_PUBLIC_IMAGE_DOMAINS
-            ? process.env.NEXT_PUBLIC_IMAGE_DOMAINS.split(",").map(
-                  (domain) => ({
-                      protocol: "https",
-                      hostname: domain.trim(),
-                      port: "",
-                      pathname: "/**",
-                  })
-              )
-            : [],
+        remotePatterns: imageRemotePatterns,
     },
 
     // Mark packages that use Node.js APIs as external (moved from experimental in Next.js 16)
